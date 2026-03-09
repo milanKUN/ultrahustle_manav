@@ -20,7 +20,20 @@ class AuthController extends Controller
 {
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $payload = $request->all();
+
+        // Support common frontend naming.
+        if (! isset($payload['password_confirmation']) && isset($payload['confirmPassword'])) {
+            $payload['password_confirmation'] = $payload['confirmPassword'];
+        }
+        if (! isset($payload['fullName']) && isset($payload['full_name'])) {
+            $payload['fullName'] = $payload['full_name'];
+        }
+        if (! isset($payload['agreedToTerms']) && isset($payload['agreed_to_terms'])) {
+            $payload['agreedToTerms'] = $payload['agreed_to_terms'];
+        }
+
+        $validator = Validator::make($payload, [
             'fullName' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],

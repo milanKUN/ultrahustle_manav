@@ -42,10 +42,10 @@ return new class extends Migration
 
             $table->string('availability', 32)->nullable();
 
-            $table->json('hashtags')->default('[]');
-            $table->json('skills')->default('[]');
-            $table->json('tools')->default('[]');
-            $table->json('languages')->default('[]');
+            $table->json('hashtags')->nullable();
+            $table->json('skills')->nullable();
+            $table->json('tools')->nullable();
+            $table->json('languages')->nullable();
 
             $table->timestampsTz();
 

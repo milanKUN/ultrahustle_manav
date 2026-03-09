@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -19,6 +20,14 @@ class User extends Authenticatable
         static::creating(function (self $user): void {
             if (empty($user->uh_user_id)) {
                 $user->uh_user_id = self::generateUniqueUhUserId();
+            }
+
+            if (
+                empty($user->name)
+                && ! empty($user->full_name)
+                && Schema::hasColumn($user->getTable(), 'name')
+            ) {
+                $user->name = $user->full_name;
             }
         });
     }

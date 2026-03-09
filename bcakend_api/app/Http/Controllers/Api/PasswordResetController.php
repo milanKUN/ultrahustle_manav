@@ -25,9 +25,22 @@ class PasswordResetController extends Controller
 
         $email = strtolower(trim((string) $validator->validated()['email']));
 
-        $status = Password::sendResetLink([
-            'email' => $email,
-        ]);
+        try {
+            $status = Password::sendResetLink([
+                'email' => $email,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            Log::error('Forgot password failed to send reset link.', [
+                'email' => $this->maskEmail($email),
+                'exception' => class_basename($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            // For security, do not reveal whether the email exists.
+            return $this->successResponse('If this email exists, a reset link has been sent.');
+        }
 
         Log::info('Forgot password requested.', [
             'email' => $this->maskEmail($email),
