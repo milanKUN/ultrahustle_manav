@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class TeamController extends Controller
 {
@@ -78,7 +79,7 @@ class TeamController extends Controller
 
             report($e);
 
-            return $this->errorResponse('Failed to create team.', [], 500);
+            return $this->errorResponse('Failed to create team.', $this->exceptionPayload($e, $this->queryHint($e)), 500);
         }
     }
 
@@ -156,7 +157,7 @@ class TeamController extends Controller
 
             report($e);
 
-            return $this->errorResponse('Failed to update team.', [], 500);
+            return $this->errorResponse('Failed to update team.', $this->exceptionPayload($e, $this->queryHint($e)), 500);
         }
     }
 
@@ -194,7 +195,16 @@ class TeamController extends Controller
         }
 
         $filename = 'team_'.$team->id.'_'.now()->format('YmdHis').'_'.Str::random(8).'.'.$ext;
-        $path = $file->storeAs('uploads/team-avatars', $filename, 'public');
+
+        try {
+            $path = $file->storeAs('uploads/team-avatars', $filename, 'public');
+        } catch (Throwable $e) {
+            report($e);
+
+            return $this->errorResponse('Failed to upload avatar.', $this->exceptionPayload($e, [
+                'hint' => 'Storage write failed. Ensure storage/app/public is writable and run php artisan storage:link on the server.',
+            ]), 500);
+        }
 
         try {
             DB::transaction(function () use ($team, $path, $filename, $mime, $file): void {
@@ -206,11 +216,16 @@ class TeamController extends Controller
                     'avatar_updated_at' => now(),
                 ])->save();
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $disk->delete($path);
             report($e);
 
-            return $this->errorResponse('Failed to upload avatar.', [], 500);
+            $hint = [];
+            if ($e instanceof QueryException) {
+                $hint = $this->queryHint($e);
+            }
+
+            return $this->errorResponse('Failed to upload avatar.', $this->exceptionPayload($e, $hint), 500);
         }
 
         if ($oldPath && $oldPath !== $path) {
@@ -499,6 +514,42 @@ class TeamController extends Controller
         }
 
         return false;
+    }
+
+    private function queryHint(QueryException $e): array
+    {
+        $message = strtolower((string) $e->getMessage());
+
+        if (
+            str_contains($message, 'base table')
+            || str_contains($message, 'doesn\'t exist')
+            || str_contains($message, 'no such table')
+            || str_contains($message, 'unknown column')
+        ) {
+            return ['hint' => 'Database schema looks out of date. Run php artisan migrate --force on the server.'];
+        }
+
+        if (str_contains($message, 'foreign key constraint fails')) {
+            return ['hint' => 'Foreign key constraint failed. Ensure the authenticated user exists in the users table and migrations ran cleanly.'];
+        }
+
+        if (str_contains($message, "field 'id' doesn't have a default value")) {
+            return ['hint' => 'A table has an id column without AUTO_INCREMENT. Run php artisan mysql:fix-auto-increment-ids then rerun migrations.'];
+        }
+
+        return [];
+    }
+
+    private function exceptionPayload(Throwable $e, array $extra = []): array
+    {
+        if (config('app.debug')) {
+            return array_merge($extra, [
+                'exception' => class_basename($e),
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $extra;
     }
 
     private function successResponse(string $message, array $data = [], int $statusCode = 200): JsonResponse
