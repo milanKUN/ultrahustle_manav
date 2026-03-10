@@ -1,7 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../pages/DesktopEmailVerification.css';
-import desktopBg from '/desktop-bg.png';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "../pages/DesktopEmailVerification.css";
+import desktopBg from "/desktop-bg.png";
+import {
+    clearPendingVerificationEmail,
+    getPendingVerificationEmail,
+    resendOtp,
+    setCurrentUserEmail,
+    verifyOtp,
+} from "../api/authApi";
+import { setOnboardingCompleted } from "../../onboarding/onboardingState";
+import { extractOnboardingCompleted, getOnboardingStatus } from "../../onboarding/api/onboardingApi";
 
 const DesktopEmailVerification = () => {
     const navigate = useNavigate();
@@ -9,7 +18,14 @@ const DesktopEmailVerification = () => {
     const [timer, setTimer] = useState(30);
     const [step, setStep] = useState('input'); // input, success
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [email, setEmail] = useState('');
     const inputsRef = useRef([]);
+
+    useEffect(() => {
+        const pendingEmail = getPendingVerificationEmail();
+        setEmail(pendingEmail);
+    }, []);
 
     // Timer logic
     useEffect(() => {
@@ -44,26 +60,55 @@ const DesktopEmailVerification = () => {
         }
     };
 
-    const handleVerify = () => {
+    const handleVerify = async () => {
         const code = otp.join('');
         if (code.length !== 6) {
             setError('Please enter a valid 6-digit code');
             return;
         }
 
-        // Mock verification logic
-        if (code === '123456') { // Mock correct code
+        if (!email) {
+            setError('Missing email for verification. Please sign up again.');
+            return;
+        }
+
+        if (isSubmitting) return;
+
+        try {
+            setIsSubmitting(true);
+            setError('');
+
+            await verifyOtp({ email, otp: code });
+            clearPendingVerificationEmail();
             setStep('success');
-        } else {
-            setError('Incorrect code, please try again');
+        } catch (err) {
+            setError(err?.message || 'Incorrect code, please try again');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const handleResend = () => {
-        setTimer(30);
-        setOtp(['', '', '', '', '', '']);
-        setError('');
-        inputsRef.current[0].focus();
+    const handleResend = async () => {
+        if (!email) {
+            setError('Missing email for resend. Please sign up again.');
+            return;
+        }
+
+        if (isSubmitting) return;
+
+        try {
+            setIsSubmitting(true);
+            setError('');
+
+            await resendOtp({ email });
+            setTimer(30);
+            setOtp(['', '', '', '', '', '']);
+            inputsRef.current?.[0]?.focus?.();
+        } catch (err) {
+            setError(err?.message || 'Failed to resend code');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -84,7 +129,7 @@ const DesktopEmailVerification = () => {
                             <div className="verification-header">
                                 <h2>Email Verification</h2>
                                 <p className="verification-desc">
-                                    We sent a reset code to <strong>dev@gmail.com</strong><br />
+                                    We sent a reset code to <strong>{email || "your email"}</strong><br />
                                     Enter the 6 digit code below to activate your account
                                 </p>
                             </div>
@@ -104,22 +149,22 @@ const DesktopEmailVerification = () => {
                                 ))}
                             </div>
 
-                            <button className="desktop-login-btn primary-lime" onClick={handleVerify}>
+                            <button className="desktop-login-btn primary-lime" onClick={handleVerify} disabled={isSubmitting}>
                                 Verify & Continue
                             </button>
 
-                            {error && <p className="error-message-desktop">Incorrect code, please try again</p>}
+                            {error && <p className="error-message-desktop">{error}</p>}
 
                             <div className="resend-text-desktop">
                                 {error ? (
                                     <span className="resend-code-error">
-                                        <button className="resend-link-desktop" disabled={timer > 0} onClick={handleResend}>
+                                        <button className="resend-link-desktop" disabled={timer > 0 || isSubmitting} onClick={handleResend}>
                                             Resend Code
                                         </button> in {timer > 0 ? `${timer} seconds` : '0 seconds'}
                                     </span>
                                 ) : (
                                     <>
-                                        Haven't got the sms yet? <button className="resend-link-desktop" disabled={timer > 0} onClick={handleResend}>Resend Code</button>
+                                        Haven't got the sms yet? <button className="resend-link-desktop" disabled={timer > 0 || isSubmitting} onClick={handleResend}>Resend Code</button>
                                         {timer > 0 && <div className="timer-text">Resend Code in {timer} seconds</div>}
                                     </>
                                 )}
@@ -145,7 +190,20 @@ const DesktopEmailVerification = () => {
                                 You're good to go. Let's start building<br />
                                 something extraordinary.
                             </p>
-                            <button className="desktop-login-btn primary-lime" onClick={() => navigate('/create-team')}>
+                            <button
+                                className="desktop-login-btn primary-lime"
+                                onClick={async () => {
+                                    setCurrentUserEmail(email);
+                                    try {
+                                        const status = await getOnboardingStatus();
+                                        const completed = extractOnboardingCompleted(status);
+                                        if (completed) setOnboardingCompleted(email, true);
+                                        navigate(completed ? "/dashboard" : "/onboarding", { replace: true });
+                                    } catch {
+                                        navigate("/onboarding", { replace: true });
+                                    }
+                                }}
+                            >
                                 Continue
                             </button>
                         </div>

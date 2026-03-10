@@ -2260,7 +2260,6 @@ export default function Marketplace({ theme, setTheme }) {
                 />
 
                 <div className="mp-content-wrapper flex flex-1 relative z-10">
-                    {/* SIDEBAR */}
 
 
                     {/* MAIN CONTENT */}

@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../pages/DesktopLogin.css";
 import desktopBg from "/desktop-bg.png";
+import { getOAuthRedirectUrl, login, setCurrentUserEmail } from "../api/authApi";
+import { setOnboardingCompleted } from "../../onboarding/onboardingState";
+import { extractOnboardingCompleted, getOnboardingStatus } from "../../onboarding/api/onboardingApi";
 
 const DesktopLogin = () => {
   const navigate = useNavigate();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,16 +26,39 @@ const DesktopLogin = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError("");
 
-    // basic guard
-    if (!formData.email || !formData.password) return;
+    if (isSubmitting) return;
+    if (!formData.email || !formData.password) {
+      setSubmitError("Please enter email and password.");
+      return;
+    }
 
-    console.log("Login Form submitted:", formData);
+    try {
+      setIsSubmitting(true);
+      await login({ email: formData.email, password: formData.password });
+      setCurrentUserEmail(formData.email);
 
-    // Example: navigate after login
-    // navigate("/user-profile");
+      const status = await getOnboardingStatus();
+      const completed = extractOnboardingCompleted(status);
+      if (completed) setOnboardingCompleted(formData.email, true);
+
+      navigate(completed ? "/dashboard" : "/onboarding", { replace: true });
+    } catch (err) {
+      setSubmitError(err?.message || "Login failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = getOAuthRedirectUrl("google");
+  };
+
+  const handleFacebookLogin = () => {
+    window.location.href = getOAuthRedirectUrl("facebook");
   };
 
   return (
@@ -57,6 +86,12 @@ const DesktopLogin = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {submitError ? (
+              <p className="auth-submit-message" role="alert">
+                {submitError}
+              </p>
+            ) : null}
+
             {/* Email Field */}
             <div className="form-group">
               <label htmlFor="email">Email Address or phone number</label>
@@ -199,8 +234,8 @@ const DesktopLogin = () => {
             </div>
 
             {/* Login Button */}
-            <button type="submit" className="desktop-login-btn">
-              Login
+            <button type="submit" className="desktop-login-btn" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
             </button>
 
             {/* Divider */}
@@ -210,7 +245,12 @@ const DesktopLogin = () => {
 
             {/* Social Login Buttons */}
             <div className="desktop-social-buttons">
-              <button type="button" className="social-btn google-btn">
+              <button
+                type="button"
+                className="social-btn google-btn"
+                onClick={handleGoogleLogin}
+                disabled={isSubmitting}
+              >
                 <svg
                   width="18"
                   height="18"
@@ -237,7 +277,12 @@ const DesktopLogin = () => {
                 <span>Continue with Google</span>
               </button>
 
-              <button type="button" className="social-btn facebook-btn">
+              <button
+                type="button"
+                className="social-btn facebook-btn"
+                onClick={handleFacebookLogin}
+                disabled={isSubmitting}
+              >
                 <svg
                   width="18"
                   height="18"

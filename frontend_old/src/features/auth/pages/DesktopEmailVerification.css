@@ -1,0 +1,277 @@
+@import "./DesktopForgotPassword.css";
+/* inherit container styles */
+
+/* Desktop Email Verification Specific Styles */
+
+.email-verification-card {
+  /* Similar dimensions to forgot password */
+  height: 420px;
+  /* Increased min-height to accommodate all elements */
+  width: 481px;
+  padding-bottom: 80px;
+  /* Add padding for absolute positioned link */
+  margin-top: 100px;
+  position: relative;
+  /* Ensure specific positioning context */
+}
+
+.verification-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.verification-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2B2B2B;
+}
+
+.verification-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.verification-desc strong {
+  font-weight: 600;
+  color: #222;
+}
+
+/* OTP Inputs */
+.otp-container-desktop {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.otp-input-desktop {
+  width: 50px;
+  height: 60px;
+  border-radius: 12px;
+  border: 1px solid #fff;
+  background: rgba(255, 255, 255, 0.4);
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.otp-input-desktop:focus {
+  outline: none;
+  border-color: #CEFF1B;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 4px rgba(206, 255, 27, 0.2);
+}
+
+.otp-input-desktop.error {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.error-message-desktop {
+  color: #ff0000;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+/* Resend Text */
+.resend-text-desktop {
+  font-size: 11px;
+  color: #555;
+  text-align: center;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+
+.resend-link-desktop {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2B2B2B;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.resend-link-desktop:disabled {
+  color: #000000;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.timer-text {
+  display: block;
+  color: #666;
+  margin-top: 2px;
+}
+
+.resend-code-error {
+  color: #ff4b4b;
+}
+
+/* Adjust primary button */
+.primary-lime {
+  width: 100%;
+  margin-top: 0;
+}
+
+/* Back to Login Link Position */
+.back-to-login {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.back-to-login button {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 0 auto;
+}
+
+.back-to-login button:hover {
+  color: #000;
+}
+
+/* =========================
+   Email Verification FULL FIX
+   - Mobile center
+   - Mobile bg image remove
+   - Clean background
+   - Scroll safe
+========================= */
+
+/* Tablets / small laptops */
+@media (max-width: 768px) {
+
+  /* ✅ Remove BG image ONLY on mobile */
+  .desktop-login-bg {
+    display: none !important;
+  }
+
+  /* ✅ Clean background + center layout */
+  .desktop-login-container {
+    background: linear-gradient(135deg, #D9D9D9, #A6A6A6);
+
+    justify-content: center;
+    align-items: center;
+    padding: 18px 14px;
+    min-height: 100vh;
+  }
+
+  /* ✅ Center wrapper */
+  .desktop-login-content {
+    width: 100%;
+    margin-top: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .email-verification-card {
+    width: min(92vw, 451px);
+    height: auto;
+    min-height: 380px;
+
+    margin: 0 auto !important;
+
+    padding-bottom: 70px;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .otp-container-desktop {
+    gap: 10px;
+  }
+
+  .otp-input-desktop {
+    width: 46px;
+    height: 56px;
+    font-size: 22px;
+    border-radius: 12px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+
+  .email-verification-card {
+    width: 92vw;
+    padding: 18px 16px 70px 16px;
+    height: auto;
+    min-height: 340px;
+
+    max-height: 86vh;
+    overflow-y: auto;
+  }
+
+  .verification-header {
+    margin-bottom: 18px;
+  }
+
+  .verification-header h2 {
+    font-size: 18px;
+  }
+
+  .verification-desc {
+    font-size: 12px;
+  }
+
+  .otp-container-desktop {
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .otp-input-desktop {
+    width: 40px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  .primary-lime {
+    margin-top: 6px;
+  }
+
+  .back-to-login {
+    bottom: 8px;
+  }
+
+  .back-to-login button {
+    font-size: 12px;
+  }
+
+  .resend-text-desktop,
+  .resend-link-desktop {
+    font-size: 10.5px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+
+  .otp-input-desktop {
+    width: 34px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  .otp-container-desktop {
+    gap: 6px;
+  }
+}

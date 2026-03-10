@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../OnboardingSelect.css";
+import { getFreelancerOnboarding, saveFreelancerWorkType } from "../../api/onboardingApi";
 
 export default function WorkTypeSelectionForCreator() {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState(null);
   const [industry, setIndustry] = useState("");
   const [buildTeamPlan, setBuildTeamPlan] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Dropdown State
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
@@ -38,6 +40,29 @@ export default function WorkTypeSelectionForCreator() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+
+    (async () => {
+      try {
+        const res = await getFreelancerOnboarding();
+        const record = res?.data ?? res;
+        if (!record || !alive) return;
+
+        if (record.work_type) setSelectedType(record.work_type);
+        if (record.team_industry) setIndustry(record.team_industry);
+        if (record.team_build_plan) setBuildTeamPlan(record.team_build_plan);
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const currentStep = 2;
   const totalSteps = 7;
 
@@ -53,8 +78,21 @@ export default function WorkTypeSelectionForCreator() {
 
   const handleBack = () => navigate("/role-selection");
 
-  const handleContinue = () => {
-    if (selectedType) navigate("/creator-goals-selection");
+  const handleContinue = async () => {
+    if (!canContinue || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await saveFreelancerWorkType({
+        work_type: selectedType,
+        team_industry: selectedType === "team" ? industry : undefined,
+        team_build_plan: selectedType === "team" ? buildTeamPlan : undefined,
+      });
+      navigate("/creator-goals-selection");
+    } catch (e) {
+      console.error("Failed to save freelancer work type", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => navigate("/onboarding");

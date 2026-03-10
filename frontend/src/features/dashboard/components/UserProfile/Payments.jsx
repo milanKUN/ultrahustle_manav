@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Eye, EyeOff } from "lucide-react";
 import "../../../onboarding/components/OnboardingSelect.css";
 
-function Payments() {
+function Payments({ theme }) {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [expiryDate, setExpiryDate] = useState("");
   const [showCardNumber, setShowCardNumber] = useState(false);
@@ -181,14 +182,17 @@ function Payments() {
       </div>
 
       {/* ✅ Calendar OUTSIDE grid (best practice) */}
-      {openCalendar && (
-        <ExpiryCalendar
-          onClose={() => setOpenCalendar(false)}
-          onSelect={(value) => {
-            setExpiryDate(value);
-            setOpenCalendar(false);
-          }}
-        />
+      {openCalendar && createPortal(
+        <div className={`user-page ${theme || 'light'}`}>
+          <ExpiryCalendar
+            onClose={() => setOpenCalendar(false)}
+            onSelect={(value) => {
+              setExpiryDate(value);
+              setOpenCalendar(false);
+            }}
+          />
+        </div>,
+        document.body
       )}
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 mb-10">
@@ -403,7 +407,7 @@ function ExpiryCalendar({ onClose, onSelect }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center cursor-pointer"
+      className="fixed inset-0 z-[9999] bg-black/30 backdrop-blur-sm flex items-center justify-center cursor-pointer"
       onClick={onClose}
     >
       {/* OUTER CARD */}

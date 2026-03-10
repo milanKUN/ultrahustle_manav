@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../OnboardingSelect.css";
+import { getFreelancerOnboarding, saveFreelancerSkills } from "../../api/onboardingApi";
 import {
   Palette,
   Code,
@@ -20,6 +21,7 @@ export default function CreatorNeeds() {
   const [rateRange, setRateRange] = useState("");
   const [hasPortfolio, setHasPortfolio] = useState(null);
   const [portfolioLinks, setPortfolioLinks] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Dropdown
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
@@ -44,6 +46,30 @@ export default function CreatorNeeds() {
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await getFreelancerOnboarding();
+        const record = res?.data ?? res;
+        if (!record || !alive) return;
+
+        if (Array.isArray(record.categories)) setSelectedCategories(record.categories);
+        if (record.primary_skill) setPrimarySkill(record.primary_skill);
+        if (record.experience_level) setExperienceLevel(record.experience_level);
+        if (record.rate_range) setRateRange(record.rate_range);
+        if (record.has_portfolio) setHasPortfolio(record.has_portfolio);
+        if (record.portfolio_links) setPortfolioLinks(record.portfolio_links);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const currentStep = 4;
@@ -85,8 +111,24 @@ export default function CreatorNeeds() {
     hasPortfolio &&
     (hasPortfolio === "no" || (hasPortfolio === "yes" && portfolioLinks));
 
-  const handleContinue = () => {
-    if (isContinueEnabled) navigate("/creator-setup-workspace");
+  const handleContinue = async () => {
+    if (!isContinueEnabled || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await saveFreelancerSkills({
+        categories: selectedCategories,
+        primary_skill: primarySkill,
+        experience_level: experienceLevel,
+        rate_range: rateRange || undefined,
+        has_portfolio: hasPortfolio,
+        portfolio_links: hasPortfolio === "yes" ? portfolioLinks : undefined,
+      });
+      navigate("/creator-setup-workspace");
+    } catch (e) {
+      console.error("Failed to save freelancer skills", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => navigate("/onboarding");

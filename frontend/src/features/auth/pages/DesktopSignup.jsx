@@ -3,9 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "../pages/DesktopLogin.css";
 import "../pages/DesktopSignup.css";
 import desktopBg from "/desktop-bg.png";
+import { getOAuthRedirectUrl, register, setPendingVerificationEmail } from "../api/authApi";
 
 const DesktopSignup = () => {
   const navigate = useNavigate();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -93,10 +97,63 @@ const DesktopSignup = () => {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup Form submitted:", formData);
-    navigate("/desktop-email-verification");
+    setSubmitError("");
+
+    if (isSubmitting) return;
+
+    if (!formData.fullName || !formData.email || !formData.password) {
+      setSubmitError("Please fill in all required fields.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setSubmitError("Passwords do not match.");
+      return;
+    }
+
+    if ((formData.password || "").length < 8) {
+      setSubmitError("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (!formData.role) {
+      setSubmitError("Please select an option.");
+      return;
+    }
+
+    if (!formData.agreedToTerms) {
+      setSubmitError("Please agree to Terms & Privacy Policy.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await register({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+        role: formData.role,
+        agreedToTerms: formData.agreedToTerms,
+      });
+
+      setPendingVerificationEmail(formData.email);
+      navigate("/desktop-email-verification");
+    } catch (err) {
+      setSubmitError(err?.message || "Signup failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignup = () => {
+    window.location.href = getOAuthRedirectUrl("google");
+  };
+
+  const handleFacebookSignup = () => {
+    window.location.href = getOAuthRedirectUrl("facebook");
   };
 
   return (
@@ -121,6 +178,12 @@ const DesktopSignup = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {submitError ? (
+              <p className="auth-submit-message" role="alert">
+                {submitError}
+              </p>
+            ) : null}
+
             {/* Full Name */}
             <div className="form-group">
               <label htmlFor="fullName">Full Name</label>
@@ -132,6 +195,7 @@ const DesktopSignup = () => {
                   placeholder="Full Name"
                   value={formData.fullName}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -147,6 +211,7 @@ const DesktopSignup = () => {
                   placeholder="Email address or phone number"
                   value={formData.email}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -164,6 +229,7 @@ const DesktopSignup = () => {
                   onChange={handleInputChange}
                   onFocus={() => setShowPasswordTooltip(true)}
                   onBlur={() => setShowPasswordTooltip(false)}
+                  required
                 />
                 <button
                   type="button"
@@ -219,6 +285,7 @@ const DesktopSignup = () => {
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
+                  required
                 />
                 <button
                   type="button"
@@ -291,8 +358,8 @@ const DesktopSignup = () => {
             </div>
 
             {/* Submit */}
-            <button type="submit" className="desktop-login-btn">
-              Sign up
+            <button type="submit" className="desktop-login-btn" disabled={isSubmitting}>
+              {isSubmitting ? "Signing up..." : "Sign up"}
             </button>
 
             <div className="desktop-divider">
@@ -301,7 +368,12 @@ const DesktopSignup = () => {
 
             {/* Social Buttons */}
             <div className="desktop-social-buttons">
-              <button type="button" className="social-btn google-btn">
+              <button
+                type="button"
+                className="social-btn google-btn"
+                onClick={handleGoogleSignup}
+                disabled={isSubmitting}
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -323,7 +395,12 @@ const DesktopSignup = () => {
                 <span>Continue with Google</span>
               </button>
 
-              <button type="button" className="social-btn facebook-btn">
+              <button
+                type="button"
+                className="social-btn facebook-btn"
+                onClick={handleFacebookSignup}
+                disabled={isSubmitting}
+              >
                 <svg width="18" height="18" viewBox="0 0 24 24">
                   <path
                     d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getFreelancerOnboarding, saveFreelancerGoals } from "../../api/onboardingApi";
 import {
   Briefcase,
   ShoppingBag,
@@ -14,6 +15,26 @@ import {
 export default function CreatorGoalsSelection() {
   const navigate = useNavigate();
   const [selectedGoals, setSelectedGoals] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await getFreelancerOnboarding();
+        const record = res?.data ?? res;
+        const goals = record?.goals || record?.selected_goals;
+        if (!alive) return;
+        if (Array.isArray(goals)) setSelectedGoals(goals);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const currentStep = 3;
   const totalSteps = 7;
@@ -49,8 +70,17 @@ export default function CreatorGoalsSelection() {
   const handleReset = () => navigate("/onboarding");
 
   const canContinue = selectedGoals.length > 0;
-  const handleContinue = () => {
-    if (canContinue) navigate("/creator-needs");
+  const handleContinue = async () => {
+    if (!canContinue || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await saveFreelancerGoals({ goals: selectedGoals });
+      navigate("/creator-needs");
+    } catch (e) {
+      console.error("Failed to save freelancer goals", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const MobileChip = ({ goal }) => {

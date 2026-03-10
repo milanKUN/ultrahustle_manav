@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import "../../../onboarding/components/OnboardingSelect.css";
+import {
+  getMyPersonalInfo,
+  putMyPersonalInfo,
+} from "../../api/personalInfoApi";
 
 export default function PersonalInformation() {
   const ABOUT_LIMIT = 700;
@@ -7,6 +11,35 @@ export default function PersonalInformation() {
   const Availability_LIMIT = 100;
   const TITLE_LIMIT = 40;
   const BIO_LIMIT = 160;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+
+  const [popup, setPopup] = useState({
+    open: false,
+    variant: "success", // success | error
+    title: "",
+    message: "",
+    showProgress: false,
+  });
+  const [popupAnimateIn, setPopupAnimateIn] = useState(false);
+  const [popupProgress, setPopupProgress] = useState(0);
+  const popupOkRef = useRef(null);
+  const popupAutoCloseRef = useRef(null);
+  const popupHideRef = useRef(null);
+
+  const lastLoadedRef = useRef(null);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [pincode, setPincode] = useState("");
 
   const [title, setTitle] = useState("");
   const [shortBio, setShortBio] = useState("");
@@ -35,6 +68,232 @@ export default function PersonalInformation() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const closePopup = () => {
+    if (popupAutoCloseRef.current) {
+      clearTimeout(popupAutoCloseRef.current);
+      popupAutoCloseRef.current = null;
+    }
+    if (popupHideRef.current) {
+      clearTimeout(popupHideRef.current);
+      popupHideRef.current = null;
+    }
+
+    setPopupAnimateIn(false);
+    popupHideRef.current = setTimeout(() => {
+      setPopup((p) => ({ ...p, open: false }));
+      setPopupProgress(0);
+      popupHideRef.current = null;
+    }, 200);
+  };
+
+  const openPopup = ({ variant, title, message, showProgress, autoCloseMs }) => {
+    const msg = String(message || "").trim();
+    if (!msg) return;
+
+    if (popupAutoCloseRef.current) {
+      clearTimeout(popupAutoCloseRef.current);
+      popupAutoCloseRef.current = null;
+    }
+    if (popupHideRef.current) {
+      clearTimeout(popupHideRef.current);
+      popupHideRef.current = null;
+    }
+
+    setPopupProgress(0);
+    setPopupAnimateIn(false);
+    setPopup({
+      open: true,
+      variant,
+      title,
+      message: msg,
+      showProgress: !!showProgress,
+    });
+
+    requestAnimationFrame(() => {
+      setPopupAnimateIn(true);
+      if (showProgress) {
+        requestAnimationFrame(() => setPopupProgress(100));
+      }
+      setTimeout(() => popupOkRef.current?.focus?.(), 0);
+    });
+
+    if (autoCloseMs) {
+      popupAutoCloseRef.current = setTimeout(() => {
+        closePopup();
+      }, autoCloseMs);
+    }
+  };
+
+  // Required helper: showSuccessPopup(message)
+  const showSuccessPopup = (message) => {
+    openPopup({
+      variant: "success",
+      title: "Save Changes",
+      message: message || "Your personal information has been successfully saved.",
+      showProgress: true,
+      autoCloseMs: 3000,
+    });
+  };
+
+  const showErrorPopup = (message) => {
+    openPopup({
+      variant: "error",
+      title: "Save Changes",
+      message: message || "Please fix the errors and try again.",
+      showProgress: false,
+      autoCloseMs: null,
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (popupAutoCloseRef.current) clearTimeout(popupAutoCloseRef.current);
+      if (popupHideRef.current) clearTimeout(popupHideRef.current);
+    };
+  }, []);
+
+  const toDisplayDate = (iso) => {
+    if (!iso || typeof iso !== "string") return "";
+    const trimmed = iso.trim();
+    const datePart = trimmed.length >= 10 ? trimmed.slice(0, 10) : trimmed;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return "";
+    const [y, mo, d] = datePart.split("-");
+    return `${d}-${mo}-${y}`;
+  };
+
+  const toIsoDate = (display) => {
+    if (!display || typeof display !== "string") return null;
+    const trimmed = display.trim();
+    const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(trimmed);
+    if (!match) return null;
+    const [, dd, mm, yyyy] = match;
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const normalizeAvailabilityForApi = (value) => {
+    const v = String(value || "").trim().toLowerCase();
+    if (v === "available") return "available";
+    if (v === "unavailable") return "unavailable";
+    if (v === "working on a project" || v === "working_on_a_project") return "working_on_a_project";
+    return null;
+  };
+
+  const normalizeAvailabilityForUi = (value) => {
+    const v = String(value || "").trim().toLowerCase();
+    if (v === "available") return "Available";
+    if (v === "unavailable") return "Unavailable";
+    if (v === "working_on_a_project" || v === "working on a project") return "Working On A Project";
+    return "";
+  };
+
+  const normalizeGenderForApi = (value) => {
+    const v = String(value || "").trim().toLowerCase();
+    if (v === "male") return "male";
+    if (v === "female") return "female";
+    if (v === "other" || v === "others") return "other";
+    return null;
+  };
+
+  const normalizeGenderForUi = (value) => {
+    const v = String(value || "").trim().toLowerCase();
+    if (v === "male") return "Male";
+    if (v === "female") return "Female";
+    if (v === "other" || v === "others") return "Others";
+    return "";
+  };
+
+  const normalizeStringArray = (value) => {
+    if (!value) return [];
+    if (Array.isArray(value)) {
+      return value
+        .map((x) => String(x || "").trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
+  const sanitizeTagArray = (value, { maxItems = 50, maxLen = 50 } = {}) => {
+    const arr = normalizeStringArray(value)
+      .map((x) => x.slice(0, maxLen))
+      .filter(Boolean);
+
+    const seen = new Set();
+    const out = [];
+    for (const item of arr) {
+      const key = item.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+      if (out.length >= maxItems) break;
+    }
+    return out;
+  };
+
+  const applyLoadedPersonalInfo = (info) => {
+    const normalized = info?.data || info;
+
+    setFirstName(normalized?.first_name ?? normalized?.firstName ?? "");
+    setLastName(normalized?.last_name ?? normalized?.lastName ?? "");
+    setUsername(normalized?.username ?? "");
+
+    setEmail(normalized?.contact_email ?? normalized?.email ?? "");
+
+    const phone = normalized?.phone_number ?? normalized?.phone ?? "";
+    setPhoneNumber(phone ? String(phone) : "");
+
+    setDob(toDisplayDate(normalized?.date_of_birth || normalized?.dob || ""));
+    setGender(normalizeGenderForUi(normalized?.gender));
+
+    setStreet(normalized?.street ?? "");
+    setCity(normalized?.city ?? "");
+    setCountry(normalized?.country ?? "");
+    setStateVal(normalized?.state ?? normalized?.stateVal ?? "");
+    setPincode(normalized?.pincode ?? "");
+
+    setTitle(normalized?.title ?? "");
+    setShortBio(normalized?.short_bio ?? normalized?.shortBio ?? "");
+    setAbout(normalized?.about ?? "");
+    setAvailability(normalizeAvailabilityForUi(normalized?.availability));
+
+    const loadedHashtags = normalizeStringArray(normalized?.hashtags ?? normalized?.hashtag);
+    const loadedSkills = normalizeStringArray(normalized?.skills);
+    const loadedTools = normalizeStringArray(normalized?.tools);
+    const loadedLanguages = normalizeStringArray(normalized?.languages);
+
+    if (loadedHashtags.length > 0) setHashtag(loadedHashtags);
+    if (loadedSkills.length > 0) setSkills(loadedSkills);
+    if (loadedTools.length > 0) setTools(loadedTools);
+    if (loadedLanguages.length > 0) setLanguages(loadedLanguages);
+
+    setHashtagDraft("");
+    setSkillsDraft("");
+    setToolsDraft("");
+  };
+
+  const loadPersonalInfo = async () => {
+    setIsLoading(true);
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    try {
+      const info = await getMyPersonalInfo();
+      lastLoadedRef.current = info;
+      applyLoadedPersonalInfo(info);
+    } catch (err) {
+      // If backend returns 404 when no record exists yet, treat it as empty.
+      const message = err?.message || "Failed to load personal info.";
+      setSubmitError(message);
+      showErrorPopup(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPersonalInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const countryOptions = ["India", "United States"];
@@ -69,6 +328,7 @@ export default function PersonalInformation() {
     "Product Design",
     "Design Systems",
   ]);
+  const [hashtagDraft, setHashtagDraft] = useState("");
   const availabilityOptions = [
     "Available",
     "Unavailable",
@@ -81,6 +341,9 @@ export default function PersonalInformation() {
     "Photoshop",
     "Tailwind CSS",
   ]);
+  const [toolsDraft, setToolsDraft] = useState("");
+
+  const [skillsDraft, setSkillsDraft] = useState("");
 
   const [languages, setLanguages] = useState([]);
 
@@ -89,16 +352,86 @@ export default function PersonalInformation() {
   /* ---------- TAG INPUT HANDLERS ---------- */
   const [focusedId, setFocusedId] = useState(null);
 
-  const handleAddTag = (e, list, setList) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      e.preventDefault();
-      setList([...list, e.target.value.trim()]);
-      e.target.value = "";
+  const removeTag = (index, list, setList) => {
+    setList(list.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async () => {
+    setSubmitError("");
+    setSubmitSuccess("");
+    setIsSaving(true);
+
+    const finalHashtags = sanitizeTagArray([
+      ...hashtag,
+      String(hashtagDraft || "").trim(),
+    ]);
+    const finalSkills = sanitizeTagArray([
+      ...skills,
+      String(skillsDraft || "").trim(),
+    ]);
+    const finalTools = sanitizeTagArray([
+      ...tools,
+      String(toolsDraft || "").trim(),
+    ]);
+    const finalLanguages = sanitizeTagArray(languages);
+
+    const payload = {
+      first_name: String(firstName || "").trim() || null,
+      last_name: String(lastName || "").trim() || null,
+      username: String(username || "").trim() || null,
+      date_of_birth: toIsoDate(dob),
+      contact_email: String(email || "").trim().toLowerCase() || null,
+      phone_country: "IN",
+      phone_country_code: "+91",
+      phone_number: String(phoneNumber || "").trim() || null,
+      gender: normalizeGenderForApi(gender),
+      street: String(street || "").trim() || null,
+      city: String(city || "").trim() || null,
+      state: String(stateVal || "").trim() || null,
+      country: String(country || "").trim() || null,
+      pincode: String(pincode || "").trim() || null,
+      title: String(title || "").trim() || null,
+      short_bio: String(shortBio || "").trim() || null,
+      about: String(about || "").trim() || null,
+      availability: normalizeAvailabilityForApi(availability),
+      hashtags: finalHashtags,
+      skills: finalSkills,
+      tools: finalTools,
+      languages: finalLanguages,
+    };
+
+    try {
+      // Keep UI in sync with what we send
+      setHashtag(finalHashtags);
+      setSkills(finalSkills);
+      setTools(finalTools);
+      setHashtagDraft("");
+      setSkillsDraft("");
+      setToolsDraft("");
+
+      const res = await putMyPersonalInfo(payload);
+      lastLoadedRef.current = res;
+      setSubmitSuccess("Saved successfully.");
+      showSuccessPopup("Your personal information has been successfully saved.");
+    } catch (err) {
+      const msg = err?.message || "Save failed.";
+      setSubmitError(msg);
+      showErrorPopup(msg);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const removeTag = (index, list, setList) => {
-    setList(list.filter((_, i) => i !== index));
+  const handleDiscard = async () => {
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    if (lastLoadedRef.current) {
+      applyLoadedPersonalInfo(lastLoadedRef.current);
+      return;
+    }
+
+    await loadPersonalInfo();
   };
 
   return (
@@ -107,8 +440,8 @@ export default function PersonalInformation() {
         {/* ================= PERSONAL INFO ================= */}
         <Section title="Personal Information">
           <TwoCol>
-            <Input label="First Name" placeholder="First Name" />
-            <Input label="Last Name" placeholder="Last Name" />
+            <Input label="First Name" placeholder="First Name" value={firstName} onChange={setFirstName} />
+            <Input label="Last Name" placeholder="Last Name" value={lastName} onChange={setLastName} />
 
             {/* USERNAME */}
             <div>
@@ -121,6 +454,14 @@ export default function PersonalInformation() {
                 <input
                   type="text"
                   placeholder="username"
+                  value={username}
+                  onChange={(e) => {
+                    const next = String(e.target.value || "")
+                      .toLowerCase()
+                      .replace(/[^a-z0-9_]/g, "")
+                      .slice(0, 30);
+                    setUsername(next);
+                  }}
                   onFocus={() => setFocusedId("username")}
                   onBlur={() => setFocusedId(null)}
                   className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0"
@@ -165,7 +506,7 @@ export default function PersonalInformation() {
               </div>
             </div>
 
-            <Input label="Email Address" placeholder="example@gmail.com" />
+            <Input label="Email Address" placeholder="example@gmail.com" value={email} onChange={setEmail} type="email" />
 
             {/* PHONE */}
             <div>
@@ -182,7 +523,11 @@ export default function PersonalInformation() {
                   inputMode="numeric"
                   placeholder="XXXXXXXXXX"
                   maxLength={10}
-                  onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
+                  value={phoneNumber}
+                  onChange={(e) => {
+                    const next = String(e.target.value || "").replace(/[^0-9]/g, "");
+                    setPhoneNumber(next.slice(0, 10));
+                  }}
                   onFocus={() => setFocusedId("phone")}
                   onBlur={() => setFocusedId(null)}
                   className="flex-1 outline-none border-none bg-transparent text-sm pl-2 focus:outline-none focus:ring-0"
@@ -229,8 +574,8 @@ export default function PersonalInformation() {
         {/* ================= ADDRESS ================= */}
         <Section title="Address">
           <TwoCol>
-            <Input label="Street" placeholder="Street" />
-            <Input label="City" placeholder="City" />
+            <Input label="Street" placeholder="Street" value={street} onChange={setStreet} />
+            <Input label="City" placeholder="City" value={city} onChange={setCity} />
             {/* COUNTRY */}
             <div>
               <Label>Country</Label>
@@ -308,7 +653,11 @@ export default function PersonalInformation() {
                 inputMode="numeric"
                 placeholder="Pincode"
                 maxLength={6}
-                onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
+                value={pincode}
+                onChange={(e) => {
+                  const next = String(e.target.value || "").replace(/[^0-9]/g, "");
+                  setPincode(next.slice(0, 6));
+                }}
                 className="w-full bg-transparent border border-black rounded-md px-3 py-2 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
               />
             </div>
@@ -374,7 +723,8 @@ export default function PersonalInformation() {
             placeholder="Add hashtags"
             tags={hashtag}
             setTags={setHashtag}
-            onKeyDown={handleAddTag}
+            draft={hashtagDraft}
+            setDraft={setHashtagDraft}
             onRemove={removeTag}
           />
         </Section>
@@ -385,7 +735,8 @@ export default function PersonalInformation() {
             placeholder="Add skills"
             tags={skills}
             setTags={setSkills}
-            onKeyDown={handleAddTag}
+            draft={skillsDraft}
+            setDraft={setSkillsDraft}
             onRemove={removeTag}
           />
         </Section>
@@ -396,7 +747,8 @@ export default function PersonalInformation() {
             placeholder="Add tools"
             tags={tools}
             setTags={setTools}
-            onKeyDown={handleAddTag}
+            draft={toolsDraft}
+            setDraft={setToolsDraft}
             onRemove={removeTag}
           />
         </Section>
@@ -456,14 +808,35 @@ export default function PersonalInformation() {
 
         {/* ================= ACTIONS ================= */}
         <div className="flex justify-end gap-4 mt-10">
-          <button className="px-4 py-2 rounded-lg text-sm border border-black">
+          <button
+            className="px-4 py-2 rounded-lg text-sm border border-black"
+            onClick={handleDiscard}
+            disabled={isLoading || isSaving}
+          >
             Discard
           </button>
-          <button className="px-4 py-2 bg-[#CEFF1B] rounded-lg text-sm font-medium border border-black">
-            Save Changes
+          <button
+            className="px-4 py-2 bg-[#CEFF1B] rounded-lg text-sm font-medium border border-black"
+            onClick={handleSave}
+            disabled={isLoading || isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
+
+      <Toast
+        open={popup.open}
+        variant={popup.variant}
+        title={popup.title}
+        message={popup.message}
+        showProgress={popup.showProgress}
+        progress={popupProgress}
+        animateIn={popupAnimateIn}
+        okRef={popupOkRef}
+        onClose={closePopup}
+      />
+
       {/* ================= CALENDAR MODAL ================= */}
       {openCalendar && (
         <Calendar
@@ -475,6 +848,122 @@ export default function PersonalInformation() {
         />
       )}
     </>
+  );
+}
+
+function Toast({ open, variant, title, message, showProgress, progress, animateIn, okRef, onClose }) {
+  if (!open) return null;
+
+  const isSuccess = variant === "success";
+  const YELLOW = "#CEFF1B";
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") onClose?.();
+  };
+
+  return (
+    <div
+      className={`fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/25 backdrop-blur-sm transition-opacity duration-200 ${
+        animateIn ? "opacity-100" : "opacity-0"
+      }`}
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        className={`w-full max-w-md transform transition-all duration-200 ${
+          animateIn ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-white text-black border border-black/10 shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
+          {/* Top animated progress bar */}
+          {showProgress && (
+            <div className="h-[3px] w-full bg-black/10">
+              <div
+                className="h-full"
+                style={{
+                  width: `${progress}%`,
+                  backgroundColor: YELLOW,
+                  transition: "width 3000ms linear",
+                }}
+              />
+            </div>
+          )}
+
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-lg font-semibold leading-6">{title}</p>
+
+              <button
+                type="button"
+                className="h-9 w-9 rounded-xl border border-black/20 grid place-items-center hover:bg-black/5"
+                onClick={onClose}
+                aria-label="Close"
+                title="Close"
+              >
+                <span className="text-base leading-none">✕</span>
+              </button>
+            </div>
+
+            <div className="mt-5 flex items-start gap-4">
+              <div
+                className="h-12 w-12 rounded-full flex items-center justify-center border border-black"
+                style={{ backgroundColor: YELLOW }}
+                aria-hidden="true"
+              >
+                {isSuccess ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm leading-6 text-black/80">{message}</p>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    ref={okRef}
+                    className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-black"
+                    style={{ backgroundColor: YELLOW, color: "#000" }}
+                    onClick={onClose}
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -667,28 +1156,46 @@ function TwoCol({ children }) {
   );
 }
 
-function Input({ label, placeholder }) {
+function Input({ label, placeholder, value, onChange, type = "text" }) {
   return (
     <div>
       <Label>{label}</Label>
       <input
         // this is for the upper
+        type={type}
         placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
         className="w-full bg-transparent border border-black rounded-md px-3 py-2 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
       />
     </div>
   );
 }
 
-function TagInput({ placeholder, tags, setTags, onKeyDown, onRemove }) {
+function TagInput({ placeholder, tags, setTags, draft, setDraft, onRemove }) {
   const clearAll = () => setTags([]);
+
+  const addDraftToTags = () => {
+    const value = String(draft || "").trim();
+    if (!value) return;
+    setTags([...(tags || []), value]);
+    setDraft?.("");
+  };
 
   return (
     <div className="space-y-3">
       {/* INPUT */}
       <input
         placeholder={placeholder}
-        onKeyDown={(e) => onKeyDown(e, tags, setTags)}
+        value={draft}
+        onChange={(e) => setDraft?.(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            addDraftToTags();
+          }
+        }}
+        onBlur={() => addDraftToTags()}
         className="w-full bg-transparent border border-black rounded-md px-3 py-2 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
       />
 

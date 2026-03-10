@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import "./CreateServiceListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
-import Sidebar from "../../../components/layout/Sidebar";
+// import Sidebar from "../../../components/layout/Sidebar";
 import MyPortfolio from "../../dashboard/components/UserProfile/MyPortfolio";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
@@ -287,7 +287,7 @@ export default function CreateServiceListing({ theme, setTheme }) {
 
       <div className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}>
         {/* ✅ SIDEBAR */}
-        <Sidebar
+        {/* <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
           showSettings={showSettings}
@@ -296,7 +296,7 @@ export default function CreateServiceListing({ theme, setTheme }) {
           onSectionChange={handleSectionChange}
           theme={theme}
           setTheme={setTheme}
-        />
+        /> */}
 
         {/* ✅ MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-5 overflow-hidden">
@@ -470,7 +470,12 @@ export default function CreateServiceListing({ theme, setTheme }) {
                     </div>
 
                     <div className="sp-topRight">
-                      <span className={`sp-mode ${mode === "Solo" ? "active" : ""}`}>Solo</span>
+                      <span
+                        className={`sp-mode cursor-pointer ${mode === "Solo" ? "active" : ""}`}
+                        onClick={() => setMode("Solo")}
+                      >
+                        Solo
+                      </span>
                       <label className="sp-switch">
                         <input
                           type="checkbox"
@@ -479,7 +484,12 @@ export default function CreateServiceListing({ theme, setTheme }) {
                         />
                         <span className="sp-slider" />
                       </label>
-                      <span className={`sp-mode ${mode === "Team" ? "active" : ""}`}>Team</span>
+                      <span
+                        className={`sp-mode cursor-pointer ${mode === "Team" ? "active" : ""}`}
+                        onClick={() => setMode("Team")}
+                      >
+                        Team
+                      </span>
                     </div>
                   </div>
 
@@ -775,9 +785,24 @@ export default function CreateServiceListing({ theme, setTheme }) {
                   {addOns.length > 0 && (
                     <div className="am-addOnList">
                       {addOns.map((item, idx) => (
-                        <div key={idx} className="am-chip">
-                          {item.name} – ${item.price} – {item.days} days
-                          <button onClick={() => removeAddOn(idx)}>×</button>
+                        <div key={idx} className="am-item-row">
+                          <div className="am-item-chip">
+                            <span className="am-chip-lbl">Name:</span> {item.name}
+                          </div>
+                          <div className="am-item-chip">
+                            <span className="am-chip-lbl">Price:</span> ${item.price}
+                          </div>
+                          <div className="am-item-chip">
+                            <span className="am-chip-lbl">Duration:</span> {item.days} days
+                          </div>
+                          <button
+                            type="button"
+                            className="am-item-remove"
+                            onClick={() => setAddOns(addOns.filter((_, i) => i !== idx))}
+                            title="Remove add-on"
+                          >
+                            ×
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -815,7 +840,7 @@ export default function CreateServiceListing({ theme, setTheme }) {
 
                 {/* Portfolio Section */}
                 <div className="csl-portfolio-wrap">
-                  <MyPortfolio />
+                  < MyPortfolio theme={theme} />
                 </div>
 
                 {/* ================= FAQ ================= */}

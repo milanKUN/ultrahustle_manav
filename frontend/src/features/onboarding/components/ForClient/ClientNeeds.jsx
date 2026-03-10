@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../OnboardingSelect.css";
+import { getClientOnboarding, saveClientNeeds } from "../../api/onboardingApi";
 import {
   Palette,
   Code,
@@ -20,6 +21,7 @@ export default function ClientNeeds() {
   const [hiringForTeam, setHiringForTeam] = useState(null); // 'yes', 'no'
   const [businessName, setBusinessName] = useState("");
   const [role, setRole] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Dropdown State
   const [isRoleOpen, setIsRoleOpen] = useState(false);
@@ -34,6 +36,30 @@ export default function ClientNeeds() {
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await getClientOnboarding();
+        const record = res?.data ?? res;
+        if (!record || !alive) return;
+
+        if (Array.isArray(record.categories)) setSelectedCategories(record.categories);
+        if (record.avg_project_budget) setBudget(record.avg_project_budget);
+        if (record.expected_frequency) setFrequency(record.expected_frequency);
+        if (record.hiring_for_team) setHiringForTeam(record.hiring_for_team);
+        if (record.hiring_business_name) setBusinessName(record.hiring_business_name);
+        if (record.hiring_role) setRole(record.hiring_role);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const currentStep = 4;
@@ -82,8 +108,24 @@ export default function ClientNeeds() {
     hiringForTeam &&
     (hiringForTeam === "no" || (hiringForTeam === "yes" && businessName && role));
 
-  const handleContinue = () => {
-    if (isContinueEnabled) navigate("/client-business-details");
+  const handleContinue = async () => {
+    if (!isContinueEnabled || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await saveClientNeeds({
+        categories: selectedCategories,
+        avg_project_budget: budget,
+        expected_frequency: frequency,
+        hiring_for_team: hiringForTeam,
+        hiring_business_name: hiringForTeam === "yes" ? businessName : undefined,
+        hiring_role: hiringForTeam === "yes" ? role : undefined,
+      });
+      navigate("/client-business-details");
+    } catch (e) {
+      console.error("Failed to save client needs", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ✅ Mobile chip (screenshot-style)

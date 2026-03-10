@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getClientOnboarding, saveClientGoals } from "../../api/onboardingApi";
 import {
   Briefcase,
   ShoppingBag,
@@ -13,6 +14,26 @@ import {
 export default function GoalsSelection() {
   const navigate = useNavigate();
   const [selectedGoals, setSelectedGoals] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await getClientOnboarding();
+        const record = res?.data ?? res;
+        const goals = record?.goals || record?.selected_goals;
+        if (!alive) return;
+        if (Array.isArray(goals)) setSelectedGoals(goals);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const currentStep = 3;
   const totalSteps = 8;
@@ -49,8 +70,17 @@ export default function GoalsSelection() {
 
   const canContinue = selectedGoals.length > 0;
 
-  const handleContinue = () => {
-    if (canContinue) navigate("/client-needs");
+  const handleContinue = async () => {
+    if (!canContinue || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await saveClientGoals({ goals: selectedGoals });
+      navigate("/client-needs");
+    } catch (e) {
+      console.error("Failed to save client goals", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ✅ Bigger on iPad mini (701–949)

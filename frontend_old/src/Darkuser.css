@@ -1,0 +1,1117 @@
+/* Generic section headings */
+.user-page.dark h1,
+.user-page.dark h2,
+.user-page.dark h3 {
+  color: #ceff1b !important;
+}
+
+.user-page.dark h4 {
+  color: #FEFEFE !important;
+}
+
+/* Agar tum specific wrapper use karte ho (recommended) */
+.user-page.dark .section-title,
+.user-page.dark .content-title,
+.user-page.dark .profile-section-title {
+  color: #ceff1b !important;
+}
+
+/* Divider line – dark mode only */
+.user-page.dark .dark-divider,
+.user-page.dark div.h-px.bg-\[\#2B2B2B\] {
+  background-color: #fefefe !important;
+}
+
+/* ============================================================
+INPUT WRAPPER DIV – DARK MODE ONLY
+(inputs ke upar / around jo div hai)
+============================================================ */
+
+/* Common input wrapper cases */
+.user-page.dark .input-wrapper,
+.user-page.dark .field-wrapper,
+.user-page.dark .form-field,
+.user-page.dark .form-group {
+  border-color: #fefefe !important;
+}
+
+/* Direct Tailwind border-black cases */
+.user-page.dark .border-black {
+  border-color: #fefefe !important;
+}
+
+/* Username / phone / flex input containers */
+.user-page.dark div.border {
+  border-color: #fefefe !important;
+}
+
+/* FIX: Remove white border on click/focus in dark mode */
+.user-page.dark .border-black:focus,
+.user-page.dark .border-black:focus-within,
+.user-page.dark div.border:focus-within,
+.user-page.dark .input-wrapper:focus-within,
+.user-page.dark .field-wrapper:focus-within,
+.user-page.dark .form-field:focus-within,
+.user-page.dark .form-group:focus-within {
+  border-color: transparent !important;
+}
+
+/* Divider line above sections */
+.user-page.dark .dark-divider {
+  background-color: #fefefe !important;
+}
+
+/* ============================================================
+PROFILE CARD – DARK MODE ONLY
+============================================================ */
+
+.user-page.dark .profile-card {
+  background-color: #2b2b2b !important;
+  border-color: #ceff1b !important;
+}
+
+/* Avatar circle */
+.user-page.dark .profile-avatar {
+  background-color: #383838 !important;
+  border-color: #fefefe !important;
+}
+
+
+/* DARK MODE – CONNECT BUTTON TEXT BLACK */
+.user-page.dark button.bg-\[\#CEFF1B\] {
+  color: #000000 !important;
+}
+
+/* User name */
+.user-page.dark .profile-name {
+  color: #ffffff !important;
+}
+
+/* ============================================================
+DARK MODE – FORM ACTION BUTTONS (VISIBLE FIX)
+============================================================ */
+
+/* Common: button text black */
+.user-page.dark .flex.justify-end button {
+  color: #000000 !important;
+}
+
+/* DISCARD BUTTON (outline style, visible on dark bg) */
+.user-page.dark .flex.justify-end button:not(.bg-\[\#CEFF1B\]) {
+  background-color: transparent !important;
+  border: 1px solid #fefefe !important;
+  /* 👈 WHITE BORDER */
+  color: #fefefe !important;
+  /* 👈 WHITE TEXT */
+}
+
+/* SAVE / GREEN BUTTON */
+.user-page.dark .flex.justify-end button.bg-\[\#CEFF1B\] {
+  background-color: #ceff1b !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+/* ------------------------------------------------------------
+FORCE TAILWIND LIGHT OVERRIDES (IMPORTANT)
+------------------------------------------------------------ */
+.user-page.dark .bg-white,
+.user-page.dark .bg-gray-50,
+.user-page.dark .bg-gray-100,
+.user-page.dark .bg-gray-200,
+.user-page.dark .bg-gray-300 {
+  background-color: #0b0b0b !important;
+}
+
+.user-page.dark .text-black {
+  color: #ffffff !important;
+}
+
+.user-page.dark .border-gray-200,
+.user-page.dark .border-gray-300 {
+  border-color: rgba(206, 255, 27, 0.35) !important;
+}
+
+/* ============================================================
+SIDEBAR DARK MODE – EXACT COLORS
+============================================================ */
+
+/* ICON-ONLY SIDEBAR (LEFT RAIL) */
+.user-page.dark .sidebar-icon,
+.user-page.dark .icon-rail,
+.user-page.dark .sidebar-icons,
+.user-page.dark aside.icon-rail {
+  background-color: #1D1D1D !important;
+}
+
+/* MAIN SIDEBAR */
+.user-page.dark .sidebar,
+.user-page.dark .main-sidebar,
+.user-page.dark aside.sidebar {
+  background-color: #2b2b2b !important;
+  color: black;
+  border-radius: 0 14px 14px 0 !important;
+}
+
+/* SETTINGS / RIGHT SIDEBAR */
+.user-page.dark .settings-sidebar,
+.user-page.dark aside.settings {
+  background-color: #2b2b2b !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* SIDEBAR TEXT */
+.user-page.dark .sidebar span,
+.user-page.dark .sidebar button,
+.user-page.dark .sidebar svg {
+  color: #ffffff;
+}
+
+/* HOVER REMOVED FOR DARK MODE AS REQUESTED */
+
+/* ACTIVE */
+.user-page.dark .sidebar .active,
+.user-page.dark .sidebar-item-active {
+  background-color: #ceff1b;
+  color: #000000;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ------------------------------------------------------------
+THEME VARIABLES
+------------------------------------------------------------ */
+body.light {
+  --bg: #f3f3f3;
+  --card: #ffffff;
+  --card-soft: #f7f7f7;
+  --text: #111111;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #ceff1b;
+}
+
+/* 🔥 EXACT SCREENSHOT DARK */
+.user-page.dark {
+  --bg: #000000;
+  --card: #0b0b0b;
+  --card-soft: #141414;
+  --text: #ffffff;
+  --muted: #9ca3af;
+  --border: rgba(206, 255, 27, 0.35);
+  --accent: #ceff1b;
+}
+
+/* Light (default) */
+.user-page {
+  --bg: #ffffff;
+  background-color: var(--bg);
+  color: #000;
+}
+
+/* Dark ONLY for user page */
+.user-page.dark {
+  --bg: #0f0f0f;
+  background-color: var(--bg);
+  color: #fff;
+}
+
+/* ================= LIGHT ================= */
+.user-page.light {
+  --bg: #ffffff;
+  --card: #f7f7f7;
+  --text: #0f0f0f;
+  --border: #e5e7eb;
+}
+
+/* LIGHT MODE – USER PAGE */
+.user-page.light {
+  --bg: #F2F2F2;
+  background-color: var(--bg);
+  color: #0f0f0f;
+}
+
+
+/* ================= DARK ================= */
+.user-page.dark {
+  --bg: #0b0b0b;
+  --card: #141414;
+  --text: #e9eaf0;
+  --border: #2a2a2a;
+}
+
+/* COMMON */
+.user-page {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Example components */
+.user-page.dark .profile-card {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+/* ------------------------------------------------------------
+APPLY THEME GLOBALLY
+------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+APP WRAPPER
+------------------------------------------------------------ */
+.app {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------
+COMMON LAYOUT BLOCKS
+------------------------------------------------------------ */
+.sidebar,
+.header,
+.card,
+.content-box {
+  background: linear-gradient(180deg, var(--card) 0%, var(--card-soft) 100%);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+aside.sidebar {
+  border-radius: 0 14px 14px 0 !important;
+}
+
+
+
+
+input::placeholder {
+  color: var(--muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(206, 255, 27, 0.6);
+}
+
+/* Tailwind input helper */
+.input {
+  width: 100%;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* ================= FRIEND LIST MODAL (DARK) ================= */
+
+.user-page.dark .friend-modal {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.user-page.dark .friend-modal-card {
+  background: #0b0b0b;
+  border: 2px solid #CEFF1B !important;
+  box-shadow: 0 0 25px rgba(206, 255, 27, 0.4);
+}
+
+/* ---------- CLOSE BUTTON ---------- */
+.user-page.dark .friend-modal-card button {
+  color: #9ca3af;
+}
+
+/* ---------- TABS ---------- */
+.user-page.dark .friend-modal-card .tab-btn {
+  color: #e5e7eb;
+}
+
+.user-page.dark .friend-modal-card .tab-active {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* ---------- DIVIDER ---------- */
+.user-page.dark .friend-modal-card .divider {
+  background: #fefefe !important;
+}
+
+
+/* ---------- SEARCH ---------- */
+.user-page.dark .friend-modal-card input {
+  border: 1px solid #4b4b4b;
+  color: #fff;
+}
+
+.user-page.dark .friend-modal-card input::placeholder {
+  color: #b3b3b3;
+  text-align: center;
+}
+
+/* ---------- USER ROW ---------- */
+.user-page.dark .friend-modal-card .user-row span {
+  color: #e5e7eb;
+}
+
+/* ---------- AVATAR ---------- */
+.user-page.dark .friend-modal-card .avatar {
+  background: #d1d5db;
+}
+
+/* ---------- FOLLOWING BUTTON ---------- */
+.user-page.dark .friend-modal-card .btn-following {
+  background: #ceff1b;
+  color: #000;
+  font-weight: 500;
+}
+
+/* ---------- REMOVE BUTTON ---------- */
+.user-page.dark .friend-modal-card .btn-remove {
+  border: 1px solid #6b7280;
+  color: #e5e7eb;
+  background: transparent;
+}
+
+/* ---------- ADD BUTTON ---------- */
+.user-page.dark .friend-modal-card .btn-add {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* ---------- SCROLLBAR ---------- */
+.user-page.dark .custom-scroll::-webkit-scrollbar,
+.user-page.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-page.dark .custom-scroll::-webkit-scrollbar-track,
+.user-page.dark ::-webkit-scrollbar-track {
+  background: #0b0b0b;
+}
+
+.user-page.dark .custom-scroll::-webkit-scrollbar-thumb,
+.user-page.dark ::-webkit-scrollbar-thumb {
+  background: #ceff1b;
+  border-radius: 10px;
+  border: 2px solid #0b0b0b;
+}
+
+.user-page.dark {
+  scrollbar-width: thin;
+  scrollbar-color: #ceff1b #0b0b0b;
+}
+
+/* ================= IMAGE UPLOAD MODAL ================= */
+
+.user-page.dark .image-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- CARD ---------- */
+.user-page.dark .image-modal-card {
+  background: #0b0b0b;
+  border: 1px solid #ceff1b;
+  box-shadow: 0 0 50px rgba(206, 255, 27, 0.6), 0 20px 70px rgba(0, 0, 0, 0.8);
+}
+
+/* ---------- CLOSE BUTTON ---------- */
+.user-page.dark .close-btn {
+  background: #ff2e2e;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* ---------- TITLE ---------- */
+.user-page.dark .image-modal-card h3 {
+  color: #ffffff;
+}
+
+/* ---------- IMAGE PREVIEW ---------- */
+.user-page.dark .image-preview {
+  background: #5b5b5b;
+}
+
+/* ---------- SELECT IMAGE BUTTON ---------- */
+.user-page.dark .select-btn {
+  background: #1f1f1f;
+  color: #ffffff;
+  border: 1px solid #2a2a2a;
+}
+
+/* ---------- MAX SIZE TEXT ---------- */
+.user-page.dark .image-modal-card p {
+  color: #ff3b3b;
+}
+
+/* ---------- ZOOM BAR ---------- */
+.user-page.dark .zoom-bar input[type="range"] {
+  accent-color: #CEFF1B;
+}
+
+/* ---------- UPLOAD BUTTON ---------- */
+.user-page.dark .upload-btn {
+  background: #ceff1b;
+  color: #000;
+  font-weight: 600;
+}
+
+/* ================= IMAGE MODAL ================= */
+
+/* ---------- LIGHT MODE ---------- */
+.user-page.light .image-modal {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.user-page.light .image-modal-card {
+  background: #ffffff;
+  border: 2px solid #CEFF1B !important;
+  box-shadow: 0 0 40px rgba(206, 255, 27, 0.5), 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.user-page.light .image-preview {
+  background: #d1d5db;
+}
+
+.user-page.light .select-btn {
+  background: #ffffff;
+  color: #000;
+  border: 1px solid #d1d5db;
+}
+
+.user-page.light .upload-btn {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* ---------- DARK MODE ---------- */
+.user-page.dark .image-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.user-page.dark .image-modal-card {
+  background: #0b0b0b;
+  border: 1px solid #ceff1b;
+  box-shadow: 0 0 50px rgba(206, 255, 27, 0.6), 0 20px 70px rgba(0, 0, 0, 0.8);
+}
+
+.user-page.dark .image-preview {
+  background: #5b5b5b;
+}
+
+.user-page.dark .select-btn {
+  background: #1f1f1f;
+  color: #ffffff;
+  border: 1px solid #2a2a2a;
+}
+
+.user-page.dark .upload-btn {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* ================= FRIEND LIST MODAL ================= */
+
+/* ---------- LIGHT MODE ---------- */
+.user-page.light .friend-modal {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.user-page.light .friend-modal-card {
+  background: #f2f2f2;
+  color: #000;
+  border: 2px solid #CEFF1B !important;
+}
+
+.user-page.light .divider {
+  background: #000;
+}
+
+.user-page.light input {
+  background: transparent;
+  color: #000;
+}
+
+/* ---------- DARK MODE ---------- */
+.user-page.dark .friend-modal {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.user-page.dark .friend-modal-card {
+  background: #0b0b0b;
+  color: #ffffff;
+  border: 1px solid #2a2a2a;
+}
+
+.user-page.dark .divider {
+  background: #2a2a2a;
+}
+
+.user-page.dark .profile-section input,
+.user-page.dark .profile-section select,
+.user-page.dark .profile-section textarea {
+  background: #3a3a3a !important;
+  border: 1px solid #4b4b4b !important;
+  color: #fff !important;
+}
+
+/* ================= CALENDAR MODAL ================= */
+
+.user-page.dark .calendar-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- OUTER CARD ---------- */
+.user-page.light .calendar-outer,
+.user-page.dark .calendar-outer {
+  background: #ffffff;
+  border: 2px solid #ceff1b !important;
+  box-shadow: 0 0 35px rgba(206, 255, 27, 0.45) !important;
+  border-radius: 14px;
+}
+
+.user-page.dark .calendar-outer {
+  background: #0b0b0b;
+  box-shadow: 0 0 40px rgba(206, 255, 27, 0.6) !important;
+}
+
+/* ---------- INNER CARD ---------- */
+/* CALENDAR – INNER CARD (NEON BORDER) */
+.user-page.light .calendar-inner,
+.user-page.dark .calendar-inner {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- YEAR HEADER TITLE ---------- */
+.user-page.dark .calendar-year-title {
+  color: #000000 !important;
+}
+
+/* ---------- YEAR BUTTON ---------- */
+.user-page.dark .calendar-year-btn {
+  background: #ceff1b;
+  color: #000;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ---------- MONTH HEADER ---------- */
+.user-page.dark .calendar-month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 0 6px;
+}
+
+.user-page.dark .calendar-month-header span {
+  cursor: pointer;
+}
+
+/* ---------- WEEK DAYS ---------- */
+.user-page.dark .calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  color: #cfcfcf;
+  margin-bottom: 6px;
+}
+
+/* ---------- DAYS ---------- */
+.user-page.dark .calendar-day {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.user-page.dark .calendar-day:hover {
+  background: rgba(206, 255, 27, 0.25);
+}
+
+.user-page.dark .calendar-day.active {
+  background: #ceff1b;
+  color: #000;
+  font-weight: 700;
+}
+
+/* ---------- PREV / NEXT MONTH DAYS ---------- */
+.user-page.dark .calendar-day.muted {
+  color: #6b7280;
+}
+
+/* ---------- ACTION BUTTONS ---------- */
+.user-page.dark .calendar-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 0 6px;
+}
+
+.user-page.dark .btn-cancel {
+  border: 1px solid #6b7280;
+  color: #ffffff;
+  background: transparent;
+  padding: 6px 20px;
+  border-radius: 10px;
+}
+
+.user-page.dark .btn-confirm {
+  background: #ceff1b;
+  color: #000;
+  padding: 6px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* ================= TAG / CHIP ================= */
+
+/* LIGHT MODE */
+.user-page.light .tag-chip {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #d1d5db;
+}
+
+.user-page.light .tag-chip button {
+  color: #000000;
+}
+
+.user-page.light .tag-clear-btn {
+  border-left: 1px solid #d1d5db;
+  color: #000000;
+}
+
+/* ---------------- DARK MODE (NEON) ---------------- */
+
+.user-page.dark .tag-chip {
+  color: #CEFF1B;
+  border: 1px solid #CEFF1B;
+  font-weight: 500;
+}
+
+.user-page.dark .tag-chip button {
+  color: #CEFF1B;
+}
+
+.user-page.dark .tag-chip:hover {
+  background-color: #d9ff4d;
+}
+
+/* clear-all X button */
+.user-page.dark .tag-clear-btn {
+  color: #CEFF1B;
+}
+
+.user-page.light .upload-modal {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.user-page.dark .upload-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.user-page.light .upload-card {
+  background: #EAEAEA !important;
+  border: 2px solid #CEFF1B !important;
+  color: #000;
+}
+
+.user-page.dark .upload-card {
+  background: #0b0b0b;
+  border: 2px solid #ceff1b !important;
+  color: #fff;
+}
+
+.user-page.light .upload-header {
+  color: #000;
+}
+
+.user-page.dark .upload-header {
+  color: #fff;
+}
+
+.user-page.light .upload-slot {
+  background: #eaeaea;
+  border: 2px dashed #2b2b2b;
+}
+
+.user-page.dark .upload-slot {
+  background: #0f0f0f;
+  border: 2px dashed #3a3a3a;
+}
+
+.user-page .upload-slot:hover {
+  border-color: #ceff1b;
+}
+
+.upload-cover-badge {
+  background: #ceff1b;
+  color: #000;
+}
+
+.user-page.light .upload-btn-cancel {
+  border: 1px solid #000;
+  color: #000;
+  background: transparent;
+}
+
+.user-page.dark .upload-btn-cancel {
+  border: 1px solid #fff;
+  color: #fff;
+  background: transparent;
+}
+
+.upload-btn-confirm {
+  background: #ceff1b;
+  color: #000;
+  border: 1px solid #000;
+}
+
+.user-page.light .upload-success-card {
+  background: #f5f5f5;
+  color: #000;
+  border: 2px solid #CEFF1B !important;
+}
+
+.user-page.dark .upload-success-card {
+  background: #0b0b0b;
+  color: #fff;
+  border: 2px solid #ceff1b !important;
+}
+
+/* =========================================
+FIX: CREATOR / CLIENT TOGGLE (DARK MODE)
+========================================= */
+
+/* allow white bg ONLY for this toggle */
+.user-page.dark .creator-client-toggle .bg-white {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* =========================================
+SETTINGS SIDEBAR – ACTIVE TEXT BLACK (DARK)
+========================================= */
+
+/* Active / clicked item text BLACK */
+.user-page.dark aside.settings div[style*="background-color"] {
+  color: #000000 !important;
+}
+
+/* Ensure inner text also black */
+.user-page.dark aside.settings div[style*="background-color"] * {
+  color: #000000 !important;
+}
+
+/* FORCE EDIT BADGE – DARK MODE */
+.user-page.dark .profile-avatar-badge {
+  background-color: #CEFF1B !important;
+  border-color: #CEFF1B !important;
+}
+
+/* ===============================
+TAG INPUT / TOOLS BOX – DARK MODE
+(Skills & Tools chips container)
+================================ */
+
+/* Skills & Tools chip container */
+.user-page.dark .tag-chip {
+  background-color: #5E5E5E !important;
+  color: #ceff1b !important;
+  border: 1px solid #ceff1b !important;
+}
+
+/* Chip container background (input-style box) */
+.user-page.dark .flex.items-center.w-full.min-h-\[56px\] {
+  background-color: #5E5E5E !important;
+  border: 1px solid #2a2a2a !important;
+}
+
+/* Languages selected box */
+.user-page.dark .flex.w-full.rounded-lg.bg-\[\#FEFEFE\] {
+  background-color: #5E5E5E !important;
+  border-color: #2a2a2a !important;
+}
+
+/* =========================================
+MY PORTFOLIO – DARK MODE (FINAL SINGLE FIX)
+========================================= */
+
+.user-page.dark {
+  --neon: #CEFF1B;
+  --bg-dark: #0b0b0b;
+  --bg-soft: #141414;
+  --border-dark: #2a2a2a;
+}
+
+/* Main portfolio cards */
+.user-page.dark .portfolio-card-edit,
+.user-page.dark .border-2.border-white {
+  background: rgba(43, 43, 43, 0.6) !important;
+  border-color: rgba(206, 255, 27, 0.45) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+MY PORTFOLIO – LABELS NEON (FOOLPROOF)
+========================================= */
+
+/* Labels ONLY inside My Portfolio cards */
+.user-page.dark .portfolio-card-edit label,
+.user-page.dark .border-2.border-white label {
+  color: #CEFF1B !important;
+}
+
+/* =========================================
+VERIFICATION – UPLOAD CARD (DARK MODE)
+========================================= */
+
+/* Title: Front Side / Back Side */
+.user-page.dark .verification-page p {
+  color: #ffffff !important;
+}
+
+/* Upload card box */
+.user-page.dark .verification-page .border.border-gray-300 {
+  background-color: #3a3a3a !important;
+  border-color: #3a3a3a !important;
+}
+
+/* Hover */
+.user-page.dark .verification-page .border.border-gray-300:hover {
+  background-color: #424242 !important;
+}
+
+/* Upload icon */
+.user-page.dark .verification-page svg {
+  color: #ceff1b !important;
+}
+
+/* "Click to upload" text */
+.user-page.dark .verification-page p.text-\[\#155DFC\] {
+  color: #5da9ff !important;
+}
+
+/* Remaining text */
+.user-page.dark .verification-page .text-gray-600,
+.user-page.dark .verification-page .text-gray-500 {
+  color: #cfcfcf !important;
+}
+
+/* Tabs inactive */
+.user-page.dark .verification-page button.border-gray-300 {
+  border-color: #5a5a5a !important;
+  color: #cfcfcf !important;
+}
+
+/* Tabs active already neon – just ensure */
+.user-page.dark .verification-page button.bg-\[\#CEFF1B\] {
+  color: #000 !important;
+}
+
+/* ===============================
+IMAGE MODAL – PLUS / MINUS ICON FIX
+=============================== */
+
+/* LIGHT MODE – icons normal dikhen */
+.user-page.light .image-modal img:not(.preview-image) {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* DARK MODE – icons white dikhen */
+.user-page.dark .image-modal img:not(.preview-image) {
+  filter: invert(1) brightness(1.2) !important;
+}
+
+/* ===============================
+CALENDAR – DARK NEON BORDER (FINAL)
+=============================== */
+
+.user-page.dark .calendar-inner {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Light mode – normal border */
+.user-page.light .calendar-inner {
+  border: none !important;
+}
+
+/* ===============================
+UPLOAD GRID – VIDEO & PLUS ICON FIX
+=============================== */
+
+/* video icons grey */
+.upload-slot img[src*="video"] {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+/* plus button background already green – make + black */
+.upload-slot .bg-\[\#CEFF1B\] {
+  color: #000000 !important;
+  font-weight: 400;
+}
+
+/* ensure + symbol visible */
+.upload-slot .bg-\[\#CEFF1B\] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* ===============================
+UPLOAD SUCCESS – DARK MODE BG FIX
+=============================== */
+
+.user-page.dark .upload-success-card {
+  background-color: #393939 !important;
+  border: 1px solid #CEFF1B !important;
+  color: #ffffff !important;
+}
+
+/* text inside */
+.user-page.dark .upload-success-card h3 {
+  color: #ffffff !important;
+}
+
+.user-page.dark .bg-\[\#FEFEFE\]\/40 {
+  background-color: #393939 !important;
+}
+
+.user-page.dark .bg-\[\#F2F2F2\] {
+  background-color: #2B2B2B !important;
+}
+
+/* /////// */
+/* ================= FORCE BLACK TEXT (DARK MODE) ================= */
+/* =========================================
+FORCE BLACK TEXT ON CEFF1B (DARK MODE ONLY)
+========================================= */
+
+/* Year button, selected & hover items */
+.user-page.dark .bg-\[\#CEFF1B\],
+.user-page.dark .hover\:bg-\[\#CEFF1B\]:hover {
+  color: #000 !important;
+}
+
+/* =========================================
+FORCE BLACK TEXT ON CEFF1B (LIGHT MODE ALSO)
+========================================= */
+
+.bg-\[\#CEFF1B\],
+.hover\:bg-\[\#CEFF1B\]:hover {
+  color: #000 !important;
+}
+
+/* =========================================
+LIGHT MODE – DROPDOWN HOVER ONLY
+========================================= */
+
+.user-page.light .dropdown-item:hover {
+  background-color: #CEFF1B !important;
+  color: #000 !important;
+}
+
+/* GLOBAL FORM INPUTS (DARK MODE FIX) */
+.user-page.dark input,
+.user-page.dark textarea {
+  border-color: #4B4B4B !important;
+  color: #ffffff !important;
+}
+
+.user-page.dark input::placeholder,
+.user-page.dark textarea::placeholder {
+  color: #888 !important;
+}
+
+/* CUSTOM DROPDOWNS (DARK MODE FIX) */
+.user-page.dark .onboarding-selected-option {
+  border-color: grey !important;
+
+
+}
+
+.user-page.dark .onboarding-selected-option:hover {
+  background-color: #1a1a1a !important;
+}
+
+.user-page.dark .onboarding-options-list {
+  background-color: #1e1e1e !important;
+  color: #fff !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid #333 !important;
+}
+
+.user-page.dark .onboarding-options-list li {
+  color: #e5e7eb !important;
+}
+
+.user-page.dark .onboarding-options-list li:hover,
+.user-page.dark .onboarding-options-list li.active {
+  background-color: #CEFF1B !important;
+  color: #000 !important;
+}
+
+.user-page.dark .onboarding-arrow {
+  color: #ceff1b !important;
+}
+
+/* ACTIVITY YEAR DROPDOWN – DISABLE HOVER/ACTIVE FEEDBACK */
+.activity-year-trigger,
+.user-page.dark .activity-year-trigger,
+.activity-year-trigger:hover,
+.activity-year-trigger.open,
+.user-page.dark .activity-year-trigger:hover,
+.user-page.dark .activity-year-trigger.open {
+  background-color: #CEFF1B !important;
+  color: #000 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================
+   CREATE TEAM PAGE – DARK MODE (FULL SUPPORT)
+   ========================================= */

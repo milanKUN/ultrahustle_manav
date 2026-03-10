@@ -1633,7 +1633,7 @@ function ActivityCalendar({ onClose, activityDates, theme }) {
             return (
               <div
                 key={monthName}
-                className="flex bg-white dark:bg-[#1A1A1A] rounded-[8px] p-3 border border-gray-200 dark:border-[#333333] flex-col items-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors shadow-sm dark:shadow-none min-h-[250px] md:min-h-0"
+                className="flex bg-white dark:bg-[#1A1A1A] rounded-[8px] p-3 border border-gray-200 dark:border-[#333333] flex-col items-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors shadow-sm dark:shadow-none min-h-[290px]"
                 style={{ height: "auto" }}>
                 {/* Month Name */}
                 <div className="w-full flex justify-center items-center mb-1 text-[11px] font-bold text-black dark:text-white">

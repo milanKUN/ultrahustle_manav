@@ -1,4 +1,9 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  deleteMyAvatar,
+  getMyPersonalInfo,
+  uploadMyAvatar,
+} from "../../api/personalInfoApi";
 
 export default function ProfileForm() {
   const TITLE_LIMIT = 40;
@@ -12,15 +17,118 @@ export default function ProfileForm() {
   const [openImageModal, setOpenImageModal] = useState(false);
   const [openFriends, setOpenFriends] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [zoom, setZoom] = useState(0);
   const fileRef = useRef(null);
+
+  const [personalInfo, setPersonalInfo] = useState(null);
+  const [personalInfoLoading, setPersonalInfoLoading] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+
+  const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN || "";
+
+  const toAbsoluteUrl = (maybeUrl) => {
+    if (!maybeUrl || typeof maybeUrl !== "string") return "";
+    if (maybeUrl.startsWith("http://") || maybeUrl.startsWith("https://")) return maybeUrl;
+    if (maybeUrl.startsWith("//")) return `${window.location.protocol}${maybeUrl}`;
+    if (maybeUrl.startsWith("/")) return backendOrigin ? `${backendOrigin}${maybeUrl}` : maybeUrl;
+    return backendOrigin ? `${backendOrigin}/${maybeUrl}` : maybeUrl;
+  };
+
+  const normalizePersonalInfo = (info) => info?.data || info;
+
+  const loadPersonalInfo = async () => {
+    setPersonalInfoLoading(true);
+    try {
+      const info = await getMyPersonalInfo();
+      setPersonalInfo(info);
+    } catch {
+      // Keep UI functional even if personal info isn't available yet.
+      setPersonalInfo(null);
+    } finally {
+      setPersonalInfoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPersonalInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setAvatarError("");
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = () => setSelectedImage(reader.result);
       reader.readAsDataURL(file);
+    }
+  };
+
+  const normalized = normalizePersonalInfo(personalInfo);
+
+  const displayName =
+    [normalized?.first_name ?? normalized?.firstName, normalized?.last_name ?? normalized?.lastName]
+      .filter(Boolean)
+      .join(" ") ||
+    normalized?.username ||
+    normalized?.contact_email ||
+    normalized?.email ||
+    "My Profile";
+
+  const rawAvatarUrl =
+    normalized?.avatar_url ||
+    normalized?.avatarUrl ||
+    normalized?.avatar ||
+    normalized?.profile_image_url ||
+    "";
+
+  const avatarUrl = toAbsoluteUrl(rawAvatarUrl);
+
+  const handleUploadAvatar = async () => {
+    if (!selectedFile) {
+      setAvatarError("Please select an image.");
+      return;
+    }
+
+    const MAX_BYTES = 10 * 1024 * 1024;
+    if (selectedFile.size > MAX_BYTES) {
+      setAvatarError("Maximum upload size is 10 MB.");
+      return;
+    }
+
+    setAvatarBusy(true);
+    setAvatarError("");
+    try {
+      await uploadMyAvatar(selectedFile);
+      await loadPersonalInfo();
+      setOpenImageModal(false);
+      setSelectedFile(null);
+      setSelectedImage(null);
+      setZoom(0);
+    } catch (err) {
+      setAvatarError(err?.message || "Failed to upload avatar.");
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    setAvatarBusy(true);
+    setAvatarError("");
+    try {
+      await deleteMyAvatar();
+      await loadPersonalInfo();
+      setSelectedFile(null);
+      setSelectedImage(null);
+      setZoom(0);
+      setOpenImageModal(false);
+    } catch (err) {
+      setAvatarError(err?.message || "Failed to delete avatar.");
+    } finally {
+      setAvatarBusy(false);
     }
   };
 
@@ -87,6 +195,13 @@ export default function ProfileForm() {
     flex items-center justify-center
   "
             >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Avatar"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : null}
               {/* EDIT BADGE */}
               <span
                 className="
@@ -120,7 +235,7 @@ export default function ProfileForm() {
         profile-name
       "
             >
-              Abigail
+              {personalInfoLoading ? "Loading..." : displayName}
             </span>
           </div>
 
@@ -174,7 +289,13 @@ export default function ProfileForm() {
             "
           >
             <button
-              onClick={() => setOpenImageModal(false)}
+              onClick={() => {
+                setOpenImageModal(false);
+                setSelectedFile(null);
+                setSelectedImage(null);
+                setZoom(0);
+                setAvatarError("");
+              }}
               className="
                 text-red-500 font-bold
                 absolute top-4 right-4
@@ -202,11 +323,14 @@ export default function ProfileForm() {
                 items-center justify-center
                 relative overflow-hidden
               "
+              onClick={() => {
+                if (!avatarBusy) fileRef.current?.click();
+              }}
             >
-              {selectedImage ? (
+              {selectedImage || avatarUrl ? (
                 <>
                   <img
-                    src={selectedImage}
+                    src={selectedImage || avatarUrl}
                     alt="Preview"
                     className="preview-image w-full h-full object-cover transition-transform duration-200"
                     style={{ transform: `scale(${1 + zoom / 100})` }}
@@ -254,7 +378,7 @@ export default function ProfileForm() {
                 -mt-6
               "
             >
-              Maximum upload size: 10 MB
+              {avatarError || "Maximum upload size: 10 MB"}
             </p>
             <div
               className="
@@ -302,17 +426,32 @@ export default function ProfileForm() {
               </button>
             </div>
 
-            <button
+            <div className="w-full space-y-2">
+              <button
+                onClick={handleUploadAvatar}
+                disabled={avatarBusy}
               className="
                 w-full
                 mt-auto py-3
                 font-medium
                 bg-[#CEFF1B]
                 rounded-md
+                disabled:opacity-60
               "
             >
-              Upload Photo
-            </button>
+                {avatarBusy ? "Uploading..." : "Upload Photo"}
+              </button>
+
+              {avatarUrl ? (
+                <button
+                  onClick={handleDeleteAvatar}
+                  disabled={avatarBusy}
+                  className="w-full py-3 font-medium rounded-md border border-[#2B2B2B] bg-white disabled:opacity-60"
+                >
+                  {avatarBusy ? "Please wait..." : "Remove Photo"}
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
       )}

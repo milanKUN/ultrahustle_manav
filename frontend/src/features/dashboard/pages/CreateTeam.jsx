@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from "react-dom";
 import { useNavigate } from 'react-router-dom';
 import "./CreateTeam.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
@@ -244,7 +245,7 @@ const CreateTeam = ({ theme, setTheme }) => {
         theme={theme}
       />
 
-      <div className="pt-[85px] flex relative z-10">
+      <div className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isAvatarModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}>
         {/* ✅ SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
@@ -763,7 +764,7 @@ const CreateTeam = ({ theme, setTheme }) => {
 
               {/* My Portfolio Section */}
               <div className="team-info-section">
-                <MyPortfolio />
+                <MyPortfolio theme={theme} />
               </div>
 
               {/* Team Contract & Rules Section */}
@@ -836,17 +837,18 @@ const CreateTeam = ({ theme, setTheme }) => {
           </div>
 
           {/* Avatar Upload Modal */}
-          {isAvatarModalOpen && (
-            <div
-              className="
-                z-[99] flex
-                md:mt-20 p-4 md:p-0
+          {isAvatarModalOpen && createPortal(
+            <div className={`user-page ${theme || 'light'}`}>
+              <div
+                className="
+                z-[9999] flex
+                md:mt-0 p-4 md:p-0
                 fixed inset-0 items-center justify-center image-modal
                 backdrop-blur-sm bg-black/30
               "
-            >
-              <div
-                className="
+              >
+                <div
+                  className="
                   flex flex-col items-center
                   w-[90%] max-w-[380px] h-auto max-h-[90vh] overflow-y-auto
                   p-5 md:p-6
@@ -854,28 +856,28 @@ const CreateTeam = ({ theme, setTheme }) => {
                   image-modal-card relative
                   bg-white dark:bg-[#121212]
                 "
-              >
-                <button
-                  onClick={closeAvatarModal}
-                  className="
+                >
+                  <button
+                    onClick={closeAvatarModal}
+                    className="
                     text-red-500 font-bold
                     absolute top-4 right-4
                   "
-                >
-                  ✕
-                </button>
+                  >
+                    ✕
+                  </button>
 
-                <h3
-                  className="
+                  <h3
+                    className="
                     mb-6
                     text-center font-semibold text-black dark:text-gray-100
                   "
-                >
-                  Resize and adjust <br /> your photo
-                </h3>
+                  >
+                    Resize and adjust <br /> your photo
+                  </h3>
 
-                <div
-                  className="
+                  <div
+                    className="
                     flex
                     w-full aspect-square max-w-[280px]
                     mb-5 mx-auto
@@ -884,124 +886,126 @@ const CreateTeam = ({ theme, setTheme }) => {
                     items-center justify-center
                     relative overflow-hidden
                   "
-                >
-                  {selectedAvatarImage ? (
-                    <>
-                      <img
-                        src={selectedAvatarImage}
-                        alt="Preview"
-                        className="preview-image w-full h-full object-cover transition-transform duration-200"
-                        style={{ transform: `scale(${1 + avatarZoom / 100})` }}
-                      />
-                      {/* CIRCULAR PREVIEW OVERLAY */}
-                      <div
-                        className="
+                  >
+                    {selectedAvatarImage ? (
+                      <>
+                        <img
+                          src={selectedAvatarImage}
+                          alt="Preview"
+                          className="preview-image w-full h-full object-cover transition-transform duration-200"
+                          style={{ transform: `scale(${1 + avatarZoom / 100})` }}
+                        />
+                        {/* CIRCULAR PREVIEW OVERLAY */}
+                        <div
+                          className="
                           absolute inset-0
                           pointer-events-none
                           flex items-center justify-center
                         "
-                      >
-                        <div
-                          className="
+                        >
+                          <div
+                            className="
                             w-[230px] h-[230px] md:w-[250px] md:h-[250px]
                             rounded-full
                             border-2 border-white/50
                           "
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <button
-                      onClick={handleSelectImageClick}
-                      className="
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <button
+                        onClick={handleSelectImageClick}
+                        className="
                         w-[157px] h-[58.41px]
                         text-sm
                         bg-white text-black
                         rounded
                       "
-                    >
-                      Select Image
-                    </button>
-                  )}
-                  <input
-                    ref={avatarInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarFileChange}
-                    style={{ display: 'none' }}
-                  />
-                </div>
+                      >
+                        Select Image
+                      </button>
+                    )}
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarFileChange}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
 
-                <p
-                  className="
+                  <p
+                    className="
                     mb-2
                     text-xs text-center text-red-500
                     -mt-6
                   "
-                >
-                  Maximum upload size: 10 MB
-                </p>
-                <div
-                  className="
+                  >
+                    Maximum upload size: 10 MB
+                  </p>
+                  <div
+                    className="
                     flex w-full max-w-[280px] mx-auto
                     mb-6
                     items-center justify-between gap-3
                     zoom-bar
                   "
-                >
-                  {/* MINUS */}
-                  <button
-                    onClick={() => setAvatarZoom(Math.max(0, avatarZoom - 10))}
-                    className="p-2 flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors flex items-center justify-center"
                   >
-                    <img
-                      src="/minus.svg"
-                      alt="Decrease"
-                      className="w-8 h-8 sm:w-6 sm:h-6 object-contain"
-                    />
-                  </button>
+                    {/* MINUS */}
+                    <button
+                      onClick={() => setAvatarZoom(Math.max(0, avatarZoom - 10))}
+                      className="p-2 flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors flex items-center justify-center"
+                    >
+                      <img
+                        src="/minus.svg"
+                        alt="Decrease"
+                        className="w-8 h-8 sm:w-6 sm:h-6 object-contain"
+                      />
+                    </button>
 
-                  {/* RANGE */}
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={avatarZoom}
-                    onChange={(e) => setAvatarZoom(parseInt(e.target.value))}
-                    className="
+                    {/* RANGE */}
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={avatarZoom}
+                      onChange={(e) => setAvatarZoom(parseInt(e.target.value))}
+                      className="
                       flex-1
                       min-w-[100px]
                       accent-[#CEFF1B]
                     "
-                  />
-
-                  {/* PLUS */}
-                  <button
-                    onClick={() => setAvatarZoom(Math.min(100, avatarZoom + 10))}
-                    className="p-2 flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors flex items-center justify-center"
-                  >
-                    <img
-                      src="/plus.svg"
-                      alt="Increase"
-                      className="w-8 h-8 sm:w-6 sm:h-6 object-contain"
                     />
-                  </button>
-                </div>
 
-                <button
-                  className="
+                    {/* PLUS */}
+                    <button
+                      onClick={() => setAvatarZoom(Math.min(100, avatarZoom + 10))}
+                      className="p-2 flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors flex items-center justify-center"
+                    >
+                      <img
+                        src="/plus.svg"
+                        alt="Increase"
+                        className="w-8 h-8 sm:w-6 sm:h-6 object-contain"
+                      />
+                    </button>
+                  </div>
+
+                  <button
+                    className="
                     w-full
                     mt-auto py-3
                     font-medium
                     bg-[#CEFF1B] text-black
                     rounded-md
                   "
-                  onClick={closeAvatarModal}
-                >
-                  Upload Photo
-                </button>
+                    onClick={closeAvatarModal}
+                  >
+                    Upload Photo
+                  </button>
+                </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       </div>

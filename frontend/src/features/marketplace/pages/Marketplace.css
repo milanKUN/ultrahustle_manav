@@ -34,9 +34,9 @@
     flex-direction: column;
 }
 
-/* Hide sidebar hamburger button — no sidebar on this page */
+/* Sidebar hamburger button visible */
 .mp-page .hamburger-btn {
-    display: none !important;
+    display: flex !important;
 }
 
 .mp-content-wrapper {
@@ -76,12 +76,14 @@
     padding: 0 48px;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     z-index: 3;
 }
 
 .mp-heroText {
     flex: 1.2;
     z-index: 2;
+    text-align: left;
 }
 
 .mp-heroTitle {
@@ -409,9 +411,8 @@
     padding: 10px 4px 24px;
     scroll-behavior: smooth;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE/Edge */
+    scroll-snap-type: x mandatory;
 }
 
 .mp-grid::-webkit-scrollbar {
@@ -422,11 +423,11 @@
 /* CARD */
 .mp-card {
     flex: 0 0 320px;
-    /* Fixed width for horizontal scrolling */
     background: transparent;
     border-radius: 16px;
     overflow: hidden;
     transition: all 0.3s ease;
+    scroll-snap-align: center;
 }
 
 .dark .mp-card {
@@ -467,14 +468,14 @@
 }
 
 .mp-avatar {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: #333;
 }
 
 .mp-userName {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
     color: #1a1a1a;
 }
@@ -661,10 +662,6 @@
     right: -24px;
 }
 
-.mp-floatArrow:hover {
-    background: #d4ff33;
-    transform: translateY(-50%) scale(1.1);
-}
 
 /* CHIP ARROWS */
 .chip-arrow {
@@ -693,11 +690,6 @@
     right: 0;
 }
 
-.chip-arrow:hover {
-    background: #ceff1b;
-    box-shadow: 0 0 10px #ceff1b;
-    transform: translateY(-50%) scale(1.1);
-}
 
 .mp-chipScroller-wrapper .mp-chipScroller {
     padding: 0 32px 4px;
@@ -755,7 +747,8 @@
     .mp-heroInner {
         flex-direction: column;
         padding: 0 24px;
-        text-align: center;
+        text-align: left;
+        align-items: flex-start;
         gap: 24px;
     }
 
@@ -866,6 +859,7 @@
     .mp-heroTitle,
     .mp-heroSub {
         font-size: 24px;
+        text-align: left !important;
     }
 
     .mp-heroInner {
@@ -946,15 +940,14 @@
         font-size: 12px;
     }
 
-    /* Section title */
-    .mp-sectionTitle {
-        font-size: 18px;
-        margin-bottom: 16px;
+    /* Cards */
+    .mp-grid {
+        padding: 10px 30px 24px;
+        gap: 15px;
     }
 
-    /* Cards */
     .mp-card {
-        flex: 0 0 220px;
+        flex: 0 0 calc(100vw - 60px);
     }
 
     .mp-imgWrap {
@@ -968,6 +961,7 @@
     .mp-heroTitle,
     .mp-heroSub {
         font-size: 20px;
+        text-align: left !important;
     }
 
     .mp-megaGrid {
@@ -976,7 +970,12 @@
     }
 
     .mp-card {
-        flex: 0 0 180px;
+        flex: 0 0 calc(100vw - 40px);
+    }
+
+    .mp-grid {
+        padding: 10px 20px 24px;
+        gap: 10px;
     }
 
     .mp-shell {

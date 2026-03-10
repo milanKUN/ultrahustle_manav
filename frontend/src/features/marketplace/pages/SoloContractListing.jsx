@@ -97,70 +97,64 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
   };
 
   // Deliverables
-  const [deliverableDraft, setDeliverableDraft] = useState({
-    title: "",
-    format: "",
-    qty: "",
-    acceptance: "",
-  });
-  const [deliverables, setDeliverables] = useState([]);
+  const [deliverables, setDeliverables] = useState([
+    { id: crypto?.randomUUID?.() || String(Date.now()), title: "", format: "", qty: "", acceptance: "" }
+  ]);
 
-  const onDraftChange = (key) => (e) =>
-    setDeliverableDraft((p) => ({ ...p, [key]: e.target.value }));
+  const updateDeliverable = (index, key, value) => {
+    setDeliverables((p) =>
+      p.map((d, i) => (i === index ? { ...d, [key]: value } : d))
+    );
+  };
 
   const addDeliverable = () => {
-    const t = deliverableDraft.title.trim();
-    const f = deliverableDraft.format.trim();
-    const q = deliverableDraft.qty.trim();
-    const a = deliverableDraft.acceptance.trim();
-    if (!t && !f && !q && !a) return;
-
     setDeliverables((p) => [
       ...p,
       {
         id: crypto?.randomUUID?.() || String(Date.now()),
-        title: t,
-        format: f,
-        qty: q,
-        acceptance: a,
+        title: "",
+        format: "",
+        qty: "",
+        acceptance: "",
       },
     ]);
-    setDeliverableDraft({ title: "", format: "", qty: "", acceptance: "" });
   };
 
-  const removeDeliverable = (id) =>
+  const removeDeliverable = (id) => {
+    if (deliverables.length <= 1) {
+      setDeliverables([{ id: crypto?.randomUUID?.() || String(Date.now()), title: "", format: "", qty: "", acceptance: "" }]);
+      return;
+    }
     setDeliverables((p) => p.filter((d) => d.id !== id));
+  };
 
   // Milestones
-  const [milestoneDraft, setMilestoneDraft] = useState({
-    name: "Milestone 1",
-    amount: "",
-    deadline: "",
-  });
-  const [milestones, setMilestones] = useState([]);
+  const [milestones, setMilestones] = useState([
+    { id: crypto?.randomUUID?.() || String(Date.now()), name: "Milestone 1", amount: "", deadline: "" }
+  ]);
 
-  const onMilestoneDraftChange = (key) => (e) =>
-    setMilestoneDraft((p) => ({ ...p, [key]: e.target.value }));
+  const updateMilestone = (index, key, value) => {
+    setMilestones((p) =>
+      p.map((m, i) => (i === index ? { ...m, [key]: value } : m))
+    );
+  };
 
   const addMilestone = () => {
-    const name = milestoneDraft.name.trim();
-    const amount = milestoneDraft.amount.trim();
-    const deadline = milestoneDraft.deadline.trim();
-    if (!name && !amount && !deadline) return;
-
     setMilestones((p) => [
       ...p,
       {
         id: crypto?.randomUUID?.() || String(Date.now()),
-        name,
-        amount,
-        deadline,
+        name: `Milestone ${p.length + 1}`,
+        amount: "",
+        deadline: "",
       },
     ]);
-    setMilestoneDraft({ name: `Milestone ${milestones.length + 2}`, amount: "", deadline: "" });
   };
 
-  const removeMilestone = (id) => setMilestones((p) => p.filter((m) => m.id !== id));
+  const removeMilestone = (id) => {
+    if (milestones.length <= 1) return;
+    setMilestones((p) => p.filter((m) => m.id !== id));
+  };
 
   // Activity log dummy (same UI)
   const activity = useMemo(
@@ -310,27 +304,24 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
                         onChange={onChange("title")}
                       />
                     </div>
-                    <div className="cnc-field">
+                    <div className="cnc-field cnc-contract-type-field">
                       <label className="cnc-label">Contract Type</label>
-                      <div className="cnc-input cnc-input--switchWrap">
-                        <input
-                          className="cnc-inputInner"
-                          placeholder="Solo/ Team service"
-                          value={form.contractType}
-                          onChange={onChange("contractType")}
-                        />
-                        <div className="cnc-switchArea">
-                          <span className="cnc-switchText">Solo/team</span>
-                          <button
-                            type="button"
-                            className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
-                            onClick={onToggle("soloTeam")}
-                            aria-pressed={form.soloTeam}
-                            aria-label="Solo/team toggle"
-                          >
-                            <span className="cnc-knob" />
-                          </button>
-                        </div>
+                      <div className="cnc-type-switch-wrapper">
+                        <span className={`cnc-type-label ${!form.soloTeam ? "active" : ""}`}>
+                          Solo
+                        </span>
+                        <button
+                          type="button"
+                          className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
+                          onClick={onToggle("soloTeam")}
+                          aria-pressed={form.soloTeam}
+                          aria-label="Solo/team toggle"
+                        >
+                          <span className="cnc-knob" />
+                        </button>
+                        <span className={`cnc-type-label ${form.soloTeam ? "active" : ""}`}>
+                          Team
+                        </span>
                       </div>
                     </div>
                     <div className="cnc-field">
@@ -456,81 +447,58 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
 
                   <div className="cnc-deliverables">
                     <div className="cnc-del-title">Deliverables</div>
-                    <div className="cnc-del-grid">
-                      <div className="cnc-field">
-                        <label className="cnc-label">Title</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Title"
-                          value={deliverableDraft.title}
-                          onChange={onDraftChange("title")}
-                        />
-                      </div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Format/file type</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Format/file type"
-                          value={deliverableDraft.format}
-                          onChange={onDraftChange("format")}
-                        />
-                      </div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Quantity</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Quantity"
-                          value={deliverableDraft.qty}
-                          onChange={onDraftChange("qty")}
-                        />
-                      </div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Acceptance Criteria</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Acceptance Criteria"
-                          value={deliverableDraft.acceptance}
-                          onChange={onDraftChange("acceptance")}
-                        />
-                      </div>
-                    </div>
-                    <button type="button" className="cnc-addBtn" onClick={addDeliverable}>
-                      Add Deliverables
-                    </button>
+
                     {deliverables.length > 0 && (
-                      <div className="cnc-del-list">
-                        {deliverables.map((d) => (
-                          <div className="cnc-del-item-card" key={d.id}>
-                            <div className="cnc-del-tag-list">
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Title:</span> {d.title || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Format:</span> {d.format || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Qty:</span> {d.qty || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Acceptance:</span> {d.acceptance || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              className="cnc-del-close-btn"
-                              onClick={() => removeDeliverable(d.id)}
-                              title="Remove deliverable"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
+                      <div className="cnc-del-header">
+                        <label className="cnc-label">Title</label>
+                        <label className="cnc-label">Format/file type</label>
+                        <label className="cnc-label">Quantity</label>
+                        <label className="cnc-label">Acceptance Criteria</label>
+                        <div /> {/* remove btn space */}
                       </div>
                     )}
+
+                    {deliverables.map((d, index) => (
+                      <div className="cnc-del-row-wrapper" key={d.id}>
+                        <div className="cnc-del-grid">
+                          <input
+                            className="cnc-input"
+                            placeholder="Title"
+                            value={d.title}
+                            onChange={(e) => updateDeliverable(index, "title", e.target.value)}
+                          />
+                          <input
+                            className="cnc-input"
+                            placeholder="Format/file type"
+                            value={d.format}
+                            onChange={(e) => updateDeliverable(index, "format", e.target.value)}
+                          />
+                          <input
+                            className="cnc-input"
+                            placeholder="Quantity"
+                            value={d.qty}
+                            onChange={(e) => updateDeliverable(index, "qty", e.target.value)}
+                          />
+                          <input
+                            className="cnc-input"
+                            placeholder="Acceptance Criteria"
+                            value={d.acceptance}
+                            onChange={(e) => updateDeliverable(index, "acceptance", e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="cnc-del-row-remove"
+                            onClick={() => removeDeliverable(d.id)}
+                            title="Remove row"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" className="cnc-addBtn mt-2" onClick={addDeliverable}>
+                      + Add More Deliverables
+                    </button>
                   </div>
 
                   <div className="cnc-field cnc-outScope">
@@ -713,72 +681,56 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
 
                   <div className="cnc-milestones">
                     <div className="cnc-del-title">Milestones</div>
-                    <div className="cnc-mil-grid">
-                      <div className="cnc-field">
-                        <label className="cnc-label">Add Milestone</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Milestone 1"
-                          value={milestoneDraft.name}
-                          onChange={onMilestoneDraftChange("name")}
-                        />
-                      </div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Amount</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="$10000"
-                          value={milestoneDraft.amount}
-                          onChange={onMilestoneDraftChange("amount")}
-                        />
-                      </div>
-                      {/* Initial delivery deadline (Milestone) */}
-                      <div className="cnc-span-all">
-                        <DateInput
-                          label="Initial delivery deadline"
-                          value={milestoneDraft.deadline}
-                          onOpen={() => setCalendarConfig({
-                            value: milestoneDraft.deadline,
-                            onSelect: (val) => setMilestoneDraft(p => ({ ...p, deadline: val }))
-                          })}
-                        />
-                      </div>
 
-                    </div>
-                    <button type="button" className="cnc-addBtn" onClick={addMilestone}>
-                      + Add Milestone
-                    </button>
                     {milestones.length > 0 && (
-                      <div className="cnc-mil-list">
-                        {milestones.map((m) => (
-                          <div className="cnc-del-item-card" key={m.id}>
-                            <div className="cnc-del-tag-list">
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Name:</span> {m.name || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Amount:</span> {m.amount || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                              <div className="cnc-del-tag">
-                                <span className="cnc-tag-lbl">Deadline:</span> {m.deadline || "-"}
-                                <span className="cnc-tag-x">✕</span>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              className="cnc-del-close-btn"
-                              onClick={() => removeMilestone(m.id)}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
+                      <div className="cnc-mil-header">
+                        <label className="cnc-label">Milestone Name</label>
+                        <label className="cnc-label">Amount</label>
+                        <label className="cnc-label">Deadline</label>
+                        <div /> {/* remove btn space */}
                       </div>
                     )}
+
+                    {milestones.map((m, index) => (
+                      <div className="cnc-mil-row-wrapper" key={m.id}>
+                        <div className="cnc-mil-grid">
+                          <input
+                            className="cnc-input"
+                            placeholder={`Milestone ${index + 1}`}
+                            value={m.name}
+                            onChange={(e) => updateMilestone(index, "name", e.target.value)}
+                          />
+                          <input
+                            className="cnc-input"
+                            placeholder="$1000"
+                            value={m.amount}
+                            onChange={(e) => updateMilestone(index, "amount", e.target.value)}
+                          />
+                          <DateInput
+                            label=""
+                            value={m.deadline}
+                            onOpen={() => setCalendarConfig({
+                              value: m.deadline,
+                              onSelect: (val) => updateMilestone(index, "deadline", val)
+                            })}
+                          />
+                          <button
+                            type="button"
+                            className="cnc-mil-row-remove"
+                            onClick={() => removeMilestone(m.id)}
+                            title="Remove milestone"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" className="cnc-addBtn mt-2" onClick={addMilestone}>
+                      + Add Milestone
+                    </button>
                   </div>
                 </div>
+
                 {/* Team Payout Configuration (Conditional) */}
                 {form.soloTeam && (
                   <div className="cnc-card cnc-card--mt cnc-teamPayoutCard">

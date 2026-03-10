@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../OnboardingSelect.css';
+import { getClientOnboarding, saveClientBusinessDetails } from "../../api/onboardingApi";
 
 export default function BusinessDetails() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function BusinessDetails() {
   });
 
   const [isPersonalAccount, setIsPersonalAccount] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom Dropdown State
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
@@ -33,6 +35,39 @@ export default function BusinessDetails() {
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  // Prefill from backend (resume flow)
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await getClientOnboarding();
+        const record = res?.data ?? res;
+        if (!record || !alive) return;
+
+        if (typeof record.is_personal_account === "boolean") {
+          setIsPersonalAccount(record.is_personal_account);
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          businessName: record.business_name ?? prev.businessName,
+          employees: record.employees != null ? String(record.employees) : prev.employees,
+          industry: record.business_industry ?? prev.industry,
+          website: record.website ?? prev.website,
+          taxId: record.tax_id ?? prev.taxId,
+          country: record.country ?? prev.country,
+          state: record.state ?? prev.state,
+          city: record.city ?? prev.city,
+        }));
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const currentStep = 5; // Step 5 (0-indexed was 4 previously)
@@ -79,10 +114,38 @@ export default function BusinessDetails() {
     navigate('/client-needs');
   };
 
-  const handleContinue = () => {
-    // Navigate to next step
-    if (isFormValid()) {
+  const handleContinue = async () => {
+    if (!isFormValid() || isSubmitting) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        is_personal_account: !!isPersonalAccount,
+      };
+
+      if (!isPersonalAccount) {
+        payload.business_name = formData.businessName;
+        payload.employees = formData.employees ? Number(formData.employees) : undefined;
+
+        // Backend expects business_industry (Technology/Marketing/...)
+        payload.business_industry =
+          formData.industry === "Other" ? formData.otherIndustry : formData.industry;
+
+        payload.country = formData.country;
+        payload.state = formData.state;
+        payload.city = formData.city;
+
+        if (formData.website) payload.website = formData.website;
+        if (formData.taxId) payload.tax_id = formData.taxId;
+      }
+
+      await saveClientBusinessDetails(payload);
       navigate('/client-setup-workspace');
+    } catch (e) {
+      console.error("Failed to save client business details", e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

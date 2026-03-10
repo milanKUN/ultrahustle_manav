@@ -1,10 +1,57 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { updateMyPassword } from "../../api/passwordApi";
 
 export default function Security() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChangePassword = async () => {
+    setError("");
+    setSuccess("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setError("Please fill all password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("New password and confirmation do not match.");
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setError("New password must be different from current password.");
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await updateMyPassword({
+        current_password: currentPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword,
+      });
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setSuccess("Password updated successfully.");
+    } catch (e) {
+      setError(e?.message || "Request failed");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="">
@@ -27,6 +74,8 @@ export default function Security() {
               <input
                 type={showCurrentPassword ? "text" : "password"}
                 placeholder="********"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
                 className="w-full bg-transparent border border-black rounded-md px-3 py-2 pr-10 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
               />
               <button
@@ -46,6 +95,8 @@ export default function Security() {
               <input
                 type={showNewPassword ? "text" : "password"}
                 placeholder="********"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className="w-full bg-transparent border border-black rounded-md px-3 py-2 pr-10 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
               />
               <button
@@ -67,6 +118,8 @@ export default function Security() {
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="********"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full bg-transparent border border-black rounded-md px-3 py-2 pr-10 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
               />
               <button
@@ -81,11 +134,23 @@ export default function Security() {
 
           {/* Button */}
           <div className="flex items-end">
-            <button className="ml-auto border border-black bg-[#CEFF1B] text-[#2B2B2B] text-sm px-6 py-2 rounded-md font-semibold">
-              Confirm Password
+            <button
+              type="button"
+              onClick={handleChangePassword}
+              disabled={isSaving}
+              className="ml-auto border border-black bg-[#CEFF1B] text-[#2B2B2B] text-sm px-6 py-2 rounded-md font-semibold disabled:opacity-60"
+            >
+              {isSaving ? "Saving..." : "Confirm Password"}
             </button>
           </div>
         </div>
+
+        {(error || success) && (
+          <div className="mt-4">
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            {success && <p className="text-sm text-green-700">{success}</p>}
+          </div>
+        )}
       </div>
 
       {/* ================= Active Devices ================= */}

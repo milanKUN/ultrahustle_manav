@@ -1,19 +1,46 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../pages/DesktopForgotPassword.css';
 import desktopBg from '/desktop-bg.png';
+import { forgotPassword, resetPassword } from '../api/authApi';
 
 const DesktopForgotPassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1); // 1: Email, 2: New Password, 3: Success
   const [formData, setFormData] = useState({
     email: '',
+    token: '',
     password: '',
     confirmPassword: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [submitMessage, setSubmitMessage] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const params = useMemo(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const hashParams = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+    return { searchParams, hashParams };
+  }, [location.search, location.hash]);
+
+  useEffect(() => {
+    const token = params.searchParams.get('token') || params.hashParams.get('token') || '';
+    const email = params.searchParams.get('email') || params.hashParams.get('email') || '';
+
+    if (token || email) {
+      setFormData((prev) => ({
+        ...prev,
+        email: email || prev.email,
+        token: token || prev.token,
+      }));
+      setStep(2);
+    }
+  }, [params]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,17 +50,68 @@ const DesktopForgotPassword = () => {
     }));
   };
 
-  const handleEmailSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    if (formData.email) {
-      setStep(2);
+    setSubmitError('');
+    setSubmitMessage('');
+
+    if (isSubmitting) return;
+    if (!formData.email) {
+      setSubmitError('Please enter your email.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const data = await forgotPassword({ email: formData.email });
+      setSubmitMessage(data?.message || 'We have emailed your password reset link.');
+    } catch (err) {
+      setSubmitError(err?.message || 'Failed to send reset link.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password && formData.password === formData.confirmPassword) {
+    setSubmitError('');
+    setSubmitMessage('');
+
+    if (isSubmitting) return;
+
+    if (!formData.email) {
+      setSubmitError('Missing email. Please use the reset link from your email.');
+      return;
+    }
+
+    if (!formData.token) {
+      setSubmitError('Missing token. Please use the reset link from your email.');
+      return;
+    }
+
+    if (!formData.password || !formData.confirmPassword) {
+      setSubmitError('Please enter and confirm your new password.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setSubmitError('Passwords do not match.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await resetPassword({
+        email: formData.email,
+        token: formData.token,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
       setStep(3);
+    } catch (err) {
+      setSubmitError(err?.message || 'Failed to reset password.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -62,6 +140,14 @@ const DesktopForgotPassword = () => {
           {/* STEP 1: Email Input */}
           {step === 1 && (
             <form onSubmit={handleEmailSubmit}>
+              {submitError ? (
+                <p className="auth-submit-message" role="alert">{submitError}</p>
+              ) : null}
+
+              {submitMessage ? (
+                <p className="auth-submit-message" role="status">{submitMessage}</p>
+              ) : null}
+
               <div className="form-group">
                 <label htmlFor="email">Email Address or phone number</label>
                 <div className="input-wrapper">
@@ -77,8 +163,8 @@ const DesktopForgotPassword = () => {
                 </div>
               </div>
 
-              <button type="submit" className="desktop-login-btn action-btn-grey">
-                Reset Password
+              <button type="submit" className="desktop-login-btn action-btn-grey" disabled={isSubmitting}>
+                {isSubmitting ? 'Sending...' : 'Reset Password'}
               </button>
 
               <div className="back-to-login">
@@ -92,6 +178,14 @@ const DesktopForgotPassword = () => {
           {/* STEP 2: New Password */}
           {step === 2 && (
             <form onSubmit={handlePasswordSubmit}>
+              {submitError ? (
+                <p className="auth-submit-message" role="alert">{submitError}</p>
+              ) : null}
+
+              {submitMessage ? (
+                <p className="auth-submit-message" role="status">{submitMessage}</p>
+              ) : null}
+
               <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <div className="input-wrapper">
@@ -143,7 +237,7 @@ const DesktopForgotPassword = () => {
               </div>
 
               <button type="submit" className="desktop-login-btn action-btn-grey">
-                Reset Password
+                {isSubmitting ? 'Resetting...' : 'Reset Password'}
               </button>
             </form>
           )}
@@ -165,7 +259,7 @@ const DesktopForgotPassword = () => {
               </p>
               <button
                 className="desktop-login-btn primary-lime"
-                onClick={() => navigate('/onboarding')}
+                onClick={() => navigate('/login')}
               >
                 Continue
               </button>

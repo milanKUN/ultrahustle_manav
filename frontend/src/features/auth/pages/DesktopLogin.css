@@ -195,6 +195,19 @@
   box-shadow: 0 10px 22px rgba(206, 255, 27, 0.28);
 }
 
+.desktop-login-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.auth-submit-message {
+  margin: 6px 0 10px;
+  font-size: 13px;
+  color: #2B2B2B;
+}
+
 /* Divider */
 .desktop-divider {
   display: flex;

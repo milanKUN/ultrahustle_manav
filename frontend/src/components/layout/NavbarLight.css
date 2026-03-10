@@ -928,7 +928,7 @@
 
   /* Hamburger Toggle */
   .hamburger-btn {
-    display: none !important;
+    display: flex !important;
   }
 
   .inreview-header.dark .hamburger-btn {

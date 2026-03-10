@@ -1,0 +1,1438 @@
+/* NavbarLight Component Styles */
+:root {
+  --ir-bg: #EAEAEA;
+  --ir-card-bg: rgba(254, 254, 254, 0.60);
+  --ir-lime: #CEFF1B;
+  --ir-text-dark: #222;
+  --ir-text-secondary: #5C5C5C;
+  --ir-border: #e0e0e0;
+  --ir-border-dark: #333;
+}
+
+/* Base styles */
+.hamburger-btn {
+  display: none;
+}
+
+/* Header Styles */
+.inreview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 40px;
+  background-color: rgba(234, 234, 234, 0.95);
+  border-bottom: 0.5px solid #CEFF1B;
+  box-shadow: 0 1px 13.6px 0 #CEFF1B;
+  backdrop-filter: blur(27px);
+  height: 85px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+  margin-left: 0;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+}
+
+.nav-link {
+  color: #D3D5D0;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 33px;
+  transition: color 0.2s;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav-pill {
+  width: 42px;
+  height: 5px;
+  border-radius: 0 0 41.309px 41.309px;
+  background: transparent;
+  transition: all 0.25s ease;
+  margin-top: -12px;
+}
+
+.nav-pill.active {
+  background: #CEFF1B;
+  box-shadow: 0 4px 10px rgba(206, 255, 27, 0.4);
+}
+
+.nav-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #5C5C5C;
+  transition: color 0.25s ease;
+}
+
+.nav-item:hover .nav-text,
+.nav-item:hover .nav-pill {
+  color: #222;
+}
+
+.nav-item:hover .nav-pill:not(.active) {
+  background: #CEFF1B;
+}
+
+/* ✅ Active nav item — neon text + pill (light & dark) */
+.nav-item .nav-pill.active+.nav-text,
+.nav-item:has(.nav-pill.active) .nav-text {
+  color: #CEFF1B !important;
+  font-weight: 600;
+}
+
+.nav-pill.active {
+  background: #CEFF1B;
+  box-shadow: 0 4px 14px rgba(206, 255, 27, 0.6), 0 0 20px rgba(206, 255, 27, 0.3);
+}
+
+
+
+
+
+
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+/* Header Search Bar */
+.header-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 398px;
+  min-width: 0;
+}
+
+.inreview-header .search-input {
+  width: 100%;
+  padding: 12px 45px 12px 20px;
+  border: 1.569px solid #CEFF1B;
+  border-radius: 36.138px;
+  font-size: 16px;
+  background: rgba(193, 193, 193, 0.24);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inreview-header .search-input::placeholder {
+  text-align: left;
+  color: #606060;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14.117px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.inreview-header .search-input:focus {
+  border-radius: 36.138px;
+  border: 1.569px solid #FEFEFE;
+  background: #FEFEFE;
+  box-shadow: 0 1px 10px 0 #CEFF1B;
+}
+
+.search-icon {
+  position: absolute;
+  right: 16px;
+  pointer-events: none;
+}
+
+/* Search Dropdown Styles */
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 877px;
+  max-height: 420px;
+  background: rgba(254, 254, 254, 0.80);
+  border-radius: 6.225px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(23.169px);
+  z-index: 1000;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.search-dropdown:hover,
+.search-dropdown:active {
+  box-shadow: 0 0.403px 6px 0 #CEFF1B;
+}
+
+.search-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: #FEFEFE;
+  border-bottom: 1px solid #CEFF1B;
+
+  flex-wrap: nowrap;
+  /* 👈 wrap band */
+  overflow-x: auto;
+  /* 👈 zyada tabs ho to scroll */
+  white-space: nowrap;
+}
+
+/* scrollbar hide (optional) */
+.search-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+
+.search-tab {
+  flex: 1;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  font-weight: 500;
+  color: #2B2B2B;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-tab:hover {
+  color: #2B2B2B;
+}
+
+.search-tab:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.search-tab.active {
+  background: #CEFF1B;
+  color: #2B2B2B;
+  border-radius: 11px;
+  margin: 8px;
+}
+
+.search-results {
+  max-height: 500px;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.search-results::-webkit-scrollbar {
+  display: none;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  height: 65px;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #FEFEFE;
+  border-bottom: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: #f5f5f5;
+}
+
+.search-result-item.highlighted {
+  background: #CEFF1B;
+}
+
+.search-result-avatar {
+  width: 49px;
+  height: 45px;
+  border-radius: 8px;
+  background: #B5B5B5;
+  flex-shrink: 0;
+  margin-left: 24px;
+}
+
+.search-result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  flex: 1;
+  min-width: 0;
+}
+
+
+
+.search-result-title {
+  font-size: 15px !important;
+  font-weight: 500;
+
+  color: #2B2B2B;
+}
+
+.search-result-description {
+  font-size: 13px !important;
+  /* ✅ smaller */
+  line-height: 1.15;
+  color: rgba(92, 92, 92, 0.77);
+  font-weight: 400;
+}
+
+
+.ai-powered-badge {
+  display: inline-flex;
+  /* 👈 important */
+  align-items: center;
+  height: 36px;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #2B2B2B;
+  color: #FEFEFE;
+  font-size: 12.8px;
+  font-weight: 400;
+  border-radius: 7.869px;
+  box-shadow: none;
+  white-space: nowrap;
+  width: 130px;
+  transition: all 0.3s ease;
+}
+
+.search-result-item:hover .ai-powered-badge,
+.search-result-item:active .ai-powered-badge {
+  box-shadow: 3px 1px 8.1px 1px #FF5CE8, -4px 2px 9.2px 0 #B67EFF;
+}
+
+/* ✅ Ai Powered icon always visible */
+.ai-powered-badge svg {
+  display: block !important;
+  width: 17px !important;
+  height: 17px !important;
+  flex: 0 0 8px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ✅ just in case: svg path never becomes transparent */
+.ai-powered-badge svg path {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ✅ hover me bhi icon ko affect mat karo */
+.search-result-item:hover .ai-powered-badge svg,
+.search-result-item:hover .ai-powered-badge svg path {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+
+
+/* ================= SEARCH RESULT FINAL HOVER FIX ================= */
+
+/* remove old hover + highlighted effects */
+.search-result-item.highlighted {
+  background: #FEFEFE !important;
+  box-shadow: none !important;
+}
+
+/* base */
+.search-result-item {
+
+  border: none !important;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+/* ✅ full neon hover (no border) */
+.search-result-item:hover {
+  background: #CEFF1B !important;
+  box-shadow: 0 0 12px rgba(206, 255, 27, 0.6),
+    0 0 24px rgba(206, 255, 27, 0.35) !important;
+}
+
+.inreview-header.dark .messages-dropdown .view-all-link {
+  color: #ffffff !important;
+}
+
+
+/* ✅ hover pe text black */
+.search-result-item:hover .search-result-title,
+.search-result-item:hover .search-result-description {
+  color: #000000 !important;
+}
+
+/* ✅ hover pe icon black */
+.search-result-item:hover .external-link-btn svg path {
+  stroke: #000000 !important;
+}
+
+/* ✅ hover pe ai badge readable */
+.search-result-item:hover .ai-powered-badge {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+
+.external-link-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  margin-left: 24px;
+  margin-right: 32px;
+}
+
+.external-link-btn:hover {
+  opacity: 1;
+}
+
+.search-view-all {
+  display: block;
+  padding: 16px 20px;
+  height: 55px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 400;
+  background: rgba(254, 254, 254, 0.80);
+  color: rgba(43, 43, 43, 0.50);
+  text-decoration: none;
+  border-top: 1px solid #CEFF1B;
+  transition: color 0.2s;
+}
+
+.search-view-all:hover {
+  color: #2B2B2B;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--ir-text-secondary);
+  transition: color 0.2s;
+  outline: none;
+}
+
+.icon-btn:hover {
+  color: var(--ir-text-dark);
+}
+
+.icon-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.user-avatar-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #5C5C5C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.user-avatar-btn svg {
+  stroke: var(--ir-lime);
+}
+
+/* Active state for avatar button - Enhanced Neon Glow */
+.user-avatar-btn.active {
+  background: #FAFAFA;
+  border: none;
+  box-shadow: 0 0 15px 5px rgba(206, 255, 27, 0.6), 0 0 30px 10px rgba(206, 255, 27, 0.4) !important;
+}
+
+.user-avatar-btn.active svg path:first-child {
+  fill: #FAFAFA;
+  stroke: #FAFAFA;
+}
+
+.user-avatar-btn.active svg path:last-child {
+  stroke: #3a3a3a;
+}
+
+/* User Avatar Wrapper for Dropdown */
+.user-avatar-wrapper {
+  position: relative;
+}
+
+/* User Dropdown Menu */
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 24px) !important;
+  right: 0;
+  width: 260px;
+  background: rgba(254, 254, 254, 0.40);
+  border-radius: 8.727px;
+  box-shadow: 0 1px 4px 0 #CEFF1B;
+  backdrop-filter: blur(27px);
+  padding: 16px 0 6px 0 !important;
+  z-index: 1000;
+}
+
+.dropdown-greeting {
+  padding: 8px 20px 12px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #5C5C5C;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #CEFF1B;
+  margin: 4px 0;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #5C5C5C;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  color: var(--ir-text-dark);
+}
+
+/* LIGHT THEME LOGOUT FIX */
+.inreview-header.light .user-dropdown .dropdown-item.logout,
+.inreview-header:not(.dark) .user-dropdown .dropdown-item.logout,
+.dropdown-item.logout {
+
+  color: #ef4444 !important;
+  font-weight: 500 !important;
+}
+
+.inreview-header.light .user-dropdown .dropdown-item.logout:hover,
+.inreview-header:not(.dark) .user-dropdown .dropdown-item.logout:hover,
+.dropdown-item.logout:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+}
+
+/* Messages Dropdown Styles */
+.messages-wrapper {
+  position: relative;
+}
+
+.messages-dropdown {
+  position: absolute;
+  height: 460px !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -28px;
+  right: 125px;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 30px solid #CEFF1B;
+}
+
+.messages-header {
+  background: #CEFF1B;
+  border-radius: 6.22px 6.22px 10px 10px;
+  height: 48px;
+  padding: 14px 20px;
+  font-size: 18.67px;
+  font-weight: 500;
+  color: #2B2B2B;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.messages-list::-webkit-scrollbar {
+  display: none;
+}
+
+.message-item {
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #fefefe;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.message-item:nth-child(even),
+.message-item:last-child {
+  background: #F1F1F1;
+}
+
+
+
+.message-item:hover {
+  background: #e8e8e8;
+}
+
+.message-avatar {
+  width: 49px;
+  height: 44px;
+  border-radius: 10px;
+  background: #B5B5B5;
+  flex-shrink: 0;
+}
+
+.message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.message-name {
+  font-size: 15px !important;
+  font-weight: 500;
+  color: #000000;
+}
+
+.message-text {
+  font-size: 13px !important;
+  font-weight: 400;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0px;
+}
+
+.message-time {
+  font-size: 16px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 15px;
+  text-align: center;
+  font-size: 24px;
+  height: 62px !important;
+  background: transparent;
+  color: rgba(43, 43, 43, 0.50) !important;
+  ;
+  text-decoration: none;
+  border-top: 1px solid #CEFF1B;
+  transition: all 0.2s;
+  border-radius: 0 0 6.225px 6.225px;
+}
+
+.view-all-link:hover {
+  background: transparent;
+  color: #000 !important;
+  font-weight: 500;
+}
+
+/* Notifications Dropdown Styles */
+.notifications-wrapper {
+  position: relative;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  height: 450px !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 10px;
+}
+
+.notifications-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -28px;
+  right: 85px;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 30px solid #CEFF1B;
+}
+
+.notification-container {
+  background-color: #D5D5D5;
+}
+
+.notifications-header {
+  background: #CEFF1B;
+  border-radius: 6.22px 6.22px 10px 10px;
+  height: 45px;
+  padding: 14px 20px;
+  font-size: 18.67px;
+  font-weight: 500;
+  color: #2B2B2B;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mark-all-read {
+  padding: 10px 20px;
+  text-align: right;
+  font-size: 14px;
+  color: #2B2B2B;
+  cursor: pointer;
+  background: #D5D5D5;
+}
+
+.mark-all-read:hover {
+  color: #2B2B2B;
+}
+
+.notifications-list {
+  flex: 1;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.notifications-list::-webkit-scrollbar {
+  display: none;
+}
+
+.notification-item {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #fefefe;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:nth-child(even),
+.notification-item:last-child {
+  background: #F1F1F1;
+}
+
+.notification-item:nth-child(even) .notification-text,
+.notification-item:nth-child(even) .notification-time,
+.notification-item:last-child .notification-text,
+.notification-item:last-child .notification-time {
+  color: #2B2B2B;
+}
+
+/* Last two items have two lines of text */
+.notification-item:nth-child(4) .notification-text,
+.notification-item:nth-child(5) .notification-text {
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.notification-item:hover {
+  background: #e8e8e8;
+}
+
+.notification-avatar {
+  width: 49px;
+  height: 44px;
+  border-radius: 10px;
+  background: #B5B5B5;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-text {
+  font-size: 15px !important;
+  font-weight: 400;
+  color: #000000;
+}
+
+.notification-time {
+  font-size: 16px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.notifications-view-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 24px;
+  height: 56px !important;
+  background: transparent;
+  color: rgba(43, 43, 43, 0.50);
+  text-decoration: none;
+  border-top: 1px solid #CEFF1B;
+  transition: all 0.2s;
+  border-radius: 0 0 6.225px 6.225px;
+}
+
+.notifications-view-all:hover {
+  background: transparent;
+  color: #000 !important;
+  font-weight: 500;
+}
+
+/* Blur Overlay */
+.blur-overlay {
+  position: fixed;
+  top: 85px;
+  /* Start below header */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.0);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  cursor: pointer;
+}
+
+/* ========== NARROW DESKTOP FIX: Nest Hub / iPad Pro / Nest Hub Max (951px - 1400px) ========== */
+@media (min-width: 951px) and (max-width: 1400px) {
+  .inreview-header {
+    padding: 12px 15px !important;
+    gap: 15px !important;
+  }
+
+  .logo {
+    height: 26px !important;
+  }
+
+  .header-left {
+    gap: 12px !important;
+    flex-shrink: 0;
+  }
+
+  .nav-menu {
+    gap: 12px !important;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    /* Ensure it can anchor the dropdown if needed, but fixed search-dropdown usually centers on viewport */
+  }
+
+  .header-search {
+    width: 450px !important;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .search-dropdown {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 40px) !important;
+    max-width: 877px !important;
+    top: 85px !important;
+    z-index: 9999 !important;
+  }
+
+  .header-right {
+    gap: 12px !important;
+    flex-shrink: 0;
+  }
+}
+
+/* ========== MOBILE HEADER ORDER FIX ========== */
+@media (max-width: 950px) {
+  .nav-menu {
+    display: none !important;
+  }
+
+  .inreview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    gap: 15px;
+  }
+
+  /* LEFT SIDE */
+  .header-left {
+    order: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  /* Hamburger Toggle */
+  .hamburger-btn {
+    display: none !important;
+  }
+
+  .inreview-header.dark .hamburger-btn {
+    color: #fff;
+  }
+
+  /* LOGO */
+  .logo {
+    height: 28px;
+    width: auto;
+    margin-left: 0;
+  }
+
+  /* hide desktop nav items */
+  .nav-menu,
+  .nav-link,
+  .nav-item {
+    display: none !important;
+  }
+
+  /* CENTERED SEARCH */
+  .search-wrapper {
+    order: 2;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: none;
+  }
+
+  .header-search {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  /* RIGHT SIDE */
+  .header-right {
+    order: 3;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  /* ===== ≤500px: Pure mobile — hamburger + icons only ===== */
+  /* =========================
+   ≤500px FINAL CENTER FIX
+========================= */
+  @media (max-width: 550px) {
+
+
+    .notifications-dropdown::before {
+      display: none !important;
+    }
+
+    .inreview-header {
+      position: fixed;
+      height: 68px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      position: static !important;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    /* TRUE CENTER LOGO — SMALLER */
+    .logo {
+      position: fixed !important;
+      left: 50% !important;
+      top: 25px !important;
+      transform: translateX(-50%);
+      height: 35px !important;
+      /* 👈 balanced height */
+      width: 200px !important;
+      z-index: 1001;
+      pointer-events: none;
+    }
+
+    .search-wrapper {
+      display: none !important;
+    }
+
+    .header-right {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notifications-wrapper,
+    .user-avatar-wrapper {
+      display: flex !important;
+    }
+
+    .messages-wrapper {
+      display: none !important;
+    }
+
+    .blur-overlay {
+      top: 68px !important;
+    }
+
+    .notifications-dropdown,
+    .search-dropdown {
+      top: 68px !important;
+    }
+
+  }
+
+
+}
+
+
+
+/* ========== MOBILE DROPDOWN FIX ========== */
+@media (max-width: 950px) {
+
+  /* ✅ FORCE CENTER NOTIFICATION DROPDOWN */
+  .notifications-wrapper {
+    position: static !important;
+    /* avoid weird right offset from parent */
+  }
+
+  .notifications-dropdown {
+    position: fixed !important;
+    top: 84px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+
+    width: calc(100vw - 20px) !important;
+    /* 10px gap left+right */
+    max-width: 520px !important;
+    /* optional: desktop-like max */
+    border-radius: 12px !important;
+
+    z-index: 9999 !important;
+  }
+
+  /* ✅ Arrow (triangle) center */
+  .notifications-dropdown::before {
+    right: auto !important;
+    left: 92% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  /* ✅ FORCE CENTER SEARCH DROPDOWN */
+  .search-dropdown {
+    position: fixed !important;
+    top: 84px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 20px) !important;
+    max-width: 600px !important;
+    border-radius: 12px !important;
+    z-index: 9999 !important;
+  }
+}
+
+/* ✅ ONLY 501px — 950px: Notifications dropdown 8% left */
+@media (min-width: 551px) and (max-width: 950px) {
+  .notifications-dropdown {
+    left: 58% !important;
+    /* 50% - 8% */
+    transform: translateX(-50%) !important;
+  }
+
+  .notifications-dropdown::before {
+    display: block !important;
+  }
+}
+
+/* ✅ ONLY <=500px: Hide arrow (triangle) */
+@media (max-width: 550px) {
+  .notifications-dropdown::before {
+    display: none !important;
+  }
+}
+
+/* ================= DARK MODE ================= */
+
+
+
+/* ✅ DARK MODE: kill light-mode even/odd styling (fix blank rows) */
+.inreview-header.dark .notification-item,
+.inreview-header.dark .notification-item:nth-child(even),
+.inreview-header.dark .notification-item:nth-child(odd),
+.inreview-header.dark .notification-item:last-child {
+  background: #2b2b2b !important;
+}
+
+/* ✅ text always visible */
+.inreview-header.dark .notification-item .notification-text,
+.inreview-header.dark .notification-item .notification-time {
+  color: #ffffff !important;
+}
+
+/* optional: divider line */
+.inreview-header.dark .notification-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* optional hover */
+.inreview-header.dark .notification-item:hover {
+  background: #3a3a3a !important;
+}
+
+/* ✅ DARK MODE: Messages list rows always visible */
+.inreview-header.dark .message-item,
+.inreview-header.dark .message-item:nth-child(even),
+.inreview-header.dark .message-item:nth-child(odd),
+.inreview-header.dark .message-item:last-child {
+  background: #2b2b2b !important;
+}
+
+/* ✅ text/time always white */
+.inreview-header.dark .message-name,
+.inreview-header.dark .message-text,
+.inreview-header.dark .message-time {
+  color: #ffffff !important;
+}
+
+/* optional divider */
+.inreview-header.dark .message-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* hover */
+.inreview-header.dark .message-item:hover {
+  background: #3a3a3a !important;
+}
+
+.inreview-header.dark {
+  background-color: #0f1115;
+  border-bottom: 1px solid #1f2937;
+}
+
+/* Nav links */
+.inreview-header.dark .nav-link {
+  color: #d1d5db;
+}
+
+.inreview-header.dark .nav-link.active {
+  color: #ceff1b;
+}
+
+/* Search */
+.inreview-header.dark .search-input {
+  background: rgba(214, 214, 214, 0.24);
+  color: #fff;
+  border-color: #2a2f3a;
+}
+
+.inreview-header.dark .search-input:focus {
+  background: #ffffff;
+  /* 👈 white after click */
+  color: #000000;
+  /* text readable */
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(206, 255, 27, 0.6);
+}
+
+.inreview-header.dark .search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Icons */
+.inreview-header.dark .icon-btn svg path {
+  stroke: #d1d5db;
+}
+
+/* Dropdowns */
+.inreview-header.dark .messages-dropdown,
+.inreview-header.dark .notifications-dropdown,
+.inreview-header.dark .user-dropdown,
+.inreview-header.dark .search-dropdown {
+  background: rgba(43, 43, 43, 0.6);
+  color: #fff;
+  border: 1px solid #2a2f3a;
+}
+
+/* Dropdown items */
+.inreview-header.dark .dropdown-item,
+.inreview-header.dark .message-name,
+.inreview-header.dark .notification-text {
+  color: #e5e7eb;
+}
+
+.inreview-header.dark .dropdown-item:hover {
+  background: #CEFF1B;
+  color: #000;
+}
+
+/* Blur overlay */
+.inreview-header.dark~.blur-overlay {
+  backdrop-filter: blur(6px);
+}
+
+/* ================= SEARCH DROPDOWN DARK FIX ================= */
+
+/* Tabs container */
+.inreview-header.dark .search-tabs {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Inactive tabs */
+.inreview-header.dark .search-tab {
+  background: transparent;
+  color: #9ca3af;
+}
+
+/* Active tab */
+.inreview-header.dark .search-tab.active {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* Results container */
+.inreview-header.dark .search-results {
+  background: var(--card);
+}
+
+/* Each result row */
+.inreview-header.dark .search-result-item {
+  background: transparent;
+  color: var(--text);
+}
+
+/* Highlighted row (green one in screenshot) */
+.inreview-header.dark .search-result-item.highlighted {
+  background: #ceff1b;
+  color: #000;
+}
+
+/* Title & description */
+.inreview-header.dark .search-result-title {
+  color: inherit;
+}
+
+.inreview-header.dark .search-result-description {
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* Avatar bg (grey boxes) */
+.inreview-header.dark .search-result-avatar {
+  background: #3a3a3a;
+}
+
+/* View all footer */
+.inreview-header.dark .search-view-all {
+  background: #1a1d23;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+/* External link icon */
+.inreview-header.dark .external-link-btn svg path {
+  stroke: var(--text);
+}
+
+/* ================= MESSAGE DROPDOWN FINAL DARK FIX ================= */
+
+.inreview-header.dark .messages-dropdown,
+.inreview-header.dark .notifications-dropdown {
+  background: #2B2B2B;
+  border: 1px solid #ceff1b;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+}
+
+.inreview-header.dark .view-all-link,
+.inreview-header.dark .notifications-view-all {
+  background: transparent;
+  color: #ffffff;
+  border-top: 1px solid #ceff1b;
+}
+
+.inreview-header.dark .view-all-link:hover,
+.inreview-header.dark .notifications-view-all:hover {
+  background: transparent;
+  color: #ceff1b !important;
+}
+
+
+/* ======================================================= */
+
+
+
+/* Dark mode – notification header text BLACK */
+.inreview-header.dark .notifications-dropdown .notifications-header {
+  color: #000000 !important;
+}
+
+/* Dark mode – mark all as read BLACK */
+.inreview-header.dark .notifications-dropdown .mark-all-read {
+  color: #000000 !important;
+}
+
+
+/* =========================
+USER DROPDOWN – DARK MODE FIX
+========================= */
+
+/* Hi, First Name! → white */
+.inreview-header.dark .user-dropdown .dropdown-greeting {
+  color: #ffffff !important;
+}
+
+/* Logout → red */
+.inreview-header.dark .user-dropdown .dropdown-item.logout {
+  color: #ef4444 !important;
+  /* red */
+}
+
+/* optional: hover pe thoda dark red */
+.inreview-header.dark .user-dropdown .dropdown-item.logout:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+
+
+
+/* ================= VIEW ALL COMMON BEHAVIOUR ================= */
+
+/* DEFAULT = WHITE */
+.inreview-header.dark .view-all-link,
+.inreview-header.dark .search-view-all,
+.inreview-header.dark .notifications-view-all {
+  color: #ffffff;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* HOVER = neon glow */
+.inreview-header.dark .view-all-link:hover,
+.inreview-header.dark .notifications-view-all:hover {
+  color: #ffffff;
+}
+
+/* ✅ Search View All — neon hover in dark mode */
+.inreview-header.dark .search-view-all:hover {
+  color: #CEFF1B !important;
+  /* text-shadow: 0 0 10px rgba(206, 255, 27, 0.8), 0 0 20px rgba(206, 255, 27, 0.4); */
+  background: transparent !important;
+  transition: all 0.25s ease;
+}
+
+/* ACTIVE (CLICKED) = neon locked */
+.inreview-header.dark .view-all-link.active,
+.inreview-header.dark .search-view-all.active,
+.inreview-header.dark .notifications-view-all.active {
+  color: #ceff1b;
+  font-weight: 400;
+}
+
+
+/* Dark mode (extra safe) */
+.inreview-header.dark .view-all-link.active {
+  color: #CEFF1B !important;
+}
+
+
+/* Dark mode – avatar active FULL GREEN with Layered Glow */
+.inreview-header.dark .user-avatar-btn.active {
+  background: #ceff1b;
+  border: none;
+  box-shadow: 0 0 15px 5px rgba(206, 255, 27, 0.7), 0 0 35px 12px rgba(206, 255, 27, 0.5) !important;
+}
+
+/* Circle fill bhi green */
+.inreview-header.dark .user-avatar-btn.active svg path:first-child {
+  fill: #ceff1b;
+  stroke: #ceff1b;
+}
+
+/* Inner profile icon dark (contrast ke liye) */
+.inreview-header.dark .user-avatar-btn.active svg path:last-child {
+  stroke: #2b2b2b;
+}
+
+/* ===============================
+   HEADER BG: LIGHT = #D2D2D2
+   DARK = no issues
+   (place at END)
+================================ */
+
+/* Light mode header background */
+.inreview-header {
+  background-color: #D2D2D2 !important;
+}
+
+/* Dark mode header background (force) */
+.inreview-header.dark {
+  background-color: #0f1115 !important;
+  border-bottom: 1px solid #1f2937 !important;
+}

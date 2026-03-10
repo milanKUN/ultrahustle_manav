@@ -1,0 +1,2235 @@
+/* TeamProfileLight Additional Styles */
+/* These styles extend InReviewLight.css for Portfolio, Listings, and Reviews sections */
+/* Member  */
+.membersWrap {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.membersHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.membersTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+}
+
+.membersLine {
+  flex: 1;
+  height: 1px;
+  background: #cfcfcf;
+}
+
+/* outer light border like screenshot */
+.membersPanel {
+  border: 1px solid #ceff1b;
+  border-radius: 14px;
+  padding: 18px;
+  background-color: #FFF;
+  margin-bottom: 30px;
+}
+
+/* grid */
+.membersGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.memberCard {
+  background: #D6D6D6;
+
+  border-radius: 16px;
+  padding: 18px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.memberTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: #232323;
+  flex: 0 0 56px;
+}
+
+.memberInfo {
+  line-height: 1.1;
+}
+
+.memberName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+
+.memberRole {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin-top: 4px;
+}
+
+.memberTag {
+  margin-top: 14px;
+  background: #ceff1b;
+  color: #1a1a1a;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.viewBtn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a3a3a;
+  cursor: pointer;
+}
+
+.viewBtn:hover {
+  background: #CEFF1B;
+  border-color: #CEFF1B;
+  color: #000;
+  box-shadow: 0 0 15px #CEFF1B;
+  transition: all 0.3s ease;
+}
+
+/* responsive */
+@media (max-width: 1024px) {
+  .membersGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .membersPanel {
+    padding: 14px;
+  }
+
+  .membersGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .memberCard {
+    padding: 16px;
+  }
+}
+
+/* =========================
+   MEMBERS — DARK MODE ONLY
+   Works when wrapper has: .user-page.dark
+   Light CSS SAME rahega
+========================= */
+
+.user-page.dark .membersTitle {
+  color: #ffffff !important;
+}
+
+.user-page.dark .membersLine {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.user-page.dark .membersPanel {
+  background-color: rgba(43, 43, 43, 0.6) !important;
+  border-color: rgba(206, 255, 27, 0.35) !important;
+}
+
+.user-page.dark .memberCard {
+  background: #FEFEFE40 !important;
+  border: 1px solid rgba(206, 255, 27, 0.18) !important;
+}
+
+.user-page.dark .avatar {
+  background: #2b2b2b !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.user-page.dark .memberName {
+  color: #ffffff !important;
+}
+
+.user-page.dark .memberRole {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+.user-page.dark .memberTag {
+  background: #ceff1b !important;
+  color: #111111 !important;
+}
+
+.user-page.dark .viewBtn {
+  background: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: black !important;
+}
+
+.user-page.dark .viewBtn:hover {
+  background: #CEFF1B !important;
+  border-color: #CEFF1B !important;
+  color: #000000 !important;
+  box-shadow: 0 0 15px #CEFF1B !important;
+  transition: all 0.3s ease !important;
+}
+
+
+/* Portfolio Section */
+.portfolio-section {
+  padding: 20px 0;
+}
+
+.portfolio-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.portfolio-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #222;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.portfolio-header-line {
+  flex: 1;
+  height: 1px;
+  background: #5C5C5C;
+}
+
+/* Featured Portfolio Card */
+.portfolio-featured-card {
+  display: grid;
+  grid-template-columns: 45% 1fr;
+  gap: 40px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  border: 2px solid #CEFF1B;
+  margin-bottom: 20px;
+}
+
+.portfolio-featured-image {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.portfolio-featured-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  filter: grayscale(100%);
+  border-radius: 12px;
+}
+
+.portfolio-featured-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding-right: 20px;
+}
+
+.portfolio-featured-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: #222;
+}
+
+.portfolio-featured-desc {
+  font-size: 14px;
+  color: #5C5C5C;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.portfolio-featured-cost {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.cost-label {
+  font-size: 12px;
+  color: #5C5C5C;
+}
+
+.cost-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Portfolio Grid Card */
+.portfolio-grid-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 20px;
+  border: 2px solid #CEFF1B;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.portfolio-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-item-image {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.portfolio-item-image img {
+  width: 100%;
+  height: 219px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.portfolio-item-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.portfolio-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.portfolio-item-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+}
+
+.portfolio-item-desc {
+  font-size: 12px;
+  color: #5C5C5C;
+}
+
+.portfolio-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+
+/* ===============================
+   PORTFOLIO — DARK MODE
+=============================== */
+
+.user-page.dark .portfolio-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .portfolio-header-line {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Featured Card */
+.user-page.dark .portfolio-featured-card {
+  background: #141414 !important;
+  border-color: rgba(206, 255, 27, 0.4) !important;
+}
+
+.user-page.dark .portfolio-featured-title {
+  color: #ffffff !important;
+}
+
+.user-page.dark .portfolio-featured-desc {
+  color: #cfcfcf !important;
+}
+
+.user-page.dark .cost-label {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .cost-value {
+  color: #ffffff !important;
+}
+
+/* Grid Card */
+.user-page.dark .portfolio-grid-card {
+  background: #141414 !important;
+  border-color: rgba(206, 255, 27, 0.4) !important;
+}
+
+.user-page.dark .portfolio-item-title {
+  color: #ffffff !important;
+}
+
+.user-page.dark .portfolio-item-desc {
+  color: #cfcfcf !important;
+}
+
+.user-page.dark .portfolio-item-right .cost-label {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .portfolio-item-right .cost-value {
+  color: #ffffff !important;
+}
+
+/* Listings Section */
+.listings-section {
+  padding: 30px 0;
+}
+
+.listings-tab {
+  padding: 12px 28px;
+  background: #CEFF1B;
+  border: 1px solid #333;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.listing-card {
+  background: none;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.listing-image {
+  position: relative;
+  height: 200px;
+  border-radius: 12px;
+  margin: 8px 8px 0 8px;
+  overflow: hidden;
+}
+
+.listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.listing-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.listing-nav-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.listing-nav-btn.left {
+  left: 10px;
+}
+
+.listing-nav-btn.right {
+  right: 10px;
+}
+
+.listing-info {
+  padding: 12px 12px 8px 12px;
+}
+
+.listing-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.listing-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #222;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.listing-type {
+  padding: 4px 12px;
+  background: #CEFF1B;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #222;
+  flex-shrink: 0;
+}
+
+.listing-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.listing-views {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #5C5C5C;
+}
+
+.listing-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.listing-actions {
+  display: flex;
+  padding: 8px 12px 12px 12px;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-view-listing {
+  flex: 1;
+  padding: 12px;
+  background: #FFFFFF;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #222;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn-view-listing:hover {
+  background: #CEFF1B;
+  border-color: #CEFF1B;
+  color: #000;
+  box-shadow: 0 0 15px #CEFF1B;
+  transition: all 0.3s ease;
+}
+
+.btn-favorite {
+  padding: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Reviews Section */
+.reviews-section {
+  padding: 30px 0;
+}
+
+.reviews-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reviews-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #222;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.reviews-header-line {
+  flex: 1;
+  height: 0.5px;
+  background: #5C5C5C;
+}
+
+.reviews-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  background: none;
+  padding: 30px 0;
+}
+
+.reviews-summary {
+  padding-right: 30px;
+}
+
+.rating-overview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rating-score {
+  font-size: 20px;
+  font-weight: 300;
+  color: #222;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.review-count {
+  font-size: 14px;
+  color: #5C5C5C;
+}
+
+.rating-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-label {
+  width: 30px;
+  font-size: 14px;
+  color: #222;
+}
+
+.rating-bar {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: 4px;
+}
+
+.rating-count {
+  width: 30px;
+  font-size: 14px;
+  color: #5C5C5C;
+  text-align: right;
+}
+
+/* Reviews List */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-item {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #2B2B2B;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reviewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+}
+
+.reviewer-info {
+  flex: 1;
+}
+
+.reviewer-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  display: block;
+}
+
+.review-stars {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.review-date {
+  font-size: 14px;
+  color: #5C5C5C;
+}
+
+.review-text {
+  font-size: 14px;
+  color: #5C5C5C;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===============================
+   CUSTOM SCROLLBAR – NEON
+================================ */
+
+/* Chrome, Edge, Safari */
+.reviews-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reviews-list::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  /* 👈 grey background */
+  border-radius: 10px;
+}
+
+.reviews-list::-webkit-scrollbar-thumb {
+  background: #ceff1b;
+  /* 👈 neon color */
+  border-radius: 10px;
+  box-shadow: 0 0 6px rgba(206, 255, 27, 0.9);
+}
+
+.reviews-list::-webkit-scrollbar-thumb:hover {
+  background: #dfff4f;
+  box-shadow: 0 0 10px rgba(206, 255, 27, 1);
+}
+
+/* Firefox */
+.reviews-list {
+  scrollbar-width: thin;
+  scrollbar-color: #ceff1b #e0e0e0;
+  /* thumb | track */
+}
+
+
+/* join button css */
+.btn-join {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #2b2b2b;
+  background: #ceff1b;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-join.sent {
+  background: white;
+  border-color: #bdbdbd;
+  color: #2b2b2b;
+  cursor: default;
+}
+
+.btn-join.sent svg {
+  color: #2b2b2b;
+}
+
+
+/* =========================
+   RESPONSIVE FIXES
+   ========================= */
+
+/* Base safety */
+.team-profile-page,
+.team-profile-page * {
+  box-sizing: border-box;
+}
+
+.inreview-main {
+  width: 100%;
+  min-width: 0;
+  /* important for flex overflow */
+}
+
+/* Make main content adapt next to sidebar */
+.pt-16.flex.relative.z-10 {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Prevent horizontal scroll on mobile */
+.team-profile-page {
+  overflow-x: hidden;
+}
+
+/* ======= Desktop / Large screens improvements ======= */
+@media (min-width: 1024px) {
+  .inreview-main {
+    padding-left: 20px;
+    /* little gap from sidebar */
+    padding-right: 20px;
+  }
+}
+
+/* ======= Tablet (<= 1024px) ======= */
+@media (max-width: 1024px) {
+  .inreview-main {
+    padding: 16px;
+  }
+
+  /* Title badges section stacks nicely */
+  .title-badges-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .title-left,
+  .title-center,
+  .title-right {
+    width: 100%;
+  }
+
+  .trust-badges,
+  .hashtags {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* =========================
+   TITLE + BADGES (IMAGE LIKE)
+========================= */
+
+  .title-badges-section {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    /* left a bit wider */
+    gap: 18px;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  /* common card */
+  .tb-card {
+    background: rgba(254, 254, 254, 0.60);
+    border: 1px solid #CEFF1B;
+    border-radius: 22px;
+    padding: 22px 24px;
+    min-height: 180px;
+    /* same feel like image */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* LEFT */
+  .section-title {
+    margin: 0 0 10px;
+    font-size: 22px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #2b2b2b;
+  }
+
+  .section-description {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.55;
+    color: #5c5c5c;
+    max-width: 520px;
+  }
+
+  /* CENTER */
+  .center-info {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .location-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2b2b2b;
+  }
+
+  /* availability pill (wide like image) */
+  .availability-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px 22px;
+    border-radius: 14px;
+
+    background: #CEFF1B;
+    border: 1px solid #CEFF1B;
+
+    font-size: 16px;
+    font-weight: 500;
+    color: #2b2b2b;
+    white-space: nowrap;
+  }
+
+  /* RIGHT */
+  .trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .trust-badge {
+    background: #CEFF1B;
+    border: 1px solid #CEFF1B;
+    color: #2b2b2b;
+
+    padding: 10px 16px;
+    border-radius: 14px;
+
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hashtag {
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: #CEFF1B;
+    border: 1px solid #CEFF1B;
+    color: #1a1a1a;
+
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* =========================
+   RESPONSIVE
+========================= */
+  @media (max-width: 1024px) {
+    .title-badges-section {
+      grid-template-columns: 1fr;
+    }
+
+    .tb-card {
+      min-height: auto;
+    }
+
+    .availability-pill {
+      width: 100%;
+      /* mobile pe full width */
+      justify-content: center;
+    }
+  }
+
+}
+
+/* ======= Mobile (<= 768px) ======= */
+@media (max-width: 768px) {
+  .inreview-main {
+    padding: 14px;
+  }
+
+  /* Profile card stack */
+  .profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 24px;
+    height: auto !important;
+    /* Reset fixed height */
+  }
+
+  .profile-left {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .profile-actions {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-message,
+  .btn-join {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Stats grid 2 columns */
+  .stats-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+  }
+
+  /* Content cards */
+  .content-card {
+    padding: 14px;
+  }
+
+  /* Skills wrapper: keep scroll usable */
+  .skills-wrapper {
+    position: relative;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .skills-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 8px;
+    padding: 8px 6px;
+  }
+
+  .skill-tag {
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  /* Tools wrap */
+  .tools-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Languages wrap */
+  .languages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Portfolio featured stack */
+  .portfolio-featured-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .portfolio-featured-image img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  /* Portfolio grid single column */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Listings: 1 column */
+  .listings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .listing-card {
+    width: 100%;
+  }
+
+  .listing-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+
+
+
+  /* tools and skill */
+
+  .scrollable {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    white-space: nowrap;
+  }
+
+  .scrollable::-webkit-scrollbar {
+    display: none;
+  }
+
+  .skills-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Reviews: stack summary and list */
+  .reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .reviews-summary,
+  .reviews-list {
+    width: 100%;
+  }
+
+  .reviews-summary {
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .rating-overview {
+    flex-wrap: wrap;
+  }
+
+  .rating-score {
+    font-size: 24px;
+  }
+}
+
+/* ======= Small Mobile (<= 420px) ======= */
+@media (max-width: 420px) {
+  .stats-section {
+    grid-template-columns: 1fr;
+    /* 1 column for very small screens */
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .btn-message,
+  .btn-join {
+    width: 100%;
+  }
+
+  .listing-image img {
+    height: 170px;
+  }
+
+  .portfolio-featured-image img {
+    height: 190px;
+  }
+}
+
+
+
+/* user page css  */
+
+
+/* ===== Activity Time icon (dots grid) ===== */
+.stat-icon.activity-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* grid wrapper */
+.activity-dots {
+  display: grid;
+  grid-template-columns: repeat(7, 12px);
+  gap: 3px;
+  align-items: center;
+  justify-items: center;
+}
+
+/* each dot */
+.activity-dots .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cfcfcf;
+  /* grey */
+}
+
+/* active green dots */
+.activity-dots .dot.on {
+  background: #CEFF1B;
+}
+
+/* ✅ Hover effect for clickable Activity Time card */
+.stat-card:has(.activity-dots):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(206, 255, 27, 0.2);
+  transition: all 0.2s ease;
+}
+
+.user-page.dark .stat-card:has(.activity-dots):hover {
+  box-shadow: 0 4px 12px rgba(206, 255, 27, 0.3);
+}
+
+:root {
+  --lime: #ceff1b;
+  --text: #2b2b2b;
+  --muted: #6b6b6b;
+  --bg: #FEFEFE/66;
+  --panel: #f7f7f7;
+}
+
+/* Outer container like screenshot */
+.teamsWrap {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--lime);
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+}
+
+.teamsTitle {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* row */
+.teamsRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* card */
+.teamCard {
+  background: var(--bg);
+  border: 1px solid var(--lime);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+}
+
+.teamTop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.teamAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.teamMeta {
+  min-width: 0;
+  flex: 1;
+}
+
+.teamName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* role pill */
+.teamRolePill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid #dedede;
+  background: #f3f3f3;
+  color: #3b3b3b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* members row */
+.teamMembersRow {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.teamUsersIcon {
+  display: inline-flex;
+  color: #7a7a7a;
+}
+
+/* button like screenshot */
+.teamBtn {
+  width: 80%;
+  margin-top: 12px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid var(--lime);
+  background: #ffffff;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12px;
+  margin-left: 17%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+.teamBtnIcon {
+  display: inline-flex;
+  color: var(--text);
+}
+
+.teamBtn:hover {
+  background: #CEFF1B;
+  border-color: #CEFF1B;
+  color: #000;
+  box-shadow: 0 0 15px #CEFF1B;
+  transition: all 0.3s ease;
+}
+
+/* ✅ responsive */
+@media (max-width: 980px) {
+  .teamsRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .teamsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ===============================
+   DARK MODE – TEAMS SECTION
+================================ */
+
+.user-page-dark .teamsWrap {
+  background-color: rgba(43, 43, 43, 0.6);
+  border: 1px solid #ceff1b;
+}
+
+.user-page-dark .teamsTitle {
+  color: #ffffff;
+}
+
+/* Team card */
+.user-page-dark .teamCard {
+  background-color: rgba(43, 43, 43, 0.6);
+  border: 1px solid #ceff1b;
+}
+
+/* Team name */
+.user-page-dark .teamName {
+  color: #ffffff;
+}
+
+/* Role pill */
+.user-page-dark .teamRolePill {
+  background: #1f1f1f;
+  border: 1px solid #2a2a2a;
+  color: #dcdcdc;
+}
+
+/* Members row */
+.user-page-dark .teamMembersRow {
+  color: #a8a8a8;
+}
+
+.user-page-dark .teamUsersIcon {
+  color: #9f9f9f;
+}
+
+/* Button ✅ FIXED */
+.user-page-dark .teamBtn {
+  background: #0f0f0f;
+  border: 1px solid #ceff1b;
+  color: #ceff1b;
+}
+
+.user-page-dark .teamBtnIcon {
+  color: #ceff1b;
+}
+
+.user-page-dark .teamBtn:hover {
+  background: #CEFF1B !important;
+  border-color: #CEFF1B !important;
+  color: #000000 !important;
+  box-shadow: 0 0 15px #CEFF1B !important;
+  transition: all 0.3s ease !important;
+}
+
+
+/* for folow button  */
+
+
+
+/* review */
+
+.reviews-container {
+  display: flex;
+  gap: 24px;
+}
+
+/* LEFT side 50% */
+.reviews-summary {
+  flex: 1;
+}
+
+/* RIGHT side scrollable */
+.reviews-list {
+  flex: 1;
+  max-height: 380px;
+  /* 👈 jitni height chahiye */
+  overflow-y: auto;
+  /* 👈 vertical scroll */
+  padding-right: 8px;
+  /* scrollbar gap */
+}
+
+/* Smooth & clean scrollbar (optional but pro) */
+.reviews-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reviews-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.reviews-list::-webkit-scrollbar-track {
+  background: #ceff1b;
+}
+
+/* port folio description */
+
+.profile-info-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 8px !important;
+}
+
+.info-icon {
+  color: #333;
+}
+
+.info-badge {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.location-badge {
+  font-size: 16px;
+  color: #333;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #111;
+  margin-right: 6px;
+}
+
+.availability-badge {
+  background: #CEFF1B;
+  padding: 8px 16px;
+  border-radius: 10px;
+  color: #000 !important;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+
+/* 🔥 PORTFOLIO MODAL BACKDROP (Blur Effect) */
+.portfolio-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ✅ MODAL CARD – Centered + Internal Scroll */
+.portfolio-modal-content {
+  width: 95% !important;
+  max-width: 550px !important;
+  max-height: 80vh !important;
+  margin-top: 50px !important;
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  position: relative !important;
+  z-index: 100000 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  animation: modalIn 0.25s ease;
+  box-shadow: 0 0 40px rgba(206, 255, 27, 0.6), 0 30px 60px rgba(0, 0, 0, 0.4) !important;
+  pointer-events: auto !important;
+}
+
+/* 🔝 Top bar (sticky) */
+.portfolio-modal-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: #fff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+/* ✅ Navbar Actions (Arrows and Counter) */
+.portfolio-modal-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  /* Push group to the right */
+  margin-right: 20px;
+  /* Space between nav and close button */
+}
+
+.portfolio-modal-counter {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.nav-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.nav-arrow:hover {
+  background: #CEFF1B;
+  border-color: #CEFF1B;
+  color: #000;
+}
+
+.portfolio-modal-content.dark .nav-arrow {
+  background: #222;
+  border-color: #444;
+  color: #fff;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-counter {
+  color: #ddd;
+}
+
+.portfolio-modal-content.dark .nav-arrow:hover {
+  background: #CEFF1B;
+  border-color: #CEFF1B;
+  color: #000;
+}
+
+/* 🌙 DARK MODE Modal Body */
+.portfolio-modal-content.dark {
+  background: #121212 !important;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-topbar {
+  background: black;
+  border-bottom: 1px solid #333;
+  color: #ffffff;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-info h3 {
+  color: #ffffff;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-info p {
+  color: #a0a0a0;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-cost {
+  background: #1e1e1e;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-cost span {
+  color: #a0a0a0;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-cost strong {
+  color: #ffffff;
+}
+
+/* ✅ Close button RIGHT SIDE (inside topbar) */
+.portfolio-modal-close {
+  /* margin-left: auto; Removed to stay grouped with nav */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+
+  color: #000;
+  /* ✅ better contrast on lime */
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.portfolio-modal-close:hover {
+  background: #CEFF1B;
+  box-shadow: 0 0 15px #CEFF1B;
+  color: #000;
+}
+
+/* 🌙 DARK MODE Close button */
+.portfolio-modal-content.dark .portfolio-modal-close {
+  color: #ffffff !important;
+  border: 1px solid #ffffff !important;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-close:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+  border-color: #ffffff !important;
+}
+
+/* 📝 Info */
+.portfolio-modal-info {
+  padding: 18px;
+}
+
+.portfolio-modal-info h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.portfolio-modal-info p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 🔥 Neon scrollbar – WebKit */
+.portfolio-modal-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.portfolio-modal-content::-webkit-scrollbar-track {
+  background: white;
+  border-radius: 10px;
+}
+
+.portfolio-modal-content.dark::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.portfolio-modal-content::-webkit-scrollbar-thumb {
+  background: #CEFF1B;
+  border-radius: 10px;
+}
+
+/* 💰 Cost */
+.portfolio-modal-cost {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.portfolio-modal-cost span {
+  font-size: 13px;
+  color: #777;
+}
+
+.portfolio-modal-cost strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* 🖼 Main image */
+.portfolio-modal-image {
+  padding: 0 18px 18px;
+}
+
+.portfolio-modal-brand {
+  margin-left: 15px;
+}
+
+.portfolio-modal-image img {
+  width: 100%;
+  height: 450px;
+  /* ✅ Fixed height for image to encourage scrolling */
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* thumbs */
+.portfolio-modal-thumbs {
+  padding: 0 18px 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.portfolio-modal-thumbs img {
+  height: 110px;
+  width: 100%;
+  /* ✅ grid me 200px fixed mat rakho */
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .portfolio-modal-backdrop {
+    padding: 16px !important;
+  }
+
+  .portfolio-modal-content {
+    width: 100% !important;
+    max-height: 90vh !important;
+  }
+
+  .portfolio-modal-topbar {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .portfolio-brand-circle {
+    display: none;
+    /* Hide circle to save space */
+  }
+
+  .portfolio-modal-nav {
+    margin-right: 0;
+  }
+
+  .portfolio-modal-info {
+    padding: 14px;
+  }
+
+  .portfolio-modal-image {
+    padding: 0 14px 14px;
+  }
+
+  .portfolio-modal-image img {
+    height: auto;
+    max-height: 300px;
+  }
+
+  .portfolio-modal-thumbs {
+    padding: 0 14px 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+/* Background Blur Effect */
+.blurred {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+  pointer-events: none;
+}
+
+/* Horizontal Scroll Containers */
+.scrollable {
+  display: flex !important;
+  gap: 16px;
+  overflow-x: auto !important;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  flex: 1;
+  margin-left: 20px;
+}
+
+.scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+/* ✨ Animation */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* profile card */
+.profile-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #2b2b2b;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #2b2b2b;
+}
+
+/* 🔹 Meta line */
+.profile-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6f6f6f;
+}
+
+.status-online {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #2ecc71;
+  font-weight: 500;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ecc71;
+}
+
+.meta-separator {
+  color: black;
+  font-weight: 500;
+}
+
+
+
+
+/* =========================================
+TEAM PROFILE — DARK MODE (CreateTeam style)
+Works when wrapper has: .user-page.dark
+========================================= */
+
+/* Ensure page area turns dark */
+.user-page.dark .inreview-container,
+.user-page.dark .inreview-main {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* ---------------------------
+PROFILE TOP CARD
+--------------------------- */
+.user-page.dark .profile-card {
+  background-color: rgba(43, 43, 43, 0.6) !important;
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .profile-name {
+  color: #ffffff !important;
+}
+
+.user-page.dark .profile-username {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.user-page.dark .profile-meta-line {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.user-page.dark .meta-separator {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Buttons */
+.user-page.dark .btn-message {
+  background: transparent !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.user-page.dark .btn-join {
+  background: #CEFF1B !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+/* avatar */
+.user-page.dark .profile-avatar {
+  background: #2b2b2b !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* ---------------------------
+TITLE + BADGES GRID
+--------------------------- */
+.user-page.dark .title-badges-section>div {
+  background-color: rgba(43, 43, 43, 0.6) !important;
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .section-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .section-description {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+/* availability badge */
+.user-page.dark .availability-badge {
+  background: #CEFF1B !important;
+  border: none !important;
+  color: #2B2B2B !important;
+}
+
+/* trust badges */
+.user-page.dark .trust-badge {
+  background: #CEFF1B !important;
+  border: none !important;
+  color: #2B2B2B !important;
+}
+
+/* hashtags */
+.user-page.dark .hashtag {
+  background: #CEFF1B !important;
+  border: none !important;
+  color: #2B2B2B !important;
+}
+
+.user-page.dark .info-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.user-page.dark .info-badge,
+.user-page.dark .location-badge {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.user-page.dark .info-badge.availability-badge {
+  color: #000000 !important;
+}
+
+.user-page.dark .info-label {
+  color: #ffffff !important;
+}
+
+/* ---------------------------
+STATS CARDS
+--------------------------- */
+.user-page.dark .stats-section .stat-card {
+  background-color: rgba(43, 43, 43, 0.6) !important;
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .stat-value {
+  color: #ffffff !important;
+}
+
+.user-page.dark .stat-label {
+  color: rgba(255, 255, 255, 0.60) !important;
+}
+
+/* ---------------------------
+ABOUT / WHAT WE DO content cards
+--------------------------- */
+.user-page.dark .content-card {
+  background-color: rgba(43, 43, 43, 0.6);
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .card-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .card-text {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+/* ---------------------------
+SKILLS / TOOLS / LANGUAGES chips
+--------------------------- */
+.user-page.dark .skill-tag {
+
+  border: none !important;
+  color: #2b2b2b !important;
+}
+
+.user-page.dark .tool-tag {
+
+  border: 1px solid #FEFEFE !important;
+  color: white !important;
+}
+
+.user-page.dark .language-item {
+  border: 1px solid #FEFEFE !important;
+  color: white !important;
+}
+
+.user-page.dark .scroll-btn circle {
+  fill: #CEFF1B !important;
+}
+
+.user-page.dark .scroll-btn path {
+  stroke: #000 !important;
+}
+
+/* ---------------------------
+PORTFOLIO
+--------------------------- */
+.user-page.dark .portfolio-header-line,
+.user-page.dark .reviews-header-line {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.user-page.dark .portfolio-featured-card,
+.user-page.dark .portfolio-grid-card {
+  background-color: rgba(43, 43, 43, 0.6) !important;
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .portfolio-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .portfolio-featured-title,
+.user-page.dark .portfolio-item-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .portfolio-featured-desc,
+.user-page.dark .portfolio-item-desc,
+.user-page.dark .cost-label {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+.user-page.dark .cost-value {
+  color: #CEFF1B !important;
+}
+
+/* ---------------------------
+LISTINGS
+--------------------------- */
+.user-page.dark .listings-tab {
+  background: #CEFF1B !important;
+  border: none !important;
+  color: #2B2B2B !important;
+}
+
+.user-page.dark .listing-card {
+  background: #0b0b0b !important;
+  border: 1px solid rgba(206, 255, 27, 0.35) !important;
+  border-radius: 20px;
+}
+
+.user-page.dark .listing-title,
+.user-page.dark .listing-price {
+  color: #ffffff !important;
+}
+
+.user-page.dark .listing-views {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+.user-page.dark .listing-type {
+  background: #CEFF1B !important;
+  border: none !important;
+  color: #2B2B2B !important;
+}
+
+/* listing arrows */
+.user-page.dark .listing-nav-btn {
+  background: rgba(0, 0, 0, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.user-page.dark .listing-nav-btn path {
+  stroke: #ffffff !important;
+}
+
+/* view listing button */
+.user-page.dark .btn-view-listing {
+  background: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: black !important;
+}
+
+.user-page.dark .btn-view-listing:hover {
+  background: #CEFF1B !important;
+  border-color: #CEFF1B !important;
+  color: #000 !important;
+  box-shadow: 0 0 15px #CEFF1B !important;
+}
+
+/* favorite icon */
+.user-page.dark .btn-favorite {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px;
+}
+
+.user-page.dark .btn-favorite svg {
+  stroke: rgba(255, 255, 255, 0.70) !important;
+}
+
+/* ---------------------------
+REVIEWS
+--------------------------- */
+.user-page.dark .reviews-title {
+  color: #CEFF1B !important;
+}
+
+.user-page.dark .reviews-container {
+  background: transparent !important;
+}
+
+.user-page.dark .rating-score,
+.user-page.dark .rating-label,
+.user-page.dark .reviewer-name {
+  color: #ffffff !important;
+}
+
+.user-page.dark .review-count,
+.user-page.dark .review-text,
+.user-page.dark .review-date,
+.user-page.dark .rating-count {
+  color: rgba(255, 255, 255, 0.70) !important;
+}
+
+.user-page.dark .rating-bar {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.user-page.dark .rating-bar-fill {
+  background: linear-gradient(90deg, #CEFF1B, #8DFF00) !important;
+}
+
+.user-page.dark .review-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+
+
+/* Modal Styling Consolidated Above */

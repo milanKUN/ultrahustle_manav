@@ -1,0 +1,13 @@
+.dashboard-container {
+    max-width: 1089px;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+
+.dashboard-page.dark .dashboard-container h1 {
+    color: white;
+}
+
+.dashboard-page.light .dashboard-container h1 {
+    color: #1a1a1a;
+}

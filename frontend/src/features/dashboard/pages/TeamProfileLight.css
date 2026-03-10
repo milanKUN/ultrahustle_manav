@@ -68,20 +68,22 @@
 }
 
 .memberInfo {
-  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .memberName {
   font-size: 15px;
   font-weight: 700;
   color: #111;
+  white-space: nowrap;
 }
 
 .memberRole {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: #666;
-  margin-top: 4px;
 }
 
 .memberTag {
@@ -166,6 +168,12 @@
 .user-page.dark .avatar {
   background: #2b2b2b !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.user-page.dark .memberInfo {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 8px !important;
 }
 
 .user-page.dark .memberName {

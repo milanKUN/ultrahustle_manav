@@ -1,0 +1,104 @@
+/* Custom Select for Onboarding */
+.onboarding-custom-select {
+  position: relative;
+  width: 100%;
+  z-index: 10;
+}
+
+.onboarding-custom-select.active {
+  z-index: 9999;
+}
+
+.onboarding-selected-option {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid black;
+  color: #000000b3;
+  /* black/70 */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+
+.onboarding-selected-option:hover {
+  background: #e5e7eb;
+}
+
+.onboarding-selected-option.open {
+  background: transparent;
+  border-color: transparent !important;
+  box-shadow: 0 0 15px #CEFF1B !important;
+}
+
+
+.onboarding-arrow {
+  font-size: 10px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.onboarding-selected-option.open .onboarding-arrow {
+  transform: rotate(180deg);
+}
+
+.onboarding-options-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background: #ffffff !important;
+  border: none;
+  border-radius: 0px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  z-index: 99999 !important;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+.onboarding-options-list li {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #374151;
+  border-radius: 0px;
+  font-size: 14px;
+}
+
+.onboarding-options-list li:hover {
+  background: #CEFF1B;
+  color: #000;
+}
+
+.onboarding-options-list li.active {
+  background: #CEFF1B;
+  color: #000;
+  font-weight: 600;
+}
+
+/* Scrollbar for options list */
+.onboarding-options-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.onboarding-options-list::-webkit-scrollbar-thumb {
+  background: #CEFF1B;
+  border-radius: 10px;
+}
+
+.onboarding-options-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Role dropdown specific - show only 2 items */
+.role-dropdown-small {
+  max-height: 88px !important;
+}

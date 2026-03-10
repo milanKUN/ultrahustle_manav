@@ -261,10 +261,12 @@ body {
 .user-page.dark.create-team-page .form-input,
 .user-page-dark.create-team-page .form-input,
 .user-page.dark.create-team-page .form-textarea,
+.user-page.dark.create-team-page .textarea-wrapper,
 .user-page-dark.create-team-page .form-textarea,
 .user-page.dark.create-team-page .form-select,
 .user-page-dark.create-team-page .form-select {
     color: #fff;
+    border-color: #fefefe !important;
 }
 
 .user-page.dark.create-team-page .form-input::placeholder,
@@ -272,6 +274,11 @@ body {
 .user-page.dark.create-team-page .form-textarea::placeholder,
 .user-page-dark.create-team-page .form-textarea::placeholder {
     color: #9ca3af;
+}
+
+.user-page.dark.create-team-page .form-select,
+.user-page-dark.create-team-page .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9' fill='none'%3E%3Cpath d='M4.76318 8.25L4.36366e-05 5.64421e-08L9.52632 8.89256e-07L4.76318 8.25Z' fill='%23fefefe'/%3E%3C/svg%3E");
 }
 
 /* Input Prefix Wrapper */
@@ -296,6 +303,11 @@ body {
     margin-right: 4px;
     user-select: none;
     font-size: 14px;
+}
+
+.user-page.dark.create-team-page .input-with-prefix,
+.user-page-dark.create-team-page .input-with-prefix {
+    border-color: #fefefe !important;
 }
 
 .create-team-page .input-with-prefix .form-input {
@@ -331,6 +343,7 @@ body {
 .user-page.dark.create-team-page .onboarding-selected-option,
 .user-page-dark.create-team-page .onboarding-selected-option {
     color: #fff !important;
+    border: 1px solid #fff !important;
 }
 
 .form-textarea {
@@ -484,9 +497,7 @@ body {
     color: #333;
 }
 
-.btn-invite:hover {
-    background-color: #f0f0f0;
-}
+
 
 .btn-invite.active {
     background-color: var(--lime-glow);

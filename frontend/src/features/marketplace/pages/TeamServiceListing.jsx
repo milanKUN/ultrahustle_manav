@@ -14,6 +14,7 @@ import {
     Infinity,
     CheckCircle2,
     User,
+    X,
 } from 'lucide-react';
 import './TeamServiceListing.css';
 import UserNavbar from '../../../components/layout/UserNavbar';
@@ -28,6 +29,9 @@ const TeamServiceListing = ({ theme, setTheme }) => {
     const [showSettings, setShowSettings] = useState(false);
     const [activeSetting, setActiveSetting] = useState('basic');
     const [showMoreListings, setShowMoreListings] = useState(false);
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [modalImgIndex, setModalImgIndex] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
 
     // Portfolio & Listing State (same as UserProfile.jsx)
     const [activeItem, setActiveItem] = useState(null);
@@ -95,6 +99,8 @@ const TeamServiceListing = ({ theme, setTheme }) => {
         { image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=500&q=80', title: 'Brand Identity & Logo Design', type: 'Service', views: 1325, price: '$1,200' },
         { image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=500&q=80', title: 'Landing Page Conversion Template', type: 'Product', views: 1640, price: '$29' },
     ];
+
+
 
     const reviewsData = {
         average: 4.9,
@@ -370,7 +376,9 @@ const TeamServiceListing = ({ theme, setTheme }) => {
                                 <div className="tsl-header-actions">
                                     <button className="tsl-icon-btn"><Share2 size={20} /></button>
                                     <button className="tsl-icon-btn"><Flag size={20} /></button>
-                                    <button className="tsl-icon-btn"><Heart size={20} /></button>
+                                    <button className="tsl-icon-btn" onClick={() => setIsLiked(!isLiked)}>
+                                        <Heart size={20} fill={isLiked ? "red" : "none"} color={isLiked ? "red" : "currentColor"} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -387,7 +395,13 @@ const TeamServiceListing = ({ theme, setTheme }) => {
                                             <button className="tsl-slider-btn right" onClick={() => setActiveImg(prev => (prev === images.length - 1 ? 0 : prev + 1))}>
                                                 <ChevronRight size={20} />
                                             </button>
-                                            <button className="tsl-expand-btn">
+                                            <button
+                                                className="tsl-expand-btn"
+                                                onClick={() => {
+                                                    setModalImgIndex(activeImg);
+                                                    setShowImageModal(true);
+                                                }}
+                                            >
                                                 <Maximize2 size={16} />
                                             </button>
                                         </div>
@@ -475,15 +489,17 @@ const TeamServiceListing = ({ theme, setTheme }) => {
 
                                     <div className="tsl-pricing-content">
                                         <div className="tsl-price-row">
-                                            <div className="tsl-price-box">
+                                            <div className="tsl-price-info">
+                                                <span className="tsl-price-label">Price</span>
                                                 <span className="tsl-price">${packages[activeTab].price}</span>
-                                                <p className="tsl-pkg-desc">{packages[activeTab].desc}</p>
                                             </div>
                                             <div className="tsl-delivery-info">
                                                 <span className="tsl-delivery-label">Delivery</span>
                                                 <span className="tsl-delivery-value">{packages[activeTab].delivery}</span>
                                             </div>
                                         </div>
+
+                                        <p className="tsl-pkg-desc">{packages[activeTab].desc}</p>
 
                                         <p className="tsl-revs">{packages[activeTab].revisions} Revisions</p>
 
@@ -576,6 +592,55 @@ const TeamServiceListing = ({ theme, setTheme }) => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* ✅ IMAGE POPUP MODAL */}
+                                {showImageModal && createPortal(
+                                    <div className={`tsl-image-modal-backdrop ${theme}`} onClick={() => setShowImageModal(false)}>
+                                        <button
+                                            className="tsl-modal-close-btn"
+                                            onClick={() => setShowImageModal(false)}
+                                        >
+                                            <X size={24} />
+                                        </button>
+
+                                        <div className="tsl-modal-content-wrap" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                className="tsl-modal-nav-btn left"
+                                                onClick={() => setModalImgIndex(prev => (prev === 0 ? images.length - 1 : prev - 1))}
+                                            >
+                                                <ChevronLeft size={32} />
+                                            </button>
+
+                                            <div className="tsl-modal-img-container">
+                                                <img
+                                                    src={images[modalImgIndex]}
+                                                    alt="Enlarged view"
+                                                    className="tsl-modal-main-img"
+                                                />
+                                            </div>
+
+                                            <button
+                                                className="tsl-modal-nav-btn right"
+                                                onClick={() => setModalImgIndex(prev => (prev === images.length - 1 ? 0 : prev + 1))}
+                                            >
+                                                <ChevronRight size={32} />
+                                            </button>
+                                        </div>
+
+                                        <div className="tsl-modal-thumbs-strip" onClick={(e) => e.stopPropagation()}>
+                                            {images.map((img, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`tsl-modal-thumb-item ${modalImgIndex === idx ? 'active' : ''}`}
+                                                    onClick={() => setModalImgIndex(idx)}
+                                                >
+                                                    <img src={img} alt={`Thumb ${idx}`} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>,
+                                    document.body
+                                )}
 
                                 {/* ✅ POPUP MODAL */}
                                 {activeItem && createPortal(

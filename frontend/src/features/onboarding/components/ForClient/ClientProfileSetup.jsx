@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCurrentUserEmail } from "../../../auth/api/authApi";
+import { setOnboardingCompleted } from "../../onboardingState";
+import { completeOnboarding } from "../../api/onboardingApi";
 
 export default function ClientProfileSetup() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const currentStep = 7; // Visual step index (8th step)
   const totalSteps = 8;
 
@@ -17,13 +21,32 @@ export default function ClientProfileSetup() {
     "/client-profile-setup"
   ];
 
-  const handleGetStarted = () => {
-    // Navigate to dashboard
-    navigate('/dashboard');
+  const handleGetStarted = async () => {
+    if (isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await completeOnboarding();
+      setOnboardingCompleted(getCurrentUserEmail(), true);
+      navigate('/dashboard', { replace: true });
+    } catch (e) {
+      console.error("Failed to complete onboarding", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSkip = () => {
-    navigate('/dashboard');
+  const handleSkip = async () => {
+    if (isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await completeOnboarding();
+      setOnboardingCompleted(getCurrentUserEmail(), true);
+      navigate('/dashboard', { replace: true });
+    } catch (e) {
+      console.error("Failed to complete onboarding", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
