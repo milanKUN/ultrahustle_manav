@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 class PersonalInfoController extends Controller
 {
@@ -184,7 +185,15 @@ class PersonalInfoController extends Controller
 
         $filename = $user->uh_user_id.'_'.now()->format('YmdHis').'_'.Str::random(8).'.'.$ext;
 
-        $path = $file->storeAs('uploads/avatars', $filename, 'public');
+        try {
+            $path = $file->storeAs('uploads/avatars', $filename, 'public');
+        } catch (Throwable $e) {
+            report($e);
+
+            return $this->errorResponse('Failed to upload avatar.', $this->exceptionPayload($e, [
+                'hint' => 'Storage write failed. Ensure storage/app/public is writable and run php artisan storage:link on the server.',
+            ]), 500);
+        }
 
         try {
             DB::transaction(function () use ($info, $path, $filename, $mime, $file): void {
@@ -196,11 +205,21 @@ class PersonalInfoController extends Controller
                     'avatar_updated_at' => now(),
                 ])->save();
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $disk->delete($path);
             report($e);
 
-            return $this->errorResponse('Failed to upload avatar.', [], 500);
+            $hint = null;
+            if ($e instanceof QueryException) {
+                $msg = strtolower($e->getMessage());
+                if (str_contains($msg, 'unknown column') || str_contains($msg, "doesn't exist") || str_contains($msg, 'no such table')) {
+                    $hint = 'Database schema may be missing avatar columns. Run php artisan migrate --force on the server.';
+                }
+            }
+
+            return $this->errorResponse('Failed to upload avatar.', $this->exceptionPayload($e, array_filter([
+                'hint' => $hint,
+            ])), 500);
         }
 
         if ($oldPath && $oldPath !== $path) {
@@ -208,6 +227,18 @@ class PersonalInfoController extends Controller
         }
 
         return $this->successResponse('Avatar uploaded.', $this->payload($user, $info->fresh()));
+    }
+
+    private function exceptionPayload(Throwable $e, array $extra = []): array
+    {
+        if (config('app.debug')) {
+            return array_merge($extra, [
+                'exception' => class_basename($e),
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $extra;
     }
 
     public function deleteAvatar(Request $request): JsonResponse
