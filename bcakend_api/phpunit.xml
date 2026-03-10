@@ -20,6 +20,8 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="base64:82sBcByKjn8CZJCTBVjSY3d9Zpd+Y2MR9sd7f1IUDi4="/>
+        <env name="APP_URL" value="http://localhost"/>
+        <env name="FRONTEND_URL" value="http://localhost:3000"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>

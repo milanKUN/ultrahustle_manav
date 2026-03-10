@@ -10,10 +10,8 @@ import "../../../Darkuser.css";
 import { getCurrentUserEmail } from "../../auth/api/authApi";
 import {
   createTeam,
-  getTeam,
   getTeamMembers,
   listTeamInvites,
-  patchTeam,
   searchCreators,
   sendTeamInvite,
   uploadTeamAvatar,
@@ -22,11 +20,6 @@ import {
 
 const CreateTeam = ({ theme, setTheme }) => {
   const navigate = useNavigate();
-
-  const currentEmailKey = String(getCurrentUserEmail() || "").trim().toLowerCase() || "anon";
-  const DRAFT_KEY = `uh_create_team_draft:${currentEmailKey}`;
-  const TEAM_ID_KEY = `uh_create_team_team_id:${currentEmailKey}`;
-
   const [formData, setFormData] = useState({
     // ... (rest of the state remains the same, will use replace_file_content specifically for targeted areas)
 
@@ -137,59 +130,6 @@ const CreateTeam = ({ theme, setTheme }) => {
 
   const [externalInviteEmail, setExternalInviteEmail] = useState("");
 
-  // Restore draft + teamId on first mount.
-  React.useEffect(() => {
-    try {
-      const rawDraft = localStorage.getItem(DRAFT_KEY);
-      if (rawDraft) {
-        const parsed = JSON.parse(rawDraft);
-        if (parsed && typeof parsed === "object") {
-          setFormData((prev) => ({
-            ...prev,
-            ...parsed,
-            // Ensure arrays stay arrays.
-            hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : prev.hashtags,
-            skills: Array.isArray(parsed.skills) ? parsed.skills : prev.skills,
-            tools: Array.isArray(parsed.tools) ? parsed.tools : prev.tools,
-            languages: Array.isArray(parsed.languages) ? parsed.languages : prev.languages,
-            rules: Array.isArray(parsed.rules) ? parsed.rules : prev.rules,
-          }));
-        }
-      }
-
-      const storedTeamId = localStorage.getItem(TEAM_ID_KEY);
-      if (storedTeamId) {
-        const id = parseInt(storedTeamId, 10);
-        if (!Number.isNaN(id) && id > 0) setTeamId(id);
-      }
-    } catch {
-      // Ignore corrupted localStorage.
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Save draft to localStorage (debounced) so reload keeps input values.
-  React.useEffect(() => {
-    const t = setTimeout(() => {
-      try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
-      } catch {
-        // Ignore quota issues.
-      }
-    }, 400);
-
-    return () => clearTimeout(t);
-  }, [DRAFT_KEY, formData]);
-
-  // Persist teamId so we can restore from backend after reload.
-  React.useEffect(() => {
-    try {
-      if (teamId) localStorage.setItem(TEAM_ID_KEY, String(teamId));
-    } catch {
-      // ignore
-    }
-  }, [TEAM_ID_KEY, teamId]);
-
 
   // ✅ Sidebar state (matching User.jsx)
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -206,8 +146,6 @@ const CreateTeam = ({ theme, setTheme }) => {
   const [avatarZoom, setAvatarZoom] = useState(50);
   const [selectedAvatarImage, setSelectedAvatarImage] = useState(null);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState(null);
-  const [teamAvatarUrl, setTeamAvatarUrl] = useState("");
-  const [avatarModalInitialSrc, setAvatarModalInitialSrc] = useState(null);
   const avatarInputRef = React.useRef(null);
 
   const handleSectionChange = (id) => {
@@ -215,15 +153,12 @@ const CreateTeam = ({ theme, setTheme }) => {
   };
 
   const openAvatarModal = () => {
-    setAvatarModalInitialSrc(selectedAvatarImage || teamAvatarUrl || null);
     setIsAvatarModalOpen(true);
   };
 
   const closeAvatarModal = () => {
     setIsAvatarModalOpen(false);
-    // Revert to what we had before opening the modal (unless upload updates it).
-    setSelectedAvatarImage(avatarModalInitialSrc || teamAvatarUrl || null);
-    setSelectedAvatarFile(null);
+    setSelectedAvatarImage(null);
     setAvatarZoom(50);
   };
 
@@ -278,77 +213,6 @@ const CreateTeam = ({ theme, setTheme }) => {
       rules: (formData.rules || []).map((t) => String(t).trim()).filter(Boolean),
     };
   };
-
-  const extractAvatarUrl = (res) => {
-    // Accept a few possible response shapes.
-    const team = res?.data || res?.team || res?.data?.team || res;
-    return (
-      team?.avatar_url ||
-      res?.data?.avatar_url ||
-      res?.avatar_url ||
-      ""
-    );
-  };
-
-  const hydrateFromTeamResponse = (res) => {
-    const team = res?.team || res?.data?.team || res?.data || res;
-    if (!team || typeof team !== "object") return;
-
-    const url = team?.avatar_url || "";
-    if (url) {
-      setTeamAvatarUrl(url);
-      setSelectedAvatarImage(url);
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      teamName: team?.name ?? prev.teamName,
-      teamUsername: team?.username ?? prev.teamUsername,
-      title: team?.title ?? prev.title,
-      bio: team?.bio ?? prev.bio,
-      about: team?.about ?? prev.about,
-      whatWeDo: team?.what_we_do ?? team?.whatWeDo ?? prev.whatWeDo,
-      category: team?.category ?? prev.category,
-      availability: team?.availability ?? prev.availability,
-      terms: team?.terms ?? prev.terms,
-      hashtags: Array.isArray(team?.hashtags) ? team.hashtags : prev.hashtags,
-      skills: Array.isArray(team?.skills) ? team.skills : prev.skills,
-      tools: Array.isArray(team?.tools) ? team.tools : prev.tools,
-      languages: Array.isArray(team?.languages) ? team.languages : prev.languages,
-      rules: Array.isArray(team?.rules) ? team.rules : prev.rules,
-    }));
-  };
-
-  // If teamId exists (created earlier), hydrate UI from backend after reload.
-  React.useEffect(() => {
-    if (!teamId) return;
-    (async () => {
-      try {
-        const res = await getTeam(teamId);
-        hydrateFromTeamResponse(res);
-        await refreshMembersAndInvites(teamId);
-      } catch {
-        // If fetch fails, draft values still show.
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId]);
-
-  // Auto-save changes to backend when team already exists (debounced).
-  React.useEffect(() => {
-    if (!teamId) return;
-
-    const t = setTimeout(async () => {
-      try {
-        await patchTeam(teamId, normalizeTeamPayload());
-      } catch {
-        // Avoid noisy alerts during typing.
-      }
-    }, 800);
-
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId, formData]);
 
   const extractTeamId = (res) => {
     // Be flexible with backend response shapes.
@@ -459,21 +323,9 @@ const CreateTeam = ({ theme, setTheme }) => {
       }
       setTeamId(newId);
 
-      try {
-        localStorage.setItem(TEAM_ID_KEY, String(newId));
-        localStorage.removeItem(DRAFT_KEY);
-      } catch {
-        // ignore
-      }
-
       if (selectedAvatarFile) {
         try {
-          const avatarRes = await uploadTeamAvatar(newId, selectedAvatarFile);
-          const url = extractAvatarUrl(avatarRes);
-          if (url) {
-            setTeamAvatarUrl(url);
-            setSelectedAvatarImage(url);
-          }
+          await uploadTeamAvatar(newId, selectedAvatarFile);
         } catch (e) {
           // Avatar upload should not block team creation.
           window.alert(e?.message || "Avatar upload failed");
@@ -628,12 +480,8 @@ const CreateTeam = ({ theme, setTheme }) => {
                   className="relative w-20 h-20 rounded-full bg-[#D9D9D9] cursor-pointer flex items-center justify-center avatar-container"
                   onClick={openAvatarModal}
                 >
-                  {(selectedAvatarImage || teamAvatarUrl) ? (
-                    <img
-                      src={selectedAvatarImage || teamAvatarUrl}
-                      alt="Team Avatar"
-                      className="w-full h-full rounded-full object-cover"
-                    />
+                  {selectedAvatarImage ? (
+                    <img src={selectedAvatarImage} alt="Team Avatar" className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <div className="avatar-placeholder"></div>
                   )}
@@ -1473,13 +1321,7 @@ const CreateTeam = ({ theme, setTheme }) => {
                       // If the team already exists, upload immediately.
                       if (teamId && selectedAvatarFile) {
                         try {
-                          const avatarRes = await uploadTeamAvatar(teamId, selectedAvatarFile);
-                          const url = extractAvatarUrl(avatarRes);
-                          if (url) {
-                            setTeamAvatarUrl(url);
-                            setSelectedAvatarImage(url);
-                            setAvatarModalInitialSrc(url);
-                          }
+                          await uploadTeamAvatar(teamId, selectedAvatarFile);
                           await refreshMembersAndInvites(teamId);
                         } catch (e) {
                           window.alert(e?.message || "Avatar upload failed");

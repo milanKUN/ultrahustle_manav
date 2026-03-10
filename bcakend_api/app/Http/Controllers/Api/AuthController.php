@@ -22,6 +22,10 @@ class AuthController extends Controller
     {
         $payload = $request->all();
 
+        if (isset($payload['email'])) {
+            $payload['email'] = strtolower(trim((string) $payload['email']));
+        }
+
         // Support common frontend naming.
         if (! isset($payload['password_confirmation']) && isset($payload['confirmPassword'])) {
             $payload['password_confirmation'] = $payload['confirmPassword'];
@@ -48,27 +52,46 @@ class AuthController extends Controller
         try {
             $validated = $validator->validated();
 
-            $user = User::create([
-                'uh_user_id' => User::generateUniqueUhUserId(),
-                'full_name' => $validated['fullName'],
-                'email' => strtolower($validated['email']),
-                'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
-                'provider' => null,
-                'provider_id' => null,
-                'agreed_to_terms' => true,
-            ]);
+            $user = DB::transaction(function () use ($validated) {
+                return User::create([
+                    'uh_user_id' => User::generateUniqueUhUserId(),
+                    'full_name' => $validated['fullName'],
+                    'email' => strtolower($validated['email']),
+                    'password' => Hash::make($validated['password']),
+                    'role' => $validated['role'],
+                    'provider' => null,
+                    'provider_id' => null,
+                    'agreed_to_terms' => true,
+                ]);
+            });
 
-            $this->sendEmailVerificationOtp($user);
+            $otpSent = $this->sendEmailVerificationOtp($user);
+
+            if (! $otpSent) {
+                return $this->successResponse('Registration successful. Verification code could not be sent right now. Please resend the code.', [
+                    'verification_required' => true,
+                    'otp_sent' => false,
+                    'user' => $user,
+                ], 201);
+            }
 
             return $this->successResponse('Registration successful. Verification code sent to email.', [
                 'verification_required' => true,
+                'otp_sent' => true,
                 'user' => $user,
             ], 201);
         } catch (\Throwable $e) {
             report($e);
 
-            return $this->errorResponse('Registration failed. Please try again later.', [], 500);
+            $errors = [];
+            if (config('app.debug')) {
+                $errors = [
+                    'exception' => class_basename($e),
+                    'error' => $e->getMessage(),
+                ];
+            }
+
+            return $this->errorResponse('Registration failed. Please try again later.', $errors, 500);
         }
     }
 
@@ -314,7 +337,7 @@ class AuthController extends Controller
         ], $statusCode);
     }
 
-    private function sendEmailVerificationOtp(User $user): void
+    private function sendEmailVerificationOtp(User $user): bool
     {
         $expiresInMinutes = (int) config('auth.otp_expires_minutes', 10);
         $resendCooldownSeconds = (int) config('auth.otp_resend_cooldown_seconds', 30);
@@ -327,13 +350,13 @@ class AuthController extends Controller
         if ($latest && isset($latest->created_at)) {
             $createdAt = \Illuminate\Support\Carbon::parse($latest->created_at);
             if ($createdAt->diffInSeconds(now()) < $resendCooldownSeconds) {
-                return;
+                return false;
             }
         }
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        DB::table('email_verification_otps')->insert([
+        $otpId = DB::table('email_verification_otps')->insertGetId([
             'user_id' => $user->id,
             'email' => $user->email,
             'code_hash' => Hash::make($code),
@@ -344,11 +367,20 @@ class AuthController extends Controller
             'updated_at' => now(),
         ]);
 
-        Mail::to($user->email)->send(new EmailVerificationOtpMail(
-            fullName: $user->full_name,
-            code: $code,
-            expiresInMinutes: $expiresInMinutes,
-        ));
+        try {
+            Mail::to($user->email)->send(new EmailVerificationOtpMail(
+                fullName: $user->full_name,
+                code: $code,
+                expiresInMinutes: $expiresInMinutes,
+            ));
+        } catch (\Throwable $e) {
+            report($e);
+            DB::table('email_verification_otps')->where('id', $otpId)->delete();
+
+            return false;
+        }
+
+        return true;
     }
 
     private function onboardingStatus(User $user): array

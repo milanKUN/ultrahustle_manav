@@ -146,7 +146,7 @@ class EmailVerificationController extends Controller
 
             $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-            DB::table('email_verification_otps')->insert([
+            $otpId = DB::table('email_verification_otps')->insertGetId([
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'code_hash' => Hash::make($code),
@@ -157,11 +157,26 @@ class EmailVerificationController extends Controller
                 'updated_at' => now(),
             ]);
 
-            Mail::to($user->email)->send(new EmailVerificationOtpMail(
-                fullName: $user->full_name,
-                code: $code,
-                expiresInMinutes: $expiresInMinutes,
-            ));
+            try {
+                Mail::to($user->email)->send(new EmailVerificationOtpMail(
+                    fullName: $user->full_name,
+                    code: $code,
+                    expiresInMinutes: $expiresInMinutes,
+                ));
+            } catch (\Throwable $e) {
+                report($e);
+                DB::table('email_verification_otps')->where('id', $otpId)->delete();
+
+                $errors = [];
+                if (config('app.debug')) {
+                    $errors = [
+                        'exception' => class_basename($e),
+                        'error' => $e->getMessage(),
+                    ];
+                }
+
+                return $this->errorResponse('Failed to send verification code. Please try again later.', $errors, 500);
+            }
 
             return $this->successResponse('Verification code resent.', [
                 'resend_available_in_seconds' => $resendCooldownSeconds,
