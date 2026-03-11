@@ -11,6 +11,14 @@ import "../../onboarding/components/OnboardingSelect.css";
 
 import { getMyPersonalInfo } from "../api/personalInfoApi";
 import { getMyPortfolio } from "../api/portfolioApi";
+import {
+  followUser,
+  getFollowCounts,
+  getFollowers,
+  getFollowing,
+  removeFollower as apiRemoveFollower,
+  unfollowUser,
+} from "../api/followApi";
 
 
 const UserProfile = (props) => {
@@ -52,6 +60,8 @@ const UserProfile = (props) => {
   const skillsContainerRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openFollowModal, setOpenFollowModal] = useState(false);
+  const [viewerUserId, setViewerUserId] = useState(null);
+  const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 });
 
   // ✅ Activity Calendar state
   const [openActivityCalendar, setOpenActivityCalendar] = useState(false);
@@ -234,6 +244,10 @@ const UserProfile = (props) => {
         if (!mounted) return;
         setPersonalInfo(data);
 
+        // Try to capture numeric user id if backend provides it.
+        const numericId = data?.user_id ?? data?.id ?? null;
+        if (numericId) setViewerUserId(numericId);
+
         const displayName = String(data?.display_name || "").trim();
         const first = String(data?.first_name || "").trim();
         const last = String(data?.last_name || "").trim();
@@ -283,6 +297,48 @@ const UserProfile = (props) => {
       mounted = false;
     };
   }, []);
+
+  // Follow counts (needs numeric user id)
+  useEffect(() => {
+    let mounted = true;
+    const loadCounts = async () => {
+      if (!viewerUserId) return;
+      try {
+        const res = await getFollowCounts(viewerUserId);
+        const data = res?.data ?? res;
+
+        const followers =
+          data?.followers ??
+          data?.followers_count ??
+          data?.follower_count ??
+          data?.count_followers ??
+          data?.counts?.followers ??
+          data?.counts?.followers_count ??
+          0;
+
+        const following =
+          data?.following ??
+          data?.following_count ??
+          data?.count_following ??
+          data?.counts?.following ??
+          data?.counts?.following_count ??
+          0;
+
+        if (!mounted) return;
+        setFollowCounts({
+          followers: Number(followers) || 0,
+          following: Number(following) || 0,
+        });
+      } catch {
+        // keep defaults
+      }
+    };
+
+    loadCounts();
+    return () => {
+      mounted = false;
+    };
+  }, [viewerUserId]);
 
   const teams = [
     {
@@ -380,6 +436,12 @@ const UserProfile = (props) => {
     const loadPortfolioForProfile = async () => {
       try {
         const res = await getMyPortfolio();
+
+        // Also capture numeric user id from portfolio payload (your sample includes portfolio.user_id)
+        const portfolioObj = res?.portfolio || res?.data?.portfolio || null;
+        const portfolioUserId = portfolioObj?.user_id ?? null;
+        if (portfolioUserId && !viewerUserId) setViewerUserId(portfolioUserId);
+
         const serverProjects = normalizeProjects(res)
           .slice()
           .sort((a, b) => (a?.sort_order ?? 0) - (b?.sort_order ?? 0));
@@ -593,7 +655,7 @@ const UserProfile = (props) => {
                         style={{ cursor: "pointer", textDecoration: "underline" }}
                         onClick={() => setOpenFollowModal(true)}
                       >
-                        123 Friends
+                        {followCounts.followers} Friends
                       </span>
 
                       <span className="meta-separator">•</span>
@@ -611,7 +673,7 @@ const UserProfile = (props) => {
                     Message
                   </button>
 
-                  <button
+                  {/* <button
                     className={`btn-join ${joinStatus === "sent" ? "sent" : ""}`}
                     onClick={() => setJoinStatus("sent")}
                     disabled={joinStatus === "sent"}
@@ -636,7 +698,7 @@ const UserProfile = (props) => {
                         Follow
                       </>
                     )}
-                  </button>
+                  </button> */}
                 </div>
               </section>
 
@@ -1608,6 +1670,8 @@ const UserProfile = (props) => {
         <FollowModal
           onClose={() => setOpenFollowModal(false)}
           theme={theme}
+          userId={viewerUserId}
+          onCountsChanged={(next) => setFollowCounts(next)}
         />
       )}
     </div >
@@ -1616,32 +1680,153 @@ const UserProfile = (props) => {
 
 /* ================= FOLLOWERS / FOLLOWING MODAL ================= */
 
-function FollowModal({ onClose, theme }) {
+function FollowModal({ onClose, theme, userId, onCountsChanged }) {
   const [tab, setTab] = useState("followers");
 
-  const [followersList, setFollowersList] = useState(
-    Array.from({ length: 10 }, (_, i) => ({
-      id: i,
-      name: "User Name",
-    }))
-  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
 
-  const [followingList, setFollowingList] = useState(
-    Array.from({ length: 8 }, (_, i) => ({
-      id: i + 100,
-      name: "User Name",
-    }))
-  );
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
 
-  const removeFollower = (id) => {
-    setFollowersList(followersList.filter((u) => u.id !== id));
+  const pickList = (res) => {
+    const data = res?.data ?? res;
+    const raw =
+      data?.followers ||
+      data?.following ||
+      data?.data ||
+      data?.users ||
+      data?.items ||
+      [];
+    return Array.isArray(raw) ? raw : [];
   };
 
-  const removeFollowing = (id) => {
-    setFollowingList(followingList.filter((u) => u.id !== id));
+  const toUserRow = (u) => {
+    const base = u?.user || u?.follower || u?.following || u;
+    const id =
+      base?.id ??
+      base?.user_id ??
+      base?.uh_user_id ??
+      u?.id ??
+      u?.user_id ??
+      u?.uh_user_id ??
+      null;
+    const name =
+      base?.display_name ||
+      base?.name ||
+      [base?.first_name, base?.last_name].filter(Boolean).join(" ") ||
+      base?.username ||
+      base?.email ||
+      "User";
+
+    const avatar =
+      base?.avatar_url || base?.avatar || base?.photo_url || base?.profile_photo_url || "";
+    return {
+      id,
+      name: String(name).trim() || "User",
+      avatar: typeof avatar === "string" ? avatar : "",
+    };
+  };
+
+  const refreshCounts = async () => {
+    if (!userId) return;
+    try {
+      const res = await getFollowCounts(userId);
+      const data = res?.data ?? res;
+
+      const followers =
+        data?.followers ??
+        data?.followers_count ??
+        data?.follower_count ??
+        data?.count_followers ??
+        data?.counts?.followers ??
+        data?.counts?.followers_count ??
+        0;
+
+      const following =
+        data?.following ??
+        data?.following_count ??
+        data?.count_following ??
+        data?.counts?.following ??
+        data?.counts?.following_count ??
+        0;
+
+      onCountsChanged?.({
+        followers: Number(followers) || 0,
+        following: Number(following) || 0,
+      });
+    } catch {
+      // ignore
+    }
+  };
+
+  const loadTab = async (nextTab) => {
+    if (!userId) return;
+    setLoading(true);
+    setError("");
+    try {
+      if (nextTab === "followers") {
+        const res = await getFollowers(userId);
+        const rows = pickList(res).map(toUserRow).filter((x) => x.id);
+        setFollowersList(rows);
+      } else {
+        const res = await getFollowing(userId);
+        const rows = pickList(res).map(toUserRow).filter((x) => x.id);
+        setFollowingList(rows);
+      }
+      await refreshCounts();
+    } catch (e) {
+      setError(e?.message || "Request failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+    loadTab(tab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, tab]);
+
+  const removeFollower = async (id) => {
+    setError("");
+    try {
+      await apiRemoveFollower(id);
+      setFollowersList((prev) => prev.filter((u) => u.id !== id));
+      await refreshCounts();
+    } catch (e) {
+      setError(e?.message || "Request failed");
+    }
+  };
+
+  const removeFollowing = async (id) => {
+    setError("");
+    try {
+      await unfollowUser(id);
+      setFollowingList((prev) => prev.filter((u) => u.id !== id));
+      await refreshCounts();
+    } catch (e) {
+      setError(e?.message || "Request failed");
+    }
+  };
+
+  const followBack = async (id) => {
+    setError("");
+    try {
+      await followUser(id);
+      await refreshCounts();
+    } catch (e) {
+      setError(e?.message || "Request failed");
+    }
   };
 
   const currentList = tab === "followers" ? followersList : followingList;
+  const filteredList = currentList.filter((u) =>
+    String(u?.name || "")
+      .toLowerCase()
+      .includes(String(query || "").trim().toLowerCase()),
+  );
 
   return (
     <div
@@ -1689,6 +1874,8 @@ function FollowModal({ onClose, theme }) {
         <div className="mb-3 md:mb-5 relative">
           <input
             placeholder="Search here"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             className="w-full px-5 py-2.5 text-sm text-left bg-white rounded-full border border-gray-300 placeholder:text-center focus:outline-none focus:ring-0 focus:border-gray-300"
           />
           <span className="text-gray-500 pointer-events-none absolute right-5 top-2.5">
@@ -1699,21 +1886,39 @@ function FollowModal({ onClose, theme }) {
           </span>
         </div>
 
+        {error ? (
+          <div className="mb-3 text-sm text-red-600">{error}</div>
+        ) : null}
+
         {/* LIST */}
         <div className="overflow-y-auto max-h-[360px] pr-2 space-y-5 custom-scroll">
-          {currentList.map((u) => (
+          {loading ? (
+            <div className="text-sm text-gray-600">Loading...</div>
+          ) : filteredList.length === 0 ? (
+            <div className="text-sm text-gray-600">No users found.</div>
+          ) : (
+            filteredList.map((u) => (
             <div key={u.id} className="flex items-center justify-between">
               <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0 pr-2">
-                <div className="w-9 h-9 md:w-11 md:h-11 shrink-0 bg-[#D9D9D9] rounded-full" />
+                <div className="w-9 h-9 md:w-11 md:h-11 shrink-0 bg-[#D9D9D9] rounded-full overflow-hidden">
+                  {u.avatar ? (
+                    <img src={u.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : null}
+                </div>
                 <span className="text-xs md:text-sm font-medium truncate">{u.name}</span>
               </div>
 
               {tab === "followers" ? (
                 <div className="flex gap-2">
-                  <button className="px-2 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs bg-[#CEFF1B] rounded-md text-black whitespace-nowrap font-medium">
+                  <button
+                    type="button"
+                    onClick={() => followBack(u.id)}
+                    className="px-2 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs bg-[#CEFF1B] rounded-md text-black whitespace-nowrap font-medium"
+                  >
                     Follow Back
                   </button>
                   <button
+                    type="button"
                     onClick={() => removeFollower(u.id)}
                     className="px-2 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs border rounded-md whitespace-nowrap font-medium"
                   >
@@ -1723,6 +1928,7 @@ function FollowModal({ onClose, theme }) {
               ) : (
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => removeFollowing(u.id)}
                     className="px-3 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs border rounded-md whitespace-nowrap font-medium"
                   >
@@ -1731,7 +1937,8 @@ function FollowModal({ onClose, theme }) {
                 </div>
               )}
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

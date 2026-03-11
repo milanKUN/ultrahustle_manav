@@ -66,7 +66,22 @@ export default function MyPortfolio() {
   };
 
   const projectToLocal = (p) => {
-    const coverUrl = p?.cover_media?.url || p?.cover_media?.path || p?.cover_url || p?.coverUrl || "";
+    const directCoverUrl =
+      p?.cover_media?.url ||
+      p?.cover_media?.path ||
+      p?.cover_url ||
+      p?.coverUrl ||
+      "";
+
+    const media = Array.isArray(p?.media) ? p.media : [];
+    const coverMediaId = p?.cover_media_id ?? null;
+    const coverFromMediaId =
+      coverMediaId && media.length
+        ? media.find((m) => m?.id === coverMediaId)?.url || media.find((m) => m?.id === coverMediaId)?.path
+        : "";
+    const firstMediaUrl = media?.[0]?.url || media?.[0]?.path || "";
+
+    const coverUrl = String(directCoverUrl || coverFromMediaId || firstMediaUrl || "");
 
     const cost =
       (typeof p?.cost_cents === "number" ? String(p.cost_cents) : p?.cost_cents) ??

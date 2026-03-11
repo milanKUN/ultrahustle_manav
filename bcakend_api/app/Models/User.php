@@ -97,4 +97,24 @@ class User extends Authenticatable
     {
         return $this->hasOne(Portfolio::class);
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'user_follows',
+            'following_id',
+            'follower_id'
+        )->withTimestamps();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'user_follows',
+            'follower_id',
+            'following_id'
+        )->withTimestamps();
+    }
 }

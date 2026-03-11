@@ -23,6 +23,15 @@ Route::post('/resend-otp', [\App\Http\Controllers\Api\EmailVerificationControlle
 Route::post('/email/verify-otp', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verifyOtp']);
 Route::post('/email/resend-otp', [\App\Http\Controllers\Api\EmailVerificationController::class, 'resendOtp']);
 
+Route::middleware('auth:sanctum')->group(function (): void {
+	Route::post('/follow/{id}', [\App\Http\Controllers\Api\FollowController::class, 'follow']);
+	Route::delete('/unfollow/{id}', [\App\Http\Controllers\Api\FollowController::class, 'unfollow']);
+	Route::get('/users/{id}/followers', [\App\Http\Controllers\Api\FollowController::class, 'followers']);
+	Route::get('/users/{id}/following', [\App\Http\Controllers\Api\FollowController::class, 'following']);
+	Route::delete('/followers/{id}', [\App\Http\Controllers\Api\FollowController::class, 'removeFollower']);
+	Route::get('/users/{id}/follow-counts', [\App\Http\Controllers\Api\FollowController::class, 'counts']);
+});
+
 Route::middleware('auth:sanctum')->prefix('/onboarding')->group(function (): void {
 	Route::get('/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
 	Route::post('/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
