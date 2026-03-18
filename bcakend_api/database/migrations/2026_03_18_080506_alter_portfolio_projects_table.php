@@ -11,16 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('portfolio_projects', function (Blueprint $table): void {
-			// $table->id()->primary()->autoIncrement()->change();
-			$table->foreignId('portfolio_id')->constrained('portfolios')->cascadeOnDelete()->change();
-            $table->index('portfolio_id')->change();
-		});
-        Schema::table('portfolio_media', function (Blueprint $table): void {
-			$table->id()->primary()->autoIncrement()->change();
-			$table->foreignId('project_id')->constrained('portfolio_projects')->cascadeOnDelete()->change();
-            $table->index('project_id')->change();
-		});
+        Schema::table('portfolio_projects', function (Blueprint $table) {
+            $table->primary('id');
+            // Add index (if not exists)
+            $table->index('portfolio_id');
+
+            // Add foreign key
+            $table->foreign('portfolio_id')
+                ->references('id')
+                ->on('portfolios')
+                ->cascadeOnDelete();
+        });
+        Schema::table('portfolio_projects', function (Blueprint $table) {
+            $table->primary('id');
+            // Add index (if not exists)
+            $table->index('portfolio_id');
+
+            // Add foreign key
+            $table->foreign('portfolio_id')
+                ->references('id')
+                ->on('portfolios')
+                ->cascadeOnDelete();
+        });
     }
 
     /**
@@ -28,15 +40,27 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('portfolio_projects', function (Blueprint $table): void {
-			// $table->id()->primary()->autoIncrement()->change();
-			$table->foreignId('portfolio_id')->constrained('portfolios')->cascadeOnDelete()->change();
-            $table->index('portfolio_id')->change();
-		});
-        Schema::table('portfolio_media', function (Blueprint $table): void {
-			$table->id()->primary()->autoIncrement()->change();
-			$table->foreignId('project_id')->constrained('portfolio_projects')->cascadeOnDelete();
-            $table->index('project_id')->change();
-		});
+        Schema::table('portfolio_projects', function (Blueprint $table) {
+            $table->primary('id');
+            // Add index (if not exists)
+            $table->index('portfolio_id');
+
+            // Add foreign key
+            $table->foreign('portfolio_id')
+                ->references('id')
+                ->on('portfolios')
+                ->cascadeOnDelete();
+        });
+        Schema::table('portfolio_projects', function (Blueprint $table) {
+            $table->primary('id');
+            // Add index (if not exists)
+            $table->index('portfolio_id');
+
+            // Add foreign key
+            $table->foreign('portfolio_id')
+                ->references('id')
+                ->on('portfolios')
+                ->cascadeOnDelete();
+        });
     }
 };
