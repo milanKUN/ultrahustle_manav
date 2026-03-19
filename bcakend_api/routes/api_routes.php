@@ -65,6 +65,9 @@ Route::middleware('auth:sanctum')->prefix('/v1/me')->group(function (): void {
 	Route::post('/personal-info/avatar', [\App\Http\Controllers\Api\PersonalInfoController::class, 'uploadAvatar']);
 	Route::delete('/personal-info/avatar', [\App\Http\Controllers\Api\PersonalInfoController::class, 'deleteAvatar']);
 
+	Route::get('/user-notification', [\App\Http\Controllers\Api\MeNotificationController::class, 'get']);
+	Route::put('/user-notification', [\App\Http\Controllers\Api\MeNotificationController::class, 'update']);
+
 	Route::delete('/', [\App\Http\Controllers\Api\MeController::class, 'destroy']);
 });
 

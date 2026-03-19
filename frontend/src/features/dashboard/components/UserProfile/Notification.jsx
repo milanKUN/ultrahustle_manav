@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef  } from "react";
+import {
+  getUserNotification,
+  putUserNotification,
+} from "../../api/userNotification";
 
 const Toggle = ({ enabled, onChange }) => (
   <button
@@ -15,6 +19,7 @@ const Toggle = ({ enabled, onChange }) => (
     />
   </button>
 );
+
 
 export default function Notification() {
   const [state, setState] = useState({
@@ -34,6 +39,133 @@ export default function Notification() {
     marketing: true,
     product: false,
   });
+
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+  const [popup, setPopup] = useState({
+    open: false,
+    variant: "success", // success | error
+    title: "",
+    message: "",
+    showProgress: false,
+  });
+  const [popupAnimateIn, setPopupAnimateIn] = useState(false);
+  const [popupProgress, setPopupProgress] = useState(0);
+  const popupOkRef = useRef(null);
+  const popupAutoCloseRef = useRef(null);
+  const popupHideRef = useRef(null);
+
+  const closePopup = () => {
+    if (popupAutoCloseRef.current) {
+      clearTimeout(popupAutoCloseRef.current);
+      popupAutoCloseRef.current = null;
+    }
+    if (popupHideRef.current) {
+      clearTimeout(popupHideRef.current);
+      popupHideRef.current = null;
+    }
+
+    setPopupAnimateIn(false);
+    popupHideRef.current = setTimeout(() => {
+      setPopup((p) => ({ ...p, open: false }));
+      setPopupProgress(0);
+      popupHideRef.current = null;
+    }, 200);
+  };
+
+  const openPopup = ({ variant, title, message, showProgress, autoCloseMs }) => {
+    const msg = String(message || "").trim();
+    if (!msg) return;
+
+    if (popupAutoCloseRef.current) {
+      clearTimeout(popupAutoCloseRef.current);
+      popupAutoCloseRef.current = null;
+    }
+    if (popupHideRef.current) {
+      clearTimeout(popupHideRef.current);
+      popupHideRef.current = null;
+    }
+
+    setPopupProgress(0);
+    setPopupAnimateIn(false);
+    setPopup({
+      open: true,
+      variant,
+      title,
+      message: msg,
+      showProgress: !!showProgress,
+    });
+
+    requestAnimationFrame(() => {
+      setPopupAnimateIn(true);
+      if (showProgress) {
+        requestAnimationFrame(() => setPopupProgress(100));
+      }
+      setTimeout(() => popupOkRef.current?.focus?.(), 0);
+    });
+
+    if (autoCloseMs) {
+      popupAutoCloseRef.current = setTimeout(() => {
+        closePopup();
+      }, autoCloseMs);
+    }
+  };
+
+  // Required helper: showSuccessPopup(message)
+  const showSuccessPopup = (message) => {
+    openPopup({
+      variant: "success",
+      title: "Save Changes",
+      message: message || "Your personal information has been successfully saved.",
+      showProgress: true,
+      autoCloseMs: 3000,
+    });
+  };
+
+  const showErrorPopup = (message) => {
+    openPopup({
+      variant: "error",
+      title: "Save Changes",
+      message: message || "Please fix the errors and try again.",
+      showProgress: false,
+      autoCloseMs: null,
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (popupAutoCloseRef.current) clearTimeout(popupAutoCloseRef.current);
+      if (popupHideRef.current) clearTimeout(popupHideRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getUserNotification();
+        setState(data);
+      } catch (err) {
+        console.error(err.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      await putUserNotification(state);
+      setSubmitSuccess("Saved successfully.");
+      showSuccessPopup("Your Notification are updated successfully.");
+      console.log("Saved successfully");
+    } catch (err) {
+      const msg = err?.message || "Save failed.";
+      console.error(err.message);
+      setSubmitError(msg);
+      showErrorPopup(msg);
+    }
+  };
+
 
   const toggle = (key) =>
     setState({ ...state, [key]: !state[key] });
@@ -166,9 +298,140 @@ export default function Notification() {
         <button className="w-full sm:w-auto px-4 py-2 rounded-lg text-sm border border-black">
           Discard
         </button>
-        <button className="w-full sm:w-auto px-4 py-2 bg-[#CEFF1B] rounded-lg text-sm font-medium border border-black">
+        <button
+          onClick={handleSave}
+          className="w-full sm:w-auto px-4 py-2 bg-[#CEFF1B] rounded-lg text-sm font-medium border border-black"
+        >
           Confirm
         </button>
+      </div>
+
+      <Toast
+        open={popup.open}
+        variant={popup.variant}
+        title={popup.title}
+        message={popup.message}
+        showProgress={popup.showProgress}
+        progress={popupProgress}
+        animateIn={popupAnimateIn}
+        okRef={popupOkRef}
+        onClose={closePopup}
+      />
+    </div>
+  );
+}
+
+function Toast({ open, variant, title, message, showProgress, progress, animateIn, okRef, onClose }) {
+  if (!open) return null;
+
+  const isSuccess = variant === "success";
+  const YELLOW = "#CEFF1B";
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") onClose?.();
+  };
+
+  return (
+    <div
+      className={`fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/25 backdrop-blur-sm transition-opacity duration-200 ${
+        animateIn ? "opacity-100" : "opacity-0"
+      }`}
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        className={`w-full max-w-md transform transition-all duration-200 ${
+          animateIn ? "scale-100 opacity-100" : "scale-95 opacity-0"
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-white text-black border border-black/10 shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
+          {/* Top animated progress bar */}
+          {showProgress && (
+            <div className="h-[3px] w-full bg-black/10">
+              <div
+                className="h-full"
+                style={{
+                  width: `${progress}%`,
+                  backgroundColor: YELLOW,
+                  transition: "width 3000ms linear",
+                }}
+              />
+            </div>
+          )}
+
+          <div className="p-6">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-lg font-semibold leading-6">{title}</p>
+
+              <button
+                type="button"
+                className="h-9 w-9 rounded-xl border border-black/20 grid place-items-center hover:bg-black/5"
+                onClick={onClose}
+                aria-label="Close"
+                title="Close"
+              >
+                <span className="text-base leading-none">✕</span>
+              </button>
+            </div>
+
+            <div className="mt-5 flex items-start gap-4">
+              <div
+                className="h-12 w-12 rounded-full flex items-center justify-center border border-black"
+                style={{ backgroundColor: YELLOW }}
+                aria-hidden="true"
+              >
+                {isSuccess ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm leading-6 text-black/80">{message}</p>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    ref={okRef}
+                    className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-black"
+                    style={{ backgroundColor: YELLOW, color: "#000" }}
+                    onClick={onClose}
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -117,4 +117,8 @@ class User extends Authenticatable
             'following_id'
         )->withTimestamps();
     }
+    public function userNotification()
+    {
+        return $this->hasOne(UserNotification::class);
+    }
 }
