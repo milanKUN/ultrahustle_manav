@@ -46,4 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function freelancerOnboarding()
+    {
+        return $this->hasOne(
+            \App\Models\UhFreelancerOnboarding::class,
+            'uh_user_id',   // foreign key on onboarding table
+            'uh_user_id'    // local key on users table
+        );
+    }
 }

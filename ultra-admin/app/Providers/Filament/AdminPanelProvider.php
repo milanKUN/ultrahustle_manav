@@ -56,9 +56,4 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
-
-    public function boot(): void
-    {
-        \Illuminate\Support\Facades\URL::forceRootUrl('http://159.89.193.253/ultra-admin');
-    }
 }
