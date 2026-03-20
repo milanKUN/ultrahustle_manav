@@ -87,7 +87,7 @@ export default function App() {
           <Route path="/create-team" element={<CreateTeam theme={theme} setTheme={setTheme} />} />
           <Route path="/team-profile" element={<TeamProfileLight theme={theme} setTheme={setTheme} />} />
           <Route path="/public-team-profile" element={<PublicTeamProfile theme={theme} setTheme={setTheme} />} />
-          <Route path="/user-profile" element={<UserProfile theme={theme} setTheme={setTheme} />} />
+          <Route path="/user-profile" element={<ProtectedRoute><UserProfile theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/public-user-profile" element={<PublicUserProfile theme={theme} setTheme={setTheme} />} />
           <Route path="/contracts-listing" element={<SoloContractListing theme={theme} setTheme={setTheme} />} />
           <Route path="/milestones" element={<MilestonesPage theme={theme} setTheme={setTheme} />} />
