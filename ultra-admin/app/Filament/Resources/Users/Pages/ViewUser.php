@@ -24,10 +24,8 @@ class ViewUser extends ViewRecord
             ->schema([
                 TextEntry::make('full_name'),
                 TextEntry::make('email'),
-
                 TextEntry::make('freelancerOnboarding.onboarding_role')
                     ->label('Role'),
-
                 TextEntry::make('freelancerOnboarding.work_type'),
                 TextEntry::make('freelancerOnboarding.team_industry'),
                 TextEntry::make('freelancerOnboarding.team_build_plan'),
