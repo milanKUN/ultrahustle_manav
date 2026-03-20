@@ -659,7 +659,7 @@ const UserProfile = (props) => {
                       </span>
 
                       <span className="meta-separator">•</span>
-                      <span>Joined Oct 2025 {teamData.joined}</span>
+                      <span>Joined march 2026 {teamData.joined}</span>
                     </div>
                   </div>
                 </div>
