@@ -31,8 +31,13 @@ class ViewUser extends ViewRecord
                 TextEntry::make('freelancerOnboarding.work_type'),
                 TextEntry::make('freelancerOnboarding.team_industry'),
                 TextEntry::make('freelancerOnboarding.team_build_plan'),
-                TextEntry::make('freelancerOnboarding.goals_json'),
-                TextEntry::make('freelancerOnboarding.service_categories_json'),
+                TextEntry::make('freelancerOnboarding.goals_json')
+                    ->label('Goals')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state),
+
+                TextEntry::make('freelancerOnboarding.service_categories_json')
+                    ->label('Service Categories')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state),
                 TextEntry::make('freelancerOnboarding.primary_skill'),
                 TextEntry::make('freelancerOnboarding.experience_level'),
                 TextEntry::make('freelancerOnboarding.rate_range'),
