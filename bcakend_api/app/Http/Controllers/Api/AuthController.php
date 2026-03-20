@@ -426,4 +426,13 @@ class AuthController extends Controller
             'current_step' => 0,
         ];
     }
+
+    function logout(Request $request){
+        // Revoke current token (Sanctum)
+        $request->user()->currentAccessToken()->delete();
+        
+        return response()->json([
+            'message' => 'Logged out successfully'
+        ]);
+    }
 }

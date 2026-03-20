@@ -235,3 +235,23 @@ export const getOAuthRedirectUrl = (provider) => {
   const base = API_BASE_URL || backendOrigin || window.location.origin;
   return new URL(`/auth/${provider}/redirect`, base).toString();
 };
+
+export const logout = async () => {
+  try {
+    await axios.post('/api/logout', {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem(TOKEN_KEY)}`
+      }
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    // Always clear local data even if API fails
+    localStorage.removeItem(TOKEN_KEY);
+    // localStorage.removeItem('user');
+    // If using axios defaults
+    delete axios.defaults.headers.common['Authorization'];
+    // Redirect to login
+    window.location.href = '/login';
+  }
+};

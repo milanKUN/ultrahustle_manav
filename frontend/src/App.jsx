@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import ProtectedRoute from "../src/components/ProtectedRoute.jsx";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./features/landing/pages/Home";
 import User from "./features/dashboard/pages/User";
@@ -63,7 +65,7 @@ export default function App() {
       <div className="app">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/setting" element={<User theme={theme} setTheme={setTheme} />} />
+          <Route path="/setting" element={<ProtectedRoute><User theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/desktop-forgot-password" element={<DesktopForgotPassword />} />
           <Route path="/desktop-email-verification" element={<DesktopEmailVerification />} />
           <Route path="/login" element={<DesktopLogin />} />
@@ -92,7 +94,7 @@ export default function App() {
           <Route path="/solo-milestones" element={<SoloMilestonesPage theme={theme} setTheme={setTheme} />} />
           <Route path="/create-service-listing" element={<CreateServiceListing theme={theme} setTheme={setTheme} />} />
           <Route path="/create-digital-product" element={<CreateDigitalProduct theme={theme} setTheme={setTheme} />} />
-          <Route path="/dashboard" element={<Dashboard theme={theme} setTheme={setTheme} />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/manage-team" element={<ManageTeam theme={theme} setTheme={setTheme} />} />
           <Route path="/add-listing" element={<AddNewListing theme={theme} setTheme={setTheme} />} />
           <Route path="/marketplace" element={<Marketplace theme={theme} setTheme={setTheme} />} />

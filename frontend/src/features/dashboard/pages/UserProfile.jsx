@@ -922,7 +922,7 @@ const UserProfile = (props) => {
               </section>
 
               {/* About Section */}
-              <section className="content-card">
+              {/* <section className="content-card">
                 <h3 className="card-title">Personal Info</h3>
 
                 {personalInfoLoading ? (
@@ -935,24 +935,17 @@ const UserProfile = (props) => {
                       const d = personalInfo;
                       const rows = [
                         { label: "UH User ID", value: d?.uh_user_id },
+                        { label: "Full name", value: d?.title +' '+  d?.first_name + ' '+ d?.last_name },
                         { label: "Email", value: d?.email },
-                        { label: "Contact email", value: d?.contact_email },
+                        // { label: "Contact email", value: d?.contact_email },
                         {
                           label: "Phone",
                           value: [d?.phone_country_code, d?.phone_number].filter(Boolean).join(" "),
                         },
                         { label: "Gender", value: d?.gender },
                         { label: "Date of birth", value: formatDateOnly(d?.date_of_birth) },
-                        { label: "Street", value: d?.street },
-                        { label: "City", value: d?.city },
-                        { label: "State", value: d?.state },
-                        { label: "Country", value: d?.country },
-                        { label: "Pincode", value: d?.pincode },
-                        { label: "Display name", value: d?.display_name },
-                        { label: "First name", value: d?.first_name },
-                        { label: "Last name", value: d?.last_name },
-                        { label: "Username", value: d?.username },
-                        { label: "Title", value: d?.title },
+                        { label: "Address", value: d?.street +' '+ d?.city +', '+ d?.state +' '+ d?.country +', '+ d?.pincode },
+                        // { label: "Display name", value: d?.display_name },
                         { label: "Short bio", value: d?.short_bio },
                       ];
 
@@ -982,7 +975,7 @@ const UserProfile = (props) => {
                 ) : (
                   <p className="card-text">No personal info available.</p>
                 )}
-              </section>
+              </section> */}
 
               {/* About Section */}
               <section className="content-card">

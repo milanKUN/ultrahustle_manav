@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NavbarLight.css";
+import {logout} from "../../features/auth/api/authApi";
 
 const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
@@ -669,9 +670,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
                   Settings
                 </a>
                 <div className="dropdown-divider"></div>
-                <a href="#" className="dropdown-item logout">
-                  Logout
-                </a>
+                <button onClick={logout} className="dropdown-item logout">Logout</button>
               </div>
             )}
           </div>
