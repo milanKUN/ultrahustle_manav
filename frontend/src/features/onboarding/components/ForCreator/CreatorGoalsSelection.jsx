@@ -8,7 +8,7 @@ import {
   GraduationCap,
   Users,
   Sparkles,
-  TrendingUp,
+  UserPlus,
   FileText,
 } from "lucide-react";
 
@@ -56,7 +56,7 @@ export default function CreatorGoalsSelection() {
     { id: "launch-course", label: "Launch a course", icon: GraduationCap },
     { id: "build-team", label: "Build a team", icon: Users },
     { id: "promote-listings", label: "Promote my listings", icon: FileText },
-    { id: "build-client-base", label: "Build a client base", icon: TrendingUp },
+    { id: "build-client-base", label: "Build a client base", icon: UserPlus },
     { id: "ai-match", label: "Get discovered faster (AI Match)", icon: Sparkles },
   ];
 
