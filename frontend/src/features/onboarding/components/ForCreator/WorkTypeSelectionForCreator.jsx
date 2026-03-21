@@ -134,10 +134,12 @@ export default function WorkTypeSelectionForCreator() {
             </span>
           </button>
 
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black">
-              How do you work?
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black">
+                How do you work?
+              </h2>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}
@@ -176,8 +178,9 @@ export default function WorkTypeSelectionForCreator() {
           min-[950px]:p-[clamp(24px,4vh,48px)]
 
           flex flex-col justify-start min-[701px]:justify-center min-[950px]:justify-center
-          items-center relative overflow-visible z-20
+          items-center relative overflow-visible
           min-h-[60vh] min-[701px]:min-h-[62vh] min-[950px]:min-h-[100svh]
+          z-20
         "
       >
         {/* Desktop glows (unchanged) */}

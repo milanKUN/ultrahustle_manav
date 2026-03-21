@@ -140,16 +140,19 @@ export default function CreatorGoalsSelection() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-2 sm:px-4 min-[950px]:px-0">
-            <h2 className="text-2xl sm:text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black">
-              What do you want
-            </h2>
-            <h2 className="text-2xl sm:text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black">
-              to achieve?
-            </h2>
-            <p className="text-black/60 text-sm sm:text-base min-[701px]:text-lg min-[950px]:text-xl mt-2 sm:mt-3 min-[950px]:mt-4">
-              Select multiple
-            </p>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
+                What do you
+              </h2>
+              <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
+                want to achieve
+              </h2>
+
+              <p className="text-black/60 text-base min-[701px]:text-lg min-[950px]:text-xl mt-4 max-w-md">
+                Select multiple
+              </p>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}
@@ -188,7 +191,8 @@ export default function CreatorGoalsSelection() {
           min-[950px]:p-[clamp(24px,4vh,48px)]
 
           flex flex-col justify-center items-center
-          relative overflow-visible min-h-[60vh] min-[701px]:min-h-[62vh] min-[950px]:min-h-[100svh]
+          relative overflow-visible
+          min-h-[60vh] min-[701px]:min-h-[62vh] min-[950px]:min-h-[100svh]
           z-20
         "
       >
@@ -318,7 +322,7 @@ export default function CreatorGoalsSelection() {
           <div className="flex justify-between items-center">
             <button
               onClick={handleReset}
-              className="h-10 px-5 rounded-lg border border-black bg-white text-black text-sm"
+              className="px-8 py-3 rounded-lg border border-black text-gray-600 font-medium text-lg hover:bg-gray-100 transition-all"
             >
               Reset
             </button>
@@ -326,19 +330,17 @@ export default function CreatorGoalsSelection() {
             <div className="flex gap-4">
               <button
                 onClick={handleBack}
-                className="h-10 px-6 rounded-lg border border-black bg-white text-black text-sm"
+                className="px-10 py-3 rounded-lg border border-black text-[#2B2B2B] font-medium text-lg hover:bg-gray-100 transition-all"
               >
                 Discard
               </button>
               <button
                 onClick={handleContinue}
                 disabled={!canContinue}
-                className={[
-                  "h-10 px-6 rounded-lg text-sm font-medium border transition-all",
-                  canContinue
-                    ? "bg-[#CEFF1B] border-black text-black"
-                    : "bg-gray-200 border-black text-black",
-                ].join(" ")}
+                className={`px-10 py-3 rounded-lg font-medium text-lg transition-all ${canContinue
+                  ? "bg-[#CEFF1B] border-2 border-black text-black hover:bg-[#b8e617]"
+                  : "bg-[#CEFF1B]/50 border border-[#2B2B2B] text-gray-500 cursor-not-allowed"
+                  }`}
               >
                 Continue
               </button>

@@ -133,28 +133,28 @@ export default function CreatorNeeds() {
 
   const handleReset = () => navigate("/onboarding");
 
-  // ✅ Mobile/Tablet chip (bigger on iPad mini)
   const MobileChip = ({ category }) => {
     const Icon = category.icon;
-    const active = selectedCategories.includes(category.id);
+    const isSelected = selectedCategories.includes(category.id);
 
     return (
       <button
         type="button"
         onClick={() => toggleCategory(category.id)}
         className={[
-          "flex items-center gap-2 rounded-xl border transition-all",
-          "px-3 py-2 min-[701px]:px-4 min-[701px]:py-3",
-          active
-            ? "bg-[#CEFF1B] border-black shadow-sm"
-            : "bg-white border-[#CEFF1B]",
+          "flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
+          isSelected ? "bg-[#CEFF1B] border-black shadow-sm" : "bg-white border-[#CEFF1B]",
         ].join(" ")}
       >
-        <span className="w-6 h-6 min-[701px]:w-7 min-[701px]:h-7 rounded-lg flex items-center justify-center shrink-0 bg-[#CEFF1B]">
-          <Icon size={14} className="text-black min-[701px]:hidden" strokeWidth={2} />
-          <Icon size={16} className="text-black hidden min-[701px]:block" strokeWidth={2} />
+        <span
+          className={[
+            "w-6 h-6 rounded-lg flex items-center justify-center",
+            "bg-[#CEFF1B]",
+          ].join(" ")}
+        >
+          <Icon size={14} className="text-black" strokeWidth={2} />
         </span>
-        <span className="text-xs min-[701px]:text-sm font-medium text-black/80 whitespace-nowrap">
+        <span className="text-xs font-medium text-black/80 whitespace-nowrap">
           {category.label}
         </span>
       </button>
@@ -189,18 +189,20 @@ export default function CreatorNeeds() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
-              Tell us more about
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
+                Tell us more
+              </h2>
 
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
-              your skills
-            </h2>
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
+                about your skills
+              </h2>
 
-            <p className="text-black/60 text-base min-[701px]:text-lg min-[950px]:text-xl mt-4 max-w-md">
-              What service do you offer
-            </p>
+              <p className="text-black/60 text-base min-[950px]:text-xl mt-4 min-[950px]:mt-4 max-w-md">
+                What service do you offer
+              </p>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}
@@ -219,219 +221,172 @@ export default function CreatorNeeds() {
         </div>
       </div>
 
-      {/* RIGHT/BOTTOM CONTENT */}
-      <div
-        className="
-          w-full min-[950px]:w-[70%]
-          bg-[#E0E0E0]
-          rounded-t-[34px] max-[400px]:rounded-t-[28px]
-          min-[701px]:rounded-t-[44px]
-          min-[950px]:rounded-none
-
-          -mt-10 max-[400px]:-mt-8
-          min-[701px]:-mt-12
-          min-[950px]:mt-0
-
-          px-3 py-6
-          min-[701px]:px-8 min-[701px]:py-10
-          min-[950px]:p-[clamp(24px,4vh,48px)]
-
-          flex flex-col justify-center items-center
-          relative overflow-visible min-h-[60vh] min-[701px]:min-h-[62vh] min-[950px]:min-h-[100svh]
-          z-20
-        "
-      >
+      {/* Bottom Section on Mobile      {/* Right Section - Settings/Information */}
+      <div className="w-full min-[950px]:w-[70%] bg-[#E0E0E0] rounded-t-[50px] min-[950px]:rounded-none -mt-12 min-[950px]:mt-0 px-3 py-6 min-[950px]:p-[clamp(24px,4vh,48px)] flex flex-col justify-center items-center relative overflow-visible min-h-[60vh] min-[950px]:min-h-screen z-20">
         <div className="relative z-10 w-full max-w-[900px]">
-          {/* ✅ MOBILE + TABLET (0–949px) — FIXED BIGGER FOR iPad mini */}
-          <div className="min-[950px]:hidden w-full max-w-[420px] min-[701px]:max-w-[760px] mx-auto">
-            <div
-              className="
-                bg-transparent rounded-[26px]
-                px-2 py-4
-                min-[701px]:px-6 min-[701px]:py-6
-                border border-black/10
-                shadow-sm
-              "
-            >
-              {/* category chips */}
-              <div className="flex flex-wrap gap-2 min-[701px]:gap-3">
-                {categories.map((c) => (
-                  <MobileChip key={c.id} category={c} />
-                ))}
+          {/* ✅ MOBILE (screenshot-style layout) */}
+          <div className="min-[950px]:hidden bg-transparent   py-4 border  ">
+            {/* Categories chips */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((c) => (
+                <MobileChip key={c.id} category={c} />
+              ))}
+            </div>
+
+            {/* fields */}
+            <div className="mt-5 grid grid-cols-2 gap-3 items-end">
+              <div>
+                <label className="block text-[11px] font-semibold text-black/70 mb-2">
+                  Primary skill / niche
+                </label>
+                <input
+                  type="text"
+                  value={primarySkill}
+                  onChange={(e) => setPrimarySkill(e.target.value)}
+                  placeholder="Type here"
+                  className="w-full h-10 rounded-xl border border-black bg-white px-3 text-sm text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
+                />
               </div>
 
-              {/* fields */}
-              <div className="mt-5 min-[701px]:mt-7 grid grid-cols-2 gap-3 min-[701px]:gap-5 items-end relative z-20">
-                <div>
-                  <label className="block text-[11px] min-[701px]:text-[13px] font-semibold text-black/70 mb-2">
-                    Primary skill / niche
-                  </label>
-                  <input
-                    type="text"
-                    value={primarySkill}
-                    onChange={(e) => setPrimarySkill(e.target.value)}
-                    placeholder="Skill/niche"
-                    className="w-full h-10 min-[701px]:h-12 rounded-xl border border-black/20 bg-white px-3 min-[701px]:px-4 text-sm min-[701px]:text-base text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] min-[701px]:text-[13px] font-semibold text-black/70 mb-2">
-                    Experience level
-                  </label>
-
+              <div>
+                <label className="block text-[11px] font-semibold text-black/70 mb-2">
+                  Experience level
+                </label>
+                <div
+                  className={`onboarding-custom-select ${isExperienceOpen ? "active" : ""}`}
+                  ref={experienceRef}
+                >
                   <div
-                    className={`onboarding-custom-select ${isExperienceOpen ? "active" : ""}`}
-                    ref={experienceRef}
+                    className={`onboarding-selected-option ${isExperienceOpen ? "open" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExperienceOpen(!isExperienceOpen);
+                    }}
                   >
-                    <div
-                      className={`onboarding-selected-option ${isExperienceOpen ? "open" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsExperienceOpen(!isExperienceOpen);
-                      }}
-                    >
-                      <span>{selectedExperienceLabel}</span>
-                      <span className="onboarding-arrow">▼</span>
-                    </div>
-
-                    {isExperienceOpen && (
-                      <ul className="onboarding-options-list">
-
-                        {experienceOptions.map((opt) => (
-                          <li
-                            key={opt.value}
-                            className={experienceLevel === opt.value ? "active" : ""}
-                            onClick={() => {
-                              setExperienceLevel(opt.value);
-                              setIsExperienceOpen(false);
-                            }}
-                          >
-                            {opt.label}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <span>{selectedExperienceLabel}</span>
+                    <span className="onboarding-arrow">▼</span>
                   </div>
-                </div>
 
-                <div className="col-span-2">
-                  <label className="block text-[11px] min-[701px]:text-[13px] font-semibold text-black/70 mb-2">
-                    Hourly / project range (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={rateRange}
-                    onChange={(e) => setRateRange(e.target.value)}
-                    placeholder="Hourly/project range"
-                    className="w-full h-10 min-[701px]:h-12 rounded-xl border border-black/20 bg-white px-3 min-[701px]:px-4 text-sm min-[701px]:text-base text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <label className="block text-[11px] min-[701px]:text-[13px] font-semibold text-black/70 mb-2">
-                    Do you already have a portfolio?
-                  </label>
-                  <div className="flex gap-2 min-[701px]:gap-3">
-                    {["Yes", "No"].map((opt) => {
-                      const val = opt.toLowerCase();
-                      const active = hasPortfolio === val;
-                      return (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() => setHasPortfolio(val)}
-                          className={[
-                            "flex-1 rounded-xl border font-medium transition-all",
-                            "h-10 min-[701px]:h-12 text-xs min-[701px]:text-sm",
-                            active
-                              ? "bg-[#CEFF1B] border-black text-black"
-                              : "bg-white border-black/20 text-black/60",
-                          ].join(" ")}
+                  {isExperienceOpen && (
+                    <ul className="onboarding-options-list">
+                      {experienceOptions.map((opt) => (
+                        <li
+                          key={opt.value}
+                          className={experienceLevel === opt.value ? "active" : ""}
+                          onClick={() => {
+                            setExperienceLevel(opt.value);
+                            setIsExperienceOpen(false);
+                          }}
                         >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
+                          {opt.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 
-              {/* portfolio links */}
-              {hasPortfolio === "yes" && (
-                <div className="mt-5 min-[701px]:mt-7">
-                  <label className="block text-[11px] min-[701px]:text-[13px] font-semibold text-black/70 mb-2">
-                    Upload links (IG, Behance, Portfolio, Drive)
-                  </label>
-                  <input
-                    type="text"
-                    value={portfolioLinks}
-                    onChange={(e) => setPortfolioLinks(e.target.value)}
-                    placeholder="Paste here"
-                    className="w-full h-10 min-[701px]:h-12 rounded-xl border border-black/20 bg-white px-3 min-[701px]:px-4 text-sm min-[701px]:text-base text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
+              <div className="col-span-2">
+                <label className="block text-[11px] font-semibold text-black/70 mb-2">
+                  Hourly / project range (optional)
+                </label>
+                <input
+                  type="text"
+                  value={rateRange}
+                  onChange={(e) => setRateRange(e.target.value)}
+                  placeholder="Hourly/project range"
+                  className="w-full h-10 rounded-xl border border-black bg-white px-3 text-sm text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-[11px] font-semibold text-black/70 mb-2">
+                  Do you already have a portfolio?
+                </label>
+                <div className="flex gap-2">
+                  {["Yes", "No"].map((opt) => {
+                    const val = opt.toLowerCase();
+                    const active = hasPortfolio === val;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setHasPortfolio(val)}
+                        className={[
+                          "flex-1 h-10 rounded-xl border text-xs font-medium transition-all",
+                          active
+                            ? "bg-[#CEFF1B] border-black text-black"
+                            : "bg-white border-black/20 text-black/60",
+                        ].join(" ")}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* portfolio links */}
+            {hasPortfolio === "yes" && (
+              <div className="mt-5">
+                <label className="block text-[11px] font-semibold text-black/70 mb-2">
+                  Upload links (IG, Behance, Portfolio, Drive)
+                </label>
+                <input
+                  type="text"
+                  value={portfolioLinks}
+                  onChange={(e) => setPortfolioLinks(e.target.value)}
+                  placeholder="Paste here"
+                  className="w-full h-10 rounded-xl bg-transparent border-1 border-black/20 bg-white px-3 text-sm text-black/70 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
+                />
+              </div>
+            )}
+
+            {/* bottom buttons */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={handleReset}
+                className="h-10 px-4 rounded-lg border border-black/20 bg-white text-black/60 text-sm"
+              >
+                Reset
+              </button>
+
+              <button
+                onClick={handleBack}
+                className="h-10 px-4 rounded-lg border border-black/40 bg-white text-black text-sm"
+              >
+                Back
+              </button>
+
+              <button
+                onClick={handleContinue}
+                disabled={!isContinueEnabled}
+                className={[
+                  "h-10 px-4 rounded-lg text-sm font-medium border transition-all",
+                  isContinueEnabled
+                    ? "bg-[#CEFF1B] border-black text-black"
+                    : "bg-[#DADADA] border-black/20 text-black/30",
+                ].join(" ")}
+              >
+                Continue
+              </button>
+            </div>
+
+            {/* step dots */}
+            <div className="mt-6 flex justify-center items-center gap-2">
+              {[...Array(totalSteps)].map((_, index) => (
+                index <= currentStep && (
+                  <span
+                    key={index}
+                    onClick={() => index < currentStep && navigate(stepPaths[index])}
+                    className={[
+                      "w-2 h-2 rounded-full",
+                      index === currentStep ? "bg-black" : "bg-black/30 cursor-pointer",
+                    ].join(" ")}
                   />
-                </div>
-              )}
-
-              {/* buttons */}
-              <div className="mt-6 min-[701px]:mt-8 flex flex-wrap items-center justify-center gap-2 min-[701px]:gap-5">
-                <button
-                  onClick={handleReset}
-                  className="
-                    h-10 min-[701px]:h-12
-                    px-4 min-[701px]:px-8
-                    rounded-lg border border-black/20
-                    bg-white text-black/60
-                    text-sm min-[701px]:text-base
-                  "
-                >
-                  Reset
-                </button>
-
-                <button
-                  onClick={handleBack}
-                  className="
-                    h-10 min-[701px]:h-12
-                    px-4 min-[701px]:px-8
-                    rounded-lg border border-black/40
-                    bg-white text-black
-                    text-sm min-[701px]:text-base
-                  "
-                >
-                  Back
-                </button>
-
-                <button
-                  onClick={handleContinue}
-                  disabled={!isContinueEnabled}
-                  className={[
-                    "rounded-lg font-medium border transition-all",
-                    "h-10 min-[701px]:h-12 px-4 min-[701px]:px-8 text-sm min-[701px]:text-base",
-                    isContinueEnabled
-                      ? "bg-[#CEFF1B] border-black text-black"
-                      : "bg-[#DADADA] border-black/20 text-black/30",
-                  ].join(" ")}
-                >
-                  Continue
-                </button>
-              </div>
-
-              {/* dots */}
-              <div className="mt-6 min-[701px]:mt-8 flex justify-center items-center gap-2">
-                {[...Array(totalSteps)].map((_, index) =>
-                  index <= currentStep ? (
-                    <span
-                      key={index}
-                      onClick={() => index < currentStep && navigate(stepPaths[index])}
-                      className={[
-                        "rounded-full",
-                        "w-2 h-2 min-[701px]:w-2.5 min-[701px]:h-2.5",
-                        index === currentStep ? "bg-black" : "bg-black/30 cursor-pointer",
-                      ].join(" ")}
-                    />
-                  ) : null
-                )}
-              </div>
+                )
+              ))}
             </div>
           </div>
 
@@ -452,12 +407,20 @@ export default function CreatorNeeds() {
                             key={category.id}
                             onClick={() => toggleCategory(category.id)}
                             className={`
-                              flex items-center gap-3.5 px-[clamp(12px,2vw,24px)] py-[clamp(8px,1.5vh,14px)] rounded-2xl cursor-pointer border-2 transition-all duration-300 backdrop-blur-sm justify-center whitespace-nowrap flex-1
-                              ${isSelected
-                                ? "bg-[#CEFF1B] border-[0.6px] border-[#2B2B2B] shadow-md scale-105"
-                                : "bg-transparent border-[#2B2B2B] hover:bg-white/10"
+  flex items-center gap-3.5 
+  px-[clamp(12px,2vw,24px)] 
+  py-[clamp(8px,1.5vh,14px)] 
+  rounded-2xl cursor-pointer 
+  border-2 
+  transition-all duration-300 
+  backdrop-blur-sm 
+  justify-center whitespace-nowrap flex-1
+
+  ${isSelected
+                                ? "bg-[#CEFF1B] border-black shadow-md scale-105"
+                                : "bg-white/40 border-black/20 hover:border-black/40 hover:bg-white/60"
                               }
-                            `}
+`}
                           >
                             <div className="p-1.5 rounded-xl flex items-center justify-center shrink-0 bg-[#CEFF1B]">
                               <Icon
@@ -587,7 +550,7 @@ export default function CreatorNeeds() {
               <div className="flex justify-between items-center gap-2 min-[950px]:gap-4">
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 min-[950px]:px-8 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-black font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                  className="px-4 py-2 min-[950px]:px-8 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-600 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
                 >
                   Reset
                 </button>
@@ -595,7 +558,7 @@ export default function CreatorNeeds() {
                 <div className="flex gap-2 min-[950px]:gap-4">
                   <button
                     onClick={handleBack}
-                    className="px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-black font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                    className="px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-700 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
                   >
                     Discard
                   </button>
@@ -604,7 +567,7 @@ export default function CreatorNeeds() {
                     disabled={!isContinueEnabled}
                     className={`px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg font-medium text-xs min-[950px]:text-lg transition-all whitespace-nowrap ${isContinueEnabled
                       ? "bg-[#CEFF1B] border border-black text-black hover:bg-[#b8e617]"
-                      : "bg-lime-200 border border-black text-black cursor-not-allowed"
+                      : "bg-lime-200 border border-[#2B2B2B] text-gray-400 cursor-not-allowed"
                       }`}
                   >
                     Continue
