@@ -49,4 +49,13 @@ class UhClientOnboarding extends Model
             'completed_at' => 'datetime',
         ];
     }
+
+    public function user()
+    {
+        return $this->belongsTo(
+            \App\Models\User::class,
+            'uh_user_id',   // foreign key on this table
+            'uh_user_id'    // owner key on users table
+        );
+    }
 }

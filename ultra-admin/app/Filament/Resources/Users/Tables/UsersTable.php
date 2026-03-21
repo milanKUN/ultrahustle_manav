@@ -23,7 +23,8 @@ class UsersTable
                 TextColumn::make('full_name')
                     ->searchable(),
                 TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('username')
                     ->searchable(),
                 TextColumn::make('email')

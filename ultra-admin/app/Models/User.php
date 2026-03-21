@@ -55,4 +55,42 @@ class User extends Authenticatable
             'uh_user_id'    // local key on users table
         );
     }
+
+    public function clientOnboarding()
+    {
+        return $this->hasOne(
+            \App\Models\UhClientOnboarding::class,
+            'uh_user_id',   // foreign key on onboarding table
+            'uh_user_id'    // local key on users table
+        );
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'user_follows',
+            'following_id',
+            'follower_id'
+        )->withTimestamps();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'user_follows',
+            'follower_id',
+            'following_id'
+        )->withTimestamps();
+    }
+    public function userNotification()
+    {
+        return $this->hasOne(UserNotification::class);
+    }
+
+    public function personalInfo()
+    {
+        return $this->hasOne(UserPersonalInfo::class, 'uh_user_id', 'uh_user_id');
+    }
 }

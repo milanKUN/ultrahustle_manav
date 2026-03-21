@@ -58,6 +58,6 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('freelancerOnboarding');
+            ->with('freelancerOnboarding', 'clientOnboarding');
     }
 }
