@@ -29,7 +29,9 @@ class ViewUser extends ViewRecord
                         TextEntry::make('full_name'),
                         TextEntry::make('email'),
                         TextEntry::make('username'),
-                        TextEntry::make('created_at')->dateTime()->label('User Created At')
+                        TextEntry::make('created_at')->dateTime()->label('User Created At'),
+                        TextEntry::make('role')
+                            ->label('Role')->formatStateUsing(fn ($state) => $state === 'freelancer' ? 'Creator' : ucfirst($state))->badge(),
                     ])
                     ->columns(2),
                     // Creator ONBOARDING DATA
