@@ -9,6 +9,8 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 
 class UsersTable
 {
@@ -29,15 +31,21 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    // ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('role')
+                    ->formatStateUsing(fn ($state) => 
+                        $state === 'freelancer' ? 'Creator' : ucfirst($state)
+                    )
                     ->badge(),
                 TextColumn::make('provider')
                     ->searchable(),
                 TextColumn::make('provider_id')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('agreed_to_terms')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -52,7 +60,13 @@ class UsersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('role')
+                    ->label('User Role')
+                    ->options([
+                        'freelancer' => 'Creator',
+                        'client' => 'Client',
+                    ])
+                    ->placeholder('All Roles'),
             ])
             ->recordActions([
                 ViewAction::make(),
