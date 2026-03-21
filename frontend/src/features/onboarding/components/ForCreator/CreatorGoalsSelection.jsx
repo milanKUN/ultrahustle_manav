@@ -36,11 +36,12 @@ export default function CreatorGoalsSelection() {
     };
   }, []);
 
-  const currentStep = 3;
-  const totalSteps = 7;
+  const currentStep = 4;
+  const totalSteps = 8;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/creator-role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",

@@ -37,6 +37,9 @@ Route::middleware('auth:sanctum')->prefix('/onboarding')->group(function (): voi
 	Route::get('/status', [\App\Http\Controllers\Api\OnboardingController::class, 'status']);
 	Route::post('/complete', [\App\Http\Controllers\Api\OnboardingController::class, 'complete']);
 
+	Route::post('/check-username', [\App\Http\Controllers\Api\OnboardingController::class, 'checkUserName']);
+	Route::post('/save-username', [\App\Http\Controllers\Api\OnboardingController::class, 'saveUserName']);
+
 	Route::get('/client', [\App\Http\Controllers\Api\OnboardingController::class, 'getClient']);
 	Route::patch('/client/work-type', [\App\Http\Controllers\Api\OnboardingController::class, 'clientWorkType']);
 	Route::patch('/client/goals', [\App\Http\Controllers\Api\OnboardingController::class, 'clientGoals']);

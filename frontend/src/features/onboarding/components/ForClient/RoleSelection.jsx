@@ -5,13 +5,14 @@ export default function RoleSelection() {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null);
 
-  const currentStep = 1;
-  const totalSteps = 8;
+  const currentStep = 2;
+  const totalSteps = 9;
 
   const handleBack = () => navigate("/onboarding");
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/client-role-selection",
     "/client-work-type-selection",
     "/client-goals-selection",

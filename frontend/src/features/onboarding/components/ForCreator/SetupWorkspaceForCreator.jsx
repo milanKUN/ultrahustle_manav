@@ -4,10 +4,11 @@ import { ArrowRight } from 'lucide-react';
 
 export default function SetupWorkspaceForCreator() {
   const navigate = useNavigate();
-  const currentStep = 5; // Step 6 visually (0-indexed is 5)
-  const totalSteps = 7;
+  const currentStep = 6; // Step 6 visually (0-indexed is 5)
+  const totalSteps = 8;
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/creator-role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",

@@ -13,13 +13,14 @@ use App\Http\Requests\Onboarding\FreelancerWorkTypeRequest;
 use App\Models\UhClientOnboarding;
 use App\Models\UhFreelancerOnboarding;
 use App\Models\User;
+use App\Models\UserPersonalInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OnboardingController extends Controller
 {
-    private const CLIENT_FINAL_STEP = 8;
-    private const CREATOR_FINAL_STEP = 7;
+    private const CLIENT_FINAL_STEP = 9;
+    private const CREATOR_FINAL_STEP = 8;
 
     public function status(Request $request): JsonResponse
     {
@@ -86,7 +87,7 @@ class OnboardingController extends Controller
             array_merge(['onboarding_role' => 'client'], $validated)
         );
 
-        $model->current_step = max((int) $model->current_step, 2);
+        $model->current_step = max((int) $model->current_step, 3);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'client', $model->fresh()));
@@ -104,7 +105,7 @@ class OnboardingController extends Controller
             ]
         );
 
-        $model->current_step = max((int) $model->current_step, 3);
+        $model->current_step = max((int) $model->current_step, 4);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'client', $model->fresh()));
@@ -133,7 +134,7 @@ class OnboardingController extends Controller
             ]
         );
 
-        $model->current_step = max((int) $model->current_step, 4);
+        $model->current_step = max((int) $model->current_step, 5);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'client', $model->fresh()));
@@ -164,7 +165,7 @@ class OnboardingController extends Controller
             array_merge(['onboarding_role' => 'client'], $validated)
         );
 
-        $model->current_step = max((int) $model->current_step, 5);
+        $model->current_step = max((int) $model->current_step, 6);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'client', $model->fresh()));
@@ -193,7 +194,7 @@ class OnboardingController extends Controller
             array_merge(['onboarding_role' => 'creator'], $validated)
         );
 
-        $model->current_step = max((int) $model->current_step, 2);
+        $model->current_step = max((int) $model->current_step, 3);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'creator', $model->fresh()));
@@ -211,7 +212,7 @@ class OnboardingController extends Controller
             ]
         );
 
-        $model->current_step = max((int) $model->current_step, 3);
+        $model->current_step = max((int) $model->current_step, 4);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'creator', $model->fresh()));
@@ -239,7 +240,7 @@ class OnboardingController extends Controller
             ]
         );
 
-        $model->current_step = max((int) $model->current_step, 4);
+        $model->current_step = max((int) $model->current_step, 5);
         $model->save();
 
         return response()->json($this->statusPayload($user, 'creator', $model->fresh()));
@@ -285,5 +286,35 @@ class OnboardingController extends Controller
             'completed_at' => $record?->completed_at,
             'data' => $record,
         ];
+    }
+
+    public function checkUserName(Request $request){
+        $username = $request->username;
+
+		$exists = \App\Models\User::where('username', $username)->exists();
+
+		return response()->json([
+			'available' => !$exists
+		]);
+    }
+
+    public function saveUserName(Request $request){
+        $request->validate([
+            'username' => 'required|alpha_num|min:3|max:20|unique:users,username'
+        ]);
+        $user = $request->user();
+        $username = $request->username;
+        //user table
+        $user->update([
+            'username' => $username
+        ]);
+        //user personal information table
+        $userInfo = UserPersonalInfo::updateOrCreate(
+            ['uh_user_id' => $request->user()->uh_user_id],
+            [
+                'username' => $username
+            ]
+        );
+        return response()->json($this->statusPayload($user, '', $user->fresh()));
     }
 }

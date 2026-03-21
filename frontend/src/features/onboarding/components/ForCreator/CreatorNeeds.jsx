@@ -72,11 +72,12 @@ export default function CreatorNeeds() {
     };
   }, []);
 
-  const currentStep = 4;
-  const totalSteps = 7;
+  const currentStep = 5;
+  const totalSteps = 8;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/creator-role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",

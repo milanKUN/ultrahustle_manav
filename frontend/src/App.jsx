@@ -9,6 +9,7 @@ import DesktopSignup from "./features/auth/pages/DesktopSignup";
 import DesktopForgotPassword from "./features/auth/pages/DesktopForgotPassword";
 import DesktopEmailVerification from "./features/auth/pages/DesktopEmailVerification";
 import CreatorOnboarding from "./features/onboarding/pages/CreatorOnboarding";
+import UserUserName from "./features/onboarding/components/UserUserName";
 import RoleSelection from "./features/onboarding/components/ForClient/RoleSelection";
 import WorkTypeSelection from "./features/onboarding/components/ForClient/WorkTypeSelection";
 import GoalsSelection from "./features/onboarding/components/ForClient/GoalsSelection";
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="/login" element={<DesktopLogin />} />
           <Route path="/signup" element={<DesktopSignup />} />
           <Route path="/onboarding" element={<CreatorOnboarding />} />
+          <Route path="/username" element={<UserUserName />} />
           <Route path="/role-selection" element={<RoleSelection />} />
           <Route path="/client-work-type-selection" element={<WorkTypeSelection />} />
           <Route path="/client-goals-selection" element={<GoalsSelection />} />

@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 export default function CreatorOnboarding() {
   const navigate = useNavigate();
   const [currentStep] = useState(0);
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",
@@ -16,7 +17,7 @@ export default function CreatorOnboarding() {
     "/creator-profile-setup",
   ];
 
-  const handleGetStarted = () => navigate("/role-selection");
+  const handleGetStarted = () => navigate("/username");
   const handleSkip = () => navigate("/");
 
   return (

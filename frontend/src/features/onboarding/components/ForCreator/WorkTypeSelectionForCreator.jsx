@@ -63,11 +63,12 @@ export default function WorkTypeSelectionForCreator() {
     };
   }, []);
 
-  const currentStep = 2;
-  const totalSteps = 7;
+  const currentStep = 3;
+  const totalSteps = 8;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",

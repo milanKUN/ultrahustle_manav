@@ -48,6 +48,17 @@ export const completeOnboarding = async () => {
   return unwrap(res);
 };
 
+//save username
+export const saveUserName = async (payload) => {
+  const res = await api.post("/api/onboarding/save-username", payload);
+  return unwrap(res);
+};
+//check username availabilty
+export const checkUserName = async (payload) => {
+  const res = await api.post("/api/onboarding/check-username", payload);
+  return res;
+};
+
 // Client
 export const saveClientWorkType = async ({ work_type, team_industry, team_build_plan }) => {
   const res = await api.patch("/api/onboarding/client/work-type", {

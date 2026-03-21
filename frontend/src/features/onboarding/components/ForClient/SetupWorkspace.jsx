@@ -4,11 +4,12 @@ import { ArrowRight } from 'lucide-react';
 
 export default function SetupWorkspace() {
   const navigate = useNavigate();
-  const currentStep = 6; // Step 7 visually (0-indexed is 6)
-  const totalSteps = 8;
+  const currentStep = 7; // Step 7 visually (0-indexed is 6)
+  const totalSteps = 9;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/client-role-selection",
     "/client-work-type-selection",
     "/client-goals-selection",

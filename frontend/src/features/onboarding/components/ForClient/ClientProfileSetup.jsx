@@ -7,11 +7,12 @@ import { completeOnboarding } from "../../api/onboardingApi";
 export default function ClientProfileSetup() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const currentStep = 7; // Visual step index (8th step)
-  const totalSteps = 8;
+  const currentStep = 8; // Visual step index (8th step)
+  const totalSteps = 9;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/client-role-selection",
     "/client-work-type-selection",
     "/client-goals-selection",

@@ -63,11 +63,12 @@ export default function WorkTypeSelection() {
     };
   }, []);
 
-  const currentStep = 2;
-  const totalSteps = 8;
+  const currentStep = 3;
+  const totalSteps = 9;
 
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/client-role-selection",
     "/client-work-type-selection",
     "/client-goals-selection",

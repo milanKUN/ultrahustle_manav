@@ -70,10 +70,11 @@ export default function BusinessDetails() {
     };
   }, []);
 
-  const currentStep = 5; // Step 5 (0-indexed was 4 previously)
-  const totalSteps = 8;
+  const currentStep = 6; // Step 5 (0-indexed was 4 previously)
+  const totalSteps = 9;
   const stepPaths = [
     "/onboarding",
+    "/username",
     "/client-role-selection",
     "/client-work-type-selection",
     "/client-goals-selection",
