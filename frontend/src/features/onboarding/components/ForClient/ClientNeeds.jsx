@@ -190,17 +190,20 @@ export default function ClientNeeds() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
-              Tell us more
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
+                Tell us more
+              </h2>
 
-            <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
-              about what your needs            </h2>
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
+                about what your needs
+              </h2>
 
-            <p className="text-black/60 text-base min-[950px]:text-xl mt-4 min-[950px]:mt-4 max-w-md">
-              What type of creators do you hire?
-            </p>
+              <p className="text-black/60 text-base min-[950px]:text-xl mt-4 min-[950px]:mt-4 max-w-md">
+                What type of creators do you hire?
+              </p>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}
@@ -431,12 +434,20 @@ export default function ClientNeeds() {
                             key={category.id}
                             onClick={() => toggleCategory(category.id)}
                             className={`
-                              flex items-center gap-3.5 px-[clamp(12px,2vw,24px)] py-[clamp(8px,1.5vh,14px)] rounded-2xl cursor-pointer border-2 transition-all duration-300 backdrop-blur-sm justify-center whitespace-nowrap flex-1
-                              ${isSelected
-                                ? "bg-[#CEFF1B] border-black/50 shadow-md scale-105"
-                                : "bg-transparent border-[#2B2B2B] "
+  flex items-center gap-3.5 
+  px-[clamp(12px,2vw,24px)] 
+  py-[clamp(8px,1.5vh,14px)] 
+  rounded-2xl cursor-pointer 
+  border-2 
+  transition-all duration-300 
+  backdrop-blur-sm 
+  justify-center whitespace-nowrap flex-1
+
+  ${isSelected
+                                ? "bg-[#CEFF1B] border-black shadow-md scale-105"
+                                : "bg-white/40 border-black/20 hover:border-black/40 hover:bg-white/60"
                               }
-                            `}
+`}
                           >
                             <div
                               className={`p-1.5 rounded-xl flex items-center justify-center shrink-0 bg-[#CEFF1B]`}
