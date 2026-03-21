@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('jobs', function (Blueprint $table) {
-            $table->primary('id')->change();
+            $table->primary('id')->autoIncrement()->change();
         });
     }
 
