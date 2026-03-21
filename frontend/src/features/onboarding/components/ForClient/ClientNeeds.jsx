@@ -190,17 +190,20 @@ export default function ClientNeeds() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
-              Tell us more
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
+                Tell us more
+              </h2>
 
-            <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
-              about what your needs            </h2>
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
+                about what your needs
+              </h2>
 
-            <p className="text-black/60 text-base min-[950px]:text-xl mt-4 min-[950px]:mt-4 max-w-md">
-              What type of creators do you hire?
-            </p>
+              <p className="text-black/60 text-base min-[950px]:text-xl mt-4 min-[950px]:mt-4 max-w-md">
+                What type of creators do you hire?
+              </p>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}

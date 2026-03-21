@@ -192,16 +192,15 @@ export default function BusinessDetails() {
           </button>
 
           {/* Title */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-32 items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black mb-1 leading-tight">
-              Organization &
-            </h2>
-            <h2 className="text-4xl min-[950px]:text-4xl font-bold text-black mb-4 leading-tight">
-              Business Details
-            </h2>
-            <h2 className="hidden min-[950px]:block text-black text-3xl font-bold">
-
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black mb-1 leading-tight">
+                Organization &
+              </h2>
+              <h2 className="text-4xl min-[950px]:text-4xl font-bold text-black mb-4 leading-tight">
+                Business Details
+              </h2>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}

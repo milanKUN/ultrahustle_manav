@@ -108,18 +108,20 @@ export default function RoleSelection() {
           </button>
 
           {/* QUESTION */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
-              How will you be
-            </h2>
+          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+            <div className="flex flex-col items-start text-left max-w-fit">
+              <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
+                How will you be
+              </h2>
 
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
-              using Ultra Hustle?
-            </h2>
+              <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
+                using Ultra Hustle?
+              </h2>
 
-            <p className="text-black/60 text-base min-[701px]:text-lg min-[950px]:text-xl mt-4 min-[950px]:mt-6 max-w-md">
-              This helps us tailor your dashboard
-            </p>
+              <p className="text-black/60 text-base min-[701px]:text-lg min-[950px]:text-xl mt-4 min-[950px]:mt-6 max-w-md">
+                This helps us tailor your dashboard
+              </p>
+            </div>
           </div>
 
           {/* Step Indicators - Desktop Only */}
@@ -324,8 +326,8 @@ export default function RoleSelection() {
             </div>
           </div>
 
-          {/* ✅ THIS is the line you wanted: LEFT aligned and ALSO placed to the LEFT side (not centered block) */}
-          <p className="mt-6 text-left text-gray-600 text-lg">
+
+          <p className="mt-6 text-center text-gray-600 text-lg">
             You can switch or use both roles anytime.
           </p>
 
