@@ -20,6 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        URL::forceRootUrl('http://159.89.193.253/ultra-admin');
+        // URL::forceRootUrl('http://159.89.193.253/ultra-admin');
     }
 }
