@@ -134,7 +134,7 @@ export default function WorkTypeSelection() {
             </span>
           </button>
 
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black">
                 How do you work?
@@ -343,47 +343,35 @@ export default function WorkTypeSelection() {
             )}
 
             {/* Buttons row */}
-            <div className="mt-5 min-[701px]:mt-8 flex flex-wrap items-center justify-center gap-2 min-[701px]:gap-5">
+            <div className="mt-5 min-[701px]:mt-8 w-full flex flex-wrap items-center justify-between gap-y-4 gap-x-2 min-[701px]:gap-5">
               <button
                 onClick={handleReset}
-                className="
-                  h-10 min-[701px]:h-12
-                  px-4 min-[701px]:px-8
-                  rounded-lg border border-black/20
-                  bg-white text-black/60
-                  text-sm min-[701px]:text-base
-                "
+                className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
                 Reset
               </button>
 
-              <button
-                onClick={handleBack}
-                className="
-                  h-10 min-[701px]:h-12
-                  px-4 min-[701px]:px-8
-                  rounded-lg border border-black/40
-                  bg-white text-black
-                  text-sm min-[701px]:text-base
-                "
-              >
-                Back
-              </button>
+              <div className="flex items-center gap-2 min-[701px]:gap-5">
+                <button
+                  onClick={handleBack}
+                  className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+                >
+                  Back
+                </button>
 
-              <button
-                onClick={handleContinue}
-                disabled={!canContinue}
-                className={[
-                  "rounded-lg font-medium border",
-                  "h-10 min-[701px]:h-12 px-4 min-[701px]:px-8",
-                  "text-sm min-[701px]:text-base",
-                  canContinue
-                    ? "bg-[#CEFF1B] border-black text-black"
-                    : "bg-[#DADADA] border-black/20 text-black/30",
-                ].join(" ")}
-              >
-                Continue
-              </button>
+                <button
+                  onClick={handleContinue}
+                  disabled={!canContinue}
+                  className={[
+                    "h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm min-[701px]:text-base transition-all",
+                    canContinue
+                      ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                      : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                  ].join(" ")}
+                >
+                  Continue
+                </button>
+              </div>
             </div>
 
             {/* dots */}
@@ -406,11 +394,11 @@ export default function WorkTypeSelection() {
         </div>
 
         {/* ✅ DESKTOP (your original, unchanged) */}
-        <div className="hidden min-[950px]:flex flex-col min-[950px]:flex-row gap-6 justify-between items-stretch relative z-10 w-full px-4">
+        <div className="hidden min-[950px]:flex flex-col min-[950px]:flex-row gap-6 justify-between items-stretch relative z-10 w-full max-w-[980px] px-4">
           {/* Solo Card */}
           <div
             onClick={() => setSelectedType("solo")}
-            className={`flex-1 max-w-[450px] min-h-[160px] p-[clamp(16px,3vh,32px)] rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedType === "solo"
+            className={`flex-1 max-w-[450px] min-h-[160px] p-4 py-5 rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedType === "solo"
               ? "bg-[#CEFF1B]  shadow-lg"
               : "bg-[#FEFEFE]/40 border-1 border-[#CEFF1B] hover:bg-white/20"
               }`}
@@ -440,7 +428,7 @@ export default function WorkTypeSelection() {
           {/* Team Card */}
           <div
             onClick={() => setSelectedType("team")}
-            className={`flex-1 max-w-[450px] min-h-[160px] p-[clamp(16px,3vh,32px)] rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedType === "team"
+            className={`flex-1 max-w-[450px] min-h-[160px] p-4 py-5 rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedType === "team"
               ? "bg-[#CEFF1B]  shadow-lg"
               : "bg-[#FEFEFE]/40 border-1 border-[#CEFF1B] hover:bg-white/20"
               }`}
@@ -470,7 +458,7 @@ export default function WorkTypeSelection() {
 
         {/* Extra Options for Team Selection - Desktop (unchanged) */}
         {selectedType === "team" && (
-          <div className="hidden min-[950px]:flex mt-4 min-[950px]:mt-6 flex-col min-[950px]:flex-row gap-6 justify-between items-start w-full px-4 relative z-20 animate-fade-in-up">
+          <div className="hidden min-[950px]:flex mt-4 min-[950px]:mt-6 flex-col min-[950px]:flex-row gap-6 justify-between items-start w-full max-w-[980px] px-4 relative z-20 animate-fade-in-up">
             <div className="flex-1 w-full max-w-[450px]">
               <label className="block text-gray-800 font-semibold mb-2 text-lg">
                 Industry
@@ -530,13 +518,13 @@ export default function WorkTypeSelection() {
         )}
 
         {/* Desktop Footer (unchanged) */}
-        <div className="hidden min-[950px]:block mt-4 min-[950px]:mt-6 relative z-10 w-full max-w-[750px]">
+        <div className="hidden min-[950px]:block mt-4 min-[950px]:mt-6 relative z-10 w-full max-w-[980px] px-4">
           {selectedType !== "team" && <div className="h-8 mb-4"></div>}
 
           <div className="flex justify-between items-center">
             <button
               onClick={handleReset}
-              className="px-8 py-3 rounded-lg border-1 border-black text-gray-600 font-medium text-lg hover:bg-gray-100 transition-all"
+              className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
             >
               Reset
             </button>
@@ -544,16 +532,16 @@ export default function WorkTypeSelection() {
             <div className="flex gap-4">
               <button
                 onClick={handleBack}
-                className="px-10 py-3 rounded-lg border-1 border-black text-gray-700 font-medium text-lg hover:bg-gray-100 transition-all"
+                className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
                 Back
               </button>
               <button
                 onClick={handleContinue}
                 disabled={!canContinue}
-                className={`px-10 py-3 rounded-lg font-medium text-lg transition-all ${canContinue
-                  ? "bg-[#CEFF1B] border-2 border-black text-black hover:bg-[#b8e617]"
-                  : "bg-gray-200 border-1 border-black text-gray-700 cursor-not-allowed"
+                className={`min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all ${canContinue
+                  ? "bg-[#CEFF1B] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95"
+                  : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none"
                   }`}
               >
                 Continue

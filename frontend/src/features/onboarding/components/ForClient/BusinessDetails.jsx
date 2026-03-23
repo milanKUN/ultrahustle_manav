@@ -193,7 +193,7 @@ export default function BusinessDetails() {
           </button>
 
           {/* Title */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black mb-1 leading-tight">
                 Organization &
@@ -418,31 +418,33 @@ export default function BusinessDetails() {
             <span className="text-sm min-[950px]:text-xl text-gray-600 font-medium">This is a personal account</span>
           </div>
 
-          <div className="flex flex-wrap justify-center items-center w-full gap-2 min-[950px]:gap-4">
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 min-[950px]:px-8 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border-1 border-[#2B2B2B] text-gray-600 font-medium text-sm min-[950px]:text-lg hover:bg-gray-100 transition-all"
-            >
-              Reset
-            </button>
+          <div className="mt-5 min-[950px]:mt-2 relative z-10 w-full max-w-[1200px] px-4 min-[950px]:px-0">
+            <div className="flex justify-between items-center gap-2 min-[950px]:gap-4 w-full">
+              <button
+                onClick={handleReset}
+                className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+              >
+                Reset
+              </button>
 
-            <div className="flex gap-2 min-[950px]:gap-4">
-              <button
-                onClick={handleBack}
-                className="px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border-1 border-[#2B2B2B] text-gray-700 font-medium text-sm min-[950px]:text-lg hover:bg-gray-100 transition-all"
-              >
-                Discard
-              </button>
-              <button
-                onClick={handleContinue}
-                disabled={!isFormValid()}
-                className={`px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg font-medium text-sm min-[950px]:text-lg transition-all whitespace-nowrap ${isFormValid()
-                  ? 'bg-[#CEFF1B] border border-black text-black hover:bg-[#b8e617]'
-                  : 'bg-[#CEFF1B]/50 border-1 border-[#2B2B2B] text-gray-400 cursor-not-allowed'
-                  }`}
-              >
-                Continue
-              </button>
+              <div className="flex gap-4">
+                <button
+                  onClick={handleBack}
+                  className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleContinue}
+                  disabled={!isFormValid()}
+                  className={`min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all ${isFormValid()
+                    ? "bg-[#CEFF1B] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95"
+                    : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none"
+                    }`}
+                >
+                  Continue
+                </button>
+              </div>
             </div>
           </div>
 

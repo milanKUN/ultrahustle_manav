@@ -108,184 +108,120 @@ export default function UserUserName() {
   const handleBack = () => navigate("/onboarding");
 
   return (
-    <div className="min-h-[100svh] w-full flex flex-col min-[950px]:flex-row">
+    <div
+      className="min-h-[100vh] w-full flex items-center justify-end relative cursor-default overflow-hidden pr-[8%]"
+      style={{ backgroundColor: 'transparent', isolation: 'isolate' }}
+    >
+      {/* Full Screen Background */}
+      <img
+        src="/usernameBG.png"
+        alt="bg"
+        className="fixed top-0 left-0 w-[100vw] h-[100vh] object-cover z-[-1] scale-[1.3] translate-x-[15%]"
+        style={{ pointerEvents: "none" }}
+      />
 
-      {/* 🔵 LEFT SIDE (Branding / Illustration) */}
-      <div className="w-full min-[950px]:w-[30%] relative overflow-hidden bg-[#CEFF1B] min-h-[45vh] min-[950px]:min-h-[100svh]">
-        <div className="absolute inset-0 flex flex-col justify-between p-6 min-[701px]:p-8 min-[950px]:p-10">
-          {/* Back Button - Mobile/Tablet Only */}
-          <button
-            onClick={handleBack}
-            className="min-[950px]:hidden w-10 h-10 min-[701px]:w-12 min-[701px]:h-12 rounded-full flex items-center justify-center mb-4 relative"
-            style={{
-              background: "linear-gradient(180deg, #FFFFFF, #9C9C9C)",
-              padding: "2px",
-            }}
-          >
-            <span className="w-full h-full rounded-full flex items-center justify-center bg-[#CEFF1B]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 min-[701px]:h-6 min-[701px]:w-6 text-black"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </span>
-          </button>
+      {/* Centered Card */}
+      <div
+        className="relative z-10 w-full max-w-[480px] mx-4 bg-[#FEFEFE66] backdrop-blur-[20px] rounded-[26px] border-2 border-[rgba(206,255,27,0.9)] shadow-[0_18px_50px_rgba(0,0,0,0.18),0_0_0_6px_rgba(206,255,27,0.06)] flex flex-col px-6 py-8 sm:px-8 sm:py-10"
+        style={{ transform: 'translateZ(0)', willChange: 'transform', cursor: 'default' }}
+      >
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-[20px] sm:text-2xl font-semibold text-[#2B2B2B] mb-2 sm:mb-3">Create your username</h2>
+          <p className="text-[13px] sm:text-sm text-[#666]">
+            This will be your public identity
+          </p>
+        </div>
 
-          {/* QUESTION */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-start min-[950px]:pt-[clamp(40px,10vh,128px)] items-center min-[950px]:items-start text-center min-[950px]:text-left px-4 min-[950px]:px-0">
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
-              How will you be
-            </h2>
+        {/* Input */}
+        <input
+          type="text"
+          value={username}
+          onChange={handleChange}
+          placeholder="Enter username"
+          className="w-full h-[46px] border border-black/10 rounded-[12px] px-4 text-[14px] sm:text-base bg-[rgba(235,235,235,0.85)] focus:outline-none focus:border-[#CEFF1B] focus:shadow-[0_0_0_4px_rgba(206,255,27,0.25)] transition-all text-[#333] placeholder:text-[#888]"
+        />
 
-            <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black -mt-1 leading-tight">
-              using Ultra Hustle?
-            </h2>
+        {/* Status */}
+        <div className="mt-2 text-sm h-5 font-medium">
+          {status === "checking" && (
+            <span className="text-gray-400">Checking...</span>
+          )}
+          {status === "available" && (
+            <span className="text-green-600">✔ Available</span>
+          )}
+          {status === "taken" && (
+            <span className="text-red-500">❌ Already taken</span>
+          )}
+        </div>
 
-            <p className="text-black/60 text-base min-[701px]:text-lg min-[950px]:text-xl mt-4 min-[950px]:mt-6 max-w-md">
-              This helps us tailor your dashboard
+        {/* Suggestions */}
+        {suggestions.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs sm:text-sm text-gray-500 mb-2">
+              Try one of these:
             </p>
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => setUsername(s)}
+                  className="px-3 py-1.5 border border-black/10 rounded-full text-xs sm:text-sm hover:bg-[#CEFF1B] hover:border-transparent transition-all bg-white/50 text-[#2B2B2B]"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Step Indicators - Desktop Only */}
-          <div className="hidden min-[950px]:flex items-center gap-3 ml-12">
-            {[...Array(totalSteps)].map((_, index) =>
-              index <= currentStep ? (
-                <div
-                  key={index}
-                  onClick={() => index < currentStep && navigate(stepPaths[index])}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentStep
-                    ? "bg-black w-4 h-4"
-                    : "bg-white cursor-pointer"
-                    }`}
-                />
-              ) : null
-            )}
+        {/* Error */}
+        {error && (
+          <p className="text-red-500 text-xs sm:text-sm mt-3 ml-1 font-medium">{error}</p>
+        )}
+
+        {/* Buttons */}
+        <div className="mt-8 pt-2 flex w-full flex-wrap items-center justify-between gap-y-4 gap-x-2">
+          <button
+            onClick={handleReset}
+            className="h-10 sm:h-12 px-4 sm:px-6 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+          >
+            Reset
+          </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={handleBack}
+              className="h-10 sm:h-12 px-4 sm:px-6 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleContinue}
+              disabled={status !== "available"}
+              className={[
+                "h-10 sm:h-12 px-4 sm:px-6 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm transition-all",
+                status === "available"
+                  ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60"
+                  : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+              ].join(" ")}
+            >
+              Continue
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* ⚪ RIGHT SIDE (Form) */}
-      <div
-        className="
-          w-full min-[950px]:w-[70%]
-          bg-[#E0E0E0]
-          min-[950px]:bg-gradient-to-br min-[950px]:from-[#E8E8E8] min-[950px]:via-[#E0E0E0] min-[950px]:to-[#D8D8D8]
-
-          rounded-t-[34px] max-[400px]:rounded-t-[28px]
-          min-[701px]:rounded-t-[44px]
-          min-[950px]:rounded-none
-
-          -mt-10 max-[400px]:-mt-8
-          min-[701px]:-mt-12
-          min-[950px]:mt-0
-
-          p-6 pt-8
-          min-[701px]:p-10 min-[701px]:pt-10
-          min-[950px]:p-[clamp(24px,4vh,48px)]
-
-          flex flex-col justify-center items-center
-          relative overflow-visible z-20
-          min-h-[60vh] min-[701px]:min-h-[62vh] min-[950px]:min-h-[100svh]
-        "
-      >
-        <div className="hidden min-[950px]:block absolute w-[500px] h-[500px] rounded-full pointer-events-none z-0" />
-        <div className="hidden min-[950px]:block absolute w-[400px] h-[400px] rounded-full pointer-events-none z-0" />
-        <div className="hidden min-[950px]:block absolute w-[350px] h-[350px] rounded-full pointer-events-none z-0" />
-
-        {/* Content */}
-        <div className="hidden min-[950px]:block relative z-10 w-full max-w-[980px] px-4 login-card-glass forgot-password-card">
-            <div className="forgot-password-header">
-                <h2 className="text-2xl font-semibold mb-2">Create your username</h2>
-                <p className="text-gray-500 mb-6">
-                    This will be your public identity
-                </p>
-            </div>         
-
-          {/* Input */}
-          <input
-            type="text"
-            value={username}
-            onChange={handleChange}
-            placeholder="Enter username"
-            className="w-full border rounded-lg px-4 py-3 text-lg"
-          />
-
-          {/* Status */}
-          <div className="mt-2 text-sm h-5">
-            {status === "checking" && (
-              <span className="text-gray-400">Checking...</span>
-            )}
-            {status === "available" && (
-              <span className="text-green-600">✔ Available</span>
-            )}
-            {status === "taken" && (
-              <span className="text-red-500">❌ Already taken</span>
-            )}
-          </div>
-
-          {/* Suggestions */}
-          {suggestions.length > 0 && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-500 mb-2">
-                Try one of these:
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                {suggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setUsername(s)}
-                    className="px-3 py-1 border rounded-full text-sm hover:bg-[#CEFF1B]"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Step dots */}
+        <div className="mt-6 flex justify-center items-center gap-2">
+          {[...Array(totalSteps)].map((_, index) =>
+            index <= currentStep ? (
+              <span
+                key={index}
+                className={[
+                  "w-2 h-2 rounded-full",
+                  index === currentStep ? "bg-black" : "bg-black/30",
+                ].join(" ")}
+              />
+            ) : null
           )}
-
-          {/* Error */}
-          {error && (
-            <p className="text-red-500 text-sm mt-3">{error}</p>
-          )}
-
-          {/* Buttons */}
-          <div className="mt-6 flex justify-between items-center">
-            <button
-              onClick={handleReset}
-              className="px-8 py-3 rounded-lg border-2 border-black text-gray-600 font-medium text-lg hover:bg-gray-100 transition-all"
-            >
-              Reset
-            </button>
-            <div className="flex gap-4">
-                <button
-                onClick={handleBack}
-                className="px-10 py-3 rounded-lg border border-black text-black font-medium text-lg hover:bg-gray-100 transition-all"
-                >
-                Back
-                </button>
-                <button
-                    onClick={handleContinue}
-                    disabled={status !== "available"}
-                    className={`px-10 py-3 rounded-lg font-medium text-lg transition-all ${status === "available"
-                    ? "bg-[#CEFF1B] border-2 border-black text-black hover:bg-[#b8e617]"
-                    : "bg-gray-200 border-2 border-gray-300 text-gray-400 cursor-not-allowed"
-                    }`}
-                >
-                    Continue
-                </button>
-              </div>
-          </div>
-
         </div>
       </div>
     </div>

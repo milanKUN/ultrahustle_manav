@@ -141,7 +141,7 @@ export default function GoalsSelection() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
                 What do you
@@ -211,48 +211,36 @@ export default function GoalsSelection() {
               ))}
             </div>
 
-            {/* Buttons */}
-            <div className="mt-6 min-[701px]:mt-8 flex flex-wrap items-center justify-center gap-2 min-[701px]:gap-5">
+            {/* Buttons row */}
+            <div className="mt-5 min-[701px]:mt-8 w-full flex flex-wrap items-center justify-between gap-y-4 gap-x-2 min-[701px]:gap-5">
               <button
                 onClick={handleReset}
-                className="
-                  h-10 min-[701px]:h-12
-                  px-4 min-[701px]:px-8
-                  rounded-lg border border-black/20
-                  bg-white text-black/60
-                  text-sm min-[701px]:text-base
-                "
+                className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
                 Reset
               </button>
 
-              <button
-                onClick={handleBack}
-                className="
-                  h-10 min-[701px]:h-12
-                  px-4 min-[701px]:px-8
-                  rounded-lg border border-black/40
-                  bg-white text-black
-                  text-sm min-[701px]:text-base
-                "
-              >
-                Back
-              </button>
+              <div className="flex items-center gap-2 min-[701px]:gap-5">
+                <button
+                  onClick={handleBack}
+                  className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+                >
+                  Back
+                </button>
 
-              <button
-                onClick={handleContinue}
-                disabled={!canContinue}
-                className={[
-                  "rounded-lg font-medium border transition-all",
-                  "h-10 min-[701px]:h-12 px-4 min-[701px]:px-8",
-                  "text-sm min-[701px]:text-base",
-                  canContinue
-                    ? "bg-[#CEFF1B] border-black text-black"
-                    : "bg-[#DADADA] border-black/20 text-black/30",
-                ].join(" ")}
-              >
-                Continue
-              </button>
+                <button
+                  onClick={handleContinue}
+                  disabled={!canContinue}
+                  className={[
+                    "h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm min-[701px]:text-base transition-all",
+                    canContinue
+                      ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                      : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                  ].join(" ")}
+                >
+                  Continue
+                </button>
+              </div>
             </div>
 
             {/* Step dots */}
@@ -275,9 +263,9 @@ export default function GoalsSelection() {
         </div>
 
         {/* ✅ DESKTOP (your original, unchanged) */}
-        <div className="hidden min-[950px]:block relative z-10 w-full max-w-[900px]">
-          <div className="-mt-6 bg-white/40 backdrop-blur-md border-1 border-[#CEFF1B] rounded-[30px] p-8 min-[950px]:p-[clamp(20px,3.5vh,48px)] shadow-xl min-h-[360px]">
-            <div className="flex flex-wrap gap-4 justify-center min-[950px]:justify-start mt-4 min-[950px]:mt-6">
+        <div className="hidden min-[950px]:block relative z-10 w-full max-w-[600px] min-[1300px]:max-w-[700px]">
+          <div className="-mt-6 bg-white/40 backdrop-blur-md border-1 border-[#CEFF1B] rounded-[20px] min-[950px]:rounded-[24px] p-5 min-[950px]:p-[clamp(16px,2vh,24px)] shadow-xl">
+            <div className="flex flex-wrap gap-3 min-[950px]:gap-5 justify-center min-[950px]:justify-start mt-2 min-[950px]:mt-3">
               {goals.map((goal) => {
                 const Icon = goal.icon;
                 const isSelected = selectedGoals.includes(goal.id);
@@ -287,18 +275,18 @@ export default function GoalsSelection() {
                     key={goal.id}
                     onClick={() => toggleGoal(goal.id)}
                     className={`
-                      flex items-center gap-4 px-6 py-4 rounded-xl cursor-pointer border-2 backdrop-blur-sm
+                      flex items-center gap-2 min-[950px]:gap-3 px-3 py-2.5 min-[950px]:px-4 min-[950px]:py-3 rounded-[10px] cursor-pointer border-2 backdrop-blur-sm transition-all duration-300
                       ${isSelected
-                        ? "bg-[#CEFF1B] border-black shadow-lg scale-105"
-                        : "bg-white/20 border-[#2B2B2B] "
+                        ? "bg-[#CEFF1B] border-black shadow-sm scale-[1.03]"
+                        : "bg-white/20 border-[#2B2B2B] hover:bg-white/40 hover:border-black/50"
                       }
                     `}
                   >
-                    <div className="bg-[#CEFF1B] p-2 rounded-lg flex items-center justify-center shrink-0">
-                      <Icon size={20} className="text-black" strokeWidth={2} />
+                    <div className="bg-[#CEFF1B] p-1.5 rounded-lg flex items-center justify-center shrink-0">
+                      <Icon size={16} className="text-black min-[950px]:w-[18px] min-[950px]:h-[18px]" strokeWidth={2} />
                     </div>
 
-                    <span className={`font-[500] text-lg ${isSelected ? "text-black" : "text-gray-800"}`}>
+                    <span className={`font-[500] text-sm min-[950px]:text-[15px] ${isSelected ? "text-black" : "text-gray-800"}`}>
                       {goal.label}
                     </span>
                   </div>
@@ -309,11 +297,11 @@ export default function GoalsSelection() {
         </div>
 
         {/* Desktop Footer */}
-        <div className="hidden min-[950px]:block mt-4 min-[950px]:mt-8 relative z-10 w-full max-w-[900px]">
-          <div className="flex justify-between items-center">
+        <div className="hidden min-[950px]:block mt-3 min-[950px]:mt-4 relative z-10 w-full max-w-[600px] min-[1300px]:max-w-[700px] px-4 min-[950px]:px-0">
+          <div className="flex justify-between items-center w-full">
             <button
               onClick={handleReset}
-              className="px-8 py-3 rounded-lg border border-black text-gray-600 font-medium text-lg hover:bg-gray-100 transition-all"
+              className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
             >
               Reset
             </button>
@@ -321,16 +309,16 @@ export default function GoalsSelection() {
             <div className="flex gap-4">
               <button
                 onClick={handleBack}
-                className="px-10 py-3 rounded-lg border border-black text-[#2B2B2B] font-medium text-lg hover:bg-gray-100 transition-all"
+                className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
-                Discard
+                Back
               </button>
               <button
                 onClick={handleContinue}
                 disabled={!canContinue}
-                className={`px-10 py-3 rounded-lg font-medium text-lg transition-all ${canContinue
-                  ? "bg-[#CEFF1B] border-2 border-black text-black hover:bg-[#b8e617]"
-                  : "bg-[#CEFF1B]/50 border border-[#2B2B2B] text-gray-500 cursor-not-allowed"
+                className={`min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all ${canContinue
+                  ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                  : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none"
                   }`}
               >
                 Continue

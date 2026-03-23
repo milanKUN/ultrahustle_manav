@@ -12,7 +12,7 @@ export default function CreatorOnboarding() {
     "/role-selection",
     "/creator-work-type-selection",
     "/creator-goals-selection",
-    "/creator-needs",
+    "/creator-work-type-selection",
     "/creator-setup-workspace",
     "/creator-profile-setup",
   ];
@@ -21,12 +21,12 @@ export default function CreatorOnboarding() {
   const handleSkip = () => navigate("/");
 
   return (
-    <div className="min-h-[100svh] w-full">
+    <div className="h-[100svh] w-full overflow-hidden">
       {/* Layout:
           0–1000px: stacked
           1001px+: split
       */}
-      <div className="min-h-[100svh] w-full overflow-x-hidden min-[1001px]:overflow-hidden flex flex-col min-[1001px]:flex-row">
+      <div className="h-full w-full overflow-hidden flex flex-col min-[1001px]:flex-row">
         {/* IMAGE */}
         <div
           className="
@@ -34,7 +34,7 @@ export default function CreatorOnboarding() {
             h-[32svh] max-[400px]:h-[30svh]
             min-[401px]:h-[36svh]
             min-[701px]:h-[42svh]
-            min-[1001px]:h-auto min-[1001px]:basis-[46%] min-[1001px]:shrink-0
+            min-[1001px]:h-full min-[1001px]:basis-[46%] min-[1001px]:shrink-0
           "
         >
           <div className="absolute inset-0 bg-gradient-to-b from-[#E8E8E8] via-[#E0E0E0] to-[#D8D8D8]" />
@@ -56,7 +56,7 @@ export default function CreatorOnboarding() {
         {/* CONTENT AREA */}
         <div
           className="
-            w-full flex-1 min-h-0 relative z-20 overflow-y-auto
+            w-full flex-1 min-h-0 relative z-20 overflow-hidden
             bg-[#E0E0E0]
             min-[1001px]:bg-gradient-to-br min-[1001px]:from-[#E8E8E8] min-[1001px]:via-[#E0E0E0] min-[1001px]:to-[#D8D8D8]
 
@@ -98,19 +98,19 @@ export default function CreatorOnboarding() {
                 min-[1301px]:rounded-[30px]
 
                 /* ✅ widths per your ranges (iPad Air: 820px → card ~760px) */
-                max-w-[340px] max-[400px]:max-w-[330px]
-                min-[401px]:max-w-[560px]
-                min-[701px]:max-w-[760px]
-                min-[1001px]:max-w-[860px]
-                min-[1301px]:max-w-[960px]
+                max-w-[320px] max-[400px]:max-w-[300px]
+                min-[401px]:max-w-[440px]
+                min-[701px]:max-w-[540px]
+                min-[1001px]:max-w-[600px]
+                min-[1301px]:max-w-[680px]
 
                 /* ✅ padding tuned (iPad/tablet bigger + cleaner) */
-                px-4 py-5
-                max-[400px]:px-4 max-[400px]:py-5
-                min-[401px]:px-8 min-[401px]:py-8
-                min-[701px]:px-12 min-[701px]:py-12
-                min-[1001px]:px-12 min-[1001px]:py-12
-                min-[1301px]:px-14 min-[1301px]:py-14
+                px-4 py-4
+                max-[400px]:px-4 max-[400px]:py-4
+                min-[401px]:px-6 min-[401px]:py-5
+                min-[701px]:px-8 min-[701px]:py-6
+                min-[1001px]:px-10 min-[1001px]:py-8
+                min-[1301px]:px-12 min-[1301px]:py-10
               "
             >
               {/* TOP */}
@@ -119,10 +119,10 @@ export default function CreatorOnboarding() {
                   className="
                     font-roboto font-bold text-gray-800 leading-tight
                     text-[21px] max-[400px]:text-[20px]
-                    min-[401px]:text-[28px]
-                    min-[701px]:text-[36px]
-                    min-[1001px]:text-[46px]
-                    min-[1301px]:text-[54px]
+                    min-[401px]:text-[24px]
+                    min-[701px]:text-[30px]
+                    min-[1001px]:text-[38px]
+                    min-[1301px]:text-[46px]
                   "
                 >
                   Welcome To
@@ -135,35 +135,35 @@ export default function CreatorOnboarding() {
                     className="
                       mx-auto object-contain
                       h-[38px] max-[400px]:h-[36px]
-                      min-[401px]:h-[52px]
-                      min-[701px]:h-[68px]
-                      min-[1001px]:h-[86px]
-                      min-[1301px]:h-[96px]
+                      min-[401px]:h-[44px]
+                      min-[701px]:h-[56px]
+                      min-[1001px]:h-[72px]
+                      min-[1301px]:h-[80px]
                     "
                   />
                 </div>
               </div>
 
               {/* DIVIDER */}
-              <div className="h-[2px] w-full bg-black my-4 min-[701px]:my-6 min-[1001px]:my-8" />
+              <div className="h-[2px] w-full bg-black my-3 min-[701px]:my-4 min-[1001px]:my-5" />
 
               {/* BOTTOM */}
               <div className="text-center mx-auto">
                 <p
                   className="
                     text-gray-800 leading-relaxed
-                    text-[12.5px] max-[400px]:text-[12px]
-                    min-[401px]:text-[15px]
-                    min-[701px]:text-[18px]
-                    min-[1001px]:text-[24px]
-                    min-[1301px]:text-[28px]
-                    mb-5 min-[701px]:mb-8 min-[1001px]:mb-12
+                    text-[12px] max-[400px]:text-[11px]
+                    min-[401px]:text-[14px]
+                    min-[701px]:text-[16px]
+                    min-[1001px]:text-[20px]
+                    min-[1301px]:text-[22px]
+                    mb-4 min-[701px]:mb-5 min-[1001px]:mb-6
                   "
                 >
                   Let&apos;s personalize your workspace.
                 </p>
 
-                <div className="flex justify-center mb-6 min-[701px]:mb-10 min-[1001px]:mb-12">
+                <div className="flex justify-center mb-4 min-[701px]:mb-6 min-[1001px]:mb-8">
                   <button
                     onClick={handleGetStarted}
                     className="
@@ -174,18 +174,18 @@ export default function CreatorOnboarding() {
 
                       rounded-lg min-[701px]:rounded-xl
 
-                      px-5 py-[10px]
+                      px-5 py-[8px]
                       max-[400px]:px-5
-                      min-[401px]:px-9 min-[401px]:py-3
-                      min-[701px]:px-12 min-[701px]:py-4
-                      min-[1001px]:px-14 min-[1001px]:py-[18px]
-                      min-[1301px]:px-16 min-[1301px]:py-[20px]
+                      min-[401px]:px-8 min-[401px]:py-2
+                      min-[701px]:px-10 min-[701px]:py-3
+                      min-[1001px]:px-12 min-[1001px]:py-[12px]
+                      min-[1301px]:px-14 min-[1301px]:py-[14px]
 
-                      text-[13px]
-                      min-[401px]:text-[15px]
-                      min-[701px]:text-[18px]
-                      min-[1001px]:text-[24px]
-                      min-[1301px]:text-[28px]
+                      text-[12px]
+                      min-[401px]:text-[14px]
+                      min-[701px]:text-[16px]
+                      min-[1001px]:text-[18px]
+                      min-[1301px]:text-[20px]
                     "
                   >
                     Get Started

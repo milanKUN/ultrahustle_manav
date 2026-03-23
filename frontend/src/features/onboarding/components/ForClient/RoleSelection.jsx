@@ -40,7 +40,7 @@ export default function RoleSelection() {
         className={[
           "flex-1 min-w-0 flex flex-col items-start text-left",
           "rounded-2xl transition-all border",
-          "p-3 sm:p-4 min-[701px]:p-6",
+          "p-4 sm:p-5 min-[701px]:p-7 min-h-[160px] sm:min-h-[180px] min-[701px]:min-h-[220px]",
           active
             ? "bg-[#CEFF1B] border-black shadow-md"
             : "bg-white border-[#CEFF1B] shadow-sm",
@@ -109,7 +109,7 @@ export default function RoleSelection() {
           </button>
 
           {/* QUESTION */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[701px]:text-4xl min-[950px]:text-4xl font-bold text-black leading-tight">
                 How will you be
@@ -177,8 +177,8 @@ export default function RoleSelection() {
           className="
             min-[950px]:hidden
             w-full
-            max-w-[420px]
-            min-[701px]:max-w-[720px]
+            max-w-[480px]
+            min-[701px]:max-w-[780px]
             relative z-10
             px-2 sm:px-0
             min-[701px]:px-6
@@ -203,51 +203,40 @@ export default function RoleSelection() {
           </div>
 
           {/* Mobile/Tablet: center */}
-          <p className="text-center text-black/60 text-sm min-[701px]:text-base mt-4 min-[701px]:mt-6">
+          <p className="text-left w-full text-black/60 text-sm min-[701px]:text-base mt-4 min-[701px]:mt-6">
             You can switch or use both roles anytime.
           </p>
 
           {/* buttons row */}
-          <div className="mt-5 min-[701px]:mt-8 flex flex-wrap items-center justify-center gap-2 min-[701px]:gap-5">
+          <div className="mt-5 min-[701px]:mt-8 w-full flex flex-wrap items-center justify-between gap-y-4 gap-x-2 min-[701px]:gap-5">
             <button
               onClick={handleReset}
-              className="
-                h-10 min-[701px]:h-12
-                px-4 min-[701px]:px-8
-                rounded-lg border border-black/20
-                bg-white text-black/60
-                text-sm min-[701px]:text-base
-              "
+              className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
             >
               Reset
             </button>
 
-            <button
-              onClick={handleBack}
-              className="
-                h-10 min-[701px]:h-12
-                px-4 min-[701px]:px-8
-                rounded-lg border border-black/40
-                bg-white text-black
-                text-sm min-[701px]:text-base
-              "
-            >
-              Back
-            </button>
+            <div className="flex items-center gap-2 min-[701px]:gap-5">
+              <button
+                onClick={handleBack}
+                className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+              >
+                Back
+              </button>
 
-            <button
-              onClick={handleContinue}
-              disabled={!selectedRole}
-              className={[
-                "h-10 min-[701px]:h-12 rounded-lg font-medium border",
-                "px-6 min-[701px]:px-8 text-sm min-[701px]:text-base",
-                selectedRole
-                  ? "bg-[#CEFF1B] border-black text-black"
-                  : "bg-[#DADADA] border-black/20 text-black/30",
-              ].join(" ")}
-            >
-              Continue
-            </button>
+              <button
+                onClick={handleContinue}
+                disabled={!selectedRole}
+                className={[
+                  "h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm min-[701px]:text-base transition-all",
+                  selectedRole
+                    ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                    : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                ].join(" ")}
+              >
+                Continue
+              </button>
+            </div>
           </div>
 
           {/* Step Indicators - Mobile/Tablet */}
@@ -274,14 +263,14 @@ export default function RoleSelection() {
           <div className="flex gap-8 items-stretch">
             <div
               onClick={() => setSelectedRole("creator")}
-              className={`flex-1 min-h-[160px] p-[clamp(16px,3vh,32px)] rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedRole === "creator"
+              className={`flex-1 min-h-[160px] p-4 py-5 rounded-3xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedRole === "creator"
                 ? "bg-[#CEFF1B] border-2 border-black shadow-lg"
                 : "bg-white/40 border-1 border-[#CEFF1B] hover:bg-white/20"
                 }`}
             >
               <div className="mb-4">
                 <span
-                  className={`inline-block px-5 py-2 rounded-lg border-2 font-semibold text-lg ${selectedRole === "creator"
+                  className={`inline-block px-5 py-2 rounded-2xl border-1 font-semibold text-lg ${selectedRole === "creator"
                     ? "border-black bg-[#C3FF00]/10"
                     : "border-gray-400 bg-white"
                     }`}
@@ -303,14 +292,14 @@ export default function RoleSelection() {
 
             <div
               onClick={() => setSelectedRole("client")}
-              className={`flex-1 min-h-[160px] p-[clamp(16px,3vh,32px)] rounded-2xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedRole === "client"
+              className={`flex-1 min-h-[160px] p-4 py-5 rounded-3xl cursor-pointer transition-all duration-300 backdrop-blur-sm ${selectedRole === "client"
                 ? "bg-[#CEFF1B] border-2 border-black shadow-lg"
                 : "bg-white/40 border-1 border-[#CEFF1B] hover:bg-white/20"
                 }`}
             >
               <div className="mb-4">
                 <span
-                  className={`inline-block px-5 py-2 rounded-lg border-2 font-semibold text-lg ${selectedRole === "client"
+                  className={`inline-block px-5 py-2 rounded-2xl border-1 font-semibold text-lg ${selectedRole === "client"
                     ? "border-black bg-[#C3FF00]/10"
                     : "border-gray-400 bg-white"
                     }`}
@@ -328,7 +317,7 @@ export default function RoleSelection() {
           </div>
 
 
-          <p className="mt-6 text-center text-gray-600 text-lg">
+          <p className="mt-6 text-gray-600 text-lg">
             You can switch or use both roles anytime.
           </p>
 
@@ -336,7 +325,7 @@ export default function RoleSelection() {
           <div className="mt-6 flex justify-between items-center">
             <button
               onClick={handleReset}
-              className="px-8 py-3 rounded-lg border-2 border-black text-gray-600 font-medium text-lg hover:bg-gray-100 transition-all"
+              className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
             >
               Reset
             </button>
@@ -344,16 +333,16 @@ export default function RoleSelection() {
             <div className="flex gap-4">
               <button
                 onClick={handleBack}
-                className="px-10 py-3 rounded-lg border border-black text-black font-medium text-lg hover:bg-gray-100 transition-all"
+                className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
-                Discard
+                Back
               </button>
               <button
                 onClick={handleContinue}
                 disabled={!selectedRole}
-                className={`px-10 py-3 rounded-lg font-medium text-lg transition-all ${selectedRole
-                  ? "bg-[#CEFF1B] border-2 border-black text-black hover:bg-[#b8e617]"
-                  : "bg-gray-200 border-2 border-gray-300 text-gray-400 cursor-not-allowed"
+                className={`min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all ${selectedRole
+                  ? "bg-[#CEFF1B] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95"
+                  : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none"
                   }`}
               >
                 Continue
