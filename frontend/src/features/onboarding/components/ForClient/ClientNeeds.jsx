@@ -191,7 +191,7 @@ export default function ClientNeeds() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
                 Tell us more
@@ -370,33 +370,35 @@ export default function ClientNeeds() {
             )}
 
             {/* bottom buttons */}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <div className="mt-5 min-[701px]:mt-8 w-full flex flex-wrap items-center justify-between gap-y-4 gap-x-2 min-[701px]:gap-5">
               <button
                 onClick={handleReset}
-                className="h-10 px-4 rounded-lg border border-black/20 bg-white text-black/60 text-sm"
+                className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
                 Reset
               </button>
 
-              <button
-                onClick={handleBack}
-                className="h-10 px-4 rounded-lg border border-black/40 bg-white text-black text-sm"
-              >
-                Back
-              </button>
+              <div className="flex items-center gap-2 min-[701px]:gap-5">
+                <button
+                  onClick={handleBack}
+                  className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+                >
+                  Back
+                </button>
 
-              <button
-                onClick={handleContinue}
-                disabled={!isContinueEnabled}
-                className={[
-                  "h-10 px-4 rounded-lg text-sm font-medium border transition-all",
-                  isContinueEnabled
-                    ? "bg-[#CEFF1B] border-black text-black"
-                    : "bg-[#DADADA] border-black/20 text-black/30",
-                ].join(" ")}
-              >
-                Continue
-              </button>
+                <button
+                  onClick={handleContinue}
+                  disabled={!isContinueEnabled}
+                  className={[
+                    "h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm min-[701px]:text-base transition-all",
+                    isContinueEnabled
+                      ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                      : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                  ].join(" ")}
+                >
+                  Continue
+                </button>
+              </div>
             </div>
 
             {/* step dots */}
@@ -422,11 +424,11 @@ export default function ClientNeeds() {
           {/* ✅ DESKTOP (your original layout 그대로) */}
           <div className="hidden min-[950px]:block">
             {/* Creator Categories - Desktop Container */}
-            <div className="bg-white/40 min-[950px]:bg-white/40 backdrop-blur-md border-1 border-[#CEFF1B] min-[950px]:border min-[950px]:border-[#CEFF1B] rounded-[24px] min-[950px]:rounded-[30px] p-4 min-[950px]:p-[clamp(16px,3vh,32px)] shadow-xl mb-4 min-[950px]:mb-6 flex flex-col justify-center gap-4">
-              <div className="hidden min-[950px]:flex flex-col gap-4">
+            <div className="bg-white/40 min-[950px]:bg-white/40 backdrop-blur-md border-1 border-[#CEFF1B] min-[950px]:border min-[950px]:border-[#CEFF1B] rounded-[20px] min-[950px]:rounded-[24px] p-5 min-[950px]:p-[clamp(16px,2vh,24px)] shadow-xl mb-4 min-[950px]:mb-5 flex flex-col justify-center gap-3 w-full max-w-[600px] min-[1300px]:max-w-[700px]">
+              <div className="hidden min-[950px]:flex flex-col gap-3">
                 {[categories.slice(0, 3), categories.slice(3, 6), categories.slice(6)].map(
                   (row, rowIndex) => (
-                    <div key={rowIndex} className="flex flex-wrap min-[950px]:flex-nowrap gap-4 w-full">
+                    <div key={rowIndex} className="flex flex-wrap min-[950px]:flex-nowrap gap-3 w-full">
                       {row.map((category) => {
                         const Icon = category.icon;
                         const isSelected = selectedCategories.includes(category.id);
@@ -435,29 +437,26 @@ export default function ClientNeeds() {
                             key={category.id}
                             onClick={() => toggleCategory(category.id)}
                             className={`
-  flex items-center gap-3.5 
-  px-[clamp(12px,2vw,24px)] 
-  py-[clamp(8px,1.5vh,14px)] 
-  rounded-2xl cursor-pointer 
-  border-2 
-  transition-all duration-300 
-  backdrop-blur-sm 
+  flex items-center gap-2 min-[950px]:gap-3 
+  px-[clamp(10px,1.5vw,16px)] 
+  py-[clamp(6px,1.2vh,10px)] 
+  rounded-[10px] cursor-pointer 
+  border-2 transition-all duration-300 backdrop-blur-sm 
   justify-center whitespace-nowrap flex-1
 
   ${isSelected
-                                ? "bg-[#CEFF1B] border-black shadow-md scale-105"
+                                ? "bg-[#CEFF1B] border-black shadow-sm scale-[1.03]"
                                 : "bg-white/40 border-black/20 hover:border-black/40 hover:bg-white/60"
                               }
 `}
                           >
                             <div
-                              className={`p-1.5 rounded-xl flex items-center justify-center shrink-0 bg-[#CEFF1B]`}
+                              className={`p-1.5 rounded-[8px] flex items-center justify-center shrink-0 bg-[#CEFF1B]`}
                             >
-                              <Icon size={rowIndex === 0 ? 22 : 18} className="text-black" strokeWidth={2} />
+                              <Icon size={rowIndex === 0 ? 18 : 16} className="text-black" strokeWidth={2} />
                             </div>
                             <span
-                              className={`font-[500] text-[clamp(14px,1.2vw,18px)] ${isSelected ? "text-black" : "text-gray-800"
-                                }`}
+                              className={`font-[500] text-[clamp(13px,1.1vw,15px)] ${isSelected ? "text-black" : "text-gray-800"}`}
                             >
                               {category.label}
                             </span>
@@ -581,28 +580,28 @@ export default function ClientNeeds() {
               </div>
             )}
 
-            <div className="mt-4 min-[950px]:mt-[clamp(16px,2vh,32px)] relative z-10 w-full">
-              <div className="flex justify-between items-center gap-2 min-[950px]:gap-4">
+            <div className="mt-4 min-[950px]:mt-[clamp(16px,2vh,32px)] relative z-10 w-full px-4 min-[950px]:px-0">
+              <div className="flex justify-between items-center gap-2 min-[950px]:gap-4 w-full">
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 min-[950px]:px-8 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-600 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                  className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
                 >
                   Reset
                 </button>
 
-                <div className="flex gap-2 min-[950px]:gap-4">
+                <div className="flex gap-4">
                   <button
                     onClick={handleBack}
-                    className="px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-700 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                    className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
                   >
-                    Discard
+                    Back
                   </button>
                   <button
                     onClick={handleContinue}
                     disabled={!isContinueEnabled}
-                    className={`px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg font-medium text-xs min-[950px]:text-lg transition-all whitespace-nowrap ${isContinueEnabled
-                      ? "bg-[#CEFF1B] border border-black text-black hover:bg-[#b8e617]"
-                      : "bg-lime-200 border border-[#2B2B2B] text-gray-400 cursor-not-allowed"
+                    className={`min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all ${isContinueEnabled
+                      ? "bg-[#CEFF1B] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95"
+                      : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none"
                       }`}
                   >
                     Continue

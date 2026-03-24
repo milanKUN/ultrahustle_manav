@@ -190,7 +190,7 @@ export default function CreatorNeeds() {
           </button>
 
           {/* Question */}
-          <div className="flex-1 flex flex-col justify-center min-[950px]:justify-center min-[950px]:pt-0 items-center min-[950px]:items-center px-4 min-[950px]:px-0">
+          <div className="flex-1 flex flex-col justify-start mt-4 min-[950px]:mt-0 min-[950px]:pt-[clamp(40px,10vh,128px)] items-start text-left px-4 min-[950px]:px-0 w-full">
             <div className="flex flex-col items-start text-left max-w-fit">
               <h2 className="text-3xl min-[950px]:text-4xl font-bold text-black leading-tight">
                 Tell us more
@@ -238,7 +238,7 @@ export default function CreatorNeeds() {
             <div className="mt-5 grid grid-cols-2 gap-3 items-end">
               <div>
                 <label className="block text-[11px] font-semibold text-black/70 mb-2">
-                  Primary skill / niche
+                  Primary Skill / Niche
                 </label>
                 <input
                   type="text"
@@ -289,7 +289,7 @@ export default function CreatorNeeds() {
 
               <div className="col-span-2">
                 <label className="block text-[11px] font-semibold text-black/70 mb-2">
-                  Hourly / project range (optional)
+                  Hourly / Project range (optional)
                 </label>
                 <input
                   type="text"
@@ -345,33 +345,35 @@ export default function CreatorNeeds() {
             )}
 
             {/* bottom buttons */}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <div className="mt-5 min-[701px]:mt-8 w-full flex flex-wrap items-center justify-between gap-y-4 gap-x-2 min-[701px]:gap-5">
               <button
                 onClick={handleReset}
-                className="h-10 px-4 rounded-lg border border-black/20 bg-white text-black/60 text-sm"
+                className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
               >
                 Reset
               </button>
 
-              <button
-                onClick={handleBack}
-                className="h-10 px-4 rounded-lg border border-black/40 bg-white text-black text-sm"
-              >
-                Back
-              </button>
+              <div className="flex items-center gap-2 min-[701px]:gap-5">
+                <button
+                  onClick={handleBack}
+                  className="h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black text-[13px] sm:text-sm min-[701px]:text-base font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
+                >
+                  Back
+                </button>
 
-              <button
-                onClick={handleContinue}
-                disabled={!isContinueEnabled}
-                className={[
-                  "h-10 px-4 rounded-lg text-sm font-medium border transition-all",
-                  isContinueEnabled
-                    ? "bg-[#CEFF1B] border-black text-black"
-                    : "bg-[#DADADA] border-black/20 text-black/30",
-                ].join(" ")}
-              >
-                Continue
-              </button>
+                <button
+                  onClick={handleContinue}
+                  disabled={!isContinueEnabled}
+                  className={[
+                    "h-10 min-[701px]:h-12 px-4 sm:px-6 min-[701px]:px-8 rounded-[14px] border font-medium whitespace-nowrap text-[13px] sm:text-sm min-[701px]:text-base transition-all",
+                    isContinueEnabled
+                      ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                      : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                  ].join(" ")}
+                >
+                  Continue
+                </button>
+              </div>
             </div>
 
             {/* step dots */}
@@ -395,7 +397,7 @@ export default function CreatorNeeds() {
           <div className="hidden min-[950px]:block">
             {/* ... kept exactly as you had (desktop code unchanged) */}
             {/* Creator Categories - Desktop Container */}
-            <div className="bg-[#FEFEFE]/40 min-[950px]:bg-white/40 backdrop-blur-md border-[#CEFF1B] min-[950px]:border min-[950px]:border-[#CEFF1B] rounded-[24px] min-[950px]:rounded-[30px] p-4 min-[950px]:p-[clamp(16px,3vh,32px)] shadow-xl mb-4 min-[950px]:mb-6 flex flex-col justify-center gap-4">
+            <div className="bg-[#FEFEFE]/40 min-[950px]:bg-white/40 backdrop-blur-md border-[#CEFF1B] min-[950px]:border min-[950px]:border-[#CEFF1B] rounded-[24px] min-[950px]:rounded-[30px] p-4 min-[950px]:p-4 shadow-xl mb-4 min-[950px]:mb-6 flex flex-col justify-center gap-4">
               <div className="hidden min-[950px]:flex flex-col gap-4">
                 {[categories.slice(0, 3), categories.slice(3, 6), categories.slice(6)].map(
                   (row, rowIndex) => (
@@ -408,31 +410,28 @@ export default function CreatorNeeds() {
                             key={category.id}
                             onClick={() => toggleCategory(category.id)}
                             className={`
-  flex items-center gap-3.5 
-  px-[clamp(12px,2vw,24px)] 
-  py-[clamp(8px,1.5vh,14px)] 
-  rounded-2xl cursor-pointer 
-  border-2 
-  transition-all duration-300 
-  backdrop-blur-sm 
+  flex items-center gap-2 min-[950px]:gap-3 
+  px-[clamp(10px,1.5vw,16px)] 
+  py-[clamp(6px,1.2vh,10px)] 
+  rounded-[10px] cursor-pointer 
+  border-2 transition-all duration-300 backdrop-blur-sm 
   justify-center whitespace-nowrap flex-1
 
   ${isSelected
-                                ? "bg-[#CEFF1B] border-black shadow-md scale-105"
+                                ? "bg-[#CEFF1B] border-black shadow-sm scale-[1.03]"
                                 : "bg-white/40 border-black/20 hover:border-black/40 hover:bg-white/60"
                               }
 `}
                           >
-                            <div className="p-1.5 rounded-xl flex items-center justify-center shrink-0 bg-[#CEFF1B]">
+                            <div className="p-1.5 rounded-[8px] flex items-center justify-center shrink-0 bg-[#CEFF1B]">
                               <Icon
-                                size={rowIndex === 0 ? 22 : 18}
+                                size={rowIndex === 0 ? 18 : 16}
                                 className="text-black"
                                 strokeWidth={2}
                               />
                             </div>
                             <span
-                              className={`font-[500] text-[clamp(14px,1.2vw,18px)] ${isSelected ? "text-black" : "text-gray-800"
-                                }`}
+                              className={`font-[500] text-[clamp(13px,1.1vw,15px)] ${isSelected ? "text-black" : "text-gray-800"}`}
                             >
                               {category.label}
                             </span>
@@ -449,13 +448,13 @@ export default function CreatorNeeds() {
             <div className="grid grid-cols-2 gap-3 min-[950px]:gap-8 mb-6 items-end relative z-20">
               <div>
                 <label className="block text-gray-800 font-semibold font-roboto mb-2 min-[950px]:mb-3 text-[9px] min-[950px]:text-lg whitespace-nowrap">
-                  Primary skill / niche
+                  Primary Skill / Niche
                 </label>
                 <input
                   type="text"
                   value={primarySkill}
                   onChange={(e) => setPrimarySkill(e.target.value)}
-                  placeholder="Skill/niche"
+                  placeholder="Skill/Niche"
                   className="w-full p-2 min-[950px]:p-[clamp(10px,1.2vh,12px)] rounded-md min-[950px]:rounded-xl border border-black bg-transparent min-[950px]:bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_20px_#CEFF1B] font-medium text-xs min-[950px]:text-base"
                 />
               </div>
@@ -497,13 +496,13 @@ export default function CreatorNeeds() {
 
               <div>
                 <label className="block text-gray-800 font-semibold font-roboto mb-2 min-[950px]:mb-3 text-[9px] min-[950px]:text-lg whitespace-nowrap">
-                  Your hourly / project range
+                  Your hourly / Project range
                 </label>
                 <input
                   type="text"
                   value={rateRange}
                   onChange={(e) => setRateRange(e.target.value)}
-                  placeholder="Hourly/project range"
+                  placeholder="Hourly/Project range"
                   className="w-full p-2 min-[950px]:p-[clamp(10px,1.2vh,12px)] bg-transparent rounded-md min-[950px]:rounded-xl border border-black bg-[#F0F0F0]/50 min-[950px]:bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_20px_#CEFF1B] transition-all font-medium text-xs min-[950px]:text-base"
                 />
               </div>
@@ -512,7 +511,7 @@ export default function CreatorNeeds() {
                 <label className="block text-gray-800 font-semibold font-roboto mb-2 min-[950px]:mb-3 text-[9px] min-[950px]:text-lg whitespace-nowrap">
                   Do you already have a portfolio?
                 </label>
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2 justify-start">
                   {["Yes", "No"].map((opt) => (
                     <button
                       key={opt}
@@ -526,7 +525,24 @@ export default function CreatorNeeds() {
                       {opt}
                     </button>
                   ))}
-                </div>
+                </div> */}
+
+                <div className="flex gap-4 justify-start">
+                  {["Yes", "No"].map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setHasPortfolio(opt.toLowerCase())}
+                      className={`px-5 py-2 min-[950px]:py-3 rounded-md min-[950px]:rounded-xl font-medium transition-all duration-200 text-xs min-[950px]:text-base border border-black ${
+                        hasPortfolio === opt.toLowerCase()
+          ? "bg-[#CEFF1B] text-black"
+          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+      }`}
+    >
+      {opt}
+    </button>
+  ))}
+</div>
+                
               </div>
             </div>
 
@@ -547,29 +563,31 @@ export default function CreatorNeeds() {
               </div>
             )}
 
-            <div className="mt-4 min-[950px]:mt-[clamp(16px,2vh,32px)] relative z-10 w-full">
-              <div className="flex justify-between items-center gap-2 min-[950px]:gap-4">
+            <div className="mt-4 min-[950px]:mt-[clamp(16px,2vh,32px)] relative z-10 w-full px-4 min-[950px]:px-0">
+              <div className="flex justify-between items-center gap-2 min-[950px]:gap-4 w-full">
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 min-[950px]:px-8 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-600 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                  className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/20 bg-gradient-to-b from-white to-[#F4F4F4] text-black/50 font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
                 >
                   Reset
                 </button>
 
-                <div className="flex gap-2 min-[950px]:gap-4">
+                <div className="flex gap-4">
                   <button
                     onClick={handleBack}
-                    className="px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg border border-black text-gray-700 font-medium text-xs min-[950px]:text-lg hover:bg-gray-100 transition-all"
+                    className="min-w-[124px] h-[48px] px-8 rounded-[14px] border border-black/30 bg-gradient-to-b from-white to-[#F4F4F4] text-black font-medium text-base shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:brightness-95 transition-all"
                   >
-                    Discard
+                    Back
                   </button>
                   <button
                     onClick={handleContinue}
                     disabled={!isContinueEnabled}
-                    className={`px-4 py-2 min-[950px]:px-10 min-[950px]:py-3 rounded-md min-[950px]:rounded-lg font-medium text-xs min-[950px]:text-lg transition-all whitespace-nowrap ${isContinueEnabled
-                      ? "bg-[#CEFF1B] border border-black text-black hover:bg-[#b8e617]"
-                      : "bg-lime-200 border border-[#2B2B2B] text-gray-400 cursor-not-allowed"
-                      }`}
+                    className={[
+                      "min-w-[124px] h-[48px] px-8 rounded-[14px] border font-medium text-base transition-all",
+                      isContinueEnabled
+                        ? "bg-[#E2FF82] border-black/40 text-black shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#CEFF1B] hover:border-black/60 transition-all"
+                        : "bg-[#E8E8E8] border-black/10 text-black/30 cursor-not-allowed shadow-none",
+                    ].join(" ")}
                   >
                     Continue
                   </button>
