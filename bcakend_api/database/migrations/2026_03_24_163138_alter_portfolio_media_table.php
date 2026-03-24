@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('portfolio_media', function (Blueprint $table) {
-            $table->primary('id')->autoIncrement()->change();
+            $table->id()->autoIncrement()->change();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('portfolio_media', function (Blueprint $table) {
-            $table->primary('id')->autoIncrement()->change();
+            $table->id()->autoIncrement()->change();
         });
     }
 };
