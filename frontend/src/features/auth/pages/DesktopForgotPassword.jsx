@@ -21,7 +21,7 @@ const DesktopForgotPassword = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [emailSent, setEmailSent] = useState(false);
   const params = useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
     const hashParams = new URLSearchParams((location.hash || '').replace(/^#/, ''));
@@ -51,26 +51,33 @@ const DesktopForgotPassword = () => {
   };
 
   const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitError('');
-    setSubmitMessage('');
+  e.preventDefault();
+  setSubmitError('');
+  setSubmitMessage('');
 
-    if (isSubmitting) return;
-    if (!formData.email) {
-      setSubmitError('Please enter your email.');
-      return;
-    }
+  if (isSubmitting || emailSent) return;
 
-    try {
-      setIsSubmitting(true);
-      const data = await forgotPassword({ email: formData.email });
-      setSubmitMessage(data?.message || 'We have emailed your password reset link.');
-    } catch (err) {
-      setSubmitError(err?.message || 'Failed to send reset link.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  if (!formData.email) {
+    setSubmitError('Please enter your email.');
+    return;
+  }
+
+  try {
+    setIsSubmitting(true);
+
+    const data = await forgotPassword({ email: formData.email });
+
+    setSubmitMessage(data?.message || 'We have emailed your password reset link.');
+
+    // ✅ IMPORTANT
+    setEmailSent(true);
+
+  } catch (err) {
+    setSubmitError(err?.message || 'Failed to send reset link.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
@@ -163,8 +170,16 @@ const DesktopForgotPassword = () => {
                 </div>
               </div>
 
-              <button type="submit" className="desktop-login-btn action-btn-grey" disabled={isSubmitting}>
-                {isSubmitting ? 'Sending...' : 'Reset Password'}
+              <button
+                type="submit"
+                className="desktop-login-btn action-btn-grey"
+                disabled={isSubmitting || emailSent}
+              >
+                {isSubmitting
+                  ? 'Sending...'
+                  : emailSent
+                  ? 'Email Sent'
+                  : 'Reset Password'}
               </button>
 
               <div className="back-to-login">

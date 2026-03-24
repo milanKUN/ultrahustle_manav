@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('uh_client_onboarding', function (Blueprint $table) {
-            // $table->primary('id')->autoIncrement()->change();
+        Schema::create('countries', function (Blueprint $table) {
+            $table->unsignedBigInteger('id')->autoIncrement();
+            $table->string('name')->nullable();
+            $table->string('shortname')->nullable();
+            $table->string('phoneCode')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('countries');
     }
 };

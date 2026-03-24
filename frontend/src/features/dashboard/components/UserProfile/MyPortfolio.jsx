@@ -263,7 +263,7 @@ export default function MyPortfolio() {
               <button
                 type="button"
                 onClick={openUploadForMain}
-                className="absolute inset-0 m-auto bg-[#CEFF1B] px-4 py-2 rounded"
+                className="absolute inset-0 m-auto  px-4 py-2 rounded"
                 disabled={isSaving || isLoading}
               >
                 Upload Photo
@@ -319,7 +319,7 @@ export default function MyPortfolio() {
                     <button
                       type="button"
                       onClick={() => openUploadForProject(project)}
-                      className="absolute inset-0 m-auto bg-[#CEFF1B] px-3 py-1 rounded text-xs"
+                      className="absolute inset-0 m-auto px-3 py-1 rounded text-xs"
                       disabled={isSaving || isLoading}
                     >
                       Change Photo

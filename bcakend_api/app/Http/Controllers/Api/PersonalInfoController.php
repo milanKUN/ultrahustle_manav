@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
+use App\Models\Country;
+use App\Models\State;
+use App\Models\City;
+use App\Models\Language;
 
 class PersonalInfoController extends Controller
 {
@@ -420,5 +424,27 @@ class PersonalInfoController extends Controller
             'message' => $message,
             'errors' => $errors,
         ], $statusCode);
+    }
+
+    public function getCountries(){
+        $countries = Country::select('id', 'name', 'phoneCode', 'shortname')->orderBy('name')->get();
+        return $countries;
+    }
+
+    public function getStateByCountryId($country_id){
+        return State::where('country_id', $country_id)
+			->select('id', 'name')
+			->orderBy('name')
+			->get();
+    }
+
+    public function getCityByStateId($state_id){
+        return City::where('state_id', $state_id)
+			->select('id', 'name')
+			->orderBy('name')
+			->get();
+    }
+    public function getLanguages(){
+        return Language::select('id', 'value')->orderBy('value')->get();
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('portfolio_media', function (Blueprint $table) {
+        /* Schema::table('portfolio_media', function (Blueprint $table) {
             $table->primary('id');
             // Add index
             $table->index('project_id');
@@ -21,7 +21,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('portfolio_projects')
                 ->cascadeOnDelete();
-        });
+        }); */
     }
 
     /**

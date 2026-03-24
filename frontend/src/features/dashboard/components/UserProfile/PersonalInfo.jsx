@@ -3,6 +3,10 @@ import "../../../onboarding/components/OnboardingSelect.css";
 import {
   getMyPersonalInfo,
   putMyPersonalInfo,
+  getCountries,
+  getStates,
+  getCities,
+  getLanguages
 } from "../../api/personalInfoApi";
 
 export default function PersonalInformation() {
@@ -38,7 +42,7 @@ export default function PersonalInformation() {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
+  // const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
 
   const [title, setTitle] = useState("");
@@ -47,17 +51,114 @@ export default function PersonalInformation() {
   const [availability, setAvailability] = useState("");
   const [open, setOpen] = useState(false);
   const [dob, setDob] = useState("");
-  const [country, setCountry] = useState("");
-  const [stateVal, setStateVal] = useState("");
-  const [openCountry, setOpenCountry] = useState(false);
+  // const [country, setCountry] = useState("");
+  // const [stateVal, setStateVal] = useState("");
+  // const [openCountry, setOpenCountry] = useState(false);
   const [openState, setOpenState] = useState(false);
   const [gender, setGender] = useState("");
   const [openGender, setOpenGender] = useState(false);
 
   const countryRef = useRef(null);
   const stateRef = useRef(null);
+  const cityRef = useRef(null);
   const availabilityRef = useRef(null);
   const genderRef = useRef(null);
+
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState(""); // name (for display)
+  const [countryId, setCountryId] = useState(""); // id (for API)
+
+  const [states, setStates] = useState([]);
+  const [stateVal, setStateVal] = useState("");
+  const [stateId, setStateId] = useState("");
+
+  const [cities, setCities] = useState([]);
+  const [city, setCity] = useState("");
+  const [cityId, setCityId] = useState("");
+
+  const [openCity, setOpenCity] = useState(false);
+  const [languageOptions, setLanguageOptions] = useState([]);
+  const [openCountry, setOpenCountry] = useState(false);
+
+  const [phoneCountry, setPhoneCountry] = useState(null);
+  const [openPhoneCountry, setOpenPhoneCountry] = useState(false);
+  const phoneCountryRef = useRef(null);
+  const hasFetchedLanguages = useRef(false);
+
+    //get counties
+    useEffect(() => {
+      const fetchCountries = async () => {
+        try {
+          const res = await getCountries();
+          setCountries(res);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchCountries();
+    }, []);
+
+  //get states from selected country
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!countryId) {
+        setStates([]);
+        return;
+      }
+
+      try {
+        const data = await getStates(countryId);
+        setStates(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchStates();
+  }, [countryId]);
+  //get cities
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!stateId) {
+        setCities([]);
+        return;
+      }
+
+      try {
+        const data = await getCities(stateId);
+        setCities(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCities();
+  }, [stateId]);
+
+  //get languages
+  useEffect(() => {
+    if (hasFetchedLanguages.current) return;
+    hasFetchedLanguages.current = true;
+    const fetchLanguages = async () => {
+      try {
+        const res = await getLanguages();
+        setLanguageOptions(res); // ✅ store full objects
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchLanguages();
+  }, []);
+
+  //phone country // by default India will be selected
+  useEffect(() => {
+    if (countries.length > 0 && !phoneCountry) {
+      const india = countries.find(c => c.name === "India");
+      setPhoneCountry(india || countries[0]);
+    }
+  }, [countries]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -65,6 +166,7 @@ export default function PersonalInformation() {
       if (stateRef.current && !stateRef.current.contains(event.target)) setOpenState(false);
       if (availabilityRef.current && !availabilityRef.current.contains(event.target)) setOpen(false);
       if (genderRef.current && !genderRef.current.contains(event.target)) setOpenGender(false);
+      if(phoneCountryRef.current && ! phoneCountryRef.current.contains(event.target)) setOpenPhoneCountry(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -373,7 +475,7 @@ export default function PersonalInformation() {
       ...tools,
       String(toolsDraft || "").trim(),
     ]);
-    const finalLanguages = sanitizeTagArray(languages);
+    const finalLanguages = languages.map((l) => l.value);
 
     const payload = {
       first_name: String(firstName || "").trim() || null,
@@ -381,9 +483,9 @@ export default function PersonalInformation() {
       username: String(username || "").trim() || null,
       date_of_birth: toIsoDate(dob),
       contact_email: String(email || "").trim().toLowerCase() || null,
-      phone_country: "IN",
-      phone_country_code: "+91",
-      phone_number: String(phoneNumber || "").trim() || null,
+      phone_country: phoneCountry?.shortname || null,
+      phone_country_code: phoneCountry?.phoneCode ? phoneCountry.phoneCode.startsWith("+") ? phoneCountry.phoneCode.trim() : `+${phoneCountry.phoneCode.trim()}` : null,
+      phone_number: phoneNumber || null,
       gender: normalizeGenderForApi(gender),
       street: String(street || "").trim() || null,
       city: String(city || "").trim() || null,
@@ -399,6 +501,8 @@ export default function PersonalInformation() {
       tools: finalTools,
       languages: finalLanguages,
     };
+
+    console.log('payload', payload);
 
     try {
       // Keep UI in sync with what we send
@@ -510,30 +614,71 @@ export default function PersonalInformation() {
 
             {/* PHONE */}
             <div>
-              <Label>Phone Number</Label>
+            <Label>Phone Number</Label>
+
+            <div
+              className={`flex items-center border border-black rounded-md px-2 py-2 gap-2 ${
+                focusedId === "phone"
+                  ? "shadow-[0_0_15px_#CEFF1B] !border-transparent"
+                  : ""
+              }`}
+            >
+              {/* COUNTRY SELECT */}
               <div
-                className={`flex items-center border border-black rounded-md px-3 py-2 gap-2 transition-shadow ${focusedId === "phone" ? "shadow-[0_0_15px_#CEFF1B] !border-transparent" : ""
-                  }`}
+                className="relative flex items-center gap-1 cursor-pointer"
+                ref={phoneCountryRef}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenPhoneCountry(!openPhoneCountry);
+                }}
               >
-                <span className="text-sm text-gray-700">India</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-sm text-gray-700">+91</span>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  placeholder="XXXXXXXXXX"
-                  maxLength={10}
-                  value={phoneNumber}
-                  onChange={(e) => {
-                    const next = String(e.target.value || "").replace(/[^0-9]/g, "");
-                    setPhoneNumber(next.slice(0, 10));
-                  }}
-                  onFocus={() => setFocusedId("phone")}
-                  onBlur={() => setFocusedId(null)}
-                  className="flex-1 outline-none border-none bg-transparent text-sm pl-2 focus:outline-none focus:ring-0"
-                />
+                <span className="text-sm">
+                  {phoneCountry?.shortname || "Country"}
+                </span>
+                <span className="text-gray-500 text-xs">▼</span>
+
+                {openPhoneCountry && (
+                  <ul className="absolute top-10 left-0 bg-white border rounded-md shadow max-h-60 overflow-auto z-50 w-48">
+                    {countries.map((c) => (
+                      <li
+                        key={c.id}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        onClick={() => {
+                          setPhoneCountry(c);
+                          setOpenPhoneCountry(false);
+                        }}
+                      >
+                        {c.shortname} ({c.phoneCode})
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
+
+              <span className="text-gray-400">|</span>
+
+              {/* PHONE CODE */}
+              <span className="text-sm min-w-[40px]">
+                {phoneCountry?.phoneCode || "+--"}
+              </span>
+
+              {/* INPUT */}
+              <input
+                type="tel"
+                inputMode="numeric"
+                placeholder="XXXXXXXXXX"
+                maxLength={10}
+                value={phoneNumber}
+                onChange={(e) => {
+                  const next = e.target.value.replace(/[^0-9]/g, "");
+                  setPhoneNumber(next);
+                }}
+                onFocus={() => setFocusedId("phone")}
+                onBlur={() => setFocusedId(null)}
+                className="flex-1 outline-none border-none bg-transparent text-sm pl-2"
+              />
             </div>
+          </div>
 
             {/* GENDER */}
             <div>
@@ -575,11 +720,9 @@ export default function PersonalInformation() {
         <Section title="Address">
           <TwoCol>
             <Input label="Street" placeholder="Street" value={street} onChange={setStreet} />
-            <Input label="City" placeholder="City" value={city} onChange={setCity} />
-            {/* COUNTRY */}
-            <div>
-              <Label>Country</Label>
+            {/* <Input label="City" placeholder="City" value={city} onChange={setCity} /> */}            
               <div className={`onboarding-custom-select ${openCountry ? "active" : ""}`} ref={countryRef}>
+                <Label>Country</Label>
                 <div
                   className={`onboarding-selected-option ${openCountry ? "open" : ""}`}
                   onClick={(e) => {
@@ -587,29 +730,33 @@ export default function PersonalInformation() {
                     setOpenCountry(!openCountry);
                   }}
                 >
-                  <span className={!country ? "opacity-70" : ""}>{country || "Select country"}</span>
+                  <span className={!country ? "opacity-70" : ""}>
+                    {country || "Select country"}
+                  </span>
                   <span className="onboarding-arrow">▼</span>
                 </div>
 
                 {openCountry && (
                   <ul className="onboarding-options-list">
-                    {countryOptions.map((c) => (
+                    {countries?.map((c) => (
                       <li
-                        key={c}
-                        className={country === c ? "active" : ""}
+                        key={c.id}
+                        className={country === c.name ? "active" : ""}
                         onClick={() => {
-                          setCountry(c);
-                          setStateVal("");
+                          setCountry(c.name);     // display
+                          setCountryId(c.id);     // 🔥 important
+                          setStateVal("");        // reset state
+                          setStateId("");
                           setOpenCountry(false);
                         }}
                       >
-                        {c}
+                        {c.name}
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
-            </div>
+           
 
             {/* STATE */}
             <div>
@@ -619,33 +766,74 @@ export default function PersonalInformation() {
                   className={`onboarding-selected-option ${openState ? "open" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (country) setOpenState(!openState);
+                    if (countryId) setOpenState(!openState);
                   }}
-                  style={{ cursor: country ? "pointer" : "not-allowed", opacity: country ? 1 : 0.6 }}
                 >
-                  <span className={!stateVal ? "opacity-70" : ""}>{stateVal || (country ? "Select state" : "Select country first")}</span>
+                  <span className={!stateVal ? "opacity-70" : ""}>
+                    {stateVal || "Select state"}
+                  </span>
                   <span className="onboarding-arrow">▼</span>
                 </div>
 
                 {openState && (
                   <ul className="onboarding-options-list">
-                    {stateOptions.map((s) => (
+                    {states.map((s) => (
                       <li
-                        key={s}
-                        className={stateVal === s ? "active" : ""}
+                        key={s.id}
+                        className={stateVal === s.name ? "active" : ""}
                         onClick={() => {
-                          setStateVal(s);
+                          setStateVal(s.name);
+                          setStateId(s.id);
+
+                          setCity("");     // reset city
+                          setCityId("");
+
                           setOpenState(false);
                         }}
                       >
-                        {s}
+                        {s.name}
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
             </div>
+             {/* CITY */}
+            <div>
+              <Label>City</Label>
+              <div className={`onboarding-custom-select ${openCity ? "active" : ""}`} ref={cityRef}>
+                <div
+                  className={`onboarding-selected-option ${openCity ? "open" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (stateId) setOpenCity(!openCity);
+                  }}
+                >
+                  <span className={!city ? "opacity-70" : ""}>
+                    {city || "Select city"}
+                  </span>
+                  <span className="onboarding-arrow">▼</span>
+                </div>
 
+                {openCity && (
+                  <ul className="onboarding-options-list">
+                    {cities.map((c) => (
+                      <li
+                        key={c.id}
+                        className={city === c.name ? "active" : ""}
+                        onClick={() => {
+                          setCity(c.name);   // display
+                          setCityId(c.id);   // store id
+                          setOpenCity(false);
+                        }}
+                      >
+                        {c.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
             <div>
               <Label>Pincode</Label>
               <input
@@ -786,25 +974,16 @@ export default function PersonalInformation() {
         </Section>
 
         {/* ================= LANGUAGES ================= */}
-        <Section title="Languages">
-          <TagSelect
-            options={[
-              "Hindi",
-              "English",
-              "Tamil",
-              "Telugu",
-              "Marathi",
-              "Gujarati",
-              "Punjabi",
-              "Bengali",
-              "Kannada",
-              "Malayalam",
-            ]}
-            tags={languages}
-            setTags={setLanguages}
-            onRemove={removeTag}
-          />
-        </Section>
+       <Section title="Languages">
+  <TagSelect
+    options={languageOptions}   // ✅ full objects
+    tags={languages}
+    setTags={setLanguages}
+    onRemove={(id) => {
+      setLanguages((prev) => prev.filter((t) => t.id !== id));
+    }}
+  />
+</Section>
 
         {/* ================= ACTIONS ================= */}
         <div className="flex justify-end gap-4 mt-10">
@@ -1234,19 +1413,21 @@ function TagInput({ placeholder, tags, setTags, draft, setDraft, onRemove }) {
   );
 }
 
-function TagSelect({ options, tags, setTags, onRemove }) {
+const TagSelect = ({ options = [], tags = [], setTags, onRemove }) => {
   const [open, setOpen] = useState(false);
 
-  const addTag = (value) => {
-    if (!tags.includes(value)) {
-      setTags([...tags, value]);
+  const handleSelect = (option) => {
+    const exists = tags.some((t) => t.id === option.id);
+    if (!exists) {
+      setTags([...tags, option]);
     }
     setOpen(false);
   };
 
   return (
     <div className="space-y-3">
-      {/* Input */}
+      
+      {/* Dropdown */}
       <div className={`onboarding-custom-select ${open ? "active" : ""}`}>
         <div
           className={`onboarding-selected-option ${open ? "open" : ""}`}
@@ -1259,36 +1440,37 @@ function TagSelect({ options, tags, setTags, onRemove }) {
           <span className="onboarding-arrow">▼</span>
         </div>
 
-        {/* Dropdown */}
         {open && (
           <ul className="onboarding-options-list">
-            {options.map((lang) => (
+            {options.map((opt) => (
               <li
-                key={lang}
-                className={tags.includes(lang) ? "active cursor-not-allowed opacity-50" : ""}
-                onClick={() => {
-                  if (!tags.includes(lang)) addTag(lang);
-                }}
+                key={opt.id}
+                onClick={() => handleSelect(opt)}
+                className={
+                  tags.some((t) => t.id === opt.id)
+                    ? "active cursor-not-allowed opacity-50"
+                    : ""
+                }
               >
-                {lang}
+                {opt.value}
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      {/* Selected tags */}
+      {/* Selected Tags */}
       {tags.length > 0 && (
         <div className="flex w-full rounded-lg bg-[#FEFEFE] flex-wrap items-center gap-2 p-2 border">
           <div className="flex flex-wrap gap-2 flex-1">
-            {tags.map((tag, i) => (
+            {tags.map((tag) => (
               <span
-                key={i}
+                key={tag.id}
                 className="tag-chip flex items-center gap-2 px-3 py-1 rounded-md text-xs h-8"
               >
-                {tag}
+                {tag.value}
                 <button
-                  onClick={() => onRemove(i, tags, setTags)}
+                  onClick={() => onRemove(tag.id)}
                   className="text-xs"
                 >
                   ✕
@@ -1297,11 +1479,9 @@ function TagSelect({ options, tags, setTags, onRemove }) {
             ))}
           </div>
 
-          {/* CLEAR ALL */}
           <button
             onClick={() => setTags([])}
             className="tag-clear-btn ml-2 px-3 h-full flex items-center justify-center text-sm"
-            title="Clear all"
           >
             ✕
           </button>
@@ -1309,4 +1489,81 @@ function TagSelect({ options, tags, setTags, onRemove }) {
       )}
     </div>
   );
-}
+};
+
+// function TagSelect({ options, tags, setTags, onRemove }) {
+//   const [open, setOpen] = useState(false);
+
+//   const addTag = (value) => {
+//     if (!tags.includes(value)) {
+//       setTags([...tags, value]);
+//     }
+//     setOpen(false);
+//   };
+
+//   return (
+//     <div className="space-y-3">
+//       {/* Input */}
+//       <div className={`onboarding-custom-select ${open ? "active" : ""}`}>
+//         <div
+//           className={`onboarding-selected-option ${open ? "open" : ""}`}
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             setOpen(!open);
+//           }}
+//         >
+//           <span className="opacity-70">Select languages</span>
+//           <span className="onboarding-arrow">▼</span>
+//         </div>
+
+//         {/* Dropdown */}
+//         {open && (
+//           <ul className="onboarding-options-list">
+//             {options.map((lang) => (
+//               <li
+//                 key={lang}
+//                 className={tags.includes(lang) ? "active cursor-not-allowed opacity-50" : ""}
+//                 onClick={() => {
+//                   if (!tags.includes(lang)) addTag(lang);
+//                 }}
+//               >
+//                 {lang}
+//               </li>
+//             ))}
+//           </ul>
+//         )}
+//       </div>
+
+//       {/* Selected tags */}
+//       {tags.length > 0 && (
+//         <div className="flex w-full rounded-lg bg-[#FEFEFE] flex-wrap items-center gap-2 p-2 border">
+//           <div className="flex flex-wrap gap-2 flex-1">
+//             {tags.map((tag, i) => (
+//               <span
+//                 key={i}
+//                 className="tag-chip flex items-center gap-2 px-3 py-1 rounded-md text-xs h-8"
+//               >
+//                 {tag}
+//                 <button
+//                   onClick={() => onRemove(i, tags, setTags)}
+//                   className="text-xs"
+//                 >
+//                   ✕
+//                 </button>
+//               </span>
+//             ))}
+//           </div>
+
+//           {/* CLEAR ALL */}
+//           <button
+//             onClick={() => setTags([])}
+//             className="tag-clear-btn ml-2 px-3 h-full flex items-center justify-center text-sm"
+//             title="Clear all"
+//           >
+//             ✕
+//           </button>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }

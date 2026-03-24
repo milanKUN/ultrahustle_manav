@@ -73,6 +73,12 @@ Route::middleware('auth:sanctum')->prefix('/v1/me')->group(function (): void {
 	Route::put('/user-notification', [\App\Http\Controllers\Api\MeNotificationController::class, 'update']);
 
 	Route::delete('/', [\App\Http\Controllers\Api\MeController::class, 'destroy']);
+
+	Route::get('/languages', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getLanguages']);
+	Route::get('/countries', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getCountries']);
+	Route::get('/states/{country_id}', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getStateByCountryId']);
+	Route::get('/cities/{country_id}', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getCityByStateId']);
+
 });
 
 // Public decline endpoint (token-only)

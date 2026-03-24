@@ -65,6 +65,46 @@ export const putMyPersonalInfo = async (payload) => {
   }
 };
 
+//get all countries
+export const getCountries = async () => {
+  try {
+    const res = await api.get('/api/v1/me/countries');
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+//get states from selected country
+export const getStates = async (countryId) => {
+  try {
+    const res = await api.get(`/api/v1/me/states/${countryId}`);
+    return unwrap(res); // returns array directly
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+//get cities from selected state
+export const getCities = async (stateId) => {
+  try {
+    const res = await api.get(`/api/v1/me/cities/${stateId}`);
+    return unwrap(res); // returns array
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+//get languages
+export const getLanguages = async () => {
+  try {
+    const res = await api.get('/api/v1/me/languages');
+    return unwrap(res); // returns array
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
 export const patchMyPersonalInfo = async (payload) => {
   try {
     const res = await api.patch(PERSONAL_INFO_PATH, payload);
