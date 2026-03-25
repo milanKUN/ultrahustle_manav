@@ -132,13 +132,13 @@ const UserProfile = (props) => {
   // (tumhara same data yahin rahega)
   const defaultTeamData = useMemo(
     () => ({
-      name: " Name",
-      username: "@Abigail_12",
-      title: "Product Designer & Full-Stack Developer",
-      location: "Kolkata, India",
+      name: " ",
+      username: "",
+      title: "",
+      location: "",
       description:
-        "Award-winning designer with 8+ years creating elegant, user-centered digital experiences. Specialized in design systems, mobile apps, and SaaS platforms.",
-      availability: "Available for collaboration",
+        "",
+      availability: "",
       stats: {
         karma: 300,
         projectsCompleted: 47,
@@ -147,14 +147,8 @@ const UserProfile = (props) => {
       },
       badges: ["Trusted Seller", "Fast Responder", "Quality Work"],
       hashtags: ["#UI/UX", "#Web Design", "#React", "#Figma", "#Mobile"],
-      about: [
-        "I'm a passionate product designer and full-stack developer with over 8 years of experience creating elegant, user-centered digital experiences.",
-        "I specialize in bridging the gap between design and development, building pixel-perfect interfaces with clean, maintainable code.",
-      ],
-      whatWeDo: [
-        "I'm a passionate product designer and full-stack developer with over 8 years of experience creating elegant, user-centered digital experiences.",
-        "I specialize in bridging the gap between design and development, building pixel-perfect interfaces with clean, maintainable code.",
-      ],
+      about: [],
+      whatWeDo: [],
       skills: [
         "Product Design",
         "UI/UX Design",
