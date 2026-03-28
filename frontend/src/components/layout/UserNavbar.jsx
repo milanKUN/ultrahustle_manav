@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NavbarLight.css";
 import {logout} from "../../features/auth/api/authApi";
+import {getUserName} from "../../features/dashboard/api/personalInfoApi";
 
 const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
@@ -85,7 +86,22 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  //get user full name
   useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const res = await getUserName();
+        // console.log(res.full_name);
+        setUsername(res.full_name);
+      } catch (error) {
+        console.error("Failed to fetch username", error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
+  /* useEffect(() => {
     try {
       const onboarding = JSON.parse(localStorage.getItem("onboarding"));
       if (onboarding?.username) {
@@ -94,7 +110,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
     } catch (e) {
       console.error("Invalid onboarding data");
     }
-  }, []);
+  }, []); */
 
   // Sample messages data
   const messagesData = [

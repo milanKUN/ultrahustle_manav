@@ -156,3 +156,9 @@ export const getMyActivities = async () => {
   const res = await api.get("/api/v1/me/my-activities");
   return unwrap(res);
 };
+
+//get logged in user full name
+export const getUserName = async () => {
+  const res = await api.get("/api/v1/me/get-username");
+  return unwrap(res);
+};

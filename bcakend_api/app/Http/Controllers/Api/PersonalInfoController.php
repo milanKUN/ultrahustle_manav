@@ -460,4 +460,20 @@ class PersonalInfoController extends Controller
     public function getUserActivities(){
         return UserActivity::get();
     }
+
+    public function getUserName(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        return response()->json([
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+        ]);
+    }
 }

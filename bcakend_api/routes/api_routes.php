@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->prefix('/v1/me')->group(function (): void {
 	Route::get('/user-notification', [\App\Http\Controllers\Api\MeNotificationController::class, 'get']);
 	Route::put('/user-notification', [\App\Http\Controllers\Api\MeNotificationController::class, 'update']);
 	Route::get('/my-activities', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getUserActivities']);
+	Route::get('/get-username', [\App\Http\Controllers\Api\PersonalInfoController::class, 'getUserName']);
 
 	Route::delete('/', [\App\Http\Controllers\Api\MeController::class, 'destroy']);
 
