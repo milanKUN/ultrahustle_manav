@@ -858,7 +858,7 @@ export default function PersonalInformation() {
               )}
             </div>
              {/* CITY */}
-           <div
+           {/* <div
               className={`onboarding-custom-select ${openCity ? "active" : ""}`}
               ref={cityRef}
             >
@@ -932,7 +932,8 @@ export default function PersonalInformation() {
                   )}
                 </ul>
               )}
-            </div>
+            </div> */}
+            <Input label="City" placeholder="City" value={city} onChange={setCity} />
             <div>
               <Label>Pincode</Label>
               <input
