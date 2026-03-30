@@ -21,6 +21,7 @@ const DesktopForgotPassword = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordTooltip, setShowPasswordTooltip] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const params = useMemo(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -28,6 +29,25 @@ const DesktopForgotPassword = () => {
     return { searchParams, hashParams };
   }, [location.search, location.hash]);
 
+  // ✅ Password Validation State
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    special: false,
+    upper: false,
+    lower: false,
+    number: false,
+  });
+
+  const validatePassword = (pass) => {
+    setPasswordCriteria({
+      length: pass.length >= 8,
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(pass),
+      upper: /[A-Z]/.test(pass),
+      lower: /[a-z]/.test(pass),
+      number: /[0-9]/.test(pass),
+    });
+  };
+  
   useEffect(() => {
     const token = params.searchParams.get('token') || params.hashParams.get('token') || '';
     const email = params.searchParams.get('email') || params.hashParams.get('email') || '';
@@ -44,9 +64,14 @@ const DesktopForgotPassword = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+
+    if (name === "password") {
+      validatePassword(value);
+    }
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -211,6 +236,8 @@ const DesktopForgotPassword = () => {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleInputChange}
+                    onFocus={() => setShowPasswordTooltip(true)}
+                    onBlur={() => setShowPasswordTooltip(false)}
                     required
                   />
                   <button
@@ -224,6 +251,30 @@ const DesktopForgotPassword = () => {
                     </svg>
                   </button>
                 </div>
+                {/* Password Tooltip */}
+              {showPasswordTooltip && (
+                <div className="desktop-password-tooltip">
+                  <div className="tooltip-arrow"></div>
+                  <h4>Your Password must contain:</h4>
+                  <ul>
+                    <li className={!formData.password ? "" : passwordCriteria.length ? "valid" : "invalid"}>
+                      At least 8 Characters
+                    </li>
+                    <li className={!formData.password ? "" : passwordCriteria.special ? "valid" : "invalid"}>
+                      Special Character (eg. !@#$%&*)
+                    </li>
+                    <li className={!formData.password ? "" : passwordCriteria.upper ? "valid" : "invalid"}>
+                      At least one upper case letter (A-Z)
+                    </li>
+                    <li className={!formData.password ? "" : passwordCriteria.lower ? "valid" : "invalid"}>
+                      At least one lower case letter (a-z)
+                    </li>
+                    <li className={!formData.password ? "" : passwordCriteria.number ? "valid" : "invalid"}>
+                      Number (0-9)
+                    </li>
+                  </ul>
+                </div>
+              )}
               </div>
 
               <div className="form-group">
