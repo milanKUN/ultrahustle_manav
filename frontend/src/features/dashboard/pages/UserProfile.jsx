@@ -338,31 +338,20 @@ const UserProfile = (props) => {
           description: "Description",
           cost: "$",
         },
-        {
-          image:
-            "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-          title: "E-commerce Dashboard Redesign",
-          description: "This project involves designing more...",
-          cost: "$600-$800",
-        },
-        {
-          image:
-            "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-          title: "E-commerce Dashboard Redesign",
-          description: "This project involves designing more...",
-          cost: "$600-$800",
-        },
       ],
     }),
     [],
   );
 
-  const [portfolioData, setPortfolioData] = useState(defaultPortfolioData);
+  const [portfolioData, setPortfolioData] = useState({
+    featured: null,
+    items: [],
+  });
 
   useEffect(() => {
     let mounted = true;
 
-    const extractProjectImage = (p, fallback) => {
+    const extractProjectImage = (p) => {
       const candidate =
         p?.cover_media?.url ||
         p?.cover_media?.path ||
@@ -371,62 +360,89 @@ const UserProfile = (props) => {
         p?.media?.[0]?.url ||
         p?.media?.[0]?.path ||
         "";
-      const url = typeof candidate === "string" ? candidate.trim() : "";
-      return url || fallback;
+
+      return typeof candidate === "string" ? candidate.trim() : "";
     };
 
     const extractCost = (p) => {
-      if (p?.cost_cents === null || p?.cost_cents === undefined || p?.cost_cents === "") return "";
+      if (
+        p?.cost_cents === null ||
+        p?.cost_cents === undefined ||
+        p?.cost_cents === ""
+      ) {
+        return "";
+      }
+
       const currency = String(p?.currency || "USD").trim();
       return `${currency} ${p.cost_cents}`;
     };
 
     const normalizeProjects = (res) => {
-      const raw = res?.projects || res?.data?.projects || res?.portfolio?.projects || [];
+      const raw =
+        res?.projects ||
+        res?.data?.projects ||
+        res?.portfolio?.projects ||
+        [];
+
       return Array.isArray(raw) ? raw : [];
     };
 
-    const loadPortfolioForProfile = async () => {
+      const loadPortfolioForProfile = async () => {
       try {
         const res = await getMyPortfolio();
 
-        // Also capture numeric user id from portfolio payload (your sample includes portfolio.user_id)
         const portfolioObj = res?.portfolio || res?.data?.portfolio || null;
         const portfolioUserId = portfolioObj?.user_id ?? null;
-        if (portfolioUserId && !viewerUserId) setViewerUserId(portfolioUserId);
+
+        if (portfolioUserId && !viewerUserId) {
+          setViewerUserId(portfolioUserId);
+        }
 
         const serverProjects = normalizeProjects(res)
           .slice()
           .sort((a, b) => (a?.sort_order ?? 0) - (b?.sort_order ?? 0));
 
         if (!mounted) return;
-        if (serverProjects.length === 0) return; // keep default UI
 
-        const featuredFallback = defaultPortfolioData.featured.image;
-        const itemFallback = defaultPortfolioData.items?.[0]?.image || featuredFallback;
+        // ✅ No projects → show empty state
+        if (serverProjects.length === 0) {
+          setPortfolioData({
+            featured: null,
+            items: [],
+          });
+          return;
+        }
 
-        const mapProject = (p, fallbackImage) => ({
-          image: extractProjectImage(p, fallbackImage),
+        const mapProject = (p) => ({
+          image: extractProjectImage(p),
           title: p?.title ?? "",
           description: p?.description ?? "",
           cost: extractCost(p),
         });
 
         const [first, ...rest] = serverProjects;
+
         setPortfolioData({
-          featured: mapProject(first, featuredFallback),
-          items: rest.map((p) => mapProject(p, itemFallback)),
+          featured: mapProject(first),
+          items: rest.map(mapProject),
         });
-      } catch {
-        // Keep current UI (no design change) if request fails.
+      } catch (e) {
+        if (!mounted) return;
+
+        // Optional: if API fails, also show empty state
+        setPortfolioData({
+          featured: null,
+          items: [],
+        });
       }
     };
 
     loadPortfolioForProfile();
+
     return () => {
       mounted = false;
     };
-  }, [defaultPortfolioData]);
+  }, []);
 
   const listingsData = [
     {
@@ -437,51 +453,6 @@ const UserProfile = (props) => {
       views: 3247,
       price: "$2,500",
     },
-
-    {
-      image:
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80",
-      title: "React & Frontend Development Course",
-      type: "Course",
-      views: 1890,
-      price: "$99",
-    },
-
-    {
-      image:
-        "https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=500&q=80",
-      title: "E-commerce Website UI Kit",
-      type: "Product",
-      views: 2460,
-      price: "$49",
-    },
-
-    {
-      image:
-        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80",
-      title: "Growth Marketing Live Webinar",
-      type: "Webinar",
-      views: 870,
-      price: "Free",
-    },
-
-    {
-      image:
-        "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=500&q=80",
-      title: "Brand Identity & Logo Design",
-      type: "Service",
-      views: 1325,
-      price: "$1,200",
-    },
-
-    {
-      image:
-        "https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=500&q=80",
-      title: "Landing Page Conversion Template",
-      type: "Product",
-      views: 1640,
-      price: "$29",
-    },
   ];
 
   const reviewsData = {
@@ -489,48 +460,6 @@ const UserProfile = (props) => {
     total: 48,
     breakdown: { 5: 38, 4: 7, 3: 2, 2: 1, 1: 0 },
     reviews: [
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
-      {
-        name: "Emily Chen",
-        date: "Nov 15, 2025",
-        rating: 5,
-        text: "Exceptional designer!",
-      },
       {
         name: "Emily Chen",
         date: "Nov 15, 2025",
@@ -1139,160 +1068,151 @@ const UserProfile = (props) => {
                   <div className="portfolio-header-line"></div>
                 </div>
 
-                {/* ✅ Featured Portfolio Item */}
-                <div className="portfolio-featured-card">
-                  <div className="portfolio-featured-image">
-                    <img
-                      src={portfolioData.featured.image}
-                      alt={portfolioData.featured.title}
-                      onClick={() => {
-                        const allItems = [portfolioData.featured, ...portfolioData.items];
-                        setActiveItemIndex(0);
-                        setActiveItem(allItems[0]);
-                      }}
-                      style={{ cursor: "pointer" }}
-                    />
+                {!portfolioData.featured ? (
+                  <div
+                    style={{
+                      padding: "80px 20px",
+                      textAlign: "center",
+                      color: "#777",
+                      fontSize: "16px",
+                      border: "1px solid #ddd",
+                      borderRadius: "16px",
+                      marginTop: "20px",
+                    }}
+                  >
+                    No portfolio uploaded yet.
                   </div>
+                ) : (
+                  <>
+                    {/* Featured Portfolio Item */}
+                    <div className="portfolio-featured-card">
+                      <div className="portfolio-featured-image">
+                        <img
+                          src={portfolioData.featured.image}
+                          alt={portfolioData.featured.title}
+                          onClick={() => {
+                            const allItems = [portfolioData.featured, ...portfolioData.items];
+                            setActiveItemIndex(0);
+                            setActiveItem(allItems[0]);
+                          }}
+                          style={{ cursor: "pointer" }}
+                        />
+                      </div>
 
-                  <div className="portfolio-featured-content">
-                    <h4 className="portfolio-featured-title">
-                      {portfolioData.featured.title}
-                    </h4>
-                    <p className="portfolio-featured-desc">
-                      {portfolioData.featured.description}
-                    </p>
-                    <div className="portfolio-featured-cost">
-                      <span className="cost-label">Project cost</span>
-                      <span className="cost-value">
-                        {portfolioData.featured.cost}
-                      </span>
+                      <div className="portfolio-featured-content">
+                        <h4 className="portfolio-featured-title">
+                          {portfolioData.featured.title}
+                        </h4>
+                        <p className="portfolio-featured-desc">
+                          {portfolioData.featured.description}
+                        </p>
+                        <div className="portfolio-featured-cost">
+                          <span className="cost-label">Project cost</span>
+                          <span className="cost-value">
+                            {portfolioData.featured.cost}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* ✅ POPUP MODAL */}
+                    {/* Portfolio Items */}
+                    {portfolioData.items.length > 0 && (
+                      <div className="portfolio-items-grid">
+                        {portfolioData.items.map((item, index) => (
+                          <div className="portfolio-item-card" key={index}>
+                            <div className="portfolio-item-image">
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                onClick={() => {
+                                  const allItems = [portfolioData.featured, ...portfolioData.items];
+                                  setActiveItemIndex(index + 1);
+                                  setActiveItem(allItems[index + 1]);
+                                }}
+                                style={{ cursor: "pointer" }}
+                              />
+                            </div>
+
+                            <div className="portfolio-item-info">
+                              <div className="portfolio-item-left">
+                                <span className="portfolio-item-title">{item.title}</span>
+                                <span className="portfolio-item-desc">{item.description}</span>
+                              </div>
+
+                              <div className="portfolio-item-right">
+                                <span className="cost-label">Project cost</span>
+                                <span className="cost-value">{item.cost}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Popup Modal */}
                 {activeItem && createPortal(
                   <div className="portfolio-modal-backdrop" onClick={() => setActiveItem(null)}>
                     <div
                       className={`portfolio-modal-content ${theme}`}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* 🔝 Top Bar */}
                       <div className="portfolio-modal-topbar">
                         <div className="portfolio-modal-brand">
                           <div className="portfolio-brand-circle"></div>
                           <span>Made by Name</span>
                         </div>
 
-                        {/* Right Actions: Arrows + Close */}
                         <div className="flex items-center gap-4">
                           <div className="portfolio-modal-nav">
                             <button
                               className="nav-arrow left"
                               onClick={() => {
                                 const allItems = [portfolioData.featured, ...portfolioData.items];
-                                const prevIndex = activeItemIndex > 0 ? activeItemIndex - 1 : allItems.length - 1;
+                                const prevIndex =
+                                  activeItemIndex > 0 ? activeItemIndex - 1 : allItems.length - 1;
                                 setActiveItemIndex(prevIndex);
                                 setActiveItem(allItems[prevIndex]);
                               }}
-                            >◀</button>
+                            >
+                              ◀
+                            </button>
+
                             <span className="portfolio-modal-counter">
                               {activeItemIndex + 1} of {[portfolioData.featured, ...portfolioData.items].length}
                             </span>
+
                             <button
                               className="nav-arrow right"
                               onClick={() => {
                                 const allItems = [portfolioData.featured, ...portfolioData.items];
-                                const nextIndex = activeItemIndex < allItems.length - 1 ? activeItemIndex + 1 : 0;
+                                const nextIndex =
+                                  activeItemIndex < allItems.length - 1 ? activeItemIndex + 1 : 0;
                                 setActiveItemIndex(nextIndex);
                                 setActiveItem(allItems[nextIndex]);
                               }}
-                            >▶</button>
+                            >
+                              ▶
+                            </button>
                           </div>
 
-                          <button
-                            className="portfolio-modal-close"
-                            onClick={() => setActiveItem(null)}
-                          >
+                          <button className="portfolio-modal-close" onClick={() => setActiveItem(null)}>
                             ✕
                           </button>
                         </div>
                       </div>
 
-                      {/* 📝 Info */}
-                      <div className="portfolio-modal-info">
-                        <div className="portfolio-info-header">
-                          <h3>{activeItem.title}</h3>
-
-                        </div>
-                        <p>{activeItem.description}</p>
-
-                        <div className="portfolio-modal-cost">
-                          <span className="cost-label">Project cost</span>
-                          <span className="cost-value">{activeItem.cost}</span>
-                        </div>
-                      </div>
-
-                      {/* 🖼 Main Image */}
-                      <div className="portfolio-modal-image">
+                      <div className="portfolio-modal-body">
                         <img src={activeItem.image} alt={activeItem.title} />
-                      </div>
-
-                      {/* 🧩 Thumbnails */}
-                      <div className="portfolio-modal-thumbs">
-                        {[
-                          activeItem.image,
-                          activeItem.image,
-                          activeItem.image,
-                          activeItem.image,
-                          activeItem.image,
-                          activeItem.image,
-                        ].map((img, i) => (
-                          <img key={i} src={img} alt={`thumb-${i}`} />
-                        ))}
+                        <h3>{activeItem.title}</h3>
+                        <p>{activeItem.description}</p>
+                        <p><strong>Project cost:</strong> {activeItem.cost}</p>
                       </div>
                     </div>
                   </div>,
                   document.body
                 )}
-
-                {/* ✅ Portfolio Grid */}
-                <div className="portfolio-grid-card">
-                  <div className="portfolio-grid">
-                    {portfolioData.items.map((item, index) => (
-                      <div key={index} className="portfolio-item">
-                        <div className="portfolio-item-image">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            onClick={() => {
-                              const allItems = [portfolioData.featured, ...portfolioData.items];
-                              setActiveItemIndex(index + 1);
-                              setActiveItem(allItems[index + 1]);
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        </div>
-
-                        <div className="portfolio-item-info">
-                          <div className="portfolio-item-left">
-                            <span className="portfolio-item-title">
-                              {item.title}
-                            </span>
-                            <span className="portfolio-item-desc">
-                              {item.description}
-                            </span>
-                          </div>
-
-                          <div className="portfolio-item-right">
-                            <span className="cost-label">Project cost</span>
-                            <span className="cost-value">{item.cost}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </section>
 
               {/* Listings Section */}
