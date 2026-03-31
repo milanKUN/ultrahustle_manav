@@ -11,7 +11,7 @@ import Payments from "../components/UserProfile/Payments";
 import Veriffication from "../components/UserProfile/Veriffication";
 import ConnectedApps from "../components/UserProfile/ConnectedApps";
 import DeleteAccount from "../components/UserProfile/DeleteAccount";
-import MyPortfolio from "../components/UserProfile/MyPortfolio";
+import MyPortfolio from "../components/UserProfile/MyPortfolio"; 
 
 function User({ theme, setTheme }) {
   const [sidebarOpen, setSidebarOpen] = useState(() => {

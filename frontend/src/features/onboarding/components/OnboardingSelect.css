@@ -10,21 +10,43 @@
 }
 
 .onboarding-selected-option {
-  height: 40px;
+  height: auto;
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 12px;
   border-radius: 6px;
-  background: linear-gradient(to bottom, #ffffff, #F4F4F4);
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: transparent;
+  border: 1px solid black;
   color: #000000b3;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  line-height: 1.25;
 }
 
+/* Keep the outer select container full width, like phone box */
+.onboarding-custom-select {
+  position: relative;
+  width: 100%;
+  z-index: 10;
+}
+
+.onboarding-selected-option span {
+  line-height: 1.25;
+}
+
+/* phone-size select: gender/country/state/availability */
+.onboarding-custom-select.size-phone .onboarding-selected-option,
+.onboarding-custom-select.gender-select .onboarding-selected-option {
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  border-radius: 6px;
+  height: auto !important;
+  display: flex;
+  align-items: center;
+}
 
 .onboarding-selected-option:hover {
   background: #e5e7eb;
@@ -101,4 +123,53 @@
 /* Role dropdown specific - show only 2 items */
 .role-dropdown-small {
   max-height: 88px !important;
+}
+
+/* ===== DARK MODE STYLES ===== */
+.user-page.dark .onboarding-selected-option {
+  border-color: #fefefe !important;
+  color: #ffffff !important;
+}
+
+.user-page.dark .onboarding-selected-option:hover {
+  background: rgba(206, 255, 27, 0.15);
+}
+
+.user-page.dark .onboarding-selected-option.open {
+  background: transparent;
+  border-color: transparent !important;
+  box-shadow: 0 0 15px #CEFF1B !important;
+}
+
+.user-page.dark .onboarding-arrow {
+  color: #ffffff;
+}
+
+/* Explicit Overrides for Expiry Date Year Selector */
+.user-page.dark .onboarding-selected-option.expiry-year-dropdown {
+  color: #000 !important;
+  background: #CEFF1B !important;
+}
+
+.user-page.dark .expiry-year-dropdown .onboarding-arrow {
+  color: #000 !important;
+}
+
+.user-page.dark .onboarding-options-list {
+  background: #1a1a1a !important;
+  border: 1px solid #fefefe;
+}
+
+.user-page.dark .onboarding-options-list li {
+  color: #ffffff;
+}
+
+.user-page.dark .onboarding-options-list li:hover {
+  background: #CEFF1B;
+  color: #000;
+}
+
+.user-page.dark .onboarding-options-list li.active {
+  background: #CEFF1B;
+  color: #000;
 }

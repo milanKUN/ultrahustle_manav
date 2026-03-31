@@ -435,7 +435,10 @@ textarea:focus {
   font-weight: bold;
 }
 
-
+/* ---------- TITLE ---------- */
+.user-page.dark .image-modal-card h3 {
+  color: #ffffff;
+}
 
 /* ---------- IMAGE PREVIEW ---------- */
 .user-page.dark .image-preview {
@@ -873,16 +876,22 @@ MY PORTFOLIO – DARK MODE (FINAL SINGLE FIX)
   border-color: rgba(206, 255, 27, 0.45) !important;
 }
 
-.user-page.dark .portfolio-card-edit input,
-.user-page.dark .portfolio-card-edit textarea {
-  border-color: rgba(206, 255, 27, 0.45) !important;
-  background: transparent !important;
-  color: #ffffff !important;
+/* Portfolio surfaces */
+.user-page.light .portfolio-surface {
+  background-color: #f2f2f2;
 }
 
-.user-page.dark .portfolio-card-edit input::placeholder,
-.user-page.dark .portfolio-card-edit textarea::placeholder {
-  color: #888 !important;
+.user-page.dark .portfolio-surface {
+  background-color: #2b2b2b !important;
+}
+
+/* Prevent global marketplace `.my-portfolio` background bleed on user profile page */
+.user-page .user-profile-portfolio {
+  background-color: transparent !important;
+}
+
+.user-page.dark .user-profile-portfolio {
+  background-color: #0b0b0b !important;
 }
 
 
@@ -1078,7 +1087,9 @@ LIGHT MODE – DROPDOWN HOVER ONLY
 
 /* CUSTOM DROPDOWNS (DARK MODE FIX) */
 .user-page.dark .onboarding-selected-option {
-  border: 1px solid #ffffff !important;
+  border-color: grey !important;
+
+
 }
 
 .user-page.dark .onboarding-selected-option:hover {
@@ -1122,3 +1133,65 @@ LIGHT MODE – DROPDOWN HOVER ONLY
 /* =========================================
    CREATE TEAM PAGE – DARK MODE (FULL SUPPORT)
    ========================================= */
+
+/* =========================================
+   TOAST / SAVE-CHANGES MODAL – LIGHT + DARK
+   ========================================= */
+
+/* LIGHT MODE card */
+.user-page .toast-modal-card {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* DARK MODE card */
+.user-page.dark .toast-modal-card {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* TITLE */
+.user-page .toast-modal-card .toast-title {
+  color: inherit !important;
+}
+
+/* MESSAGE TEXT */
+.user-page .toast-modal-card .toast-message {
+  color: rgba(0, 0, 0, 0.75) !important;
+}
+.user-page.dark .toast-modal-card .toast-message {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* CLOSE × BUTTON */
+.user-page .toast-modal-card .toast-close-btn {
+  background-color: transparent !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  color: #000000 !important;
+}
+.user-page.dark .toast-modal-card .toast-close-btn {
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+/* OK BUTTON */
+.user-page .toast-modal-card .toast-ok-btn,
+.user-page.dark .toast-modal-card .toast-ok-btn {
+  background-color: #ceff1b !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+.user-page.dark .toast-modal-card .toast-ok-btn {
+  border-color: #000000 !important;
+}
+
+/* PROGRESS BAR TRACK */
+.user-page .toast-modal-card .toast-progress-track {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+.user-page.dark .toast-modal-card .toast-progress-track {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}

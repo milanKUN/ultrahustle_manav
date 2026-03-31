@@ -42,6 +42,26 @@ body {
   scrollbar-color: #ceff1b #f2f2f2;
 }
 
+/* Dark Mode Scrollbar Styling */
+.user-page.dark ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+
+.user-page.dark ::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 10px;
+  border: 2px solid #1a1a1a;
+}
+
+.user-page.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #666;
+}
+
+.user-page.dark * {
+  scrollbar-color: #ceff1b #1a1a1a;
+}
+
 /* rest of your CSS below */
 html {
   scroll-behavior: smooth;
@@ -285,4 +305,13 @@ html {
 .navbar-link-item:hover>.navbar-top-egg-green {
   opacity: 1;
   transform: translateX(-50%) translateY(-2px);
+}
+
+/* Custom UI Icon Dark Mode Override */
+.user-page.dark .dynamic-yellow-icon {
+  color: #9ca3af !important; /* Equivalent to text-gray-400 */
+}
+
+.user-page.dark .dynamic-yellow-icon:hover {
+  color: #d1d5db !important; /* Equivalent to hover text-gray-300 */
 }

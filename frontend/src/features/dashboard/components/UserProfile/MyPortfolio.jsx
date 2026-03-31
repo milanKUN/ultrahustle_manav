@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+
 import {
   deletePortfolioProject,
   getMyPortfolio,
@@ -240,9 +242,10 @@ export default function MyPortfolio() {
     <>
       {/* ================= PAGE (BLUR BEHIND UPLOAD GRID) ================= */}
       <div
-        className={`ml-auto mt-12 pb-20 transition-all duration-300 my-portfolio
+        className={`ml-auto mt-12 pb-20 transition-all duration-300 my-portfolio user-profile-portfolio
         ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}
       >
+      
         {/* HEADER */}
         <div className="flex items-center gap-4 mb-6">
           <h3 className="text-xl font-semibold whitespace-nowrap">My Portfolio</h3>
@@ -250,26 +253,26 @@ export default function MyPortfolio() {
         </div>
 
         {/* MAIN */}
-        <div className="border-2 border-white rounded-2xl p-6 mb-10">
+        <div className="portfolio-card-edit portfolio-surface border-1 border-[#CEFF1B] rounded-2xl p-6 mb-10">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="relative h-[417px] bg-gray-200 rounded-xl overflow-hidden">
               {mainProject.coverUrl ? (
                 <img
                   src={mainProject.coverUrl}
                   alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 m-auto bg-[#CEFF1B] px-4 py-2 rounded"
                 />
               ) : null}
               <button
                 type="button"
                 onClick={openUploadForMain}
-                className="absolute inset-0 m-auto  px-4 py-2 rounded"
+                className="absolute inset-0 m-auto bg-[#CEFF1B] px-4 py-2 rounded"
                 disabled={isSaving || isLoading}
               >
                 Upload Photo
               </button>
 
-              <button
+              {/* <button
                 type="button"
                 onClick={() => setUploadStep(null)}
                 className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center
@@ -277,18 +280,22 @@ export default function MyPortfolio() {
                 title="Close"
               >
                 ✕
-              </button>
+              </button> */}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 form-label">
               <Input
                 label="Title"
                 value={mainProject.title}
+                placeholder="SalonSync - Revolutionary AI-Powered Salon App UI/UX"
+                className="form-input"
                 onChange={(v) => setMainProject({ ...mainProject, title: v })}
               />
               <Textarea
                 label="Description"
                 limit={150}
+                className="form-textarea"
+                placeholder="This project involves designing a next-generation salon mobile application with AI-powered recommendations, seamless booking experience, and elegant user interface."
                 value={mainProject.desc}
                 onChange={(v) => setMainProject({ ...mainProject, desc: v })}
               />
@@ -296,6 +303,7 @@ export default function MyPortfolio() {
                 label="Project cost"
                 numericOnly
                 value={mainProject.cost}
+                placeholder="$600-$800"
                 onChange={(v) => setMainProject({ ...mainProject, cost: v })}
               />
             </div>
@@ -303,12 +311,12 @@ export default function MyPortfolio() {
         </div>
 
         {/* PROJECTS GRID */}
-        <div className="border-2 border-white rounded-xl p-6 mb-6 flex flex-col">
-          <div className="max-h-[520px] overflow-y-auto px-4 pb-4 -mx-4 custom-scroll">
+        <div className="portfolio-card-edit portfolio-surface border-1 border-[#CEFF1B] rounded-xl p-6 mb-6 flex flex-col">
+          <div className="px-4 pb-4 -mx-4">
             <div className="grid md:grid-cols-3 gap-6">
               {projects.map((project) => (
                 <div key={project.id} className="space-y-3">
-                  <div className="relative h-[250px] bg-gray-200 rounded-xl">
+                  <div className="relative h-[220px] bg-gray-200 rounded-xl">
                     {project.coverUrl ? (
                       <img
                         src={project.coverUrl}
@@ -319,7 +327,7 @@ export default function MyPortfolio() {
                     <button
                       type="button"
                       onClick={() => openUploadForProject(project)}
-                      className="absolute inset-0 m-auto px-3 py-1 rounded text-xs"
+                      className="absolute inset-0 m-auto bg-[#CEFF1B] px-3 py-1 rounded text-xs"
                       disabled={isSaving || isLoading}
                     >
                       Change Photo
@@ -328,8 +336,7 @@ export default function MyPortfolio() {
                     <button
                       type="button"
                       onClick={() => removeProject(project.id)}
-                      className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center
-                        bg-red-500 text-white rounded-full text-sm"
+                      className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center bg-red-500 text-white rounded-full text-sm"
                       title="Remove"
                       disabled={isSaving || isLoading}
                     >
@@ -339,17 +346,21 @@ export default function MyPortfolio() {
 
                   <Input
                     label="Title"
+                    className="text-md"
+                    placeholder="SalonSync - Revolutionary AI-Powered Salon App UI/UX"
                     value={project.title}
                     onChange={(v) => updateProject(project.id, "title", v)}
                   />
                   <Textarea
                     label="Description"
+                    placeholder="Type here"
                     limit={150}
                     value={project.desc}
                     onChange={(v) => updateProject(project.id, "desc", v)}
                   />
                   <Input
                     label="Cost"
+                    placeholder="$600-$800"
                     small
                     numericOnly
                     value={project.cost}
@@ -395,30 +406,28 @@ export default function MyPortfolio() {
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </div>
 
-      {/* ================= BACKDROP (BLUR DARK) =================
-          ✅ behind UploadGrid but above page
-      */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-[900] bg-black/30 backdrop-blur-sm"
-          onClick={() => setUploadStep(null)}
-        />
-      )}
+      {/* ================= MODALS PORTALED TO BODY ================= */}
+      {isModalOpen &&
+        createPortal(
+          <>
+            {/* BACKDROP (BLUR DARK) - behind UploadGrid but above page */}
+            <div
+              className="fixed inset-0 z-[900] bg-black/30 backdrop-blur-sm"
+              onClick={() => setUploadStep(null)}
+            />
 
-      {/* ================= UPLOAD GRID =================
-          ✅ grid stays visible in BOTH "grid" and "success"
-          ✅ when "success" => grid becomes blurred + disabled
-      */}
-      {(uploadStep === "grid" || uploadStep === "success") && (
-        <UploadGrid
-          blurred={uploadStep === "success"}
-          onBack={() => setUploadStep(null)}
-          onSelect={handleUploadSelected}
-        />
-      )}
+            {/* UPLOAD GRID (visible in both grid and success) */}
+            <UploadGrid
+              blurred={uploadStep === "success"}
+              onBack={() => setUploadStep(null)}
+              onSelect={handleUploadSelected}
+            />
 
-      {/* ================= SUCCESS MODAL (TOP) ================= */}
-      {uploadStep === "success" && <UploadSuccess onBack={() => setUploadStep(null)} />}
+            {/* SUCCESS MODAL (TOP) */}
+            {uploadStep === "success" && <UploadSuccess onBack={() => setUploadStep(null)} />}
+          </>,
+          document.body
+        )}
     </>
   );
 }
@@ -449,7 +458,7 @@ function UploadGrid({ onSelect, onBack, blurred }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center pointer-events-auto">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center pointer-events-auto">
       <div
         className={`upload-card rounded-2xl p-4 w-[95%] max-w-[820px] h-auto max-h-[90vh] flex flex-col bg-white shadow-[0_0_20px_#CEFF1B] transition-all duration-200
         ${blurred ? "blur-sm scale-[0.98] pointer-events-none select-none opacity-95" : ""}`}
