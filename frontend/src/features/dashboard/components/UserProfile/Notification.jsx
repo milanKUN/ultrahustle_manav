@@ -7,15 +7,15 @@ import {
 const Toggle = ({ enabled, onChange }) => (
   <button
     onClick={onChange}
-    className={`w-[55px] h-[24px] rounded-full relative transition duration-200 flex items-center bg-[#5C5C5CA8]`}
-    style={{ minWidth: 48, minHeight: 28 }}
+    className="flex-shrink-0 w-11 h-6 rounded-full relative transition-colors duration-200"
+    style={{ backgroundColor: '#5C5C5C80' }}
   >
     <span
-      className={`absolute left-1 w-6 h-6 rounded-full shadow-md transition-transform duration-200 ${enabled
-          ? "translate-x-full bg-[#CEFF1B]"
-          : "translate-x-0 bg-[#5B5B5B]"
-        }`}
-      style={{ minWidth: 24, minHeight: 24 }}
+      className="absolute top-[3px] w-[18px] h-[18px] rounded-full shadow-md transition-all duration-200"
+      style={{
+        left: enabled ? '23px' : '3px',
+        backgroundColor: enabled ? '#CEFF1B' : '#8a8a8a',
+      }}
     />
   </button>
 );
@@ -171,7 +171,15 @@ export default function Notification() {
     setState({ ...state, [key]: !state[key] });
 
   return (
-    <div className="from-gray-100 to-lime-50 rounded-xl -mt-32 md:-mt-32 p-4 sm:p-6">
+    <div className="verification-page
+        w-full
+        -mt-14 sm:-mt-32         /* ✅ mobile fix */
+        from-gray-100 via-white to-lime-50
+        rounded-xl
+        p-4 sm:p-6 md:p-8
+        min-h-[450px]
+        flex flex-col
+        overflow-x-hidden">
 
       {/* ================= HEADER ================= */}
       <div className="flex items-center gap-4 mb-6">
@@ -205,9 +213,9 @@ export default function Notification() {
           ].map(([label, key]) => (
             <div
               key={key}
-              className="flex justify-between items-center gap-4"
+              className="flex justify-between items-center gap-2"
             >
-              <span className="text-[16px] font-medium">
+              <span className="text-[13px] sm:text-[16px] font-medium">
                 {label}
               </span>
               <Toggle
@@ -242,9 +250,9 @@ export default function Notification() {
           ].map(([label, key]) => (
             <div
               key={key}
-              className="flex justify-between items-center gap-4"
+              className="flex justify-between items-center gap-2"
             >
-              <span className="text-[16px] font-medium">
+              <span className="text-[13px] sm:text-[16px] font-medium">
                 {label}
               </span>
               <Toggle
@@ -271,8 +279,8 @@ export default function Notification() {
         </div>
 
         <div className="space-y-4">
-          <div className="flex justify-between items-center gap-4">
-            <span className="text-[16px] font-medium">
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-[13px] sm:text-[16px] font-medium">
               Allow marketing
             </span>
             <Toggle
@@ -281,8 +289,8 @@ export default function Notification() {
             />
           </div>
 
-          <div className="flex justify-between items-center gap-4">
-            <span className="text-[16px] font-medium">
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-[13px] sm:text-[16px] font-medium">
               Allow product updates
             </span>
             <Toggle
@@ -346,10 +354,10 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
         aria-modal="true"
         aria-label={title}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-white text-black border border-black/10 shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
+        <div className="toast-modal-card relative overflow-hidden rounded-2xl shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
           {/* Top animated progress bar */}
           {showProgress && (
-            <div className="h-[3px] w-full bg-black/10">
+            <div className="toast-progress-track h-[3px] w-full">
               <div
                 className="h-full"
                 style={{
@@ -363,11 +371,11 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
 
           <div className="p-6">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-lg font-semibold leading-6">{title}</p>
+              <p className="toast-title text-lg font-semibold leading-6">{title}</p>
 
               <button
                 type="button"
-                className="h-9 w-9 rounded-xl border border-black/20 grid place-items-center hover:bg-black/5"
+                className="toast-close-btn h-9 w-9 rounded-xl grid place-items-center"
                 onClick={onClose}
                 aria-label="Close"
                 title="Close"
@@ -415,14 +423,13 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm leading-6 text-black/80">{message}</p>
+                <p className="toast-message text-sm leading-6">{message}</p>
 
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
                     ref={okRef}
-                    className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-black"
-                    style={{ backgroundColor: YELLOW, color: "#000" }}
+                    className="toast-ok-btn px-5 py-2.5 rounded-xl text-sm font-semibold"
                     onClick={onClose}
                   >
                     OK

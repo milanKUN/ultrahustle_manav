@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo  } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import "../../../onboarding/components/OnboardingSelect.css";
 import {
   getMyPersonalInfo,
@@ -89,19 +89,19 @@ export default function PersonalInformation() {
   const [countrySearch, setCountrySearch] = useState("");
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
-    //get counties
-    useEffect(() => {
-      const fetchCountries = async () => {
-        try {
-          const res = await getCountries();
-          setCountries(res);
-        } catch (err) {
-          console.error(err);
-        }
-      };
+  //get counties
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const res = await getCountries();
+        setCountries(res);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-      fetchCountries();
-    }, []);
+    fetchCountries();
+  }, []);
 
   //get states from selected country
   useEffect(() => {
@@ -171,7 +171,7 @@ export default function PersonalInformation() {
       if (cityRef.current && !cityRef.current.contains(event.target)) setOpenCity(false);
       if (availabilityRef.current && !availabilityRef.current.contains(event.target)) setOpen(false);
       if (genderRef.current && !genderRef.current.contains(event.target)) setOpenGender(false);
-      if(phoneCountryRef.current && ! phoneCountryRef.current.contains(event.target)) setOpenPhoneCountry(false);
+      if (phoneCountryRef.current && !phoneCountryRef.current.contains(event.target)) setOpenPhoneCountry(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -404,13 +404,13 @@ export default function PersonalInformation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  
+
   // (skipping for brevety in replacement chunk but keeping logic)
   const [skills, setSkills] = useState([
-    
+
   ]);
   const [hashtag, setHashtag] = useState([
-   
+
   ]);
   const [hashtagDraft, setHashtagDraft] = useState("");
   const availabilityOptions = [
@@ -420,7 +420,7 @@ export default function PersonalInformation() {
   ];
 
   const [tools, setTools] = useState([
-   
+
   ]);
   const [toolsDraft, setToolsDraft] = useState("");
 
@@ -520,7 +520,7 @@ export default function PersonalInformation() {
 
   return (
     <>
-      <div className="w-full -mt-14 pb-20">
+      <div className="w-full -mt-16">
         {/* ================= PERSONAL INFO ================= */}
         <Section title="Personal Information">
           <TwoCol>
@@ -549,7 +549,7 @@ export default function PersonalInformation() {
                   }}
                   onFocus={() => setFocusedId("username")}
                   onBlur={() => setFocusedId(null)}
-                  className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0"
+                  className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 m-0 w-full"
                   readOnly
                 />
               </div>
@@ -559,7 +559,7 @@ export default function PersonalInformation() {
             <div>
               <Label>Date of Birth</Label>
 
-              <div className="relative">
+              <div className="relative w-full" style={{ position: 'relative', width: '100%', display: 'block' }}>
                 <input
                   type="text"
                   placeholder="DD-MM-YYYY"
@@ -568,9 +568,10 @@ export default function PersonalInformation() {
                   className="w-full bg-transparent border border-black rounded-md px-3 py-2 pr-10 text-sm outline-none focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
                 />
 
-                <span
+                <div
                   onClick={() => setOpenCalendar(true)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                  className="cursor-pointer flex items-center justify-center p-1 bg-transparent hover:!bg-transparent text-gray-500 hover:text-black dynamic-yellow-icon"
+                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -588,7 +589,7 @@ export default function PersonalInformation() {
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                </span>
+                </div>
               </div>
             </div>
 
@@ -596,71 +597,70 @@ export default function PersonalInformation() {
 
             {/* PHONE */}
             <div>
-            <Label>Phone Number</Label>
+              <Label>Phone Number</Label>
 
-            <div
-              className={`flex items-center border border-black rounded-md px-2 py-2 gap-2 ${
-                focusedId === "phone"
-                  ? "shadow-[0_0_15px_#CEFF1B] !border-transparent"
-                  : ""
-              }`}
-            >
-              {/* COUNTRY SELECT */}
               <div
-                className="relative flex items-center gap-1 cursor-pointer"
-                ref={phoneCountryRef}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenPhoneCountry(!openPhoneCountry);
-                }}
+                className={`flex items-center w-full border border-black rounded-md px-3 py-2 text-sm transition-shadow gap-2 ${focusedId === "phone"
+                    ? "shadow-[0_0_15px_#CEFF1B] !border-transparent"
+                    : ""
+                  }`}
               >
-                <span className="text-sm">
-                  {phoneCountry?.shortname || "Country"}
+                {/* COUNTRY SELECT */}
+                <div
+                  className="relative flex items-center gap-1 cursor-pointer"
+                  ref={phoneCountryRef}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenPhoneCountry(!openPhoneCountry);
+                  }}
+                >
+                  <span className="text-sm">
+                    {phoneCountry?.shortname || "Country"}
+                  </span>
+                  <span className="text-gray-500 text-xs">▼</span>
+
+                  {openPhoneCountry && (
+                    <ul className="absolute top-10 left-0 bg-white border rounded-md shadow max-h-60 overflow-auto z-50 w-48">
+                      {countries.map((c) => (
+                        <li
+                          key={c.id}
+                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          onClick={() => {
+                            setPhoneCountry(c);
+                            setOpenPhoneCountry(false);
+                          }}
+                        >
+                          {c.shortname} ({c.phoneCode})
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <span className="text-gray-400">|</span>
+
+                {/* PHONE CODE */}
+                <span className="text-sm min-w-[40px]">
+                  {phoneCountry?.phoneCode || "+--"}
                 </span>
-                <span className="text-gray-500 text-xs">▼</span>
 
-                {openPhoneCountry && (
-                  <ul className="absolute top-10 left-0 bg-white border rounded-md shadow max-h-60 overflow-auto z-50 w-48">
-                    {countries.map((c) => (
-                      <li
-                        key={c.id}
-                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                        onClick={() => {
-                          setPhoneCountry(c);
-                          setOpenPhoneCountry(false);
-                        }}
-                      >
-                        {c.shortname} ({c.phoneCode})
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {/* INPUT */}
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="XXXXXXXXXX"
+                  maxLength={10}
+                  value={phoneNumber}
+                  onChange={(e) => {
+                    const next = e.target.value.replace(/[^0-9]/g, "");
+                    setPhoneNumber(next);
+                  }}
+                  onFocus={() => setFocusedId("phone")}
+                  onBlur={() => setFocusedId(null)}
+                  className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 m-0 w-full text-sm pl-2"
+                />
               </div>
-
-              <span className="text-gray-400">|</span>
-
-              {/* PHONE CODE */}
-              <span className="text-sm min-w-[40px]">
-                {phoneCountry?.phoneCode || "+--"}
-              </span>
-
-              {/* INPUT */}
-              <input
-                type="tel"
-                inputMode="numeric"
-                placeholder="XXXXXXXXXX"
-                maxLength={10}
-                value={phoneNumber}
-                onChange={(e) => {
-                  const next = e.target.value.replace(/[^0-9]/g, "");
-                  setPhoneNumber(next);
-                }}
-                onFocus={() => setFocusedId("phone")}
-                onBlur={() => setFocusedId(null)}
-                className="flex-1 outline-none border-none bg-transparent text-sm pl-2"
-              />
             </div>
-          </div>
 
             {/* GENDER */}
             <div>
@@ -702,81 +702,81 @@ export default function PersonalInformation() {
         <Section title="Address">
           <TwoCol>
             <Input label="Street" placeholder="Street" value={street} onChange={setStreet} />
-            {/* <Input label="City" placeholder="City" value={city} onChange={setCity} /> */}            
-              <div
-                className={`onboarding-custom-select ${openCountry ? "active" : ""}`}
-                ref={countryRef}
-              >
-                <Label>Country</Label>
+            {/* <Input label="City" placeholder="City" value={city} onChange={setCity} /> */}
+            <div
+              className={`onboarding-custom-select ${openCountry ? "active" : ""}`}
+              ref={countryRef}
+            >
+              <Label>Country</Label>
 
-                <div
-                  className={`onboarding-selected-option ${openCountry ? "open" : ""}`}
+              <div
+                className={`onboarding-selected-option ${openCountry ? "open" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenCountry((prev) => !prev);
+
+                  if (!openCountry) {
+                    setCountrySearch("");
+                  }
+                }}
+              >
+                <input
+                  type="text"
+                  value={openCountry ? countrySearch : country}
+                  placeholder="Select country"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setOpenCountry((prev) => !prev);
-
-                    if (!openCountry) {
-                      setCountrySearch("");
-                    }
+                    setOpenCountry(true);
                   }}
-                >
-                  <input
-                    type="text"
-                    value={openCountry ? countrySearch : country}
-                    placeholder="Select country"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenCountry(true);
-                    }}
-                    onFocus={() => {
-                      setOpenCountry(true);
-                      setCountrySearch("");
-                    }}
-                    onChange={(e) => {
-                      setCountrySearch(e.target.value);
-                      setOpenCountry(true);
-                    }}
-                    className="w-full bg-transparent outline-none border-none"
-                  />
-                  <span className="onboarding-arrow">▼</span>
-                </div>
-
-                {openCountry && (
-                  <ul className="onboarding-options-list max-h-60 overflow-y-auto">
-                    {countries?.filter((c) =>
-                      c.name.toLowerCase().includes(countrySearch.toLowerCase())
-                    ).length > 0 ? (
-                      countries
-                        .filter((c) =>
-                          c.name.toLowerCase().includes(countrySearch.toLowerCase())
-                        )
-                        .map((c) => (
-                          <li
-                            key={c.id}
-                            className={country === c.name ? "active" : ""}
-                            onClick={() => {
-                              setCountry(c.name);
-                              setCountryId(c.id);
-                              setCountrySearch(c.name);
-                              setStateVal("");
-                              setStateId("");
-                              setCity("");
-                              setCityId("");
-                              setOpenCountry(false);
-                            }}
-                          >
-                            {c.name}
-                          </li>
-                        ))
-                    ) : (
-                      <li className="opacity-70 cursor-not-allowed px-3 py-2">
-                        No country found
-                      </li>
-                    )}
-                  </ul>
-                )}
+                  onFocus={() => {
+                    setOpenCountry(true);
+                    setCountrySearch("");
+                  }}
+                  onChange={(e) => {
+                    setCountrySearch(e.target.value);
+                    setOpenCountry(true);
+                  }}
+                  className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 focus:border-transparent"
+                />
+                <span className="onboarding-arrow">▼</span>
               </div>
-           
+
+              {openCountry && (
+                <ul className="onboarding-options-list max-h-60 overflow-y-auto">
+                  {countries?.filter((c) =>
+                    c.name.toLowerCase().includes(countrySearch.toLowerCase())
+                  ).length > 0 ? (
+                    countries
+                      .filter((c) =>
+                        c.name.toLowerCase().includes(countrySearch.toLowerCase())
+                      )
+                      .map((c) => (
+                        <li
+                          key={c.id}
+                          className={country === c.name ? "active" : ""}
+                          onClick={() => {
+                            setCountry(c.name);
+                            setCountryId(c.id);
+                            setCountrySearch(c.name);
+                            setStateVal("");
+                            setStateId("");
+                            setCity("");
+                            setCityId("");
+                            setOpenCountry(false);
+                          }}
+                        >
+                          {c.name}
+                        </li>
+                      ))
+                  ) : (
+                    <li className="opacity-70 cursor-not-allowed px-3 py-2">
+                      No country found
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+
 
             {/* STATE */}
             <div
@@ -818,7 +818,7 @@ export default function PersonalInformation() {
                     setOpenState(true);
                   }}
                   disabled={!countryId}
-                  className="w-full bg-transparent outline-none border-none disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
                 />
                 <span className="onboarding-arrow">▼</span>
               </div>
@@ -857,8 +857,8 @@ export default function PersonalInformation() {
                 </ul>
               )}
             </div>
-             {/* CITY */}
-           {/* <div
+            {/* CITY */}
+            {/* <div
               className={`onboarding-custom-select ${openCity ? "active" : ""}`}
               ref={cityRef}
             >
@@ -1074,16 +1074,16 @@ export default function PersonalInformation() {
         </Section>
 
         {/* ================= LANGUAGES ================= */}
-       <Section title="Languages">
-        <TagSelect
-          options={languageOptions}   // ✅ full objects
-          tags={languages}
-          setTags={setLanguages}
-          onRemove={(id) => {
-            setLanguages((prev) => prev.filter((t) => t.id !== id));
-          }}
-        />
-      </Section>
+        <Section title="Languages">
+          <TagSelect
+            options={languageOptions}   // ✅ full objects
+            tags={languages}
+            setTags={setLanguages}
+            onRemove={(id) => {
+              setLanguages((prev) => prev.filter((t) => t.id !== id));
+            }}
+          />
+        </Section>
 
         {/* ================= ACTIONS ================= */}
         <div className="flex justify-end gap-4 mt-10">
@@ -1142,23 +1142,21 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
 
   return (
     <div
-      className={`fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/25 backdrop-blur-sm transition-opacity duration-200 ${
-        animateIn ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 z-[60] flex items-center justify-center px-4 bg-black/25 backdrop-blur-sm transition-opacity duration-200 ${animateIn ? "opacity-100" : "opacity-0"
+        }`}
       onKeyDown={handleKeyDown}
     >
       <div
-        className={`w-full max-w-md transform transition-all duration-200 ${
-          animateIn ? "scale-100 opacity-100" : "scale-95 opacity-0"
-        }`}
+        className={`w-full max-w-md transform transition-all duration-200 ${animateIn ? "scale-100 opacity-100" : "scale-95 opacity-0"
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label={title}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-white text-black border border-black/10 shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
+        <div className="toast-modal-card relative overflow-hidden rounded-2xl shadow-[0_18px_55px_rgba(0,0,0,0.25)]">
           {/* Top animated progress bar */}
           {showProgress && (
-            <div className="h-[3px] w-full bg-black/10">
+            <div className="toast-progress-track h-[3px] w-full">
               <div
                 className="h-full"
                 style={{
@@ -1172,11 +1170,11 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
 
           <div className="p-6">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-lg font-semibold leading-6">{title}</p>
+              <p className="toast-title text-lg font-semibold leading-6">{title}</p>
 
               <button
                 type="button"
-                className="h-9 w-9 rounded-xl border border-black/20 grid place-items-center hover:bg-black/5"
+                className="toast-close-btn h-9 w-9 rounded-xl grid place-items-center"
                 onClick={onClose}
                 aria-label="Close"
                 title="Close"
@@ -1224,14 +1222,13 @@ function Toast({ open, variant, title, message, showProgress, progress, animateI
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm leading-6 text-black/80">{message}</p>
+                <p className="toast-message text-sm leading-6">{message}</p>
 
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
                     ref={okRef}
-                    className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-black"
-                    style={{ backgroundColor: YELLOW, color: "#000" }}
+                    className="toast-ok-btn px-5 py-2.5 rounded-xl text-sm font-semibold"
                     onClick={onClose}
                   >
                     OK
@@ -1311,14 +1308,14 @@ function Calendar({ onClose, onSelect }) {
           <div className="relative mb-6 z-20 w-full" ref={yearRef}>
             <div className={`onboarding-custom-select ${openYear ? "active" : ""}`}>
               <div
-                className={`onboarding-selected-option ${openYear ? "open" : ""}`}
+                className={`onboarding-selected-option expiry-year-dropdown ${openYear ? "open" : ""}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenYear(!openYear);
                 }}
                 style={{ background: "#CEFF1B", color: "black", fontWeight: "bold" }}
               >
-                <span>{year} :</span>
+                <span>{year}</span>
                 <span className="onboarding-arrow">▼</span>
               </div>
 
@@ -1397,7 +1394,7 @@ function Calendar({ onClose, onSelect }) {
                   className={`mx-auto w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition
                     ${isSelected
                       ? "bg-[#CEFF1B] text-black font-bold"
-                      : "hover:bg-[#CEFF1B] hover:text-black"
+                      : "hover:bg-[#CEFF1B] hover:!text-black"
                     }`}
                 >
                   {day}
@@ -1591,7 +1588,7 @@ const TagSelect = ({ options = [], tags = [], setTags, onRemove }) => {
               setSearch(e.target.value);
               setOpen(true);
             }}
-            className="w-full bg-transparent outline-none border-none pr-6"
+            className="w-full bg-transparent outline-none border-none focus:outline-none focus:ring-0 focus:border-transparent pr-6"
           />
           <span className="onboarding-arrow">▼</span>
         </div>

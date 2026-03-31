@@ -21,9 +21,12 @@
   align-items: center;
   padding: 12px 40px;
   background-color: rgba(234, 234, 234, 0.95);
-  border-bottom: 0.5px solid #CEFF1B;
-  box-shadow: 0 1px 13.6px 0 #CEFF1B;
-  backdrop-filter: blur(27px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: linear-gradient(to right,
+      #D9D9D9,
+      #CFCFCF,
+      #C6C6C6);
   height: 85px;
   position: fixed;
   top: 0;
@@ -35,20 +38,20 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 52px;
   flex-shrink: 0;
 }
 
 .logo {
-  height: 32px;
+  height: 34px;
   width: auto;
   margin-left: 0;
 }
 
 .nav-menu {
   display: flex;
-  align-items: flex-end;
-  gap: 30px;
+  align-items: center;
+  gap: 56px;
 }
 
 .nav-link {
@@ -66,14 +69,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   cursor: pointer;
   text-decoration: none;
+  margin-right: 6px;
+}
+
+.nav-item:last-child {
+  margin-right: 0;
 }
 
 .nav-pill {
-  width: 42px;
-  height: 5px;
+  width: 52px;
+  height: 7px;
   border-radius: 0 0 41.309px 41.309px;
   background: transparent;
   transition: all 0.25s ease;
@@ -86,7 +94,7 @@
 }
 
 .nav-text {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   color: #5C5C5C;
   transition: color 0.25s ease;
@@ -122,7 +130,7 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 0;
   flex-shrink: 0;
 }
 
@@ -131,40 +139,44 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: 398px;
+  width: 100%;
+  max-width: 360px;
   min-width: 0;
 }
 
 .inreview-header .search-input {
   width: 100%;
-  padding: 12px 45px 12px 20px;
-  border: 1.569px solid #CEFF1B;
-  border-radius: 36.138px;
-  font-size: 16px;
+  height: 36px;
+  padding: 12px 42px 12px 22px;
+  border: 1px solid #CEFF1B;
+  border-radius: 999px;
+  font-size: 11px;
   background: rgba(193, 193, 193, 0.24);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .inreview-header .search-input::placeholder {
-  text-align: left;
+  text-align: center;
   color: #606060;
   font-family: 'Roboto', sans-serif !important;
-  font-size: 14.117px;
+  font-size: 11px;
   font-style: normal;
   font-weight: 400;
 }
 
 .inreview-header .search-input:focus {
-  border-radius: 36.138px;
-  border: 1.569px solid #FEFEFE;
+  border-radius: 999px;
+  border: 1px solid #FEFEFE;
   background: #FEFEFE;
   box-shadow: 0 1px 10px 0 #CEFF1B;
 }
 
 .search-icon {
   position: absolute;
-  right: 16px;
+  right: 18px;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
 }
 
@@ -174,7 +186,40 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  max-width: 600px;
+  max-width: 360px;
+}
+
+.messages-wrapper,
+.notifications-wrapper,
+.user-avatar-wrapper {
+  margin-left: 14px;
+}
+
+.messages-wrapper {
+  margin-left: 0;
+}
+
+.inreview-header:not(.dark) .messages-wrapper,
+.inreview-header:not(.dark) .notifications-wrapper,
+.inreview-header:not(.dark) .user-avatar-wrapper {
+  margin-left: 8px;
+}
+
+.inreview-header:not(.dark) .messages-wrapper {
+  margin-left: 0;
+}
+
+.inreview-header:not(.dark) .nav-menu {
+  gap: 56px;
+}
+
+.inreview-header:not(.dark) .nav-item {
+  margin-right: 6px;
+  padding: 0 8px;
+}
+
+.inreview-header:not(.dark) .nav-item:last-child {
+  margin-right: 0;
 }
 
 .search-dropdown {
@@ -444,7 +489,7 @@
 .icon-btn {
   background: transparent;
   border: none;
-  padding: 8px;
+  padding: 4px;
   cursor: pointer;
   color: var(--ir-text-secondary);
   transition: color 0.2s;
@@ -461,14 +506,24 @@
 }
 
 .user-avatar-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #5C5C5C;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.user-avatar-btn svg {
+  width: 32px;
+  height: 32px;
 }
 
 .user-avatar-btn svg {
@@ -929,6 +984,15 @@
   /* Hamburger Toggle */
   .hamburger-btn {
     display: flex !important;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #2b2b2b;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
   }
 
   .inreview-header.dark .hamburger-btn {
@@ -996,21 +1060,20 @@
       position: static !important;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 4px;
       flex: 0 0 auto;
     }
 
-    /* TRUE CENTER LOGO — SMALLER */
+    /* LOGO — inline next to hamburger, not centered */
     .logo {
-      position: fixed !important;
-      left: 50% !important;
-      top: 25px !important;
-      transform: translateX(-50%);
-      height: 35px !important;
-      /* 👈 balanced height */
-      width: 200px !important;
-      z-index: 1001;
-      pointer-events: none;
+      position: static !important;
+      height: 28px !important;
+      width: auto !important;
+      transform: none !important;
+      top: auto !important;
+      left: auto !important;
+      pointer-events: auto;
+      margin-left: 6px;
     }
 
     .search-wrapper {
@@ -1021,7 +1084,7 @@
       flex: 0 0 auto;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 4px;
     }
 
     .notifications-wrapper,
@@ -1030,7 +1093,7 @@
     }
 
     .messages-wrapper {
-      display: none !important;
+      display: flex !important;
     }
 
     .blur-overlay {
@@ -1168,8 +1231,8 @@
 }
 
 .inreview-header.dark {
-  background-color: #0f1115;
-  border-bottom: 1px solid #1f2937;
+  background-color: #2B2B2B99;
+  border-bottom: 1px solid #CEFF1B;
 }
 
 /* Nav links */
@@ -1428,11 +1491,264 @@ USER DROPDOWN – DARK MODE FIX
 
 /* Light mode header background */
 .inreview-header {
-  background-color: #D2D2D2 !important;
+  background-color: rgba(234, 234, 234, 0.95) !important;
+  border-bottom: 1px solid #CEFF1B !important;
+  box-shadow: 0 2px 12px 3px rgba(206, 255, 27, 0.35) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  background: linear-gradient(to right,
+      #D9D9D9,
+      #CFCFCF,
+      #C6C6C6) !important;
 }
 
 /* Dark mode header background (force) */
 .inreview-header.dark {
-  background-color: #0f1115 !important;
-  border-bottom: 1px solid #1f2937 !important;
+  background: #2B2B2B99 !important;
+  border-bottom: 1px solid #CEFF1B !important;
+  box-shadow: 0 2px 12px 3px rgba(206, 255, 27, 0.18) !important;
+}
+
+.inreview-header.dark .header-left {
+  gap: 52px;
+}
+
+.inreview-header.dark .logo {
+  height: 34px;
+}
+
+.inreview-header.dark .nav-menu {
+  gap: 56px;
+  align-items: center;
+}
+
+.inreview-header.dark .nav-item {
+  gap: 5px;
+  margin-right: 6px;
+}
+
+.inreview-header.dark .nav-item:last-child {
+  margin-right: 0;
+}
+
+.inreview-header.dark .nav-pill {
+  width: 52px;
+  height: 7px;
+  margin-top: -12px;
+}
+
+.inreview-header.dark .nav-text {
+  color: #d4d4d4;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.inreview-header.dark .nav-item:hover .nav-text {
+  color: #ffffff;
+}
+
+.inreview-header.dark .nav-item .nav-pill.active+.nav-text,
+.inreview-header.dark .nav-item:has(.nav-pill.active) .nav-text {
+  color: #CEFF1B !important;
+}
+
+.inreview-header.dark .search-wrapper {
+  max-width: 360px;
+}
+
+.inreview-header.dark .header-search {
+  width: 100%;
+  max-width: 360px;
+}
+
+.inreview-header.dark .search-input {
+  height: 36px;
+  padding: 12px 42px 12px 22px;
+  border: 1px solid #707070;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.inreview-header.dark .search-input::placeholder {
+  color: #f1f1f1;
+  font-size: 11px;
+  text-align: center;
+}
+
+.inreview-header.dark .search-icon {
+  right: 18px;
+  width: 16px;
+  height: 16px;
+}
+
+.inreview-header.dark .header-right {
+  gap: 0;
+}
+
+.inreview-header.dark .messages-wrapper,
+.inreview-header.dark .notifications-wrapper,
+.inreview-header.dark .user-avatar-wrapper {
+  margin-left: 14px;
+}
+
+.inreview-header.dark .messages-wrapper {
+  margin-left: 0;
+}
+
+.inreview-header.dark .icon-btn {
+  padding: 4px;
+}
+
+.inreview-header.dark .icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.inreview-header.dark .icon-btn svg path {
+  stroke: #ffffff;
+}
+
+.inreview-header.dark .user-avatar-btn {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+}
+
+.inreview-header.dark .user-avatar-btn svg {
+  width: 32px;
+  height: 32px;
+}
+
+.inreview-header.dark .user-avatar-btn svg path:first-child {
+  fill: #CEFF1B;
+  stroke: #CEFF1B;
+}
+
+.inreview-header.dark .user-avatar-btn svg path:last-child {
+  stroke: #2B2B2B;
+}
+
+.inreview-header.dark .search-input:focus,
+.inreview-header.dark .search-input:focus-visible {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border-color: #CEFF1B !important;
+  box-shadow: 0 0 0 2px rgba(206, 255, 27, 0.22) !important;
+}
+
+/* =======================================================
+   SMALL SCREEN UNIFIED LAYOUT — BOTH LIGHT & DARK MODE
+   Ensures consistent layout across themes at ≤550px
+   ======================================================= */
+@media (max-width: 550px) {
+
+  /* Force same height and padding for both themes */
+  .inreview-header,
+  .inreview-header.dark {
+    height: 64px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+  }
+
+  /* LEFT — hamburger + logo flush together */
+  .inreview-header .header-left,
+  .inreview-header.dark .header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Hamburger same size both modes */
+  .inreview-header .hamburger-btn,
+  .inreview-header.dark .hamburger-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Logo same size, inline */
+  .inreview-header .logo,
+  .inreview-header.dark .logo {
+    position: static !important;
+    height: 26px !important;
+    width: auto !important;
+    transform: none !important;
+    margin-left: 4px !important;
+  }
+
+  /* Hide search on mobile both themes */
+  .inreview-header .search-wrapper,
+  .inreview-header.dark .search-wrapper {
+    display: none !important;
+  }
+
+  /* RIGHT — icons in a row, same gap */
+  .inreview-header .header-right,
+  .inreview-header.dark .header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* All wrappers visible */
+  .inreview-header .messages-wrapper,
+  .inreview-header.dark .messages-wrapper,
+  .inreview-header .notifications-wrapper,
+  .inreview-header.dark .notifications-wrapper,
+  .inreview-header .user-avatar-wrapper,
+  .inreview-header.dark .user-avatar-wrapper {
+    display: flex !important;
+    margin-left: 0 !important;
+  }
+
+  /* Icon buttons same size */
+  .inreview-header .icon-btn,
+  .inreview-header.dark .icon-btn {
+    padding: 4px !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .inreview-header .icon-btn svg,
+  .inreview-header.dark .icon-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* LIGHT MODE icon color */
+  .inreview-header:not(.dark) .icon-btn svg path {
+    stroke: #2b2b2b !important;
+  }
+
+  /* DARK MODE icon color */
+  .inreview-header.dark .icon-btn svg path {
+    stroke: #ffffff !important;
+  }
+
+  /* Avatar same size */
+  .inreview-header .user-avatar-btn,
+  .inreview-header.dark .user-avatar-btn {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .inreview-header .user-avatar-btn img,
+  .inreview-header.dark .user-avatar-btn img {
+    width: 30px !important;
+    height: 30px !important;
+  }
 }
