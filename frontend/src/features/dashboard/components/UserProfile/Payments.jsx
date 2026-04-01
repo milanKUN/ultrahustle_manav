@@ -9,7 +9,15 @@ function Payments({ theme }) {
   const [showCardNumber, setShowCardNumber] = useState(false);
 
   return (
-    <div className=" -mt-16 from-gray-100 to-lime-50 rounded-xl p-6">
+    <div className="verification-page
+        w-full
+        -mt-14 sm:-mt-32          /* ✅ mobile fix */
+        from-gray-100 via-white to-lime-50
+        rounded-xl
+        p-4 sm:p-6 md:p-8
+        min-h-[450px]
+        flex flex-col
+        overflow-x-hidden">
       {/* ================= HEADER ================= */}
       <div className="flex items-center gap-4 mb-6">
         <h3 className="text-xl font-semibold whitespace-nowrap">
@@ -105,7 +113,7 @@ function Payments({ theme }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
           <label className="block mb-1 font-medium">Card Number</label>
-          <div className="relative">
+          <div className="relative w-full" style={{ position: 'relative', width: '100%', display: 'block' }}>
             <input
               type={showCardNumber ? "text" : "password"}
               inputMode="numeric"
@@ -114,13 +122,13 @@ function Payments({ theme }) {
               className="w-full bg-transparent border border-black rounded-md px-3 py-2 pr-10 text-sm focus:outline-none focus:!border-transparent focus:ring-0 focus:shadow-[0_0_15px_#CEFF1B]"
               placeholder="**** **** **** 2345"
             />
-            <button
-              type="button"
+            <span
               onClick={() => setShowCardNumber(!showCardNumber)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none"
+              className="!text-gray-400 hover:!text-gray-600 cursor-pointer flex items-center justify-center p-1 bg-transparent hover:!bg-transparent"
+              style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
             >
               {showCardNumber ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
+            </span>
           </div>
         </div>
 
@@ -147,7 +155,7 @@ function Payments({ theme }) {
         <div>
           <label className="block mb-1 font-medium">Expiry Date</label>
 
-          <div className="relative">
+          <div className="relative w-full" style={{ position: 'relative', width: '100%', display: 'block' }}>
             <input
               type="text"
               placeholder="MM / YY"
@@ -158,7 +166,8 @@ function Payments({ theme }) {
 
             <span
               onClick={() => setOpenCalendar(true)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+              className="cursor-pointer flex items-center justify-center p-1 bg-transparent hover:!bg-transparent !text-gray-400 hover:!text-gray-600"
+              style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -283,7 +292,7 @@ function Payments({ theme }) {
 
           <div>
             <label className="block mb-1 font-medium">Phone Number</label>
-            <div className="flex items-center border border-black rounded-md px-3 py-2 gap-2 focus-within:shadow-[0_0_15px_#CEFF1B] focus-within:!border-transparent">
+            <div className="w-full flex items-center border border-black rounded-md px-3 py-2 gap-2 focus-within:shadow-[0_0_15px_#CEFF1B] focus-within:!border-transparent">
               <span className="text-sm text-gray-700">India</span>
               <span className="text-gray-400">|</span>
               <span className="text-sm text-gray-700">+91</span>
@@ -293,7 +302,7 @@ function Payments({ theme }) {
                 placeholder="XXXXXXXXXX"
                 maxLength={10}
                 onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
-                className="flex-1 outline-none border-none bg-transparent text-sm pl-2 focus:outline-none focus:ring-0"
+                className="flex-1 outline-none border-none py-0 bg-transparent text-sm pl-2 focus:outline-none focus:ring-0"
               />
             </div>
           </div>
@@ -421,14 +430,14 @@ function ExpiryCalendar({ onClose, onSelect }) {
           <div className="relative mb-4 w-full" ref={yearRef}>
             <div className={`onboarding-custom-select ${openYear ? "active" : ""}`}>
               <div
-                className={`onboarding-selected-option ${openYear ? "open" : ""}`}
+                className={`onboarding-selected-option expiry-year-dropdown ${openYear ? "open" : ""}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenYear(!openYear);
                 }}
                 style={{ background: "#CEFF1B", color: "black", fontWeight: "bold" }}
               >
-                <span>{year} :</span>
+                <span>{year}</span>
                 <span className="onboarding-arrow">▼</span>
               </div>
 

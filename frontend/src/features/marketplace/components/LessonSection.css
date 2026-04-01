@@ -162,6 +162,88 @@
   gap: 6px;
 }
 
+.lesson-section .onboarding-selected-option {
+  border: 1px solid #000 !important;
+  background-color: transparent !important;
+}
+
+.lesson-section .onboarding-selected-option.open {
+  border-color: transparent !important;
+  box-shadow: 0 0 15px #ceff1b !important;
+}
+
+.lesson-section .onboarding-options-list {
+  z-index: 30;
+}
+
+.lesson-tags-limit-text {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.lesson-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 6px;
+  padding: 8px;
+  background-color: #fff;
+  gap: 8px;
+}
+
+.lesson-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.lesson-tag-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #333;
+  border: 1px solid grey;
+  box-shadow: none;
+}
+
+.lesson-tag-remove {
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  color: inherit;
+}
+
+.lesson-tag-remove:hover {
+  color: #ff4d4f;
+}
+
+.lesson-tag-clear-btn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #333;
+  padding: 6px 8px;
+}
+
+.lesson-tag-clear-btn:hover {
+  color: #ff4d4f;
+}
+
 .lesson-label {
   font-size: 14px;
   font-weight: 500;
@@ -170,6 +252,20 @@
 
 .user-page.dark .lesson-label {
   color: #ccc;
+}
+
+.user-page.dark .lesson-tags-container {
+  background-color: #232323;
+}
+
+.user-page.dark .lesson-tag-pill {
+  background-color: #232323;
+  color: #fff;
+}
+
+.user-page.dark .lesson-tag-remove,
+.user-page.dark .lesson-tag-clear-btn {
+  color: #ceff1b;
 }
 
 .lesson-input {
@@ -197,25 +293,30 @@
 .lesson-textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+    border: 1px solid #ddd;
+  border-radius: 6px;
   background: transparent;
   font-size: 14px;
+  color: #111;
   min-height: 100px;
-  resize: vertical;
+  resize: none;
   transition: all 0.2s;
 }
 
 .user-page.dark .lesson-textarea {
   background: #141414;
-  border-color: #333;
+  border-color: #000;
   color: #fff;
 }
 
 .lesson-textarea:focus {
   outline: none;
-  border-color: #dbf132;
-  box-shadow: 0 0 0 2px rgba(219, 241, 50, 0.1);
+  border-color: transparent;
+  box-shadow: 0 0 15px #ceff1b;
+}
+
+.lesson-textarea::placeholder {
+  color: #9ca3af;
 }
 
 .lesson-section-footer {

@@ -87,7 +87,7 @@ export default function Security() {
   return (
     <div className="">
       {/* ================= Security ================= */}
-      <div className="mb-8 -mt-14 pb-10">
+      <div className="mb-8 -mt-16">
         <div className="flex items-center gap-4 mb-6">
           <h3 className="text-xl font-semibold whitespace-nowrap">
             Security
@@ -112,7 +112,7 @@ export default function Security() {
               <button
                 type="button"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 focus:outline-none bg-transparent hover:bg-transparent !bg-transparent dynamic-yellow-icon"
               >
                 {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -133,7 +133,7 @@ export default function Security() {
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 focus:outline-none bg-transparent hover:bg-transparent !bg-transparent dynamic-yellow-icon"
               >
                 {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -156,7 +156,7 @@ export default function Security() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 focus:outline-none bg-transparent hover:bg-transparent !bg-transparent dynamic-yellow-icon"
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

@@ -433,7 +433,7 @@ export default function CreateCourse({ theme, setTheme }) {
                     <div className="csl-field">
                       <label className="csl-label">Short description</label>
                       <textarea
-                        className="csl-textarea"
+                        className="csl-textarea h-28"
                         placeholder="Short description"
                         value={form.shortDescription}
                         onChange={(e) => setFormField("shortDescription", e.target.value)}
@@ -465,7 +465,7 @@ export default function CreateCourse({ theme, setTheme }) {
                     </div>
                   </div>
 
-                  <div className="csl-group-box">
+                  {/* <div className="csl-group-box">
                     <div className="csl-field">
                       <label className="csl-label">Prerequisites</label>
                       <textarea
@@ -475,7 +475,7 @@ export default function CreateCourse({ theme, setTheme }) {
                         onChange={(e) => setFormField("prerequisites", e.target.value)}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="csl-group-box">
                     <div className="csl-field">
@@ -535,17 +535,25 @@ export default function CreateCourse({ theme, setTheme }) {
                         placeholder="Languages"
                       />
                       <p className="csl-hint mt-2">You can add up to 10 Languages</p>
-                      <div className="csl-chips-container mt-4">
-                        {languages.map((l, i) => (
-                          <div className="csl-tag-chip" key={i}>
-                            {l} <button onClick={() => removeItem(i, languages, setLanguages)}>×</button>
-                          </div>
-                        ))}
-                        <button type="button" className="csl-clear-all" onClick={() => setLanguages([])} title="Clear all">✕</button>
-                      </div>
+                      {languages.length > 0 && (
+                        <div className="csl-chips-container mt-4">
+                          {languages.map((l, i) => (
+                            <div className="csl-tag-chip" key={i}>
+                              {l} <button onClick={() => removeItem(i, languages, setLanguages)}>×</button>
+                            </div>
+                          ))}
+                          <button type="button" className="csl-clear-all" onClick={() => setLanguages([])} title="Clear all">✕</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
+
+                <CoverSection
+                  cover={cover}
+                  onUploadClick={() => setUploadStep("grid")}
+                  onRemoveCover={() => setCover(null)}
+                />
 
                 {/* Agenda Section */}
                 <div className="csl-card">
@@ -555,8 +563,10 @@ export default function CreateCourse({ theme, setTheme }) {
                       <div key={item.id} className="csl-agenda-item">
                         <div className="csl-agenda-header">
                           <span className="csl-agenda-num">Agenda item {idx + 1}</span>
-                          <button onClick={() => removeAgendaItem(idx)} className="csl-trash-btn">
-                            <Trash2 size={20} />
+                          <button type="button" onClick={() => removeAgendaItem(idx)} className="csl-trash-btn" title="Delete agenda item">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6" />
+                            </svg>
                           </button>
                         </div>
                         <div className="csl-grid2">
@@ -653,11 +663,7 @@ export default function CreateCourse({ theme, setTheme }) {
                   </div>
                 </div>
 
-                <CoverSection
-                  cover={cover}
-                  onUploadClick={() => setUploadStep("grid")}
-                  onRemoveCover={() => setCover(null)}
-                />
+                
 
                 <DeliverablesSection
                   deliverables={deliverables}

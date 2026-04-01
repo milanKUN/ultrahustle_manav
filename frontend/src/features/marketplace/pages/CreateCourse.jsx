@@ -446,7 +446,7 @@ export default function CreateCourse({ theme, setTheme }) {
                     <div className="csl-field">
                       <label className="csl-label">Prerequisites</label>
                       <textarea
-                        className="csl-textarea"
+                        className="csl-textarea h-28"
                         placeholder="No prior design experience required; basic computer skills recommended."
                         value={form.prerequisites}
                         onChange={(e) => setFormField("prerequisites", e.target.value)}
@@ -512,14 +512,16 @@ export default function CreateCourse({ theme, setTheme }) {
                         placeholder="Languages"
                       />
                       <p className="csl-hint mt-2">You can add up to 10 Languages</p>
-                      <div className="csl-chips-container mt-4">
-                        {languages.map((l, i) => (
-                          <div className="csl-tag-chip" key={i}>
-                            {l} <button onClick={() => removeItem(i, languages, setLanguages)}>×</button>
-                          </div>
-                        ))}
-                        <button type="button" className="csl-clear-all" onClick={() => setLanguages([])} title="Clear all">✕</button>
-                      </div>
+                      {languages.length > 0 && (
+                        <div className="csl-chips-container mt-4">
+                          {languages.map((l, i) => (
+                            <div className="csl-tag-chip" key={i}>
+                              {l} <button onClick={() => removeItem(i, languages, setLanguages)}>×</button>
+                            </div>
+                          ))}
+                          <button type="button" className="csl-clear-all" onClick={() => setLanguages([])} title="Clear all">✕</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -536,6 +538,15 @@ export default function CreateCourse({ theme, setTheme }) {
                   onRemoveLesson={removeLesson}
                   onUpdateLesson={updateLesson}
                   onUploadMedia={uploadLessonMedia}
+                />
+
+                <DeliverablesSection
+                  deliverables={deliverables}
+                  onAddDeliverable={addDeliverable}
+                  onUpdateDeliverableNotes={updateDeliverableNotes}
+                  links={links}
+                  onAddLink={addLink}
+                  onUpdateLink={updateLink}
                 />
 
                 <div className="csl-group-box">
@@ -559,14 +570,7 @@ export default function CreateCourse({ theme, setTheme }) {
                   />
                 </div>
 
-                <DeliverablesSection
-                  deliverables={deliverables}
-                  onAddDeliverable={addDeliverable}
-                  onUpdateDeliverableNotes={updateDeliverableNotes}
-                  links={links}
-                  onAddLink={addLink}
-                  onUpdateLink={updateLink}
-                />
+                
 
                 <FAQSection
                   faqs={faqs}

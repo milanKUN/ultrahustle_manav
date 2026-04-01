@@ -35,10 +35,10 @@ import SoloMilestonesPage from "./features/marketplace/pages/SoloMilestonesPage"
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
 import AddNewListing from "./features/marketplace/pages/AddNewListing";
-import Marketplace from "./features/marketplace/pages/Marketplace";
 import TeamServiceListing from "./features/marketplace/pages/TeamServiceListing";
 import DigitalProductListing from "./features/marketplace/pages/DigitalProductListing";
 import MyListings from "./features/marketplace/pages/MyListings";
+import MyListingPage from "./features/marketplace/pages/MyListingPage";
 import CreateCourse from "./features/marketplace/pages/CreateCourse";
 import CourseListing from "./features/marketplace/pages/CourseListing";
 import OrderDeliverables from "./features/marketplace/pages/OrderDeliverables";
@@ -99,7 +99,10 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/manage-team" element={<ManageTeam theme={theme} setTheme={setTheme} />} />
           <Route path="/add-listing" element={<AddNewListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/marketplace" element={<Marketplace theme={theme} setTheme={setTheme} />} />
+          <Route
+            path="/my-listings"
+            element={<MyListingPage theme={theme} setTheme={setTheme} />}
+          />
           <Route path="/team-service-listing" element={<TeamServiceListing theme={theme} setTheme={setTheme} />} />
           <Route path="/digital-product-listing" element={<DigitalProductListing theme={theme} setTheme={setTheme} />} />
           <Route path="/my-listings" element={<MyListings theme={theme} setTheme={setTheme} />} />

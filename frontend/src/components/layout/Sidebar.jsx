@@ -30,7 +30,7 @@ const CREATOR_ITEMS = [
     label: "Marketplace",
     icon: Store,
     children: [
-      { label: "View Products", icon: Package, path: "/marketplace" },
+      { label: "My Listings", icon: CiSaveDown1, path: "/my-listings" },
       { label: "Add New Listings", icon: FilePlus, path: "/add-listing" },
     ],
   },
@@ -213,7 +213,7 @@ export default function Sidebar({
           >
             <button
               onClick={() => setExpanded((p) => !p)}
-              className="w-10 h-10 rounded-full flex items-center justify-center mb-6 transition hover:scale-105"
+              className="w-10 h-10 rounded-full flex items-center justify-center mb-6 transition"
               style={{ backgroundColor: "var(--bg)" }}
             >
               <img src="/switch.svg" alt="toggle sidebar" className="w-5 h-5" />
@@ -239,10 +239,10 @@ export default function Sidebar({
                       }
                     }}
                     className={`
-                      w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                      w-10 h-10 rounded-xl flex items-center justify-center duration-300
                       ${isActive
                         ? "bg-[#CEFF1B] shadow-[0_0_15px_rgba(206,255,27,0.4)]"
-                        : theme === 'dark' ? "transparent" : "hover:bg-white/10"
+                        : "bg-transparent"
                       }
                     `}
                     title={item.label}
@@ -313,7 +313,7 @@ export default function Sidebar({
               {!isMobile && (
                 <button
                   onClick={() => setExpanded(false)}
-                  className="p-2 rounded-xl bg-[#CEFF1B] text-[#000] hover:opacity-90 transition"
+                  className="p-2 rounded-xl bg-[#CEFF1B] text-[#000] transition"
                   title="Collapse Sidebar"
                 >
                   <ChevronLeft size={20} />
@@ -325,6 +325,15 @@ export default function Sidebar({
             <nav className="space-y-4">
               {SIDEBAR_ITEMS.map((item) => {
                 const isNeon = activeMain === item.label && !item.children;
+                const itemBgColor = isNeon
+                  ? "#CEFF1B"
+                  : "transparent";
+
+                const itemTextColor = isNeon
+                  ? "#000000"
+                  : theme === "dark"
+                    ? "#FFFFFF"
+                    : "#111111";
 
                 return (
                   <div key={item.label}>
@@ -361,32 +370,36 @@ export default function Sidebar({
                         setActiveMain(item.label);
                         setOpenMenu(openMenu === item.label ? null : item.label);
                       }}
-                      className="w-full flex items-center font-medium px-3 py-2 rounded-md transition"
+                      className="w-full flex items-center gap-3 font-medium px-3 py-2 rounded-md transition"
                       style={{
-                        backgroundColor: isNeon
-                          ? "#CEFF1B"
-                          : theme === "dark" && openMenu === item.label
-                            ? "#3A3A3A"
-                            : theme === "light" && openMenu === item.label
-                              ? "#E8E8E8"
-                              : "transparent",
-
-                        color: isNeon
-                          ? "#000000"
-                          : theme === "dark"
-                            ? "#FFFFFF"
-                            : "var(--text)",
+                        backgroundColor: itemBgColor,
+                        color: itemTextColor,
                       }}
                     >
-                      <item.icon size={18} />
-                      <span className="ml-4">{item.label}</span>
+                      <item.icon size={18} color={itemTextColor} style={{ flexShrink: 0 }} />
+                      <span className="flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis">
+                        {item.label}
+                      </span>
 
                       {item.children && (
-                        <ChevronDown
-                          size={14}
-                          className={`ml-auto transition-transform ${openMenu === item.label ? "rotate-180" : ""
-                            }`}
-                        />
+                        <span
+                          className={`ml-auto inline-flex items-center justify-center transition-transform ${openMenu === item.label ? "rotate-180" : ""}`}
+                          style={{ flexShrink: 0, color: itemTextColor, lineHeight: 0 }}
+                          aria-hidden="true"
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </span>
                       )}
                     </button>
 

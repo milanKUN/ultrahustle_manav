@@ -9,7 +9,7 @@ export default function Verification() {
       className="
         verification-page
         w-full
-        -mt-12 sm:-mt-24          /* ✅ mobile fix */
+        -mt-16 sm:-mt-32          /* ✅ mobile fix */
         from-gray-100 via-white to-lime-50
         rounded-xl
         p-4 sm:p-6 md:p-8
@@ -27,7 +27,7 @@ export default function Verification() {
       </div>
 
       {/* IDENTITY VERIFICATION */}
-      <p className="text-[16px] sm:text-[18px] md:text-[20px] font-semibold text-gray-700 mb-4">
+      <p className="text-[18px] sm:text-[20px] font-semibold text-slate-800 mb-4">
         Identity Verification
       </p>
 
@@ -94,16 +94,17 @@ function TabButton({ label, active, onClick }) {
     <button
       onClick={onClick}
       className={`
-        px-3 sm:px-4
+        px-4
         py-2
-        text-xs
-        rounded-md
+        text-[14px]
+        font-medium
+        rounded-lg
         border
         transition
         whitespace-nowrap
         ${active
           ? "bg-[#CEFF1B] border-black text-black"
-          : "bg-transparent border-gray-300 text-gray-600 hover:bg-gray-50"
+          : "bg-white border-gray-200 text-slate-600 hover:bg-gray-50"
         }
       `}
     >
@@ -116,7 +117,7 @@ function UploadBox({ title, full }) {
   return (
     <div className="w-full overflow-hidden">
       {title && (
-        <p className="text-[14px] sm:text-[16px] font-medium text-gray-700 mb-2">
+        <p className="text-[14px] sm:text-[16px] font-medium text-slate-800 mb-3">
           {title}
         </p>
       )}
@@ -124,30 +125,31 @@ function UploadBox({ title, full }) {
       <div
         className={`
           w-full
-          border border-gray-300
-          rounded-lg
+          border border-gray-200
+          rounded-xl
           text-center
           bg-transparent
-          hover:bg-gray-200
+          hover:bg-gray-50
           transition
           cursor-pointer
-          ${full ? "p-6 sm:p-10" : "p-4 sm:p-6"}
+          flex flex-col items-center justify-center
+          gap-1
+          ${full ? "p-6 sm:p-10 min-h-[180px]" : "p-4 sm:p-5 min-h-[150px]"}
         `}
       >
-        <Upload className="mx-auto mb-3 text-gray-500" size={22} />
+        <Upload className="text-slate-500 mb-1" size={24} strokeWidth={1.5} />
 
-        <p className="text-sm font-medium text-[#155DFC] break-words">
-          Click to upload
-          <span className="text-gray-600 font-normal">
-            {" "}or Drag or drop file
-          </span>
+        <p className="text-[15px] sm:text-[16px] font-medium text-[#2563EB] m-0 leading-tight">
+          Click to upload<span className="text-slate-500 font-normal"> or Drag or drop file</span>
         </p>
 
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-[12px] sm:text-[13px] text-slate-500 m-0 text-center w-full leading-snug">
           PDF, JPG, JPEG, PNG less than 10MB.
         </p>
-        <p className="text-xs text-gray-500">
-          Ensure your document are in good condition and readable
+        
+        <p className="text-[12px] sm:text-[13px] text-slate-500 m-0 text-center w-full max-w-[280px] leading-snug">
+          Ensure your document are in good condition<br className="hidden sm:block" />
+          and readable
         </p>
       </div>
     </div>

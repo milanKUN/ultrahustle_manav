@@ -35,7 +35,7 @@ body {
 
 .user-page.dark.create-team-page .overflow-y-auto::-webkit-scrollbar-track,
 .user-page-dark.create-team-page .overflow-y-auto::-webkit-scrollbar-track {
-    background: #ffffff !important;
+    background: #111 !important;
     border-radius: 10px;
 }
 
@@ -206,27 +206,29 @@ body {
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
+    /* column-gap: 10px; */
+    gap: 0px 40px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     min-width: 0;
     /* Prevents grid blowout */
 }
 
+
 .form-group.full-width {
     grid-column: 1 / -1;
-    margin-bottom: 20px;
+    /* margin-bottom: 0px; */
 }
 
 .create-team-page .form-label {
     font-weight: 500;
     font-size: 20px !important;
     color: #2B2B2B;
+    margin-bottom: 4px !important;
 }
 
 .required-star {
@@ -241,7 +243,8 @@ body {
     border-radius: 6px;
     border: 1px solid #000;
     background-color: transparent;
-    padding: 8px 12px;
+    padding: 0.5rem 0.75rem;
+    min-height: 40px;
     font-size: 14px;
     font-family: inherit;
     color: #000;
@@ -261,12 +264,10 @@ body {
 .user-page.dark.create-team-page .form-input,
 .user-page-dark.create-team-page .form-input,
 .user-page.dark.create-team-page .form-textarea,
-.user-page.dark.create-team-page .textarea-wrapper,
 .user-page-dark.create-team-page .form-textarea,
 .user-page.dark.create-team-page .form-select,
 .user-page-dark.create-team-page .form-select {
     color: #fff;
-    border-color: #fefefe !important;
 }
 
 .user-page.dark.create-team-page .form-input::placeholder,
@@ -274,11 +275,6 @@ body {
 .user-page.dark.create-team-page .form-textarea::placeholder,
 .user-page-dark.create-team-page .form-textarea::placeholder {
     color: #9ca3af;
-}
-
-.user-page.dark.create-team-page .form-select,
-.user-page-dark.create-team-page .form-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='9' viewBox='0 0 10 9' fill='none'%3E%3Cpath d='M4.76318 8.25L4.36366e-05 5.64421e-08L9.52632 8.89256e-07L4.76318 8.25Z' fill='%23fefefe'/%3E%3C/svg%3E");
 }
 
 /* Input Prefix Wrapper */
@@ -303,11 +299,6 @@ body {
     margin-right: 4px;
     user-select: none;
     font-size: 14px;
-}
-
-.user-page.dark.create-team-page .input-with-prefix,
-.user-page-dark.create-team-page .input-with-prefix {
-    border-color: #fefefe !important;
 }
 
 .create-team-page .input-with-prefix .form-input {
@@ -343,7 +334,6 @@ body {
 .user-page.dark.create-team-page .onboarding-selected-option,
 .user-page-dark.create-team-page .onboarding-selected-option {
     color: #fff !important;
-    border: 1px solid #fff !important;
 }
 
 .form-textarea {
@@ -419,7 +409,7 @@ body {
 .char-counter {
     font-size: 0.75rem;
     color: var(--error-color);
-    margin-top: 4px;
+    /* margin-top: 2px; */
 }
 
 .char-counter.valid {
@@ -443,7 +433,7 @@ body {
     justify-content: space-between;
     padding: 12px 16px;
     background: transparent;
-    border: 1px solid #FEFEFE;
+    border: 0.87px solid #2B2B2B;
     border-radius: 8px;
 }
 
@@ -497,7 +487,10 @@ body {
     color: #333;
 }
 
-
+.btn-invite:hover {
+    background: #2B2B2B;
+    color: #fff;
+}
 
 .btn-invite.active {
     background-color: var(--lime-glow);
@@ -511,9 +504,9 @@ body {
     width: 100%;
     padding: 24px;
     background: #FEFEFE40;
-    border: 3px solid #FEFEFE;
+    /* border: 3px solid #FEFEFE; */
+    border: 0.5px solid #CEFF1B;
     border-radius: 27px;
-
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
     box-sizing: border-box;
     display: flex;
@@ -951,7 +944,7 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 40px;
+    margin-top: 0px;
     position: relative;
     z-index: 1;
 }
@@ -1073,8 +1066,8 @@ body {
 }
 
 .table-avatar {
-    width: 36px;
-    height: 36px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: #e0e0e0;
     display: flex;
@@ -1214,7 +1207,7 @@ body {
     padding: 8px;
     background-color: #fff;
     gap: 8px;
-    margin-top: 5px;
+    /* margin-top: 2px; */
 
 }
 

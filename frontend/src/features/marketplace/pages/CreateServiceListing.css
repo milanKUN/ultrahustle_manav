@@ -49,10 +49,19 @@
 .am-card,
 .faq-wrap {
   width: 100%;
-  background: transparent;
-  border: none;
-  padding: 10px 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
   box-sizing: border-box;
+}
+
+.user-page.dark .csl-card,
+.user-page.dark .sp-card,
+.user-page.dark .am-card,
+.user-page.dark .faq-wrap {
+  background: #1a1a1a;
+  border-color: #333;
 }
 
 .csl-header {
@@ -148,22 +157,30 @@
 }
 
 .csl-section {
-  font-size: 20px;
-  margin: 10px 0 14px;
-  color: #222;
+  font-size: 18px;
+  margin: 0 0 20px;
+  color: #111;
   font-weight: 600;
 }
 
+.user-page.dark .csl-section {
+  color: #fff;
+}
+
 .csl-field {
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
 
 .csl-label {
   display: block;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  color: #222;
-  margin-bottom: 6px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.user-page.dark .csl-label {
+  color: #d1d5db;
 }
 
 @media (max-width: 768px) {
@@ -191,9 +208,9 @@
 .am-input,
 .faq-input {
   width: 100%;
-  border: 1px solid #000;
-  border-radius: var(--csl-radius);
-  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #ffffff;
   color: #111;
   font-size: 14px;
   padding: 10px 12px;
@@ -210,13 +227,13 @@
 
 .csl-input::placeholder,
 .csl-textarea::placeholder {
-  color: #9a9a9a;
+  color: #9ca3af;
 }
 
 .csl-textarea {
-  min-height: 72px;
+  min-height: 80px;
   resize: none;
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 .csl-input:focus,
@@ -225,8 +242,8 @@
 .sp-textarea:focus,
 .am-input:focus,
 .faq-input:focus {
-  border-color: transparent !important;
-  box-shadow: 0 0 15px #CEFF1B !important;
+  border-color: #ceff1b !important;
+  box-shadow: 0 0 0 3px rgba(206, 255, 27, 0.1) !important;
   outline: none;
 }
 
@@ -237,15 +254,26 @@
 .user-page.dark .am-input,
 .user-page.dark .faq-input,
 .user-page.dark .onboarding-selected-option {
-  border: 1px solid #CEFF1B;
+  background: #2a2a2a;
+  border-color: #404040;
   color: #fff;
+}
+
+.user-page.dark .csl-input:focus,
+.user-page.dark .csl-textarea:focus,
+.user-page.dark .sp-input:focus,
+.user-page.dark .sp-textarea:focus,
+.user-page.dark .am-input:focus,
+.user-page.dark .faq-input:focus {
+  border-color: #ceff1b !important;
+  box-shadow: 0 0 0 3px rgba(206, 255, 27, 0.15) !important;
 }
 
 .user-page.dark .csl-input::placeholder,
 .user-page.dark .sp-input::placeholder,
 .user-page.dark .am-input::placeholder,
 .user-page.dark .faq-input::placeholder {
-  color: #b0b0b0;
+  color: #6b7280;
 }
 
 /* Custom Select Dropdown Dark Mode Adjustments */

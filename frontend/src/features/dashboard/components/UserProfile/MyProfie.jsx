@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 import {
   deleteMyAvatar,
   getMyPersonalInfo,
@@ -270,11 +272,11 @@ export default function ProfileForm() {
       </div>
 
       {/* ================= IMAGE MODAL ================= */}
-      {openImageModal && (
+      {openImageModal && createPortal(
         <div
           className="
-            z-50 flex
-            md:mt-20 p-4 md:p-0
+            z-[9999] flex
+            p-4 md:p-0
             fixed inset-0 items-center justify-center image-modal
             backdrop-blur-sm bg-black/30
           "
@@ -286,6 +288,7 @@ export default function ProfileForm() {
               p-5 md:p-6
               rounded-2xl
               image-modal-card relative
+              bg-white
             "
           >
             <button
@@ -453,11 +456,17 @@ export default function ProfileForm() {
               ) : null}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ================= FRIEND LIST MODAL ================= */}
-      {openFriends && <FriendListModal onClose={() => setOpenFriends(false)} />}
+
+      {openFriends &&
+        createPortal(
+          <FriendListModal onClose={() => setOpenFriends(false)} />,
+          document.body,
+        )}
     </>
   );
 }
@@ -494,8 +503,8 @@ function FriendListModal({ onClose }) {
   return (
     <div
       className="
-        z-50 flex
-        md:mt-20 p-4 md:p-0
+        z-[9999] flex
+        p-4 md:p-0
         bg-black/60
         backdrop-blur-sm
         fixed inset-0 items-center justify-center friend-modal

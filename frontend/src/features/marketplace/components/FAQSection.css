@@ -44,22 +44,28 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: #555;
   padding: 4px;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
-.delete-btn:hover:not(:disabled) {
-  color: #ff4444;
+.delete-btn svg {
+  stroke: #555 !important;
+  color: #555 !important;
+}
+
+.user-page.dark .delete-btn svg {
+  stroke: #bbb !important;
+  color: #bbb !important;
+}
+
+.delete-btn:hover:not(:disabled) svg {
+  stroke: #ff4444 !important;
+  color: #ff4444 !important;
 }
 
 .delete-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-}
-
-.user-page.dark .delete-btn {
-  color: #bbb;
 }
 
 .faq-field {

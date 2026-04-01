@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./NavbarLight.css";
-import {logout} from "../../features/auth/api/authApi";
-import {getUserName, getMyPersonalInfo} from "../../features/dashboard/api/personalInfoApi";
+import { logout } from "../../features/auth/api/authApi";
+import { getUserName, getMyPersonalInfo } from "../../features/dashboard/api/personalInfoApi";
 
 const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
@@ -386,7 +386,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
   return (
     <>
       {/* Header/Navbar */}
-      <header className={`inreview-header ${theme}`}>
+      <header className={`inreview-header border-b border-[#CEFF1B] shadow-[0_2px_12px_3px_rgba(206,255,  27,0.35)] backdrop-blur-xl bg-gradient-to-r from-[#D9D9D9] via-[#CFCFCF] to-[#C6C6C6] ${theme} !z-[200] pointer-events-auto`}>
         <div className="header-left">
           <button className="hamburger-btn" onClick={handleSidebarToggle}>
             {(externalIsSidebarOpen !== undefined ? externalIsSidebarOpen : isSidebarOpen) ? "✕" : "☰"}

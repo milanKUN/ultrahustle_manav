@@ -58,6 +58,7 @@ export default function CreatorGoalsSelection() {
     { id: "build-team", label: "Build a team", icon: Users },
     { id: "promote-listings", label: "Promote my listings", icon: FileText },
     { id: "build-client-base", label: "Build a client base", icon: UserPlus },
+    { id: "promote-listings", label: "Promote my listings", icon: FileText },
     { id: "ai-match", label: "Get discovered faster (AI Match)", icon: Sparkles },
   ];
 
