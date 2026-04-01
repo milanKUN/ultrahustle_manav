@@ -18,6 +18,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\UserActivity;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Str;
+use App\Services\UserActivityService;
 
 class AuthController extends Controller
 {
@@ -128,7 +129,7 @@ class AuthController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
             $agent = new Agent();
             $agent->setUserAgent($request->userAgent());
-
+            
             // Optional: mark old current sessions false
             UserActivity::where('user_id', $user->id)
                 ->update(['is_current' => false]);
@@ -145,6 +146,8 @@ class AuthController extends Controller
                 'is_current' => true,
             ]);
             $onboarding = $this->onboardingStatus($user);
+
+            UserActivityService::markLogin($user);
 
             return $this->successResponse('Login successful.', [
                 'token' => $token,

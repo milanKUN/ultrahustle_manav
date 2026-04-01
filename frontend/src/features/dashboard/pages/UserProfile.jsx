@@ -9,7 +9,7 @@ import Sidebar from "../../../components/layout/Sidebar";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
 
-import { getMyPersonalInfo } from "../api/personalInfoApi";
+import { getMyPersonalInfo, getMyActivity } from "../api/personalInfoApi";
 import { getMyPortfolio } from "../api/portfolioApi";
 import {
   followUser,
@@ -65,10 +65,9 @@ const UserProfile = (props) => {
 
   // ✅ Activity Calendar state
   const [openActivityCalendar, setOpenActivityCalendar] = useState(false);
-  const [activityDates, setActivityDates] = useState([
-    "05-02-2026", "08-02-2026", "12-02-2026", "15-02-2026",
-    "18-02-2026", "22-02-2026", "25-02-2026", "28-02-2026"
-  ]); // Sample activity dates in DD-MM-YYYY format
+  const [activityDates, setActivityDates] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(false);
+  const [activityError, setActivityError] = useState("");
 
   // ✅ Sidebar state (standardized with localStorage)
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -316,8 +315,54 @@ const UserProfile = (props) => {
     return () => {
       mounted = false;
     };
-  }, [viewerUserId]);
+    }, [viewerUserId]);
 
+    //user login activity
+    useEffect(() => {
+    let mounted = true;
+
+    const loadActivity = async () => {
+      setActivityLoading(true);
+      setActivityError("");
+
+      try {
+        const res = await getMyActivity();
+        const rawDates = res?.activity_dates || [];
+
+        if (!mounted) return;
+
+        const normalized = Array.isArray(rawDates)
+          ? rawDates
+              .map((d) => {
+                const date = new Date(d);
+                if (Number.isNaN(date.getTime())) return null;
+
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, "0");
+                const dd = String(date.getDate()).padStart(2, "0");
+
+                return `${yyyy}-${mm}-${dd}`;
+              })
+              .filter(Boolean)
+          : [];
+
+        setActivityDates(normalized);
+      } catch (e) {
+        if (!mounted) return;
+        setActivityError(e?.message || "Failed to load activity");
+        setActivityDates([]);
+      } finally {
+        if (!mounted) return;
+        setActivityLoading(false);
+      }
+    };
+
+    loadActivity();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
   const teams = [];
 
   const defaultPortfolioData = useMemo(
@@ -776,10 +821,10 @@ const UserProfile = (props) => {
                         const activeDays = new Set(
                           activityDates
                             .filter((d) => {
-                              const [dd, mm, yyyy] = d.split("-").map(Number);
+                              const [yyyy, mm] = d.split("-").map(Number);
                               return mm === currentMonth && yyyy === currentYear;
                             })
-                            .map((d) => parseInt(d.split("-")[0], 10))
+                            .map((d) => parseInt(d.split("-")[2], 10))
                         );
 
                         return Array.from({ length: daysInMonth }).map((_, i) => (
@@ -792,13 +837,15 @@ const UserProfile = (props) => {
                   {/* ✅ content */}
                   <div className="stat-content">
                     <span className="stat-value">
-                      {activityDates.filter((d) => {
-                        const [, mm, yyyy] = d.split("-").map(Number);
+                      {activityLoading ? "..." : activityDates.filter((d) => {
+                        const [yyyy, mm] = d.split("-").map(Number);
                         const now = new Date();
                         return mm === now.getMonth() + 1 && yyyy === now.getFullYear();
                       }).length}
                     </span>
-                    <span className="stat-label">Activity Time</span>
+                    <span className="stat-label">
+                      {new Date().toLocaleString("default", { month: "long" })} Activity
+                    </span>
                   </div>
                 </div>
               </section>
@@ -1846,7 +1893,7 @@ function ActivityCalendar({ onClose, activityDates, theme }) {
 
 
   const hasActivity = (day, mIndex, y) => {
-    const formatted = `${String(day).padStart(2, "0")}-${String(mIndex + 1).padStart(2, "0")}-${y}`;
+    const formatted = `${y}-${String(mIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     return activityDates.includes(formatted);
   };
 
@@ -2003,7 +2050,16 @@ function ActivityCalendar({ onClose, activityDates, theme }) {
 
                         return (
                           <div key={`cell-${cellIndex}`} className={cssClasses}>
-                            <div className={`w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] flex items-center justify-center rounded-full transition-colors ${isActive ? "bg-[#CEFF1B] text-black font-extrabold shadow-sm" : ""}`}>
+                            <div
+                              className={`w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] flex items-center justify-center rounded-full transition-colors
+                                ${
+                                  isActive
+                                    ? "bg-[#22c55e] text-white font-bold shadow-sm"
+                                    : content
+                                    ? "bg-[#e5e7eb] dark:bg-[#2f2f2f] text-[#6b7280] dark:text-[#a3a3a3]"
+                                    : ""
+                                }`}
+                            >
                               {content}
                             </div>
                           </div>

@@ -162,3 +162,9 @@ export const getUserName = async () => {
   const res = await api.get("/api/v1/me/get-username");
   return unwrap(res);
 };
+
+//user login activities for activity time on user profile page
+export const getMyActivity = async () => {
+  const res = await api.get("/api/v1/me/my-activity");
+  return unwrap(res);
+};
