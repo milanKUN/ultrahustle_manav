@@ -1,6 +1,5 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import {
     Share2,
     Flag,
@@ -12,18 +11,20 @@ import {
     Star,
     ChevronDown,
     Clock,
+    Infinity,
+    CheckCircle2,
+    User,
     X,
-    Play,
 } from "lucide-react";
-import "./CourseListing.css";
+import "./TeamServiceListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import "../../../Darkuser.css";
 import "../../dashboard/pages/TeamProfileLight.css";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 import DetailedTeamCard from "../components/DetailedTeamCard";
 
-const CourseListing = ({ theme, setTheme }) => {
-    const navigate = useNavigate();
+
+const ServiceListing = ({ theme, setTheme }) => {
     const [activeTab, setActiveTab] = useState("Basic");
     const [activeImg, setActiveImg] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -43,6 +44,23 @@ const CourseListing = ({ theme, setTheme }) => {
     const [activeFaq, setActiveFaq] = useState(null);
     const recommendedGridRef = useRef(null);
     const moreFromSarahGridRef = useRef(null);
+
+    useEffect(() => {
+        const shouldLockScroll = Boolean(activeItem || showImageModal);
+        const { body, documentElement } = document;
+        const previousBodyOverflow = body.style.overflow;
+        const previousHtmlOverflow = documentElement.style.overflow;
+
+        if (shouldLockScroll) {
+            body.style.overflow = "hidden";
+            documentElement.style.overflow = "hidden";
+        }
+
+        return () => {
+            body.style.overflow = previousBodyOverflow;
+            documentElement.style.overflow = previousHtmlOverflow;
+        };
+    }, [activeItem, showImageModal]);
 
     const scrollGridRef = (ref, direction) => {
         if (ref.current) {
@@ -304,10 +322,10 @@ const CourseListing = ({ theme, setTheme }) => {
     ];
 
     const images = [
-        "https://images.unsplash.com/photo-1586717791821-3f44a563fe4c?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1522542550221-31fd19250226?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2070&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop",
     ];
 
@@ -471,28 +489,21 @@ const CourseListing = ({ theme, setTheme }) => {
                 {/* MAIN CONTENT */}
                 <div className="relative flex-1 min-w-0 overflow-hidden">
                     <div className="overflow-y-auto h-[calc(100vh-85px)]">
-                        <div className={`cl-page ${theme}`}>
-                            <div className="cl-header">
-                                {/* <div 
-                                    className="cl-back-link" 
-                                    onClick={() => navigate('/my-listings')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--mylis-muted)', marginBottom: '10px', fontSize: '14px' }}
-                                >
-                                    <ChevronLeft size={16} /> Back to My Listings
-                                </div> */}
-                                <h1 className="cl-title">
+                        <div className={`tsl-page ${theme}`}>
+                            <div className="tsl-header">
+                                <h1 className="tsl-title">
                                     I will design online course cover and
                                     digital product mockup bundle
                                 </h1>
-                                <div className="cl-header-actions">
-                                    <button className="cl-icon-btn">
+                                <div className="tsl-header-actions">
+                                    <button className="tsl-icon-btn">
                                         <Share2 size={20} />
                                     </button>
-                                    <button className="cl-icon-btn">
+                                    <button className="tsl-icon-btn">
                                         <Flag size={20} />
                                     </button>
                                     <button
-                                        className="cl-icon-btn"
+                                        className="tsl-icon-btn"
                                         onClick={() => setIsLiked(!isLiked)}
                                     >
                                         <Heart
@@ -506,19 +517,19 @@ const CourseListing = ({ theme, setTheme }) => {
                                 </div>
                             </div>
 
-                            <div className="cl-container">
+                            <div className="tsl-container">
                                 {/* Left Column */}
-                                <div className="cl-main">
+                                <div className="tsl-main">
                                     {/* Slider */}
-                                    <div className="cl-slider-wrap">
-                                        <div className="cl-main-img-box">
+                                    <div className="tsl-slider-wrap">
+                                        <div className="tsl-main-img-box">
                                             <img
                                                 src={images[activeImg]}
                                                 alt="Service"
-                                                className="cl-main-img"
+                                                className="tsl-main-img"
                                             />
                                             <button
-                                                className="cl-slider-btn left"
+                                                className="tsl-slider-btn left"
                                                 onClick={() =>
                                                     setActiveImg((prev) =>
                                                         prev === 0
@@ -530,7 +541,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 <ChevronLeft size={20} />
                                             </button>
                                             <button
-                                                className="cl-slider-btn right"
+                                                className="tsl-slider-btn right"
                                                 onClick={() =>
                                                     setActiveImg((prev) =>
                                                         prev ===
@@ -543,7 +554,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 <ChevronRight size={20} />
                                             </button>
                                             <button
-                                                className="cl-expand-btn"
+                                                className="tsl-expand-btn"
                                                 onClick={() => {
                                                     setModalImgIndex(activeImg);
                                                     setShowImageModal(true);
@@ -552,13 +563,13 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 <Maximize2 size={16} />
                                             </button>
                                         </div>
-                                        <div className="cl-thumbs">
+                                        <div className="tsl-thumbs">
                                             {images.map((img, idx) => (
                                                 <img
                                                     key={idx}
                                                     src={img}
                                                     alt="Thumb"
-                                                    className={`cl-thumb ${activeImg === idx ? "active" : ""}`}
+                                                    className={`tsl-thumb ${activeImg === idx ? "active" : ""}`}
                                                     onClick={() =>
                                                         setActiveImg(idx)
                                                     }
@@ -568,33 +579,33 @@ const CourseListing = ({ theme, setTheme }) => {
                                     </div>
 
                                     {/* Profile Card */}
-                                    <div className="cl-profile-mini-card">
-                                        <div className="cl-pmc-left">
-                                            <div className="cl-pmc-avatar-wrap">
-                                                <div className="cl-pmc-avatar-bg"></div>
-                                                <div className="cl-pmc-status-dot"></div>
+                                    <div className="tsl-profile-mini-card">
+                                        <div className="tsl-pmc-left">
+                                            <div className="tsl-pmc-avatar-wrap">
+                                                <div className="tsl-pmc-avatar-bg"></div>
+                                                <div className="tsl-pmc-status-dot"></div>
                                             </div>
-                                            <div className="cl-pmc-info">
-                                                <div className="cl-pmc-name-row">
-                                                    <span className="cl-pmc-name">
+                                            <div className="tsl-pmc-info">
+                                                <div className="tsl-pmc-name-row">
+                                                    <span className="tsl-pmc-name">
                                                         Sarah Anderson
                                                     </span>
-                                                    <div className="cl-pmc-online-badge">
-                                                        <div className="cl-pmc-online-dot"></div>
+                                                    <div className="tsl-pmc-online-badge">
+                                                        <div className="tsl-pmc-online-dot"></div>
                                                         <span>Online</span>
                                                     </div>
                                                 </div>
-                                                <div className="cl-pmc-meta">
+                                                <div className="tsl-pmc-meta">
                                                     <Clock size={14} />
                                                     <span>
                                                         Avg response: 1 hour
                                                     </span>
                                                 </div>
-                                                <div className="cl-pmc-role-row">
-                                                    <span className="cl-pmc-role">
+                                                <div className="tsl-pmc-role-row">
+                                                    <span className="tsl-pmc-role">
                                                         Full Stack Developer
                                                     </span>
-                                                    <div className="cl-pmc-rating">
+                                                    <div className="tsl-pmc-rating">
                                                         <Star
                                                             size={14}
                                                             fill="#CEFF1B"
@@ -607,14 +618,14 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button className="cl-pmc-view-btn">
+                                        <button className="tsl-pmc-view-btn">
                                             View profile
                                             <ChevronRight size={18} />
                                         </button>
                                     </div>
 
                                     {/* Description */}
-                                    <div className="cl-section">
+                                    <div className="tsl-section">
                                         <h2>Description</h2>
                                         <p>
                                             He is the best in the game. Always
@@ -625,95 +636,61 @@ const CourseListing = ({ theme, setTheme }) => {
                                         </p>
                                     </div>
 
-                                    <div className="cl-section">
-                                        <h2>What you will learn</h2>
-                                        <ul className="cl-bullet-list">
-                                            <li>He is the best in the game.</li>
-                                            <li>
-                                                Always have time to explain to
-                                                me and made sure.
-                                            </li>
-                                            <li>
-                                                I was satisfied at every stage.
-                                            </li>
-                                            <li>
-                                                Don't skip him if you want the
-                                                best. He's great
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Prerequisites</h2>
+                                    <div className="tsl-section">
+                                        <h2>About This Service</h2>
                                         <p>
-                                            He is the best in the game. Always
-                                            have time to explain to me and made
-                                            sure I was satisfied at every stage.
-                                            Don't skip him if you want the best.
-                                            He's great
+                                            Welcome! I'm a senior UI/UX designer
+                                            with 8+ years of experience crafting
+                                            beautiful, user-centered mobile
+                                            applications. I specialize in
+                                            creating intuitive interfaces that
+                                            not only look stunning but are
+                                            backed by thorough user research and
+                                            industry best practices.
                                         </p>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Tools needed</h2>
-                                        <div className="cl-tools-list">
-                                            <span>Notion</span>
-                                            <span>Tailwind CSS</span>
-                                            <span>Photoshop</span>
-                                            <span>Figma</span>
-                                            <span>Illustrator</span>
-                                            <span>TypeScript</span>
-                                            <span>Webflow</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Languages</h2>
-                                        <div className="cl-languages-row">
-                                            <strong>English</strong>
-                                            <strong>Hindi</strong>
-                                            <strong>Tamil</strong>
-                                        </div>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Preview video</h2>
-                                        <div className="cl-video-card">
-                                            <div className="cl-video-placeholder">
-                                                <img
-                                                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
-                                                    alt="Video Placeholder"
-                                                />
-                                                <div className="cl-video-overlay">
-                                                    <div className="cl-play-button">
-                                                        <Play
-                                                            size={24}
-                                                            fill="black"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <p>
+                                            Whether you're launching a startup
+                                            MVP, redesigning an existing app, or
+                                            building a complex enterprise
+                                            solution, I'll help bring your
+                                            vision to life with modern design
+                                            principles and pixel-perfect
+                                            execution.
+                                        </p>
                                     </div>
                                 </div>
 
                                 {/* Right Column (Sticky Pricing) */}
-                                <div className="cl-pricing-card">
-                                    <div className="cl-pricing-content">
-                                        <div className="cl-price-row">
-                                            <div className="cl-price-info">
-                                                <span className="cl-price-label">
+                                <div className="tsl-pricing-card">
+                                    <div className="tsl-pricing-tabs">
+                                        {Object.keys(packages).map((pkg) => (
+                                            <button
+                                                key={pkg}
+                                                className={`tsl-tab ${activeTab === pkg ? "active" : ""}`}
+                                                onClick={() =>
+                                                    setActiveTab(pkg)
+                                                }
+                                            >
+                                                {pkg}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="tsl-pricing-content">
+                                        <div className="tsl-price-row">
+                                            <div className="tsl-price-info">
+                                                <span className="tsl-price-label">
                                                     Price
                                                 </span>
-                                                <span className="cl-price">
+                                                <span className="tsl-price">
                                                     ${packages[activeTab].price}
                                                 </span>
                                             </div>
-                                            <div className="cl-delivery-info">
-                                                <span className="cl-delivery-label">
+                                            <div className="tsl-delivery-info">
+                                                <span className="tsl-delivery-label">
                                                     Delivery
                                                 </span>
-                                                <span className="cl-delivery-value">
+                                                <span className="tsl-delivery-value">
                                                     {
                                                         packages[activeTab]
                                                             .delivery
@@ -722,26 +699,26 @@ const CourseListing = ({ theme, setTheme }) => {
                                             </div>
                                         </div>
 
-                                        <p className="cl-pkg-desc">
+                                        <p className="tsl-pkg-desc">
                                             {packages[activeTab].desc}
                                         </p>
 
-                                        <p className="cl-revs">
+                                        <p className="tsl-revs">
                                             {packages[activeTab].revisions}{" "}
                                             Revisions
                                         </p>
 
-                                        <h4 className="cl-inclusions-title">
+                                        <h4 className="tsl-inclusions-title">
                                             What's included
                                         </h4>
-                                        <div className="cl-inclusions-list">
+                                        <div className="tsl-inclusions-list">
                                             {packages[activeTab].inclusions.map(
                                                 (item, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="cl-inclusion-item"
+                                                        className="tsl-inclusion-item"
                                                     >
-                                                        <div className="cl-check-circle">
+                                                        <div className="tsl-check-circle">
                                                             <Check
                                                                 size={12}
                                                                 strokeWidth={3}
@@ -753,19 +730,463 @@ const CourseListing = ({ theme, setTheme }) => {
                                             )}
                                         </div>
 
-                                        <div className="cl-divider"></div>
+                                        <div className="tsl-divider"></div>
 
-                                        <div className="cl-pricing-actions">
-                                            <button className="cl-btn-primary">
+                                        <h4 className="tsl-addons-title">
+                                            Add-ons
+                                        </h4>
+                                        <div className="tsl-addons-list">
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <span className="tsl-addon-name">
+                                                        Extra revision
+                                                    </span>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$25
+                                                </span>
+                                            </div>
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <div className="tsl-addon-info">
+                                                        <span className="tsl-addon-name">
+                                                            Superfast delivery
+                                                        </span>
+                                                        <span className="tsl-addon-sub">
+                                                            -2days
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$75
+                                                </span>
+                                            </div>
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <div className="tsl-addon-info">
+                                                        <span className="tsl-addon-name">
+                                                            Additional 5 screens
+                                                        </span>
+                                                        <span className="tsl-addon-sub">
+                                                            +2days
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$120
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="tsl-pricing-actions">
+                                            <button className="tsl-btn-primary">
                                                 Create Contract
                                             </button>
-                                            <button className="cl-btn-outline">
+                                            <button className="tsl-btn-outline">
                                                 Chat first
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            {/* My Portfolio Section */}
+
+                            <section className="portfolio-section">
+                                <div className="portfolio-header">
+                                    <h3 className="portfolio-title">
+                                        My Portfolio
+                                    </h3>
+                                    <div className="portfolio-header-line"></div>
+                                </div>
+
+                                {/* ✅ Featured Portfolio Item */}
+                                <div className="portfolio-featured-card">
+                                    <div className="portfolio-featured-image">
+                                        <img
+                                            src={portfolioData.featured.image}
+                                            alt={portfolioData.featured.title}
+                                            onClick={() => {
+                                                const allItems = [
+                                                    portfolioData.featured,
+                                                    ...portfolioData.items,
+                                                ];
+                                                setActiveItemIndex(0);
+                                                setActiveItem(allItems[0]);
+                                            }}
+                                            style={{ cursor: "pointer" }}
+                                        />
+                                    </div>
+
+                                    <div className="portfolio-featured-content">
+                                        <h4 className="portfolio-featured-title">
+                                            {portfolioData.featured.title}
+                                        </h4>
+                                        <p className="portfolio-featured-desc">
+                                            {portfolioData.featured.description}
+                                        </p>
+                                        <div className="portfolio-featured-cost">
+                                            <span className="cost-label">
+                                                Project cost
+                                            </span>
+                                            <span className="cost-value">
+                                                {portfolioData.featured.cost}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ✅ POPUP MODAL */}
+                                {activeItem &&
+                                    createPortal(
+                                        <div
+                                            className="portfolio-modal-backdrop"
+                                            onClick={() => setActiveItem(null)}
+                                        >
+                                            <div
+                                                className={`portfolio-modal-content ${theme}`}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                <div className="portfolio-modal-scroll">
+                                                    {/* 🔝 Top Bar */}
+                                                    <div className="portfolio-modal-topbar">
+                                                        <div className="portfolio-modal-brand">
+                                                            <div className="portfolio-brand-circle"></div>
+                                                            <span>
+                                                                Made by Name
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Right Actions: Arrows + Close */}
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="portfolio-modal-nav">
+                                                                <button
+                                                                    className="nav-arrow left"
+                                                                    onClick={() => {
+                                                                        const allItems =
+                                                                            [
+                                                                                portfolioData.featured,
+                                                                                ...portfolioData.items,
+                                                                            ];
+                                                                        const prevIndex =
+                                                                            activeItemIndex >
+                                                                            0
+                                                                                ? activeItemIndex -
+                                                                                  1
+                                                                                : allItems.length -
+                                                                                  1;
+                                                                        setActiveItemIndex(
+                                                                            prevIndex,
+                                                                        );
+                                                                        setActiveItem(
+                                                                            allItems[
+                                                                                prevIndex
+                                                                            ],
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    ◀
+                                                                </button>
+                                                                <span className="portfolio-modal-counter">
+                                                                    {activeItemIndex +
+                                                                        1}{" "}
+                                                                    of{" "}
+                                                                    {
+                                                                        [
+                                                                            portfolioData.featured,
+                                                                            ...portfolioData.items,
+                                                                        ].length
+                                                                    }
+                                                                </span>
+                                                                <button
+                                                                    className="nav-arrow right"
+                                                                    onClick={() => {
+                                                                        const allItems =
+                                                                            [
+                                                                                portfolioData.featured,
+                                                                                ...portfolioData.items,
+                                                                            ];
+                                                                        const nextIndex =
+                                                                            activeItemIndex <
+                                                                            allItems.length -
+                                                                                1
+                                                                                ? activeItemIndex +
+                                                                                  1
+                                                                                : 0;
+                                                                        setActiveItemIndex(
+                                                                            nextIndex,
+                                                                        );
+                                                                        setActiveItem(
+                                                                            allItems[
+                                                                                nextIndex
+                                                                            ],
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    ▶
+                                                                </button>
+                                                            </div>
+
+                                                            <button
+                                                                className="portfolio-modal-close"
+                                                                onClick={() =>
+                                                                    setActiveItem(
+                                                                        null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 📝 Info */}
+                                                    <div className="portfolio-modal-info">
+                                                        <div className="portfolio-info-header">
+                                                            <h3>
+                                                                {
+                                                                    activeItem.title
+                                                                }
+                                                            </h3>
+                                                        </div>
+                                                        <p>
+                                                            {
+                                                                activeItem.description
+                                                            }
+                                                        </p>
+
+                                                        <div className="portfolio-modal-cost">
+                                                            <span className="cost-label">
+                                                                Project cost
+                                                            </span>
+                                                            <span className="cost-value">
+                                                                {
+                                                                    activeItem.cost
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* 🖼 Main Image */}
+                                                    <div className="portfolio-modal-image">
+                                                        <img
+                                                            src={
+                                                                activeItem.image
+                                                            }
+                                                            alt={
+                                                                activeItem.title
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {/* 🧩 Thumbnails */}
+                                                    <div className="portfolio-modal-thumbs">
+                                                        {[
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                        ].map((img, i) => (
+                                                            <img
+                                                                key={i}
+                                                                src={img}
+                                                                alt={`thumb-${i}`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>,
+                                        document.body,
+                                    )}
+
+                                {/* ✅ Portfolio Grid */}
+                                <div className="portfolio-grid-card">
+                                    <div className="portfolio-grid">
+                                        {portfolioData.items.map(
+                                            (item, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="portfolio-item"
+                                                >
+                                                    <div className="portfolio-item-image">
+                                                        <img
+                                                            src={item.image}
+                                                            alt={item.title}
+                                                            onClick={() => {
+                                                                const allItems =
+                                                                    [
+                                                                        portfolioData.featured,
+                                                                        ...portfolioData.items,
+                                                                    ];
+                                                                setActiveItemIndex(
+                                                                    index + 1,
+                                                                );
+                                                                setActiveItem(
+                                                                    allItems[
+                                                                        index +
+                                                                            1
+                                                                    ],
+                                                                );
+                                                            }}
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="portfolio-item-info">
+                                                        <div className="portfolio-item-left">
+                                                            <span className="portfolio-item-title">
+                                                                {item.title}
+                                                            </span>
+                                                            <span className="portfolio-item-desc">
+                                                                {
+                                                                    item.description
+                                                                }
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="portfolio-item-right">
+                                                            <span className="cost-label">
+                                                                Project cost
+                                                            </span>
+                                                            <span className="cost-value">
+                                                                {item.cost}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Compare Packages Section */}
+                            <section className="compare-packages-section">
+                                <div className="compare-header">
+                                    <h3 className="compare-title">
+                                        Compare Packages
+                                    </h3>
+                                    <div className="compare-header-line"></div>
+                                </div>
+
+                                <div className="compare-table-container">
+                                    <table className="compare-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Package Features</th>
+                                                <th>Basic</th>
+                                                <th>Standard</th>
+                                                <th>Premium</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {comparisonData.map((row, idx) => (
+                                                <tr key={idx}>
+                                                    <td className="feature-name">
+                                                        {row.feature}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.basic,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.basic.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.basic
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.standard,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.standard.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.standard
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.premium,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.premium.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.premium
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
 
                             {/* Listings Section */}
                             <section style={{ width: "100%" }}>
@@ -1018,6 +1439,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                 </button>
                             </div>
 
+                            {/* Detailed Team Card */}
                             <DetailedTeamCard />
 
                             {/* FAQ Section */}
@@ -1231,34 +1653,36 @@ const CourseListing = ({ theme, setTheme }) => {
                             </section>
 
                             {/* Recommended Section */}
-                            <div className="cl-listing-container">
-                                <h2 className="cl-sectionTitle">Recommended</h2>
+                            <div className="tsl-listing-container">
+                                <h2 className="tsl-sectionTitle">
+                                    Recommended
+                                </h2>
                                 <div
-                                    className="cl-mp-grid"
+                                    className="tsl-mp-grid"
                                     ref={recommendedGridRef}
                                 >
                                     {recommendedProducts.map((p) => (
                                         <article
-                                            className="cl-mp-card"
+                                            className="tsl-mp-card"
                                             key={p.id}
                                         >
-                                            <div className="cl-mp-imgWrap">
+                                            <div className="tsl-mp-imgWrap">
                                                 <img
-                                                    className="cl-mp-img"
+                                                    className="tsl-mp-img"
                                                     src={p.image}
                                                     alt=""
                                                 />
                                             </div>
-                                            <div className="cl-mp-cardBody">
-                                                <div className="cl-mp-topLine">
-                                                    <div className="cl-mp-user">
-                                                        <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">
+                                            <div className="tsl-mp-cardBody">
+                                                <div className="tsl-mp-topLine">
+                                                    <div className="tsl-mp-user">
+                                                        <div className="tsl-mp-avatar"></div>
+                                                        <span className="tsl-mp-userName">
                                                             {p.name}
                                                         </span>
                                                         {p.verified && (
                                                             <svg
-                                                                className="cl-mp-verifyIcon"
+                                                                className="tsl-mp-verifyIcon"
                                                                 width="16"
                                                                 height="16"
                                                                 viewBox="0 0 24 24"
@@ -1279,7 +1703,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                                         )}
                                                     </div>
                                                     {p.ai && (
-                                                        <span className="cl-mp-aiBadge">
+                                                        <span className="tsl-mp-aiBadge">
                                                             <svg
                                                                 width="16"
                                                                 height="16"
@@ -1292,12 +1716,12 @@ const CourseListing = ({ theme, setTheme }) => {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="cl-mp-desc">
+                                                <p className="tsl-mp-desc">
                                                     {p.title}
                                                 </p>
-                                                <div className="cl-mp-metaRow">
-                                                    <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">
+                                                <div className="tsl-mp-metaRow">
+                                                    <div className="tsl-mp-rating">
+                                                        <span className="tsl-mp-star">
                                                             ★
                                                         </span>
                                                         <span>
@@ -1305,23 +1729,23 @@ const CourseListing = ({ theme, setTheme }) => {
                                                                 1,
                                                             )}
                                                         </span>
-                                                        <span className="cl-mp-rev">
+                                                        <span className="tsl-mp-rev">
                                                             ({p.reviews})
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">
+                                                <div className="tsl-mp-bottomRow">
+                                                    <div className="tsl-mp-price">
                                                         {p.priceLabel}
                                                     </div>
                                                     <button
-                                                        className="cl-mp-cta"
+                                                        className="tsl-mp-cta"
                                                         type="button"
                                                     >
                                                         {p.cta}
                                                         <ChevronRight
                                                             size={12}
-                                                            className="cl-mp-ctaIcon"
+                                                            className="tsl-mp-ctaIcon"
                                                         />
                                                     </button>
                                                 </div>
@@ -1330,7 +1754,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                     ))}
                                 </div>
                                 <button
-                                    className="cl-mp-floatArrow left"
+                                    className="tsl-mp-floatArrow left"
                                     type="button"
                                     onClick={() =>
                                         scrollGridRef(
@@ -1342,7 +1766,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                     <ChevronLeft size={24} />
                                 </button>
                                 <button
-                                    className="cl-mp-floatArrow right"
+                                    className="tsl-mp-floatArrow right"
                                     type="button"
                                     onClick={() =>
                                         scrollGridRef(
@@ -1357,38 +1781,38 @@ const CourseListing = ({ theme, setTheme }) => {
 
                             {/* More from Sarah Anderson Section */}
                             <div
-                                className="cl-listing-container"
+                                className="tsl-listing-container"
                                 style={{ marginTop: "40px" }}
                             >
-                                <h2 className="cl-sectionTitle">
+                                <h2 className="tsl-sectionTitle">
                                     More from Sarah Anderson
                                 </h2>
                                 <div
-                                    className="cl-mp-grid"
+                                    className="tsl-mp-grid"
                                     ref={moreFromSarahGridRef}
                                 >
                                     {moreFromSarah.map((p) => (
                                         <article
-                                            className="cl-mp-card"
+                                            className="tsl-mp-card"
                                             key={p.id}
                                         >
-                                            <div className="cl-mp-imgWrap">
+                                            <div className="tsl-mp-imgWrap">
                                                 <img
-                                                    className="cl-mp-img"
+                                                    className="tsl-mp-img"
                                                     src={p.image}
                                                     alt=""
                                                 />
                                             </div>
-                                            <div className="cl-mp-cardBody">
-                                                <div className="cl-mp-topLine">
-                                                    <div className="cl-mp-user">
-                                                        <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">
+                                            <div className="tsl-mp-cardBody">
+                                                <div className="tsl-mp-topLine">
+                                                    <div className="tsl-mp-user">
+                                                        <div className="tsl-mp-avatar"></div>
+                                                        <span className="tsl-mp-userName">
                                                             {p.name}
                                                         </span>
                                                         {p.verified && (
                                                             <svg
-                                                                className="cl-mp-verifyIcon"
+                                                                className="tsl-mp-verifyIcon"
                                                                 width="16"
                                                                 height="16"
                                                                 viewBox="0 0 24 24"
@@ -1409,7 +1833,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                                         )}
                                                     </div>
                                                     {p.ai && (
-                                                        <span className="cl-mp-aiBadge">
+                                                        <span className="tsl-mp-aiBadge">
                                                             <svg
                                                                 width="16"
                                                                 height="16"
@@ -1422,12 +1846,12 @@ const CourseListing = ({ theme, setTheme }) => {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="cl-mp-desc">
+                                                <p className="tsl-mp-desc">
                                                     {p.title}
                                                 </p>
-                                                <div className="cl-mp-metaRow">
-                                                    <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">
+                                                <div className="tsl-mp-metaRow">
+                                                    <div className="tsl-mp-rating">
+                                                        <span className="tsl-mp-star">
                                                             ★
                                                         </span>
                                                         <span>
@@ -1435,23 +1859,23 @@ const CourseListing = ({ theme, setTheme }) => {
                                                                 1,
                                                             )}
                                                         </span>
-                                                        <span className="cl-mp-rev">
+                                                        <span className="tsl-mp-rev">
                                                             ({p.reviews})
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">
+                                                <div className="tsl-mp-bottomRow">
+                                                    <div className="tsl-mp-price">
                                                         {p.priceLabel}
                                                     </div>
                                                     <button
-                                                        className="cl-mp-cta"
+                                                        className="tsl-mp-cta"
                                                         type="button"
                                                     >
                                                         {p.cta}
                                                         <ChevronRight
                                                             size={12}
-                                                            className="cl-mp-ctaIcon"
+                                                            className="tsl-mp-ctaIcon"
                                                         />
                                                     </button>
                                                 </div>
@@ -1460,7 +1884,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                     ))}
                                 </div>
                                 <button
-                                    className="cl-mp-floatArrow left"
+                                    className="tsl-mp-floatArrow left"
                                     type="button"
                                     onClick={() =>
                                         scrollGridRef(
@@ -1472,7 +1896,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                     <ChevronLeft size={24} />
                                 </button>
                                 <button
-                                    className="cl-mp-floatArrow right"
+                                    className="tsl-mp-floatArrow right"
                                     type="button"
                                     onClick={() =>
                                         scrollGridRef(
@@ -1493,4 +1917,4 @@ const CourseListing = ({ theme, setTheme }) => {
     );
 };
 
-export default CourseListing;
+export default ServiceListing;

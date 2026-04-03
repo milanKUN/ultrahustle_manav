@@ -443,10 +443,23 @@
     border-radius: 6px;
 }
 
+.tsl-tab:hover {
+    background: #d9d9d9;
+    color: #222222;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(107, 114, 128, 0.22);
+}
+
+.tsl-tab:focus-visible {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
 .tsl-tab.active {
     background: #ffffff !important;
     color: #000000 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
 }
 
 .tsl-pricing-content {
@@ -811,32 +824,56 @@
 .tsl-lang-tags {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
-.tsl-lang-tags span {
-    padding: 8px 24px;
-    border-radius: 12px;
+.tsl-team-profile-card .tsl-lang-tags span {
+    min-width: 106px;
+    height: 32px;
+    padding: 0 18px;
+    border-radius: 999px;
     font-size: 14px;
-    color: var(--tsl-text);
-}
-
-.tsl-page.dark .tsl-lang-tags span {
+    font-weight: 500;
+    color: #6b6b6b;
     background: #ffffff;
-    color: #000000;
+    border: 1px solid #d8ef72;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
-.tsl-full-profile-btn {
+.tsl-page.dark .tsl-team-profile-card .tsl-lang-tags span {
+    background: #ffffff;
+    color: #6b6b6b;
+    border-color: #d8ef72;
+}
+
+.tsl-team-profile-card .tsl-full-profile-btn {
     margin-top: 24px;
-    background: var(--tsl-lime);
-    color: #000;
-    border: none;
-    padding: 14px 48px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 15px;
+    background: #c6ff00 !important;
+    color: #000000 !important;
+    border: 1.5px solid #2a2a2a !important;
+    padding: 11px 28px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
     cursor: pointer;
-    width: fit-content;
-    border: 1px solid black;
+    width: 214px !important;
+    min-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.tsl-team-profile-card .tsl-full-profile-btn:hover {
+    background: #d2ff33 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14) !important;
 }
 
 .tsl-profile-right {
@@ -1024,8 +1061,13 @@
 }
 
 .faq-item.active .faq-question {
-    background: var(--tsl-lime);
-    color: #000;
+    background: #ceff1b !important;
+    color: #000000 !important;
+}
+
+.faq-item.active .faq-question span,
+.faq-item.active .faq-question svg {
+    color: #000000 !important;
 }
 
 .faq-answer {

@@ -14,7 +14,7 @@ const TeamProfileLight = (props) => {
   const [activeItem, setActiveItem] = useState(null);
   const toolsContainerRef = useRef(null);
   const languagesContainerRef = useRef(null);
-  const [joinStatus, setJoinStatus] = useState("idle");
+  const [joinStatus, setJoinStatus] = useState("idle"); 
   const scrollHorizontal = (ref, direction) => {
     if (!ref?.current) return;
     const scrollAmount = 200;

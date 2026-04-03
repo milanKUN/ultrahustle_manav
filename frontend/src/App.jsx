@@ -38,6 +38,7 @@ import CreateServiceListing from "./features/marketplace/pages/CreateServiceList
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
 import AddNewListing from "./features/marketplace/pages/AddNewListing";
 import TeamServiceListing from "./features/marketplace/pages/TeamServiceListing";
+import ServiceListing from "./features/marketplace/pages/ServiceListing";
 import DigitalProductListing from "./features/marketplace/pages/DigitalProductListing";
 import MyListings from "./features/marketplace/pages/MyListings";
 import MyListingPage from "./features/marketplace/pages/MyListingPage";
@@ -108,6 +109,8 @@ export default function App() {
             element={<MyListingPage theme={theme} setTheme={setTheme} />}
           />
           <Route path="/team-service-listing" element={<TeamServiceListing theme={theme} setTheme={setTheme} />} />
+          <Route path="/service-listing" element={<ServiceListing theme={theme} setTheme={setTheme} />} />
+
           <Route path="/digital-product-listing" element={<DigitalProductListing theme={theme} setTheme={setTheme} />} />
           <Route path="/my-listings" element={<MyListings theme={theme} setTheme={setTheme} />} />
           <Route path="/create-course" element={<CreateCourse theme={theme} setTheme={setTheme} />} />

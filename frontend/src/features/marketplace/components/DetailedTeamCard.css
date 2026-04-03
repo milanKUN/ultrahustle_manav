@@ -1,304 +1,309 @@
-/* Detailed Team Profile Card */
-.cl-team-profile-card {
+.tsl-team-profile-card {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
     padding: 48px;
-    background: #F7F7F7;
+    margin-bottom: 24px;
+    background: #f7f7f7;
     border: 1px solid #ceff1b;
     border-radius: 32px;
-    margin-bottom: 24px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 }
 
-.user-page.dark .cl-team-profile-card {
-    background: #1A1A1A;
-    border-color: #CEFF1B;
+.user-page.dark .tsl-team-profile-card {
+    background: #1a1a1a;
+    border-color: #ceff1b;
 }
 
-.cl-profile-left {
+.tsl-profile-left,
+.tsl-profile-right {
     display: flex;
     flex-direction: column;
+}
+
+.tsl-profile-left {
     gap: 24px;
 }
 
-.cl-profile-header {
-    display: flex;
-    gap: 20px;
-    align-items: center;
+.tsl-profile-right {
+    gap: 24px;
 }
 
-.cl-avatar-container {
+.tsl-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.tsl-avatar-container {
     position: relative;
     width: 100px;
     height: 100px;
+    flex-shrink: 0;
 }
 
-.cl-profile-avatar {
+.tsl-profile-avatar {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     object-fit: cover;
+    border-radius: 50%;
     background: #eee;
 }
 
-.cl-online-indicator {
+.tsl-online-indicator {
     position: absolute;
-    bottom: 5px;
     right: 5px;
+    bottom: 5px;
     width: 18px;
     height: 18px;
     background: #4caf50;
-    border: 3px solid var(--cl-card-bg);
+    border: 3px solid #f7f7f7;
     border-radius: 50%;
 }
 
-.cl-profile-title-box h3 {
-    font-size: 24px;
-    font-weight: 700;
+.user-page.dark .tsl-online-indicator {
+    border-color: #1a1a1a;
+}
+
+.tsl-profile-title-box h3 {
     margin: 0;
     color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 700;
 }
 
-.user-page.dark .cl-profile-title-box h3 {
-    color: #ffffff;
+.user-page.dark .tsl-profile-title-box h3 {
+    color: #fff;
 }
 
-.cl-location {
-    color: #666;
-    font-size: 15px;
-    margin: 4px 0;
+.tsl-location {
     display: flex;
     align-items: center;
     gap: 6px;
+    margin: 4px 0;
+    color: #666;
+    font-size: 15px;
     font-weight: 500;
 }
 
-.user-page.dark .cl-location {
+.tsl-location svg {
+    color: #ccc;
+    flex-shrink: 0;
+}
+
+.user-page.dark .tsl-location {
     color: #aaa;
 }
 
-.cl-rating-row {
+.tsl-rating-row {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.cl-stars {
+.tsl-stars {
     display: flex;
     gap: 2px;
 }
 
-.cl-rating-text {
-    font-weight: 600;
+.tsl-rating-text {
     font-size: 14px;
+    font-weight: 600;
 }
 
-.cl-profile-details h4 {
+.tsl-profile-details h4,
+.tsl-skills-panel h4 {
+    margin: 0 0 16px;
+    color: #000;
     font-size: 24px;
     font-weight: 700;
-    margin: 32px 0 16px;
-    color: #000;
 }
 
-.user-page.dark .cl-profile-details h4 {
-    color: #ffffff;
-}
-
-.cl-profile-details p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #444;
-    font-weight: 500;
-}
-
-.user-page.dark .cl-profile-details p {
-    color: #ccc;
-}
-
-.cl-languages-section {
+.tsl-profile-details h4 {
     margin-top: 32px;
 }
 
-.cl-languages-section h5 {
+.user-page.dark .tsl-profile-details h4,
+.user-page.dark .tsl-skills-panel h4 {
+    color: #fff;
+}
+
+.tsl-profile-details p {
+    margin: 0;
+    color: #444;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.user-page.dark .tsl-profile-details p {
+    color: #ccc;
+}
+
+.tsl-languages-section {
+    margin-top: 32px;
+}
+
+.tsl-languages-section h5 {
+    margin: 0 0 12px;
+    color: #000;
     font-size: 18px;
     font-weight: 700;
-    margin-bottom: 12px;
-    color: #000;
 }
 
-.user-page.dark .cl-languages-section h5 {
-    color: #ffffff;
+.user-page.dark .tsl-languages-section h5 {
+    color: #fff;
 }
 
-.cl-lang-tags {
+.tsl-lang-tags {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
-.cl-lang-tags span {
+.tsl-lang-tags span {
     padding: 10px 32px;
-    border-radius: 14px;
-    font-size: 15px;
     background: #f0f0f0;
+    border-radius: 14px;
     color: #555;
+    font-size: 15px;
     font-weight: 600;
 }
 
-.user-page.dark .cl-lang-tags span {
+.user-page.dark .tsl-lang-tags span {
     background: #252525;
     color: #ccc;
 }
 
-.cl-full-profile-btn {
-    margin-top: 32px;
-    background: #CEFF1B;
-    color: #000;
-    border: 1px solid #888;
-    padding: 14px 0;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
+.tsl-full-profile-btn {
     width: 100%;
     max-width: 240px;
+    margin-top: 32px;
+    padding: 14px 0;
+    background: #ceff1b;
+    border: 1px solid #888;
+    border-radius: 12px;
+    color: #000;
+    font-size: 15px;
+    font-weight: 700;
     text-align: center;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.cl-full-profile-btn:hover {
+.tsl-full-profile-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(206, 255, 27, 0.3);
 }
 
-.user-page.dark .cl-full-profile-btn {
-    background: #CEFF1B !important;
+.user-page.dark .tsl-full-profile-btn {
+    background: #ceff1b !important;
     color: #000 !important;
-    border: 1px solid #000 !important;
+    border-color: #000 !important;
 }
 
-.cl-profile-right {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.cl-stats-grid {
+.tsl-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
 }
 
-.cl-stat-card {
-    background: #ffffff;
-    border: 1px solid #ddd;
-    padding: 24px 32px;
-    border-radius: 16px;
+.tsl-stat-card {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 24px 32px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 }
 
-.user-page.dark .cl-stat-card {
+.user-page.dark .tsl-stat-card {
     background: #252525;
-    border-color: #CEFF1B;
+    border-color: #ceff1b;
 }
 
-.stat-header {
+.tsl-team-profile-card .stat-header {
     display: flex;
     align-items: center;
     gap: 10px;
     color: #666;
 }
 
-.user-page.dark .stat-header {
+.user-page.dark .tsl-team-profile-card .stat-header {
     color: #aaa;
 }
 
-.stat-icon-svg {
+.tsl-team-profile-card .stat-icon-svg {
     stroke-width: 1.5px;
 }
 
-.stat-label {
+.tsl-team-profile-card .stat-label {
     font-size: 15px;
     font-weight: 500;
 }
 
-.stat-value {
+.tsl-team-profile-card .stat-value {
+    color: #000;
     font-size: 32px;
     font-weight: 700;
-    color: #000;
     line-height: 1;
 }
 
-.user-page.dark .cl-stat-card .stat-value {
-    color: #ffffff;
+.user-page.dark .tsl-team-profile-card .stat-value {
+    color: #fff;
 }
 
-.cl-skills-panel {
-    background: #F7F7F7;
-    border: 1px solid #aaa;
+.tsl-skills-panel {
     padding: 32px 40px;
+    background: #f7f7f7;
+    border: 1px solid #aaa;
     border-radius: 24px;
 }
 
-.user-page.dark .cl-skills-panel {
-    background: #1A1A1A;
-    border-color: #CEFF1B !important
+.user-page.dark .tsl-skills-panel {
+    background: #1a1a1a;
+    border-color: #ceff1b;
 }
 
-.cl-skills-panel h4 {
-    margin-bottom: 24px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-
-.user-page.dark .cl-skills-panel h4 {
-    color: #ffffff;
-}
-
-.cl-skills-grid {
+.tsl-skills-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.cl-skill-tag {
+.tsl-skill-tag {
     padding: 10px 18px;
-    background: #CEFF1B;
-    color: #000;
+    background: #ceff1b;
+    border: 1px solid #888;
     border-radius: 10px;
+    color: #000;
     font-size: 14px;
     font-weight: 700;
-    border: 1px solid #888;
 }
 
-.user-page.dark .cl-skill-tag {
+.user-page.dark .tsl-skill-tag {
     border-color: #000;
 }
 
-.user-page.dark .cl-stat-card {
-    background: #252525;
-    border-color: #CEFF1B;
-}
-
-.user-page.dark .cl-stat-card .stat-value {
-    color: #fff;
-}
-
-.user-page.dark .cl-skills-panel {
-    background: #1a1a1a;
-    border-color: #333;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-    .cl-team-profile-card {
+    .tsl-team-profile-card {
         grid-template-columns: 1fr;
         padding: 24px;
         gap: 24px;
+    }
+
+    .tsl-profile-header {
+        align-items: flex-start;
+    }
+
+    .tsl-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tsl-skills-panel {
+        padding: 24px;
     }
 }

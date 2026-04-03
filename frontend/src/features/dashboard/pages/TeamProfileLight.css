@@ -31,8 +31,6 @@
   border: 1px solid #ceff1b;
   border-radius: 14px;
   padding: 18px;
-  background-color: #FFF;
-  margin-bottom: 30px;
 }
 
 /* grid */
@@ -43,7 +41,7 @@
 }
 
 .memberCard {
-  background: #D6D6D6;
+  background: rgba(254, 254, 254, 0.25);
 
   border-radius: 16px;
   padding: 18px;
@@ -68,22 +66,20 @@
 }
 
 .memberInfo {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+  line-height: 1.1;
 }
 
 .memberName {
   font-size: 15px;
   font-weight: 700;
   color: #111;
-  white-space: nowrap;
 }
 
 .memberRole {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: #666;
+  margin-top: 4px;
 }
 
 .memberTag {
@@ -168,12 +164,6 @@
 .user-page.dark .avatar {
   background: #2b2b2b !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-.user-page.dark .memberInfo {
-  display: flex !important;
-  align-items: baseline !important;
-  gap: 8px !important;
 }
 
 .user-page.dark .memberName {
@@ -1533,30 +1523,41 @@
   position: fixed !important;
   inset: 0 !important;
   z-index: 99999 !important;
-  background: rgba(0, 0, 0, 0.4) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  overflow: hidden !important;
+  padding: 24px !important;
 }
 
 /* ✅ MODAL CARD – Centered + Internal Scroll */
 .portfolio-modal-content {
   width: 95% !important;
   max-width: 550px !important;
-  max-height: 80vh !important;
-  margin-top: 50px !important;
+  max-height: calc(100vh - 120px) !important;
+  margin: auto !important;
   background: #ffffff !important;
-  border-radius: 20px !important;
+  border-radius: 28px !important;
   position: relative !important;
   z-index: 100000 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow: hidden !important;
   padding: 0 !important;
   animation: modalIn 0.25s ease;
   box-shadow: 0 0 40px rgba(206, 255, 27, 0.6), 0 30px 60px rgba(0, 0, 0, 0.4) !important;
   pointer-events: auto !important;
+}
+
+.portfolio-modal-scroll {
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  scrollbar-width: thin;
+  scrollbar-color: #CEFF1B #ffffff;
 }
 
 /* 🔝 Top bar (sticky) */
@@ -1609,50 +1610,66 @@
   color: #000;
 }
 
-.portfolio-modal-content.dark .nav-arrow {
+.portfolio-modal-content.dark .nav-arrow,
+.portfolio-modal-content.dark-theme .nav-arrow {
   background: #222;
   border-color: #444;
   color: #fff;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-counter {
+.portfolio-modal-content.dark .portfolio-modal-counter,
+.portfolio-modal-content.dark-theme .portfolio-modal-counter {
   color: #ddd;
 }
 
-.portfolio-modal-content.dark .nav-arrow:hover {
+.portfolio-modal-content.dark .nav-arrow:hover,
+.portfolio-modal-content.dark-theme .nav-arrow:hover {
   background: #CEFF1B;
   border-color: #CEFF1B;
   color: #000;
 }
 
 /* 🌙 DARK MODE Modal Body */
-.portfolio-modal-content.dark {
+.portfolio-modal-content.dark,
+.portfolio-modal-content.dark-theme {
   background: #121212 !important;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-topbar {
+.portfolio-modal-content.dark .portfolio-modal-scroll,
+.portfolio-modal-content.dark-theme .portfolio-modal-scroll {
+  background: #121212 !important;
+  scrollbar-color: #CEFF1B #2a2a2a;
+}
+
+.portfolio-modal-content.dark .portfolio-modal-topbar,
+.portfolio-modal-content.dark-theme .portfolio-modal-topbar {
   background: black;
   border-bottom: 1px solid #333;
   color: #ffffff;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-info h3 {
+.portfolio-modal-content.dark .portfolio-modal-info h3,
+.portfolio-modal-content.dark-theme .portfolio-modal-info h3 {
   color: #ffffff;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-info p {
+.portfolio-modal-content.dark .portfolio-modal-info p,
+.portfolio-modal-content.dark-theme .portfolio-modal-info p {
   color: #a0a0a0;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-cost {
+.portfolio-modal-content.dark .portfolio-modal-cost,
+.portfolio-modal-content.dark-theme .portfolio-modal-cost {
   background: #1e1e1e;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-cost span {
+.portfolio-modal-content.dark .portfolio-modal-cost span,
+.portfolio-modal-content.dark-theme .portfolio-modal-cost span {
   color: #a0a0a0;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-cost strong {
+.portfolio-modal-content.dark .portfolio-modal-cost strong,
+.portfolio-modal-content.dark-theme .portfolio-modal-cost strong {
   color: #ffffff;
 }
 
@@ -1683,12 +1700,14 @@
 }
 
 /* 🌙 DARK MODE Close button */
-.portfolio-modal-content.dark .portfolio-modal-close {
+.portfolio-modal-content.dark .portfolio-modal-close,
+.portfolio-modal-content.dark-theme .portfolio-modal-close {
   color: #ffffff !important;
   border: 1px solid #ffffff !important;
 }
 
-.portfolio-modal-content.dark .portfolio-modal-close:hover {
+.portfolio-modal-content.dark .portfolio-modal-close:hover,
+.portfolio-modal-content.dark-theme .portfolio-modal-close:hover {
   background: #ffffff !important;
   color: #000000 !important;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
@@ -1712,20 +1731,21 @@
 }
 
 /* 🔥 Neon scrollbar – WebKit */
-.portfolio-modal-content::-webkit-scrollbar {
+.portfolio-modal-scroll::-webkit-scrollbar {
   width: 10px;
 }
 
-.portfolio-modal-content::-webkit-scrollbar-track {
+.portfolio-modal-scroll::-webkit-scrollbar-track {
   background: white;
   border-radius: 10px;
 }
 
-.portfolio-modal-content.dark::-webkit-scrollbar-track {
-  background: #1a1a1a;
+.portfolio-modal-content.dark .portfolio-modal-scroll::-webkit-scrollbar-track,
+.portfolio-modal-content.dark-theme .portfolio-modal-scroll::-webkit-scrollbar-track {
+  background: #2a2a2a;
 }
 
-.portfolio-modal-content::-webkit-scrollbar-thumb {
+.portfolio-modal-scroll::-webkit-scrollbar-thumb {
   background: #CEFF1B;
   border-radius: 10px;
 }
