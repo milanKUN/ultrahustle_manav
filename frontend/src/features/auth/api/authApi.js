@@ -246,6 +246,11 @@ export const logout = async () => {
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
+    const email = localStorage.getItem("uh_auth_email");
+    if (email) {
+      localStorage.removeItem(`uh_team_form_draft:create:${email}`);
+    }
+
     // Always clear local data even if API fails
     localStorage.removeItem(TOKEN_KEY);
     // localStorage.removeItem('user');
