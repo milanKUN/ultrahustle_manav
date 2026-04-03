@@ -23,7 +23,9 @@ import SetupWorkspaceForCreator from "./features/onboarding/components/ForCreato
 import CreatorProfileSetup from "./features/onboarding/components/ForCreator/CreatorProfileSetup";
 import ClientProfileSetup from "./features/onboarding/components/ForClient/ClientProfileSetup";
 import CreateTeam from "./features/dashboard/pages/CreateTeam";
+import EditTeam from "./features/dashboard/pages/EditTeam";
 import TeamProfileLight from "./features/dashboard/pages/TeamProfileLight";
+import TeamInvitePage from "./features/dashboard/pages/TeamInvitePage";
 import PublicTeamProfile from "./features/dashboard/pages/PublicTeamProfile";
 import UserProfile from "./features/dashboard/pages/UserProfile";
 import PublicUserProfile from "./features/dashboard/pages/PublicUserProfile";
@@ -87,7 +89,8 @@ export default function App() {
           <Route path="/creator-profile-setup" element={<CreatorProfileSetup />} />
           <Route path="/client-profile-setup" element={<ClientProfileSetup />} />
           <Route path="/create-team" element={<CreateTeam theme={theme} setTheme={setTheme} />} />
-          <Route path="/team-profile" element={<TeamProfileLight theme={theme} setTheme={setTheme} />} />
+          <Route path="/edit-team/:teamId" element={<EditTeam theme={theme} setTheme={setTheme} />} />
+          <Route path="/team-profile/:username" element={<TeamProfileLight theme={theme} setTheme={setTheme} />} />
           <Route path="/public-team-profile" element={<PublicTeamProfile theme={theme} setTheme={setTheme} />} />
           <Route path="/user-profile" element={<ProtectedRoute><UserProfile theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/public-user-profile" element={<PublicUserProfile theme={theme} setTheme={setTheme} />} />
@@ -99,6 +102,7 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/manage-team" element={<ManageTeam theme={theme} setTheme={setTheme} />} />
           <Route path="/add-listing" element={<AddNewListing theme={theme} setTheme={setTheme} />} />
+          <Route path="/team-invite" element={<TeamInvitePage theme={theme} setTheme={setTheme} />} />
           <Route
             path="/my-listings"
             element={<MyListingPage theme={theme} setTheme={setTheme} />}

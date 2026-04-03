@@ -58,11 +58,13 @@ class Team extends Model
 
     public function memberships(): HasMany
     {
-        return $this->hasMany(TeamMembership::class);
+        return $this->hasMany(TeamMembership::class, 'team_id');
     }
 
     public function invitations(): HasMany
     {
-        return $this->hasMany(TeamInvitation::class);
+        return $this->hasMany(TeamInvitation::class, 'team_id');
     }
+
+    
 }

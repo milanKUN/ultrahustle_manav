@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from "react-dom";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import "./CreateTeam.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
@@ -20,12 +20,28 @@ import {
   patchTeamMember,
 } from "../api/teamApi";
 
-const CreateTeam = ({ theme, setTheme }) => {
+const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+
+  const resolvedRouteTeamId = useMemo(() => {
+    const raw =
+      initialTeamId ??
+      location?.state?.teamId ??
+      location?.state?.team?.id ??
+      params?.teamId ??
+      params?.id ??
+      null;
+
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }, [initialTeamId, location?.state, params]);
 
   const currentEmailKey = String(getCurrentUserEmail() || "").trim().toLowerCase() || "anon";
-  const DRAFT_KEY = `uh_create_team_draft:${currentEmailKey}`;
-  const TEAM_ID_KEY = `uh_create_team_team_id:${currentEmailKey}`;
+  const storageScope = mode === "edit" && resolvedRouteTeamId ? `edit:${resolvedRouteTeamId}` : "create";
+  const DRAFT_KEY = `uh_team_form_draft:${storageScope}:${currentEmailKey}`;
+  const TEAM_ID_KEY = `uh_team_form_team_id:${storageScope}:${currentEmailKey}`;
 
   const [formData, setFormData] = useState({
     // ... (rest of the state remains the same, will use replace_file_content specifically for targeted areas)
@@ -143,7 +159,7 @@ const CreateTeam = ({ theme, setTheme }) => {
   const [creatorResults, setCreatorResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [teamId, setTeamId] = useState(null);
+  const [teamId, setTeamId] = useState(resolvedRouteTeamId);
   const [isSaving, setIsSaving] = useState(false);
 
   const [invitedEmails, setInvitedEmails] = useState(() => new Set());
@@ -151,8 +167,15 @@ const CreateTeam = ({ theme, setTheme }) => {
 
   const [externalInviteEmail, setExternalInviteEmail] = useState("");
 
+  const isHydratingRef = useRef(false);
+  const hasBootstrappedRef = useRef(false);
+
   // Restore draft + teamId on first mount.
-  React.useEffect(() => {
+  useEffect(() => {
+    if (resolvedRouteTeamId) {
+      setTeamId((prev) => prev || resolvedRouteTeamId);
+    }
+
     try {
       const rawDraft = localStorage.getItem(DRAFT_KEY);
       if (rawDraft) {
@@ -199,6 +222,7 @@ const CreateTeam = ({ theme, setTheme }) => {
   React.useEffect(() => {
     try {
       if (teamId) localStorage.setItem(TEAM_ID_KEY, String(teamId));
+      if (teamId) hasBootstrappedRef.current = true;
     } catch {
       // ignore
     }
@@ -334,23 +358,27 @@ const CreateTeam = ({ theme, setTheme }) => {
   };
 
   // If teamId exists (created earlier), hydrate UI from backend after reload.
-  React.useEffect(() => {
+  useEffect(() => {
     if (!teamId) return;
+
     (async () => {
+      isHydratingRef.current = true;
       try {
         const res = await getTeam(teamId);
         hydrateFromTeamResponse(res);
-        await refreshMembersAndInvites(teamId);
+        await refreshMembersAndInvites(teamId, res);
       } catch {
         // If fetch fails, draft values still show.
+      } finally {
+        isHydratingRef.current = false;
+        hasBootstrappedRef.current = true;
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamId]);
 
   // Auto-save changes to backend when team already exists (debounced).
-  React.useEffect(() => {
-    if (!teamId) return;
+  useEffect(() => {
+    if (!teamId || isHydratingRef.current || !hasBootstrappedRef.current) return;
 
     const t = setTimeout(async () => {
       try {
@@ -361,7 +389,6 @@ const CreateTeam = ({ theme, setTheme }) => {
     }, 800);
 
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamId, formData]);
 
   const extractTeamId = (res) => {
@@ -375,15 +402,31 @@ const CreateTeam = ({ theme, setTheme }) => {
     );
   };
 
-  const refreshMembersAndInvites = async (id) => {
+  const refreshMembersAndInvites = async (id, teamResponse = null) => {
     if (!id) return;
-    const [membersRes, invitesRes] = await Promise.all([
-      getTeamMembers(id),
-      listTeamInvites(id),
-    ]);
 
-    const members = membersRes?.members || membersRes?.data?.members || membersRes || [];
-    const invites = invitesRes?.invites || invitesRes?.data?.invites || invitesRes || [];
+    let membersRes = teamResponse;
+    let invitesRes = teamResponse;
+
+    if (!teamResponse) {
+      [membersRes, invitesRes] = await Promise.all([
+        getTeamMembers(id),
+        listTeamInvites(id),
+      ]);
+    }
+
+    const members =
+      membersRes?.memberships ||
+      membersRes?.members ||
+      membersRes?.data?.memberships ||
+      membersRes?.data?.members ||
+      [];
+    const invites =
+      invitesRes?.invitations ||
+      invitesRes?.invites ||
+      invitesRes?.data?.invitations ||
+      invitesRes?.data?.invites ||
+      [];
 
     const myEmail = String(getCurrentUserEmail() || "").trim().toLowerCase();
 
@@ -499,6 +542,42 @@ const CreateTeam = ({ theme, setTheme }) => {
       return newId;
     } catch (e) {
       window.alert(e?.message || "Failed to create team");
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveTeam = async () => {
+    if (requiredFieldsMissing) {
+      window.alert("Please fill all required team fields.");
+      return null;
+    }
+
+    if (!teamId) {
+      return ensureTeamCreated();
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await patchTeam(teamId, normalizeTeamPayload());
+      hydrateFromTeamResponse(res);
+
+      if (selectedAvatarFile) {
+        const avatarRes = await uploadTeamAvatar(teamId, selectedAvatarFile);
+        const url = extractAvatarUrl(avatarRes);
+        if (url) {
+          setTeamAvatarUrl(url);
+          setSelectedAvatarImage(url);
+          setAvatarModalInitialSrc(url);
+        }
+      }
+
+      await refreshMembersAndInvites(teamId);
+      showSuccess("Team Updated!", "Your team has been updated successfully.");
+      return teamId;
+    } catch (e) {
+      window.alert(e?.message || "Failed to update team");
       return null;
     } finally {
       setIsSaving(false);
@@ -632,9 +711,8 @@ const CreateTeam = ({ theme, setTheme }) => {
           <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
             <div className="create-team-container">
               <header className="header-section">
-                <h1>Create Your Team</h1>
-                <p className=""
-                >Build a team of creators and collaborate on services, products, or projects</p>
+                <h1>{teamId || mode === "edit" ? "Edit Team" : "Create Your Team"}</h1>
+                <p className="">Build a team of creators and collaborate on services, products, or projects</p>
               </header>
 
               {/* Avatar Section */}
@@ -1314,14 +1392,10 @@ const CreateTeam = ({ theme, setTheme }) => {
                     type="button"
                     disabled={isSaving}
                     onClick={async () => {
-                      if (teamId) {
-                        window.alert("Team is already created.");
-                        return;
-                      }
-                      await ensureTeamCreated();
+                      await handleSaveTeam();
                     }}
                   >
-                    {isSaving ? "Creating..." : "Create Team"}
+                    {isSaving ? (teamId ? "Saving..." : "Creating...") : (teamId || mode === "edit" ? "Save Changes" : "Create Team")}
                   </button>
                 </div>
               </div>

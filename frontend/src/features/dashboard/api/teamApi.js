@@ -179,3 +179,34 @@ export const declineTeamInvite = async (token) => {
     throw new Error(extractErrorMessage(err));
   }
 };
+
+export const getTeamByUsername = async (username) => {
+  try {
+    const res = await api.get(`${V1}/teams/username/${username}`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+// =========================
+// Manage Teams
+// =========================
+
+export const getMyTeams = async () => {
+  try {
+    const res = await api.get(`${V1}/my-teams`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+export const toggleTeamStatus = async (teamId) => {
+  try {
+    const res = await api.patch(`${V1}/teams/${teamId}/toggle-status`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
