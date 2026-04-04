@@ -472,22 +472,6 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                     <div className="overflow-y-auto h-[calc(100vh-85px)]">
                         <div className={`tsl-page ${theme}`}>
                             <div className="tsl-header">
-                                <div
-                                    className="cl-back-link"
-                                    onClick={() => navigate("/my-listings")}
-                                    style={{
-                                        cursor: "pointer",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "4px",
-                                        color: "var(--mylis-muted)",
-                                        marginBottom: "10px",
-                                        fontSize: "14px",
-                                    }}
-                                >
-                                    <ChevronLeft size={16} /> Back to My
-                                    Listings
-                                </div>
                                 <h1 className="tsl-title">
                                     I will design online course cover and
                                     digital product mockup bundle
@@ -1178,7 +1162,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                 >
                                     <ChevronDown size={20} color="#000" />
                                 </button>
-                            </div>
+                            </div> 
 
                             <DetailedTeamCard />
 

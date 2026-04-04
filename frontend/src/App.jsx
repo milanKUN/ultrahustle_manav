@@ -44,7 +44,7 @@ import MyListings from "./features/marketplace/pages/MyListings";
 import MyListingPage from "./features/marketplace/pages/MyListingPage";
 import CreateCourse from "./features/marketplace/pages/CreateCourse";
 import CourseListing from "./features/marketplace/pages/CourseListing";
-import OrderDeliverables from "./features/marketplace/pages/OrderDeliverables";
+import ProductDeliverables from "./features/marketplace/pages/ProductDeliverables.jsx";
 import CourseDeliverables from "./features/marketplace/pages/CourseDeliverables";
 import WebinarDeliverables from "./features/marketplace/pages/WebinarDeliverables";
 import WebinarListing from "./features/marketplace/pages/WebinarListing";
@@ -115,7 +115,7 @@ export default function App() {
           <Route path="/my-listings" element={<MyListings theme={theme} setTheme={setTheme} />} />
           <Route path="/create-course" element={<CreateCourse theme={theme} setTheme={setTheme} />} />
           <Route path="/course-listing" element={<CourseListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/order-deliverables" element={<OrderDeliverables theme={theme} setTheme={setTheme} />} />
+          <Route path="/product-deliverables" element={<ProductDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/course-deliverables" element={<CourseDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/webinar-deliverables" element={<WebinarDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/webinar-listing" element={<WebinarListing theme={theme} setTheme={setTheme} />} />
