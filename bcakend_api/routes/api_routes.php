@@ -107,11 +107,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Public decline endpoint (token-only)
 Route::post('/v1/team-invites/{token}/decline', [\App\Http\Controllers\Api\TeamInviteController::class, 'decline']);
+    Route::get('/v1/teams/username/{username}', [TeamController::class, 'showByUsername']);
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/teams', [TeamController::class, 'store']);
 
-    Route::get('/teams/username/{username}', [TeamController::class, 'showByUsername']);
 
     Route::get('/teams/{team}', [TeamController::class, 'show']);
     Route::patch('/teams/{team}', [TeamController::class, 'update']);
@@ -133,3 +133,4 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 	Route::get('/creators/search', [\App\Http\Controllers\Api\CreatorSearchController::class, 'search'])->middleware('throttle:30,1');
 
 });
+Route::get('/v1/teams/username/{username}/portfolio', [PortfolioController::class, 'showTeamPublic']);

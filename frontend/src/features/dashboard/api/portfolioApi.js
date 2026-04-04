@@ -10,6 +10,13 @@ const api = axios.create({
   },
 });
 
+const publicApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
 /* ================= AUTH ================= */
 
 api.interceptors.request.use((config) => {
@@ -134,6 +141,17 @@ export const deletePortfolioMedia = async (mediaId, options = {}) => {
 
     const basePath = getPortfolioBasePath(options);
     const res = await api.delete(`${basePath}/media/${mediaId}`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+export const getPublicTeamPortfolio = async (username) => {
+  try {
+    const res = await publicApi.get(
+      `/api/v1/teams/username/${username}/portfolio`
+    );
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));

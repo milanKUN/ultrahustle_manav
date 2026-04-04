@@ -116,6 +116,13 @@ class PortfolioController extends Controller
         ]);
     }
 
+    public function showTeamPublic(string $username)
+    {
+        $team = Team::where('username', $username)->firstOrFail();
+
+        return $this->showPortfolio('team', $team->id);
+    }
+
     protected function syncPortfolio(Request $request, string $ownerType, int $ownerId)
     {
         $portfolio = $this->getOrCreatePortfolio($ownerType, $ownerId);
