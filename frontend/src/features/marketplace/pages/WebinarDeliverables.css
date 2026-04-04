@@ -27,7 +27,7 @@
 }
 
 .wd-header-content h1 {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
     color: #000;
     margin-bottom: 8px;
@@ -61,11 +61,12 @@
     padding: 14px 28px;
     border-radius: 12px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 10px;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
 
@@ -81,11 +82,12 @@
     padding: 14px 28px;
     border-radius: 12px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 10px;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
 

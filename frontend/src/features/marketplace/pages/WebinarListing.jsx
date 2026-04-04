@@ -12,9 +12,6 @@ import {
     Star,
     ChevronDown,
     Clock,
-    Infinity,
-    CheckCircle2,
-    User,
     X,
     Play,
     Calendar,
@@ -389,13 +386,13 @@ const WebinarListing = ({ theme, setTheme }) => {
                     <div className="overflow-y-auto h-[calc(100vh-85px)]">
                         <div className={`cl-page ${theme}`}>
                             <div className="cl-header">
-                                <div 
+                                {/* <div 
                                     className="cl-back-link" 
                                     onClick={() => navigate('/my-listings')}
                                     style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--mylis-muted)', marginBottom: '10px', fontSize: '14px' }}
                                 >
                                     <ChevronLeft size={16} /> Back to My Listings
-                                </div>
+                                </div> */}
                                 <h1 className="cl-title">I will design online course cover and digital product mockup bundle</h1>
                                 <div className="cl-header-actions">
                                     <button className="cl-icon-btn"><Share2 size={20} /></button>
@@ -742,10 +739,8 @@ const WebinarListing = ({ theme, setTheme }) => {
                                 </button>
                             </div>
 
-
-
-
                             <DetailedTeamCard />
+                            
 
                             <FAQAccordion faqData={faqData} theme={theme} />
 

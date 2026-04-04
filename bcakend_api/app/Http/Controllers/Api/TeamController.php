@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
-
+use App\Models\Portfolio;
+use App\Models\PortfolioProject;
 class TeamController extends Controller
 {
     public function store(StoreTeamRequest $request): JsonResponse
@@ -568,5 +569,93 @@ class TeamController extends Controller
             'message' => $message,
             'errors' => $errors,
         ], $statusCode);
+    }
+
+    //manage teams
+    public function manageTeams(Request $request)
+    {
+        $user = $request->user();
+
+        $teams = Team::query()
+            ->where('owner_user_id', $user->id)
+            ->withCount('memberships as members_count')
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($team) {
+                // Team portfolio
+                $portfolio = Portfolio::where('owner_type', 'team')
+                    ->where('owner_id', $team->id)
+                    ->first();
+
+                $projectsCount = 0;
+
+                if ($portfolio) {
+                    $projectsCount = PortfolioProject::where('portfolio_id', $portfolio->id)->count();
+                }
+
+                // If you have listings/services/gigs table later, replace this
+                $listingsCount = 0;
+
+                return [
+                    'id' => $team->id,
+                    'name' => $team->name,
+                    'username' => $team->username,
+                    'title' => $team->title,
+                    'bio' => $team->bio,
+                    'avatar' => $team->avatar_path
+                        ? asset('storage/' . ltrim($team->avatar_path, '/'))
+                        : null,
+                    'members' => (int) $team->members_count,
+                    'listings' => (int) $listingsCount,
+                    'projects' => (int) $projectsCount,
+                    'isActive' => (bool) $team->is_active,
+                ];
+            });
+
+        return response()->json([
+            'teams' => $teams,
+        ]);
+    }
+
+    public function showByUsername(Request $request, string $username): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $team = Team::where('username', $username)->first();
+
+        if (! $team) {
+            return $this->errorResponse('Team not found.', [], 404);
+        }
+
+        if (! $this->canViewTeam($user, $team)) {
+            return $this->errorResponse('Forbidden.', [], 403);
+        }
+
+        $team = $team->fresh();
+
+        $memberships = $team
+            ->memberships()
+            ->with('user:id,full_name,email')
+            ->orderByDesc('id')
+            ->get();
+
+        $invitations = [];
+        if ($this->isOwner($user, $team)) {
+            $invitations = $team
+                ->invitations()
+                ->with('invitedUser:id,full_name,email', 'invitedBy:id,full_name,email')
+                ->orderByDesc('id')
+                ->get()
+                ->map(fn ($inv) => $this->invitationPayload($inv))
+                ->values()
+                ->all();
+        }
+
+        return $this->successResponse('Team fetched.', [
+            'team' => $this->teamPayload($team),
+            'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
+            'invitations' => $invitations,
+        ]);
     }
 }

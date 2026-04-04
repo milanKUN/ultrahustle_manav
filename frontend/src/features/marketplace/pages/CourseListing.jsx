@@ -1,6 +1,6 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import {
     Share2,
     Flag,
@@ -12,26 +12,23 @@ import {
     Star,
     ChevronDown,
     Clock,
-    Infinity,
-    CheckCircle2,
-    User,
     X,
     Play,
-} from 'lucide-react';
-import './CourseListing.css';
-import UserNavbar from '../../../components/layout/UserNavbar';
-import '../../../Darkuser.css';
-import '../../dashboard/pages/TeamProfileLight.css';
+} from "lucide-react";
+import "./CourseListing.css";
+import UserNavbar from "../../../components/layout/UserNavbar";
+import "../../../Darkuser.css";
+import "../../dashboard/pages/TeamProfileLight.css";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
-import DetailedTeamCard from '../components/DetailedTeamCard';
+import DetailedTeamCard from "../components/DetailedTeamCard";
 
 const CourseListing = ({ theme, setTheme }) => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('Basic');
+    const [activeTab, setActiveTab] = useState("Basic");
     const [activeImg, setActiveImg] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [showSettings, setShowSettings] = useState(false);
-    const [activeSetting, setActiveSetting] = useState('basic');
+    const [activeSetting, setActiveSetting] = useState("basic");
     const [showMoreListings, setShowMoreListings] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
     const [modalImgIndex, setModalImgIndex] = useState(0);
@@ -41,8 +38,8 @@ const CourseListing = ({ theme, setTheme }) => {
     const [activeItem, setActiveItem] = useState(null);
     const [activeItemIndex, setActiveItemIndex] = useState(0);
     const [favorites, setFavorites] = useState(new Set());
-    const [mainTab, setMainTab] = useState('listings');
-    const [filter, setFilter] = useState('All');
+    const [mainTab, setMainTab] = useState("listings");
+    const [filter, setFilter] = useState("All");
     const [activeFaq, setActiveFaq] = useState(null);
     const recommendedGridRef = useRef(null);
     const moreFromSarahGridRef = useRef(null);
@@ -68,327 +65,443 @@ const CourseListing = ({ theme, setTheme }) => {
 
     const portfolioData = {
         featured: {
-            image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-            title: 'SalonSync - Revolutionary AI-Powered Salon App UI/UX',
-            description: 'This project involves designing a next-generation salon mobile application with AI-powered recommendations.',
-            cost: '$600-$800',
+            image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+            title: "SalonSync - Revolutionary AI-Powered Salon App UI/UX",
+            description:
+                "This project involves designing a next-generation salon mobile application with AI-powered recommendations.",
+            cost: "$600-$800",
         },
         items: [
             {
-                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'Title',
-                description: 'Description',
-                cost: '$',
+                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                title: "Title",
+                description: "Description",
+                cost: "$",
             },
             {
-                image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'E-commerce Dashboard Redesign',
-                description: 'This project involves designing more...',
-                cost: '$600-$800',
+                image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                title: "E-commerce Dashboard Redesign",
+                description: "This project involves designing more...",
+                cost: "$600-$800",
             },
             {
-                image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'E-commerce Dashboard Redesign',
-                description: 'This project involves designing more...',
-                cost: '$600-$800',
+                image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                title: "E-commerce Dashboard Redesign",
+                description: "This project involves designing more...",
+                cost: "$600-$800",
             },
         ],
     };
 
     const listingsData = [
-        { image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', title: 'Complete UI/UX Design for Mobile & Web more...', type: 'Service', views: 3247, price: '$2,500' },
-        { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80', title: 'React & Frontend Development Course', type: 'Course', views: 1890, price: '$99' },
-        { image: 'https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=500&q=80', title: 'E-commerce Website UI Kit', type: 'Product', views: 2460, price: '$49' },
-        { image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80', title: 'Growth Marketing Live Webinar', type: 'Webinar', views: 870, price: 'Free' },
-        { image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=500&q=80', title: 'Brand Identity & Logo Design', type: 'Service', views: 1325, price: '$1,200' },
-        { image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=500&q=80', title: 'Landing Page Conversion Template', type: 'Product', views: 1640, price: '$29' },
+        {
+            image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            title: "Complete UI/UX Design for Mobile & Web more...",
+            type: "Service",
+            views: 3247,
+            price: "$2,500",
+        },
+        {
+            image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80",
+            title: "React & Frontend Development Course",
+            type: "Course",
+            views: 1890,
+            price: "$99",
+        },
+        {
+            image: "https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=500&q=80",
+            title: "E-commerce Website UI Kit",
+            type: "Product",
+            views: 2460,
+            price: "$49",
+        },
+        {
+            image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80",
+            title: "Growth Marketing Live Webinar",
+            type: "Webinar",
+            views: 870,
+            price: "Free",
+        },
+        {
+            image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=500&q=80",
+            title: "Brand Identity & Logo Design",
+            type: "Service",
+            views: 1325,
+            price: "$1,200",
+        },
+        {
+            image: "https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=500&q=80",
+            title: "Landing Page Conversion Template",
+            type: "Product",
+            views: 1640,
+            price: "$29",
+        },
     ];
-
-
 
     const reviewsData = {
         average: 4.9,
         total: 48,
         breakdown: { 5: 38, 4: 7, 3: 2, 2: 1, 1: 0 },
         reviews: [
-            { name: 'Emily Chen', date: 'Nov 15, 2025', rating: 5, text: 'Exceptional designer! Delivered beyond expectations with stunning visuals and perfect usability.' },
-            { name: 'James Miller', date: 'Nov 10, 2025', rating: 5, text: 'Incredible work ethic and communication throughout the project. Highly recommended!' },
-            { name: 'Sophia Lee', date: 'Oct 28, 2025', rating: 5, text: 'Professional, talented, and creative. The final product exceeded our goals completely.' },
-            { name: 'David Carter', date: 'Oct 20, 2025', rating: 4, text: 'Great collaboration, fast turnarounds, and very responsive. Would hire again for sure.' },
+            {
+                name: "Emily Chen",
+                date: "Nov 15, 2025",
+                rating: 5,
+                text: "Exceptional designer! Delivered beyond expectations with stunning visuals and perfect usability.",
+            },
+            {
+                name: "James Miller",
+                date: "Nov 10, 2025",
+                rating: 5,
+                text: "Incredible work ethic and communication throughout the project. Highly recommended!",
+            },
+            {
+                name: "Sophia Lee",
+                date: "Oct 28, 2025",
+                rating: 5,
+                text: "Professional, talented, and creative. The final product exceeded our goals completely.",
+            },
+            {
+                name: "David Carter",
+                date: "Oct 20, 2025",
+                rating: 4,
+                text: "Great collaboration, fast turnarounds, and very responsive. Would hire again for sure.",
+            },
         ],
     };
     const members = [
-        { id: 1, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 2, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 3, name: 'Abigail Abigail', role: 'Owner', tag: 'Frontend Developer' },
-        { id: 4, name: 'Abigail Abigail', role: 'Owner', tag: 'Social Media Manager' },
-        { id: 5, name: 'Abigail Abigail', role: 'Owner', tag: 'Frontend Developer' },
-        { id: 6, name: 'Abigail Abigail', role: 'Owner', tag: 'Sales' },
-        { id: 7, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 8, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 9, name: 'Abigail Abigail', role: 'Owner', tag: 'Social Media Manager' },
+        { id: 1, name: "Abigail Abigail", role: "Owner", tag: "Designer" },
+        { id: 2, name: "Abigail Abigail", role: "Owner", tag: "Designer" },
+        {
+            id: 3,
+            name: "Abigail Abigail",
+            role: "Owner",
+            tag: "Frontend Developer",
+        },
+        {
+            id: 4,
+            name: "Abigail Abigail",
+            role: "Owner",
+            tag: "Social Media Manager",
+        },
+        {
+            id: 5,
+            name: "Abigail Abigail",
+            role: "Owner",
+            tag: "Frontend Developer",
+        },
+        { id: 6, name: "Abigail Abigail", role: "Owner", tag: "Sales" },
+        { id: 7, name: "Abigail Abigail", role: "Owner", tag: "Designer" },
+        { id: 8, name: "Abigail Abigail", role: "Owner", tag: "Designer" },
+        {
+            id: 9,
+            name: "Abigail Abigail",
+            role: "Owner",
+            tag: "Social Media Manager",
+        },
     ];
 
     const recommendedProducts = [
         {
-            id: 'r1',
-            name: 'Abigail',
+            id: "r1",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Know More",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'r2',
-            name: 'Abigail',
+            id: "r2",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Buy Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Buy Now",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'r3',
-            name: 'Abigail',
+            id: "r3",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Enroll Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Enroll Now",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'r4',
-            name: 'Abigail',
+            id: "r4",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: From ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: From ₹ 24,000",
+            cta: "Know More",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
     ];
 
     const moreFromSarah = [
         {
-            id: 'm1',
-            name: 'Abigail',
+            id: "m1",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Know More",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'm2',
-            name: 'Abigail',
+            id: "m2",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Buy Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Buy Now",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'm3',
-            name: 'Abigail',
+            id: "m3",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Enroll Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: ₹ 24,000",
+            cta: "Enroll Now",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
         {
-            id: 'm4',
-            name: 'Abigail',
+            id: "m4",
+            name: "Abigail",
             verified: true,
             ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
+            title: "Browse services, products, courses, and webinars tailored...",
             rating: 4.5,
             reviews: 123,
-            priceLabel: 'Price: From ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
+            priceLabel: "Price: From ₹ 24,000",
+            cta: "Know More",
+            image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop",
         },
     ];
 
     const images = [
-        'https://images.unsplash.com/photo-1586717791821-3f44a563fe4c?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1522542550221-31fd19250226?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop',
+        "https://images.unsplash.com/photo-1586717791821-3f44a563fe4c?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1522542550221-31fd19250226?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop",
     ];
 
     const packages = {
         Basic: {
             price: 399,
-            delivery: '5 days',
+            delivery: "5 days",
             revisions: 4,
-            desc: 'Most Popular for medium projects',
+            desc: "Most Popular for medium projects",
             inclusions: [
-                'Up to 12 screens',
-                'Advanced wireframing & prototyping',
-                'Custom color scheme & typography',
-                'Mobile & tablet responsive',
-                'Interactive prototype',
-                'Source files included',
-                'Commercial use',
+                "Up to 12 screens",
+                "Advanced wireframing & prototyping",
+                "Custom color scheme & typography",
+                "Mobile & tablet responsive",
+                "Interactive prototype",
+                "Source files included",
+                "Commercial use",
             ],
         },
         Standard: {
             price: 599,
-            delivery: '7 days',
+            delivery: "7 days",
             revisions: 6,
-            desc: 'Recommended for large scale startups',
+            desc: "Recommended for large scale startups",
             inclusions: [
-                'Up to 24 screens',
-                'Advanced wireframing & prototyping',
-                'Brand Identity guidelines',
-                'Mobile & tablet responsive',
-                'Interactive prototype',
-                'Source files included',
-                'Commercial use',
+                "Up to 24 screens",
+                "Advanced wireframing & prototyping",
+                "Brand Identity guidelines",
+                "Mobile & tablet responsive",
+                "Interactive prototype",
+                "Source files included",
+                "Commercial use",
             ],
         },
         Premium: {
             price: 999,
-            delivery: '10 days',
-            revisions: 'Unlimited',
-            desc: 'Enterprise grade design solution',
+            delivery: "10 days",
+            revisions: "Unlimited",
+            desc: "Enterprise grade design solution",
             inclusions: [
-                'Unlimited screens',
-                'Full brand design system',
-                'High fidelity animation',
-                'Mobile & tablet responsive',
-                'Usability testing',
-                'Source files included',
-                'Commercial use',
+                "Unlimited screens",
+                "Full brand design system",
+                "High fidelity animation",
+                "Mobile & tablet responsive",
+                "Usability testing",
+                "Source files included",
+                "Commercial use",
             ],
         },
     };
 
     const comparisonData = [
         {
-            feature: 'Price',
-            basic: '$49',
-            standard: '$399',
-            premium: '$799'
+            feature: "Price",
+            basic: "$49",
+            standard: "$399",
+            premium: "$799",
         },
         {
-            feature: 'Delivery time (days)',
-            basic: '3',
-            standard: '5 days delivery',
-            premium: '3 days delivery'
+            feature: "Delivery time (days)",
+            basic: "3",
+            standard: "5 days delivery",
+            premium: "3 days delivery",
         },
         {
-            feature: 'Number of revisions',
-            basic: '1',
-            standard: '6 screens',
-            premium: '8 screens'
+            feature: "Number of revisions",
+            basic: "1",
+            standard: "6 screens",
+            premium: "8 screens",
         },
         {
-            feature: 'Scope of work',
-            basic: 'Design of 1 core screen or section with clean layout, spacing, and basic interaction logic.',
-            standard: 'UI/UX design for up to 3 screens with consistent layout, components, and basic user flow.',
-            premium: 'End-to-end UI/UX for a small product flow including multiple screens, components, and UX logic.'
+            feature: "Scope of work",
+            basic: "Design of 1 core screen or section with clean layout, spacing, and basic interaction logic.",
+            standard:
+                "UI/UX design for up to 3 screens with consistent layout, components, and basic user flow.",
+            premium:
+                "End-to-end UI/UX for a small product flow including multiple screens, components, and UX logic.",
         },
         {
             feature: "What's Included",
-            basic: ['1 UI screen', 'Figma file access', 'Clean layout and spacing'],
-            standard: ['Up to 3 UI screens', 'Component consistency', 'Figma source file'],
-            premium: ['Up to 6 screens', 'Reusable components', 'UX flow logic', 'Developer-ready structure']
+            basic: [
+                "1 UI screen",
+                "Figma file access",
+                "Clean layout and spacing",
+            ],
+            standard: [
+                "Up to 3 UI screens",
+                "Component consistency",
+                "Figma source file",
+            ],
+            premium: [
+                "Up to 6 screens",
+                "Reusable components",
+                "UX flow logic",
+                "Developer-ready structure",
+            ],
         },
         {
-            feature: 'How it works',
-            basic: ['Client shares requirements', 'I design and deliver the UI', 'One revision included'],
-            standard: ['Requirement discussion', 'Design + review cycles', 'Final delivery'],
-            premium: ['Strategy discussion', 'Structured design execution', 'Review and final polish']
+            feature: "How it works",
+            basic: [
+                "Client shares requirements",
+                "I design and deliver the UI",
+                "One revision included",
+            ],
+            standard: [
+                "Requirement discussion",
+                "Design + review cycles",
+                "Final delivery",
+            ],
+            premium: [
+                "Strategy discussion",
+                "Structured design execution",
+                "Review and final polish",
+            ],
         },
         {
             feature: "What's not included",
-            basic: ['Full design systems', 'Prototyping', 'Developer handoff'],
-            standard: ['Full design system', 'Advanced animations'],
-            premium: ['Frontend development', 'Copywriting']
+            basic: ["Full design systems", "Prototyping", "Developer handoff"],
+            standard: ["Full design system", "Advanced animations"],
+            premium: ["Frontend development", "Copywriting"],
         },
         {
-            feature: 'Tools used',
-            basic: 'Figma, AI Design Assistants',
-            standard: 'Figma, Notion, AI Design Tools',
-            premium: 'Figma, Notion, AI UX Tools'
+            feature: "Tools used",
+            basic: "Figma, AI Design Assistants",
+            standard: "Figma, Notion, AI Design Tools",
+            premium: "Figma, Notion, AI UX Tools",
         },
         {
-            feature: 'Delivery format',
-            basic: 'Figma File',
-            standard: 'Figma File',
-            premium: 'Figma File'
-        }
+            feature: "Delivery format",
+            basic: "Figma File",
+            standard: "Figma File",
+            premium: "Figma File",
+        },
     ];
 
     const faqData = [
         {
             question: "What information do you need to get started?",
-            answer: "I'll need your app concept, target audience details, any brand guidelines you have, competitor examples, and specific features you want included. The more details you provide, the better I can tailor the design to your needs."
+            answer: "I'll need your app concept, target audience details, any brand guidelines you have, competitor examples, and specific features you want included. The more details you provide, the better I can tailor the design to your needs.",
         },
         {
             question: "Do you provide the source files?",
-            answer: "Yes, all packages include the source Figma files with well-organized layers and components ready for development."
+            answer: "Yes, all packages include the source Figma files with well-organized layers and components ready for development.",
         },
         {
             question: "How many revisions are included?",
-            answer: "The number of revisions varies by package: Basic includes 1, Standard includes 6 screens, and Premium offers unlimited revisions until you are completely satisfied."
-        }
+            answer: "The number of revisions varies by package: Basic includes 1, Standard includes 6 screens, and Premium offers unlimited revisions until you are completely satisfied.",
+        },
     ];
 
     return (
         <div className={`user-page ${theme} min-h-screen`}>
             {/* NAVBAR */}
             <UserNavbar
-                toggleSidebar={() => setSidebarOpen(p => !p)}
+                toggleSidebar={() => setSidebarOpen((p) => !p)}
                 isSidebarOpen={sidebarOpen}
                 theme={theme}
             />
 
             <div className="pt-[85px] flex relative z-10 transition-all duration-300">
-
-
                 {/* MAIN CONTENT */}
                 <div className="relative flex-1 min-w-0 overflow-hidden">
                     <div className="overflow-y-auto h-[calc(100vh-85px)]">
                         <div className={`cl-page ${theme}`}>
                             <div className="cl-header">
-                                <div 
+                                {/* <div 
                                     className="cl-back-link" 
                                     onClick={() => navigate('/my-listings')}
                                     style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--mylis-muted)', marginBottom: '10px', fontSize: '14px' }}
                                 >
                                     <ChevronLeft size={16} /> Back to My Listings
-                                </div>
-                                <h1 className="cl-title">I will design online course cover and digital product mockup bundle</h1>
+                                </div> */}
+                                <h1 className="cl-title">
+                                    I will design online course cover and
+                                    digital product mockup bundle
+                                </h1>
                                 <div className="cl-header-actions">
-                                    <button className="cl-icon-btn"><Share2 size={20} /></button>
-                                    <button className="cl-icon-btn"><Flag size={20} /></button>
-                                    <button className="cl-icon-btn" onClick={() => setIsLiked(!isLiked)}>
-                                        <Heart size={20} fill={isLiked ? "red" : "none"} color={isLiked ? "red" : "currentColor"} />
+                                    <button className="cl-icon-btn">
+                                        <Share2 size={20} />
+                                    </button>
+                                    <button className="cl-icon-btn">
+                                        <Flag size={20} />
+                                    </button>
+                                    <button
+                                        className="cl-icon-btn"
+                                        onClick={() => setIsLiked(!isLiked)}
+                                    >
+                                        <Heart
+                                            size={20}
+                                            fill={isLiked ? "red" : "none"}
+                                            color={
+                                                isLiked ? "red" : "currentColor"
+                                            }
+                                        />
                                     </button>
                                 </div>
                             </div>
@@ -399,11 +512,34 @@ const CourseListing = ({ theme, setTheme }) => {
                                     {/* Slider */}
                                     <div className="cl-slider-wrap">
                                         <div className="cl-main-img-box">
-                                            <img src={images[activeImg]} alt="Service" className="cl-main-img" />
-                                            <button className="cl-slider-btn left" onClick={() => setActiveImg(prev => (prev === 0 ? images.length - 1 : prev - 1))}>
+                                            <img
+                                                src={images[activeImg]}
+                                                alt="Service"
+                                                className="cl-main-img"
+                                            />
+                                            <button
+                                                className="cl-slider-btn left"
+                                                onClick={() =>
+                                                    setActiveImg((prev) =>
+                                                        prev === 0
+                                                            ? images.length - 1
+                                                            : prev - 1,
+                                                    )
+                                                }
+                                            >
                                                 <ChevronLeft size={20} />
                                             </button>
-                                            <button className="cl-slider-btn right" onClick={() => setActiveImg(prev => (prev === images.length - 1 ? 0 : prev + 1))}>
+                                            <button
+                                                className="cl-slider-btn right"
+                                                onClick={() =>
+                                                    setActiveImg((prev) =>
+                                                        prev ===
+                                                        images.length - 1
+                                                            ? 0
+                                                            : prev + 1,
+                                                    )
+                                                }
+                                            >
                                                 <ChevronRight size={20} />
                                             </button>
                                             <button
@@ -422,14 +558,14 @@ const CourseListing = ({ theme, setTheme }) => {
                                                     key={idx}
                                                     src={img}
                                                     alt="Thumb"
-                                                    className={`cl-thumb ${activeImg === idx ? 'active' : ''}`}
-                                                    onClick={() => setActiveImg(idx)}
+                                                    className={`cl-thumb ${activeImg === idx ? "active" : ""}`}
+                                                    onClick={() =>
+                                                        setActiveImg(idx)
+                                                    }
                                                 />
                                             ))}
                                         </div>
                                     </div>
-
-
 
                                     {/* Profile Card */}
                                     <div className="cl-profile-mini-card">
@@ -440,7 +576,9 @@ const CourseListing = ({ theme, setTheme }) => {
                                             </div>
                                             <div className="cl-pmc-info">
                                                 <div className="cl-pmc-name-row">
-                                                    <span className="cl-pmc-name">Sarah Anderson</span>
+                                                    <span className="cl-pmc-name">
+                                                        Sarah Anderson
+                                                    </span>
                                                     <div className="cl-pmc-online-badge">
                                                         <div className="cl-pmc-online-dot"></div>
                                                         <span>Online</span>
@@ -448,13 +586,23 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 </div>
                                                 <div className="cl-pmc-meta">
                                                     <Clock size={14} />
-                                                    <span>Avg response: 1 hour</span>
+                                                    <span>
+                                                        Avg response: 1 hour
+                                                    </span>
                                                 </div>
                                                 <div className="cl-pmc-role-row">
-                                                    <span className="cl-pmc-role">Full Stack Developer</span>
+                                                    <span className="cl-pmc-role">
+                                                        Full Stack Developer
+                                                    </span>
                                                     <div className="cl-pmc-rating">
-                                                        <Star size={14} fill="#CEFF1B" color="#CEFF1B" />
-                                                        <span>4.9(247 reviews)</span>
+                                                        <Star
+                                                            size={14}
+                                                            fill="#CEFF1B"
+                                                            color="#CEFF1B"
+                                                        />
+                                                        <span>
+                                                            4.9(247 reviews)
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -469,7 +617,11 @@ const CourseListing = ({ theme, setTheme }) => {
                                     <div className="cl-section">
                                         <h2>Description</h2>
                                         <p>
-                                            He is the best in the game. Always have time to explain to me and made sure I was satisfied at every stage. Don't skip him if you want the best. He's great
+                                            He is the best in the game. Always
+                                            have time to explain to me and made
+                                            sure I was satisfied at every stage.
+                                            Don't skip him if you want the best.
+                                            He's great
                                         </p>
                                     </div>
 
@@ -477,16 +629,28 @@ const CourseListing = ({ theme, setTheme }) => {
                                         <h2>What you will learn</h2>
                                         <ul className="cl-bullet-list">
                                             <li>He is the best in the game.</li>
-                                            <li>Always have time to explain to me and made sure.</li>
-                                            <li>I was satisfied at every stage.</li>
-                                            <li>Don't skip him if you want the best. He's great</li>
+                                            <li>
+                                                Always have time to explain to
+                                                me and made sure.
+                                            </li>
+                                            <li>
+                                                I was satisfied at every stage.
+                                            </li>
+                                            <li>
+                                                Don't skip him if you want the
+                                                best. He's great
+                                            </li>
                                         </ul>
                                     </div>
 
                                     <div className="cl-section">
                                         <h2>Prerequisites</h2>
                                         <p>
-                                            He is the best in the game. Always have time to explain to me and made sure I was satisfied at every stage. Don't skip him if you want the best. He's great
+                                            He is the best in the game. Always
+                                            have time to explain to me and made
+                                            sure I was satisfied at every stage.
+                                            Don't skip him if you want the best.
+                                            He's great
                                         </p>
                                     </div>
 
@@ -522,7 +686,10 @@ const CourseListing = ({ theme, setTheme }) => {
                                                 />
                                                 <div className="cl-video-overlay">
                                                     <div className="cl-play-button">
-                                                        <Play size={24} fill="black" />
+                                                        <Play
+                                                            size={24}
+                                                            fill="black"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -530,53 +697,75 @@ const CourseListing = ({ theme, setTheme }) => {
                                     </div>
                                 </div>
 
-
                                 {/* Right Column (Sticky Pricing) */}
                                 <div className="cl-pricing-card">
-
-
                                     <div className="cl-pricing-content">
                                         <div className="cl-price-row">
                                             <div className="cl-price-info">
-                                                <span className="cl-price-label">Price</span>
-                                                <span className="cl-price">${packages[activeTab].price}</span>
+                                                <span className="cl-price-label">
+                                                    Price
+                                                </span>
+                                                <span className="cl-price">
+                                                    ${packages[activeTab].price}
+                                                </span>
                                             </div>
                                             <div className="cl-delivery-info">
-                                                <span className="cl-delivery-label">Delivery</span>
-                                                <span className="cl-delivery-value">{packages[activeTab].delivery}</span>
+                                                <span className="cl-delivery-label">
+                                                    Delivery
+                                                </span>
+                                                <span className="cl-delivery-value">
+                                                    {
+                                                        packages[activeTab]
+                                                            .delivery
+                                                    }
+                                                </span>
                                             </div>
                                         </div>
 
-                                        <p className="cl-pkg-desc">{packages[activeTab].desc}</p>
+                                        <p className="cl-pkg-desc">
+                                            {packages[activeTab].desc}
+                                        </p>
 
-                                        <p className="cl-revs">{packages[activeTab].revisions} Revisions</p>
+                                        <p className="cl-revs">
+                                            {packages[activeTab].revisions}{" "}
+                                            Revisions
+                                        </p>
 
-                                        <h4 className="cl-inclusions-title">What's included</h4>
+                                        <h4 className="cl-inclusions-title">
+                                            What's included
+                                        </h4>
                                         <div className="cl-inclusions-list">
-                                            {packages[activeTab].inclusions.map((item, idx) => (
-                                                <div key={idx} className="cl-inclusion-item">
-                                                    <div className="cl-check-circle">
-                                                        <Check size={12} strokeWidth={3} />
+                                            {packages[activeTab].inclusions.map(
+                                                (item, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="cl-inclusion-item"
+                                                    >
+                                                        <div className="cl-check-circle">
+                                                            <Check
+                                                                size={12}
+                                                                strokeWidth={3}
+                                                            />
+                                                        </div>
+                                                        <span>{item}</span>
                                                     </div>
-                                                    <span>{item}</span>
-                                                </div>
-                                            ))}
+                                                ),
+                                            )}
                                         </div>
 
                                         <div className="cl-divider"></div>
 
-
-
                                         <div className="cl-pricing-actions">
-                                            <button className="cl-btn-primary">Create Contract</button>
-                                            <button className="cl-btn-outline">Chat first</button>
+                                            <button className="cl-btn-primary">
+                                                Create Contract
+                                            </button>
+                                            <button className="cl-btn-outline">
+                                                Chat first
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
-
 
                             {/* Listings Section */}
                             <section style={{ width: "100%" }}>
@@ -599,7 +788,7 @@ const CourseListing = ({ theme, setTheme }) => {
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            marginBottom: "8px"
+                                            marginBottom: "8px",
                                         }}
                                     >
                                         <span
@@ -615,33 +804,44 @@ const CourseListing = ({ theme, setTheme }) => {
 
                                     {/* Pills */}
                                     <div
-                                        style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
+                                        style={{
+                                            display: "flex",
+                                            gap: "16px",
+                                            flexWrap: "wrap",
+                                        }}
                                     >
-                                        {["All", "Services", "Products", "Courses", "Webinars"].map(
-                                            (item) => (
-                                                <button
-                                                    key={item}
-                                                    onClick={() => setFilter(item)}
-                                                    style={{
-                                                        padding: "12px 26px",
-                                                        borderRadius: "999px",
-                                                        border: filter === item ? "1px solid #ddd" : "none",
-                                                        cursor: "pointer",
-                                                        background:
-                                                            filter === item
-                                                                ? "#fff"
-                                                                : "linear-gradient(#f5f5f5,#e9e9e9)",
-                                                        boxShadow:
-                                                            "inset 0 1px 0 rgba(255,255,255,.9),0 2px 8px rgba(0,0,0,.06)",
-                                                        fontSize: "15px",
-                                                        fontWeight: "500",
-                                                        color: "#000",
-                                                    }}
-                                                >
-                                                    {item}
-                                                </button>
-                                            ),
-                                        )}
+                                        {[
+                                            "All",
+                                            "Services",
+                                            "Products",
+                                            "Courses",
+                                            "Webinars",
+                                        ].map((item) => (
+                                            <button
+                                                key={item}
+                                                onClick={() => setFilter(item)}
+                                                style={{
+                                                    padding: "12px 26px",
+                                                    borderRadius: "999px",
+                                                    border:
+                                                        filter === item
+                                                            ? "1px solid #ddd"
+                                                            : "none",
+                                                    cursor: "pointer",
+                                                    background:
+                                                        filter === item
+                                                            ? "#fff"
+                                                            : "linear-gradient(#f5f5f5,#e9e9e9)",
+                                                    boxShadow:
+                                                        "inset 0 1px 0 rgba(255,255,255,.9),0 2px 8px rgba(0,0,0,.06)",
+                                                    fontSize: "15px",
+                                                    fontWeight: "500",
+                                                    color: "#000",
+                                                }}
+                                            >
+                                                {item}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
@@ -651,21 +851,52 @@ const CourseListing = ({ theme, setTheme }) => {
                                     {listingsData
                                         .filter((l) => {
                                             if (filter === "All") return true;
-                                            return l.type === filter.slice(0, -1);
+                                            return (
+                                                l.type === filter.slice(0, -1)
+                                            );
                                         })
-                                        .slice(0, showMoreListings ? listingsData.length : 6)
+                                        .slice(
+                                            0,
+                                            showMoreListings
+                                                ? listingsData.length
+                                                : 6,
+                                        )
                                         .map((listing, index) => (
-                                            <div key={index} className="listing-card">
+                                            <div
+                                                key={index}
+                                                className="listing-card"
+                                            >
                                                 <div className="listing-image">
-                                                    <img src={listing.image} alt={listing.title} />
+                                                    <img
+                                                        src={listing.image}
+                                                        alt={listing.title}
+                                                    />
 
                                                     <button className="listing-nav-btn left">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2.5"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
                                                             <path d="m15 18-6-6 6-6" />
                                                         </svg>
                                                     </button>
                                                     <button className="listing-nav-btn right">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2.5"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
                                                             <path d="m9 18 6-6-6-6" />
                                                         </svg>
                                                     </button>
@@ -673,32 +904,77 @@ const CourseListing = ({ theme, setTheme }) => {
 
                                                 <div className="listing-info">
                                                     <div className="listing-title-row">
-                                                        <h4 className="listing-title">{listing.title}</h4>
-                                                        <span className="listing-type">{listing.type}</span>
+                                                        <h4 className="listing-title">
+                                                            {listing.title}
+                                                        </h4>
+                                                        <span className="listing-type">
+                                                            {listing.type}
+                                                        </span>
                                                     </div>
 
                                                     <div className="listing-meta">
                                                         <div className="listing-views">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <svg
+                                                                width="14"
+                                                                height="14"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                strokeWidth="2"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                            >
                                                                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                                <circle cx="12" cy="12" r="3" />
+                                                                <circle
+                                                                    cx="12"
+                                                                    cy="12"
+                                                                    r="3"
+                                                                />
                                                             </svg>
-                                                            <span>{listing.views} views</span>
+                                                            <span>
+                                                                {listing.views}{" "}
+                                                                views
+                                                            </span>
                                                         </div>
-                                                        <div className="listing-price">{listing.price}</div>
+                                                        <div className="listing-price">
+                                                            {listing.price}
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <div className="listing-actions">
-                                                    <button className="btn-view-listing">View Listing</button>
+                                                    <button className="btn-view-listing">
+                                                        View Listing
+                                                    </button>
                                                     <button
                                                         className="btn-favorite"
-                                                        onClick={() => toggleFavorite(index)}
+                                                        onClick={() =>
+                                                            toggleFavorite(
+                                                                index,
+                                                            )
+                                                        }
                                                     >
-                                                        <svg width="20" height="20" viewBox="0 0 24 24"
-                                                            fill={favorites.has(index) ? "#ef4444" : "none"}
-                                                            stroke={favorites.has(index) ? "#ef4444" : "currentColor"}
-                                                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                                        <svg
+                                                            width="20"
+                                                            height="20"
+                                                            viewBox="0 0 24 24"
+                                                            fill={
+                                                                favorites.has(
+                                                                    index,
+                                                                )
+                                                                    ? "#ef4444"
+                                                                    : "none"
+                                                            }
+                                                            stroke={
+                                                                favorites.has(
+                                                                    index,
+                                                                )
+                                                                    ? "#ef4444"
+                                                                    : "currentColor"
+                                                            }
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
                                                         >
                                                             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                                                         </svg>
@@ -710,37 +986,46 @@ const CourseListing = ({ theme, setTheme }) => {
                             </section>
 
                             {/* Show More Button */}
-                            <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    margin: "40px 0",
+                                }}
+                            >
                                 <button
-                                    onClick={() => setShowMoreListings(!showMoreListings)}
+                                    onClick={() =>
+                                        setShowMoreListings(!showMoreListings)
+                                    }
                                     style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        background: '#CEFF1B',
-                                        borderRadius: '50%',
-                                        border: 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                                        transition: 'all 0.3s ease',
-                                        transform: showMoreListings ? 'rotate(180deg)' : 'rotate(0deg)'
+                                        width: "50px",
+                                        height: "50px",
+                                        background: "#CEFF1B",
+                                        borderRadius: "50%",
+                                        border: "none",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: "pointer",
+                                        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                                        transition: "all 0.3s ease",
+                                        transform: showMoreListings
+                                            ? "rotate(180deg)"
+                                            : "rotate(0deg)",
                                     }}
                                 >
                                     <ChevronDown size={20} color="#000" />
                                 </button>
                             </div>
 
-
-
-
                             <DetailedTeamCard />
 
                             {/* FAQ Section */}
                             <section className="faq-section">
                                 <div className="faq-header">
-                                    <h3 className="faq-title">Frequently Asked Questions</h3>
+                                    <h3 className="faq-title">
+                                        Frequently Asked Questions
+                                    </h3>
                                     <div className="faq-header-line"></div>
                                 </div>
 
@@ -748,16 +1033,27 @@ const CourseListing = ({ theme, setTheme }) => {
                                     {faqData.map((faq, index) => (
                                         <div
                                             key={index}
-                                            className={`faq-item ${activeFaq === index ? 'active' : ''}`}
+                                            className={`faq-item ${activeFaq === index ? "active" : ""}`}
                                         >
                                             <button
                                                 className="faq-question"
-                                                onClick={() => setActiveFaq(activeFaq === index ? null : index)}
+                                                onClick={() =>
+                                                    setActiveFaq(
+                                                        activeFaq === index
+                                                            ? null
+                                                            : index,
+                                                    )
+                                                }
                                             >
                                                 <span>{faq.question}</span>
                                                 <ChevronDown
                                                     size={20}
-                                                    style={{ transform: activeFaq === index ? 'rotate(180deg)' : 'rotate(0)' }}
+                                                    style={{
+                                                        transform:
+                                                            activeFaq === index
+                                                                ? "rotate(180deg)"
+                                                                : "rotate(0)",
+                                                    }}
                                                 />
                                             </button>
                                             {activeFaq === index && (
@@ -786,24 +1082,35 @@ const CourseListing = ({ theme, setTheme }) => {
                                             </span>
                                             <div className="rating-stars">
                                                 {(() => {
-                                                    const starColor = theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500";
-                                                    return [1, 2, 3, 4, 5].map((star) => (
-                                                        <svg
-                                                            key={star}
-                                                            width="16"
-                                                            height="16"
-                                                            viewBox="0 0 24 24"
-                                                            fill={
-                                                                star <= Math.round(reviewsData.average)
-                                                                    ? starColor
-                                                                    : "none"
-                                                            }
-                                                            stroke={starColor}
-                                                            strokeWidth="2"
-                                                        >
-                                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                                        </svg>
-                                                    ));
+                                                    const starColor =
+                                                        theme === "dark" ||
+                                                        theme === "dark-theme"
+                                                            ? "#ceff1b"
+                                                            : "#FFA500";
+                                                    return [1, 2, 3, 4, 5].map(
+                                                        (star) => (
+                                                            <svg
+                                                                key={star}
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill={
+                                                                    star <=
+                                                                    Math.round(
+                                                                        reviewsData.average,
+                                                                    )
+                                                                        ? starColor
+                                                                        : "none"
+                                                                }
+                                                                stroke={
+                                                                    starColor
+                                                                }
+                                                                strokeWidth="2"
+                                                            >
+                                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                            </svg>
+                                                        ),
+                                                    );
                                                 })()}
                                             </div>
                                             <span className="review-count">
@@ -813,9 +1120,25 @@ const CourseListing = ({ theme, setTheme }) => {
 
                                         <div className="rating-breakdown">
                                             {[5, 4, 3, 2, 1].map((rating) => (
-                                                <div key={rating} className="rating-bar-row">
+                                                <div
+                                                    key={rating}
+                                                    className="rating-bar-row"
+                                                >
                                                     <span className="rating-label">
-                                                        {rating} <span style={{ color: theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500" }}>★</span>
+                                                        {rating}{" "}
+                                                        <span
+                                                            style={{
+                                                                color:
+                                                                    theme ===
+                                                                        "dark" ||
+                                                                    theme ===
+                                                                        "dark-theme"
+                                                                        ? "#ceff1b"
+                                                                        : "#FFA500",
+                                                            }}
+                                                        >
+                                                            ★
+                                                        </span>
                                                     </span>
                                                     <div className="rating-bar">
                                                         <div
@@ -826,7 +1149,12 @@ const CourseListing = ({ theme, setTheme }) => {
                                                         ></div>
                                                     </div>
                                                     <span className="rating-count">
-                                                        {reviewsData.breakdown[rating]}
+                                                        {
+                                                            reviewsData
+                                                                .breakdown[
+                                                                rating
+                                                            ]
+                                                        }
                                                     </span>
                                                 </div>
                                             ))}
@@ -835,62 +1163,107 @@ const CourseListing = ({ theme, setTheme }) => {
 
                                     {/* Right Side - Reviews List */}
                                     <div className="reviews-list">
-                                        {reviewsData.reviews.map((review, index) => (
-                                            <div key={index} className="review-item">
-                                                <div className="review-header">
-                                                    <div className="reviewer-avatar"></div>
-                                                    <div className="reviewer-info">
-                                                        <span className="reviewer-name">{review.name}</span>
-                                                        <div className="review-stars">
-                                                            {(() => {
-                                                                const starColor = theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500";
-                                                                return [1, 2, 3, 4, 5].map((star) => (
-                                                                    <svg
-                                                                        key={star}
-                                                                        width="12"
-                                                                        height="12"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill={
-                                                                            star <= review.rating ? starColor : "none"
-                                                                        }
-                                                                        stroke={starColor}
-                                                                        strokeWidth="2"
-                                                                    >
-                                                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                                                    </svg>
-                                                                ));
-                                                            })()}
+                                        {reviewsData.reviews.map(
+                                            (review, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="review-item"
+                                                >
+                                                    <div className="review-header">
+                                                        <div className="reviewer-avatar"></div>
+                                                        <div className="reviewer-info">
+                                                            <span className="reviewer-name">
+                                                                {review.name}
+                                                            </span>
+                                                            <div className="review-stars">
+                                                                {(() => {
+                                                                    const starColor =
+                                                                        theme ===
+                                                                            "dark" ||
+                                                                        theme ===
+                                                                            "dark-theme"
+                                                                            ? "#ceff1b"
+                                                                            : "#FFA500";
+                                                                    return [
+                                                                        1, 2, 3,
+                                                                        4, 5,
+                                                                    ].map(
+                                                                        (
+                                                                            star,
+                                                                        ) => (
+                                                                            <svg
+                                                                                key={
+                                                                                    star
+                                                                                }
+                                                                                width="12"
+                                                                                height="12"
+                                                                                viewBox="0 0 24 24"
+                                                                                fill={
+                                                                                    star <=
+                                                                                    review.rating
+                                                                                        ? starColor
+                                                                                        : "none"
+                                                                                }
+                                                                                stroke={
+                                                                                    starColor
+                                                                                }
+                                                                                strokeWidth="2"
+                                                                            >
+                                                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                                            </svg>
+                                                                        ),
+                                                                    );
+                                                                })()}
+                                                            </div>
                                                         </div>
+                                                        <span className="review-date">
+                                                            {review.date}
+                                                        </span>
                                                     </div>
-                                                    <span className="review-date">{review.date}</span>
+                                                    <p className="review-text">
+                                                        {review.text}
+                                                    </p>
                                                 </div>
-                                                <p className="review-text">{review.text}</p>
-                                            </div>
-                                        ))}
+                                            ),
+                                        )}
                                     </div>
                                 </div>
                             </section>
 
-
-
-
-
                             {/* Recommended Section */}
                             <div className="cl-listing-container">
                                 <h2 className="cl-sectionTitle">Recommended</h2>
-                                <div className="cl-mp-grid" ref={recommendedGridRef}>
+                                <div
+                                    className="cl-mp-grid"
+                                    ref={recommendedGridRef}
+                                >
                                     {recommendedProducts.map((p) => (
-                                        <article className="cl-mp-card" key={p.id}>
+                                        <article
+                                            className="cl-mp-card"
+                                            key={p.id}
+                                        >
                                             <div className="cl-mp-imgWrap">
-                                                <img className="cl-mp-img" src={p.image} alt="" />
+                                                <img
+                                                    className="cl-mp-img"
+                                                    src={p.image}
+                                                    alt=""
+                                                />
                                             </div>
                                             <div className="cl-mp-cardBody">
                                                 <div className="cl-mp-topLine">
                                                     <div className="cl-mp-user">
                                                         <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">{p.name}</span>
+                                                        <span className="cl-mp-userName">
+                                                            {p.name}
+                                                        </span>
                                                         {p.verified && (
-                                                            <svg className="cl-mp-verifyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                            <svg
+                                                                className="cl-mp-verifyIcon"
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                            >
                                                                 <path
                                                                     fill="#1DA1F2"
                                                                     d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
@@ -907,56 +1280,120 @@ const CourseListing = ({ theme, setTheme }) => {
                                                     </div>
                                                     {p.ai && (
                                                         <span className="cl-mp-aiBadge">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                            <svg
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                            >
                                                                 <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
                                                             </svg>
                                                             Ai Powered
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="cl-mp-desc">{p.title}</p>
+                                                <p className="cl-mp-desc">
+                                                    {p.title}
+                                                </p>
                                                 <div className="cl-mp-metaRow">
                                                     <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">★</span>
-                                                        <span>{p.rating.toFixed(1)}</span>
-                                                        <span className="cl-mp-rev">({p.reviews})</span>
+                                                        <span className="cl-mp-star">
+                                                            ★
+                                                        </span>
+                                                        <span>
+                                                            {p.rating.toFixed(
+                                                                1,
+                                                            )}
+                                                        </span>
+                                                        <span className="cl-mp-rev">
+                                                            ({p.reviews})
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">{p.priceLabel}</div>
-                                                    <button className="cl-mp-cta" type="button">
+                                                    <div className="cl-mp-price">
+                                                        {p.priceLabel}
+                                                    </div>
+                                                    <button
+                                                        className="cl-mp-cta"
+                                                        type="button"
+                                                    >
                                                         {p.cta}
-                                                        <ChevronRight size={12} className="cl-mp-ctaIcon" />
+                                                        <ChevronRight
+                                                            size={12}
+                                                            className="cl-mp-ctaIcon"
+                                                        />
                                                     </button>
                                                 </div>
                                             </div>
                                         </article>
                                     ))}
                                 </div>
-                                <button className="cl-mp-floatArrow left" type="button" onClick={() => scrollGridRef(recommendedGridRef, "left")}>
+                                <button
+                                    className="cl-mp-floatArrow left"
+                                    type="button"
+                                    onClick={() =>
+                                        scrollGridRef(
+                                            recommendedGridRef,
+                                            "left",
+                                        )
+                                    }
+                                >
                                     <ChevronLeft size={24} />
                                 </button>
-                                <button className="cl-mp-floatArrow right" type="button" onClick={() => scrollGridRef(recommendedGridRef, "right")}>
+                                <button
+                                    className="cl-mp-floatArrow right"
+                                    type="button"
+                                    onClick={() =>
+                                        scrollGridRef(
+                                            recommendedGridRef,
+                                            "right",
+                                        )
+                                    }
+                                >
                                     <ChevronRight size={24} />
                                 </button>
                             </div>
 
                             {/* More from Sarah Anderson Section */}
-                            <div className="cl-listing-container" style={{ marginTop: '40px' }}>
-                                <h2 className="cl-sectionTitle">More from Sarah Anderson</h2>
-                                <div className="cl-mp-grid" ref={moreFromSarahGridRef}>
+                            <div
+                                className="cl-listing-container"
+                                style={{ marginTop: "40px" }}
+                            >
+                                <h2 className="cl-sectionTitle">
+                                    More from Sarah Anderson
+                                </h2>
+                                <div
+                                    className="cl-mp-grid"
+                                    ref={moreFromSarahGridRef}
+                                >
                                     {moreFromSarah.map((p) => (
-                                        <article className="cl-mp-card" key={p.id}>
+                                        <article
+                                            className="cl-mp-card"
+                                            key={p.id}
+                                        >
                                             <div className="cl-mp-imgWrap">
-                                                <img className="cl-mp-img" src={p.image} alt="" />
+                                                <img
+                                                    className="cl-mp-img"
+                                                    src={p.image}
+                                                    alt=""
+                                                />
                                             </div>
                                             <div className="cl-mp-cardBody">
                                                 <div className="cl-mp-topLine">
                                                     <div className="cl-mp-user">
                                                         <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">{p.name}</span>
+                                                        <span className="cl-mp-userName">
+                                                            {p.name}
+                                                        </span>
                                                         {p.verified && (
-                                                            <svg className="cl-mp-verifyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                            <svg
+                                                                className="cl-mp-verifyIcon"
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                            >
                                                                 <path
                                                                     fill="#1DA1F2"
                                                                     d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
@@ -973,36 +1410,77 @@ const CourseListing = ({ theme, setTheme }) => {
                                                     </div>
                                                     {p.ai && (
                                                         <span className="cl-mp-aiBadge">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                            <svg
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                            >
                                                                 <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
                                                             </svg>
                                                             Ai Powered
                                                         </span>
                                                     )}
                                                 </div>
-                                                <p className="cl-mp-desc">{p.title}</p>
+                                                <p className="cl-mp-desc">
+                                                    {p.title}
+                                                </p>
                                                 <div className="cl-mp-metaRow">
                                                     <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">★</span>
-                                                        <span>{p.rating.toFixed(1)}</span>
-                                                        <span className="cl-mp-rev">({p.reviews})</span>
+                                                        <span className="cl-mp-star">
+                                                            ★
+                                                        </span>
+                                                        <span>
+                                                            {p.rating.toFixed(
+                                                                1,
+                                                            )}
+                                                        </span>
+                                                        <span className="cl-mp-rev">
+                                                            ({p.reviews})
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">{p.priceLabel}</div>
-                                                    <button className="cl-mp-cta" type="button">
+                                                    <div className="cl-mp-price">
+                                                        {p.priceLabel}
+                                                    </div>
+                                                    <button
+                                                        className="cl-mp-cta"
+                                                        type="button"
+                                                    >
                                                         {p.cta}
-                                                        <ChevronRight size={12} className="cl-mp-ctaIcon" />
+                                                        <ChevronRight
+                                                            size={12}
+                                                            className="cl-mp-ctaIcon"
+                                                        />
                                                     </button>
                                                 </div>
                                             </div>
                                         </article>
                                     ))}
                                 </div>
-                                <button className="cl-mp-floatArrow left" type="button" onClick={() => scrollGridRef(moreFromSarahGridRef, "left")}>
+                                <button
+                                    className="cl-mp-floatArrow left"
+                                    type="button"
+                                    onClick={() =>
+                                        scrollGridRef(
+                                            moreFromSarahGridRef,
+                                            "left",
+                                        )
+                                    }
+                                >
                                     <ChevronLeft size={24} />
                                 </button>
-                                <button className="cl-mp-floatArrow right" type="button" onClick={() => scrollGridRef(moreFromSarahGridRef, "right")}>
+                                <button
+                                    className="cl-mp-floatArrow right"
+                                    type="button"
+                                    onClick={() =>
+                                        scrollGridRef(
+                                            moreFromSarahGridRef,
+                                            "right",
+                                        )
+                                    }
+                                >
                                     <ChevronRight size={24} />
                                 </button>
                             </div>

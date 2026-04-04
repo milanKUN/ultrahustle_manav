@@ -3,7 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PortfolioController;
-
+use App\Http\Controllers\Api\TeamController;
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
@@ -108,21 +108,28 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public decline endpoint (token-only)
 Route::post('/v1/team-invites/{token}/decline', [\App\Http\Controllers\Api\TeamInviteController::class, 'decline']);
 
-Route::middleware('auth:sanctum')->prefix('/v1')->group(function (): void {
-	Route::post('/teams', [\App\Http\Controllers\Api\TeamController::class, 'store']);
-	Route::get('/teams/{team}', [\App\Http\Controllers\Api\TeamController::class, 'show']);
-	Route::patch('/teams/{team}', [\App\Http\Controllers\Api\TeamController::class, 'update']);
+Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+    Route::post('/teams', [TeamController::class, 'store']);
 
-	Route::post('/teams/{team}/avatar', [\App\Http\Controllers\Api\TeamController::class, 'uploadAvatar']);
-	Route::delete('/teams/{team}/avatar', [\App\Http\Controllers\Api\TeamController::class, 'deleteAvatar']);
+    Route::get('/teams/username/{username}', [TeamController::class, 'showByUsername']);
 
-	Route::get('/teams/{team}/members', [\App\Http\Controllers\Api\TeamController::class, 'members']);
-	Route::patch('/teams/{team}/members/{member}', [\App\Http\Controllers\Api\TeamController::class, 'patchMember']);
-	Route::delete('/teams/{team}/members/{member}', [\App\Http\Controllers\Api\TeamController::class, 'deleteMember']);
+    Route::get('/teams/{team}', [TeamController::class, 'show']);
+    Route::patch('/teams/{team}', [TeamController::class, 'update']);
+
+    Route::post('/teams/{team}/avatar', [TeamController::class, 'uploadAvatar']);
+    Route::delete('/teams/{team}/avatar', [TeamController::class, 'deleteAvatar']);
+
+    Route::get('/teams/{team}/members', [TeamController::class, 'members']);
+    Route::patch('/teams/{team}/members/{member}', [TeamController::class, 'patchMember']);
+    Route::delete('/teams/{team}/members/{member}', [TeamController::class, 'deleteMember']);
+
+    Route::get('/my-teams', [TeamController::class, 'manageTeams']);
+    Route::patch('/teams/{team}/toggle-status', [TeamController::class, 'toggleStatus']);
 
 	Route::post('/teams/{team}/invites', [\App\Http\Controllers\Api\TeamInviteController::class, 'storeInvite']);
 	Route::get('/teams/{team}/invites', [\App\Http\Controllers\Api\TeamInviteController::class, 'listInvites']);
 	Route::post('/team-invites/{token}/accept', [\App\Http\Controllers\Api\TeamInviteController::class, 'accept']);
 
 	Route::get('/creators/search', [\App\Http\Controllers\Api\CreatorSearchController::class, 'search'])->middleware('throttle:30,1');
+
 });

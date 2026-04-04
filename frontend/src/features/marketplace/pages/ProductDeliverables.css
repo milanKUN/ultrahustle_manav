@@ -27,7 +27,7 @@
 }
 
 .od-header-content h1 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 8px;
@@ -50,7 +50,7 @@
     background: #CEFF1B;
     border: 1px solid #000;
     color: #000;
-    padding: 12px 32px;
+    padding: 12px 22px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 15px;

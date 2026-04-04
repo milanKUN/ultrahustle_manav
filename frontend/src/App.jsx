@@ -23,7 +23,9 @@ import SetupWorkspaceForCreator from "./features/onboarding/components/ForCreato
 import CreatorProfileSetup from "./features/onboarding/components/ForCreator/CreatorProfileSetup";
 import ClientProfileSetup from "./features/onboarding/components/ForClient/ClientProfileSetup";
 import CreateTeam from "./features/dashboard/pages/CreateTeam";
+import EditTeam from "./features/dashboard/pages/EditTeam";
 import TeamProfileLight from "./features/dashboard/pages/TeamProfileLight";
+import TeamInvitePage from "./features/dashboard/pages/TeamInvitePage";
 import PublicTeamProfile from "./features/dashboard/pages/PublicTeamProfile";
 import UserProfile from "./features/dashboard/pages/UserProfile";
 import PublicUserProfile from "./features/dashboard/pages/PublicUserProfile";
@@ -36,12 +38,13 @@ import CreateServiceListing from "./features/marketplace/pages/CreateServiceList
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
 import AddNewListing from "./features/marketplace/pages/AddNewListing";
 import TeamServiceListing from "./features/marketplace/pages/TeamServiceListing";
+import ServiceListing from "./features/marketplace/pages/ServiceListing";
 import DigitalProductListing from "./features/marketplace/pages/DigitalProductListing";
 import MyListings from "./features/marketplace/pages/MyListings";
 import MyListingPage from "./features/marketplace/pages/MyListingPage";
 import CreateCourse from "./features/marketplace/pages/CreateCourse";
 import CourseListing from "./features/marketplace/pages/CourseListing";
-import OrderDeliverables from "./features/marketplace/pages/OrderDeliverables";
+import ProductDeliverables from "./features/marketplace/pages/ProductDeliverables.jsx";
 import CourseDeliverables from "./features/marketplace/pages/CourseDeliverables";
 import WebinarDeliverables from "./features/marketplace/pages/WebinarDeliverables";
 import WebinarListing from "./features/marketplace/pages/WebinarListing";
@@ -87,7 +90,8 @@ export default function App() {
           <Route path="/creator-profile-setup" element={<CreatorProfileSetup />} />
           <Route path="/client-profile-setup" element={<ClientProfileSetup />} />
           <Route path="/create-team" element={<CreateTeam theme={theme} setTheme={setTheme} />} />
-          <Route path="/team-profile" element={<TeamProfileLight theme={theme} setTheme={setTheme} />} />
+          <Route path="/edit-team/:teamId" element={<EditTeam theme={theme} setTheme={setTheme} />} />
+          <Route path="/team-profile/:username" element={<TeamProfileLight theme={theme} setTheme={setTheme} />} />
           <Route path="/public-team-profile" element={<PublicTeamProfile theme={theme} setTheme={setTheme} />} />
           <Route path="/user-profile" element={<ProtectedRoute><UserProfile theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/public-user-profile" element={<PublicUserProfile theme={theme} setTheme={setTheme} />} />
@@ -99,16 +103,19 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard theme={theme} setTheme={setTheme} /></ProtectedRoute>} />
           <Route path="/manage-team" element={<ManageTeam theme={theme} setTheme={setTheme} />} />
           <Route path="/add-listing" element={<AddNewListing theme={theme} setTheme={setTheme} />} />
+          <Route path="/team-invite" element={<TeamInvitePage theme={theme} setTheme={setTheme} />} />
           <Route
             path="/my-listings"
             element={<MyListingPage theme={theme} setTheme={setTheme} />}
           />
           <Route path="/team-service-listing" element={<TeamServiceListing theme={theme} setTheme={setTheme} />} />
+          <Route path="/service-listing" element={<ServiceListing theme={theme} setTheme={setTheme} />} />
+
           <Route path="/digital-product-listing" element={<DigitalProductListing theme={theme} setTheme={setTheme} />} />
           <Route path="/my-listings" element={<MyListings theme={theme} setTheme={setTheme} />} />
           <Route path="/create-course" element={<CreateCourse theme={theme} setTheme={setTheme} />} />
           <Route path="/course-listing" element={<CourseListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/order-deliverables" element={<OrderDeliverables theme={theme} setTheme={setTheme} />} />
+          <Route path="/product-deliverables" element={<ProductDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/course-deliverables" element={<CourseDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/webinar-deliverables" element={<WebinarDeliverables theme={theme} setTheme={setTheme} />} />
           <Route path="/webinar-listing" element={<WebinarListing theme={theme} setTheme={setTheme} />} />

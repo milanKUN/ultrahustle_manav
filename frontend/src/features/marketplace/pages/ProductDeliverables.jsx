@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Download, ExternalLink, FileText, ChevronLeft, Star, ChevronUp, ChevronDown, DollarSign } from 'lucide-react';
-import './OrderDeliverables.css';
+import './ProductDeliverables.css';
 import UserNavbar from '../../../components/layout/UserNavbar';
 import Sidebar from '../../../components/layout/Sidebar';
 import DetailedTeamCard from '../components/DetailedTeamCard';
 import OrderDetailsSection from '../components/OrderDetailsSection';
 import NotesModal from '../components/NotesModal';
 
-const OrderDeliverables = ({ theme, setTheme }) => {
+const ProductDeliverables = ({ theme, setTheme }) => {
     const [sidebarOpen, setSidebarOpen] = useState(() => {
         const saved = localStorage.getItem("sidebarOpen");
         return saved ? JSON.parse(saved) : false;
@@ -69,7 +69,9 @@ const OrderDeliverables = ({ theme, setTheme }) => {
     };
 
     return (
-        <div className={`user-page order-deliverables-page ${theme} min-h-screen relative overflow-hidden`}>
+        <div
+            className={`user-page order-deliverables-page ${theme} min-h-screen relative overflow-hidden`}
+        >
             <UserNavbar
                 toggleSidebar={() => setSidebarOpen((p) => !p)}
                 theme={theme}
@@ -91,8 +93,14 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                             {/* Main Header Card */}
                             <div className="od-header-card">
                                 <div className="od-header-content">
-                                    <h1>Online Course Cover + Digital Product Mockup Bundle</h1>
-                                    <p>Access your delivered files, notes, and project chat.</p>
+                                    <h1>
+                                        Online Course Cover + Digital Product
+                                        Mockup Bundle
+                                    </h1>
+                                    <p>
+                                        Access your delivered files, notes, and
+                                        project chat.
+                                    </p>
                                 </div>
                                 <button className="od-download-all-btn">
                                     Download all
@@ -106,8 +114,12 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                         <Package size={32} />
                                     </div>
                                     <div className="od-info-text">
-                                        <span className="od-info-label">Order ID</span>
-                                        <span className="od-info-value">#PRJ-20419</span>
+                                        <span className="od-info-label">
+                                            Order ID
+                                        </span>
+                                        <span className="od-info-value">
+                                            #PRJ-20419
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="od-info-card">
@@ -115,8 +127,12 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                         <Package size={32} />
                                     </div>
                                     <div className="od-info-text">
-                                        <span className="od-info-label">Purchased</span>
-                                        <span className="od-info-value">Feb 12, 2025</span>
+                                        <span className="od-info-label">
+                                            Purchased
+                                        </span>
+                                        <span className="od-info-value">
+                                            Feb 12, 2025
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="od-info-card">
@@ -124,43 +140,77 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                         <DollarSign size={32} />
                                     </div>
                                     <div className="od-info-text">
-                                        <span className="od-info-label">Price</span>
-                                        <span className="od-info-value">$2340</span>
+                                        <span className="od-info-label">
+                                            Price
+                                        </span>
+                                        <span className="od-info-value">
+                                            $2340
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Deliverables List Section */}
                             <div className="od-deliverables-section">
-                                <h2 className="od-section-title">Delivered Files</h2>
+                                <h2 className="od-section-title">
+                                    Delivered Files
+                                </h2>
 
                                 <div className="od-files-list-container">
                                     <div className="od-files-list">
                                         {deliverables.map((item) => (
-                                            <div key={item.id} className="od-file-item">
+                                            <div
+                                                key={item.id}
+                                                className="od-file-item"
+                                            >
                                                 <div className="od-file-info">
                                                     <h3>{item.title}</h3>
                                                     <div className="od-file-meta">
-                                                        <span>Updated {item.updated}</span>
-                                                        <span className="od-meta-dot">•</span>
+                                                        <span>
+                                                            Updated{" "}
+                                                            {item.updated}
+                                                        </span>
+                                                        <span className="od-meta-dot">
+                                                            •
+                                                        </span>
                                                         <span>{item.size}</span>
                                                     </div>
                                                     <div className="od-file-tags">
-                                                        {item.tags.map(tag => (
-                                                            <span key={tag} className={`od-tag ${tag.toLowerCase()}`}>
-                                                                {tag}
-                                                            </span>
-                                                        ))}
+                                                        {item.tags.map(
+                                                            (tag) => (
+                                                                <span
+                                                                    key={tag}
+                                                                    className={`od-tag ${tag.toLowerCase()}`}
+                                                                >
+                                                                    {tag}
+                                                                </span>
+                                                            ),
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="od-file-actions">
                                                     <button className="od-action-btn primary">
-                                                        {item.type === 'download' ? <Download size={18} /> : <ExternalLink size={18} />}
+                                                        {item.type ===
+                                                        "download" ? (
+                                                            <Download
+                                                                size={18}
+                                                            />
+                                                        ) : (
+                                                            <ExternalLink
+                                                                size={18}
+                                                            />
+                                                        )}
                                                         {item.buttonText}
                                                     </button>
                                                     <button
                                                         className="od-action-btn secondary"
-                                                        onClick={() => setSelectedNote({ title: item.title, content: "This is a dummy note for the deliverable. You can add more details here." })}
+                                                        onClick={() =>
+                                                            setSelectedNote({
+                                                                title: item.title,
+                                                                content:
+                                                                    "This is a dummy note for the deliverable. You can add more details here.",
+                                                            })
+                                                        }
                                                     >
                                                         <FileText size={18} />
                                                         View note
@@ -170,6 +220,10 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+
+                            <div style={{ marginTop: "40px" }}>
+                                <DetailedTeamCard />
                             </div>
 
                             {/* FAQ Section */}
@@ -183,14 +237,20 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                     {faqData.map((faq) => (
                                         <div
                                             key={faq.id}
-                                            className={`od-faq-item ${activeFaq === faq.id ? 'active' : ''}`}
+                                            className={`od-faq-item ${activeFaq === faq.id ? "active" : ""}`}
                                         >
                                             <div
                                                 className="od-faq-question"
-                                                onClick={() => toggleFaq(faq.id)}
+                                                onClick={() =>
+                                                    toggleFaq(faq.id)
+                                                }
                                             >
                                                 <span>{faq.question}</span>
-                                                {activeFaq === faq.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                                                {activeFaq === faq.id ? (
+                                                    <ChevronUp size={24} />
+                                                ) : (
+                                                    <ChevronDown size={24} />
+                                                )}
                                             </div>
                                             {activeFaq === faq.id && (
                                                 <div className="od-faq-answer">
@@ -200,10 +260,6 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
-
-                            <div style={{ marginTop: '40px' }}>
-                                <DetailedTeamCard />
                             </div>
 
                             {/* Review Section */}
@@ -216,18 +272,36 @@ const OrderDeliverables = ({ theme, setTheme }) => {
                                 <div className="od-review-card">
                                     <div className="od-review-content">
                                         <p className="od-review-text">
-                                            Exceptional designer! Sovan delivered a comprehensive design system that transformed our product.
-                                            His attention to detail and communication throughout the project was outstanding.
-                                            Highly recommend for any serious design work!
+                                            Exceptional designer! Sovan
+                                            delivered a comprehensive design
+                                            system that transformed our product.
+                                            His attention to detail and
+                                            communication throughout the project
+                                            was outstanding. Highly recommend
+                                            for any serious design work!
                                         </p>
                                         <div className="od-review-footer">
                                             <div className="od-stars">
-                                                {[1, 2, 3, 4, 5].map(s => (
+                                                {[1, 2, 3, 4, 5].map((s) => (
                                                     <Star
                                                         key={s}
                                                         size={20}
-                                                        fill={s <= 4 ? (theme === 'dark' ? "#CEFF1B" : "#FFE100") : "#444"}
-                                                        stroke={s <= 4 ? (theme === 'dark' ? "#CEFF1B" : "#FFE100") : "#444"}
+                                                        fill={
+                                                            s <= 4
+                                                                ? theme ===
+                                                                  "dark"
+                                                                    ? "#CEFF1B"
+                                                                    : "#FFE100"
+                                                                : "#444"
+                                                        }
+                                                        stroke={
+                                                            s <= 4
+                                                                ? theme ===
+                                                                  "dark"
+                                                                    ? "#CEFF1B"
+                                                                    : "#FFE100"
+                                                                : "#444"
+                                                        }
                                                     />
                                                 ))}
                                             </div>
@@ -257,4 +331,4 @@ const OrderDeliverables = ({ theme, setTheme }) => {
     );
 };
 
-export default OrderDeliverables;
+export default ProductDeliverables;

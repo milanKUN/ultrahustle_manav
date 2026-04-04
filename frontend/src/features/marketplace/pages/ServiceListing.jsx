@@ -1,6 +1,5 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import {
     Share2,
     Flag,
@@ -12,18 +11,20 @@ import {
     Star,
     ChevronDown,
     Clock,
+    Infinity,
+    CheckCircle2,
+    User,
     X,
 } from "lucide-react";
-import "./DigitalProductListing.css";
+import "./TeamServiceListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import "../../../Darkuser.css";
 import "../../dashboard/pages/TeamProfileLight.css";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 import DetailedTeamCard from "../components/DetailedTeamCard";
-import FAQAccordion from "../components/FAQAccordion";
 
-const DigitalProductListing = ({ theme, setTheme }) => {
-    const navigate = useNavigate();
+
+const ServiceListing = ({ theme, setTheme }) => {
     const [activeTab, setActiveTab] = useState("Basic");
     const [activeImg, setActiveImg] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -40,8 +41,26 @@ const DigitalProductListing = ({ theme, setTheme }) => {
     const [favorites, setFavorites] = useState(new Set());
     const [mainTab, setMainTab] = useState("listings");
     const [filter, setFilter] = useState("All");
+    const [activeFaq, setActiveFaq] = useState(null);
     const recommendedGridRef = useRef(null);
     const moreFromSarahGridRef = useRef(null);
+
+    useEffect(() => {
+        const shouldLockScroll = Boolean(activeItem || showImageModal);
+        const { body, documentElement } = document;
+        const previousBodyOverflow = body.style.overflow;
+        const previousHtmlOverflow = documentElement.style.overflow;
+
+        if (shouldLockScroll) {
+            body.style.overflow = "hidden";
+            documentElement.style.overflow = "hidden";
+        }
+
+        return () => {
+            body.style.overflow = previousBodyOverflow;
+            documentElement.style.overflow = previousHtmlOverflow;
+        };
+    }, [activeItem, showImageModal]);
 
     const scrollGridRef = (ref, direction) => {
         if (ref.current) {
@@ -303,10 +322,10 @@ const DigitalProductListing = ({ theme, setTheme }) => {
     ];
 
     const images = [
-        "https://images.unsplash.com/photo-1586717791821-3f44a563fe4c?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1522542550221-31fd19250226?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2070&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop",
     ];
 
@@ -526,7 +545,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                 onClick={() =>
                                                     setActiveImg((prev) =>
                                                         prev ===
-                                                            images.length - 1
+                                                        images.length - 1
                                                             ? 0
                                                             : prev + 1,
                                                     )
@@ -615,53 +634,48 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                             Don't skip him if you want the best.
                                             He's great
                                         </p>
+                                    </div>
 
-                                        {/* Tools & Tech */}
-                                        <div className="tsl-tech-section">
-                                            <h4 className="tsl-detail-title">
-                                                Tools & Technologies
-                                            </h4>
-                                            <div className="tsl-tech-tags">
-                                                {[
-                                                    "Notion",
-                                                    "Tailwind CSS",
-                                                    "Photoshop",
-                                                    "Figma",
-                                                    "Illustrator",
-                                                    "TypeScript",
-                                                    "Webflow",
-                                                ].map((tool) => (
-                                                    <span
-                                                        key={tool}
-                                                        className="tsl-tech-tag"
-                                                    >
-                                                        {tool}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Delivery Format */}
-                                        <div className="tsl-delivery-section">
-                                            <h4 className="tsl-detail-title">
-                                                Delivery Format
-                                            </h4>
-                                            <div className="tsl-delivery-tags">
-                                                {["PNG", "PDF"].map((fmt) => (
-                                                    <span
-                                                        key={fmt}
-                                                        className="tsl-delivery-tag"
-                                                    >
-                                                        {fmt}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
+                                    <div className="tsl-section">
+                                        <h2>About This Service</h2>
+                                        <p>
+                                            Welcome! I'm a senior UI/UX designer
+                                            with 8+ years of experience crafting
+                                            beautiful, user-centered mobile
+                                            applications. I specialize in
+                                            creating intuitive interfaces that
+                                            not only look stunning but are
+                                            backed by thorough user research and
+                                            industry best practices.
+                                        </p>
+                                        <p>
+                                            Whether you're launching a startup
+                                            MVP, redesigning an existing app, or
+                                            building a complex enterprise
+                                            solution, I'll help bring your
+                                            vision to life with modern design
+                                            principles and pixel-perfect
+                                            execution.
+                                        </p>
                                     </div>
                                 </div>
 
                                 {/* Right Column (Sticky Pricing) */}
                                 <div className="tsl-pricing-card">
+                                    <div className="tsl-pricing-tabs">
+                                        {Object.keys(packages).map((pkg) => (
+                                            <button
+                                                key={pkg}
+                                                className={`tsl-tab ${activeTab === pkg ? "active" : ""}`}
+                                                onClick={() =>
+                                                    setActiveTab(pkg)
+                                                }
+                                            >
+                                                {pkg}
+                                            </button>
+                                        ))}
+                                    </div>
+
                                     <div className="tsl-pricing-content">
                                         <div className="tsl-price-row">
                                             <div className="tsl-price-info">
@@ -672,9 +686,27 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                     ${packages[activeTab].price}
                                                 </span>
                                             </div>
+                                            <div className="tsl-delivery-info">
+                                                <span className="tsl-delivery-label">
+                                                    Delivery
+                                                </span>
+                                                <span className="tsl-delivery-value">
+                                                    {
+                                                        packages[activeTab]
+                                                            .delivery
+                                                    }
+                                                </span>
+                                            </div>
                                         </div>
 
-                                        <div className="tsl-divider"></div>
+                                        <p className="tsl-pkg-desc">
+                                            {packages[activeTab].desc}
+                                        </p>
+
+                                        <p className="tsl-revs">
+                                            {packages[activeTab].revisions}{" "}
+                                            Revisions
+                                        </p>
 
                                         <h4 className="tsl-inclusions-title">
                                             What's included
@@ -700,218 +732,461 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
                                         <div className="tsl-divider"></div>
 
+                                        <h4 className="tsl-addons-title">
+                                            Add-ons
+                                        </h4>
+                                        <div className="tsl-addons-list">
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <span className="tsl-addon-name">
+                                                        Extra revision
+                                                    </span>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$25
+                                                </span>
+                                            </div>
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <div className="tsl-addon-info">
+                                                        <span className="tsl-addon-name">
+                                                            Superfast delivery
+                                                        </span>
+                                                        <span className="tsl-addon-sub">
+                                                            -2days
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$75
+                                                </span>
+                                            </div>
+                                            <div className="tsl-addon-item">
+                                                <div className="tsl-addon-left">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="tsl-addon-checkbox"
+                                                    />
+                                                    <div className="tsl-addon-info">
+                                                        <span className="tsl-addon-name">
+                                                            Additional 5 screens
+                                                        </span>
+                                                        <span className="tsl-addon-sub">
+                                                            +2days
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <span className="tsl-addon-price">
+                                                    +$120
+                                                </span>
+                                            </div>
+                                        </div>
+
                                         <div className="tsl-pricing-actions">
                                             <button className="tsl-btn-primary">
-                                                Buy now
+                                                Create Contract
                                             </button>
                                             <button className="tsl-btn-outline">
-                                                Add to cart
+                                                Chat first
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             {/* My Portfolio Section */}
-                            
+
                             <section className="portfolio-section">
-                                            <div className="portfolio-header">
-                                              <h3 className="portfolio-title">My Portfolio</h3>
-                                              <div className="portfolio-header-line"></div>
-                                            </div>
-                            
-                                            {/* ✅ Featured Portfolio Item */}
-                                            <div className="portfolio-featured-card">
-                                              <div className="portfolio-featured-image">
-                                                <img
-                                                  src={portfolioData.featured.image}
-                                                  alt={portfolioData.featured.title}
-                                                  onClick={() => {
-                                                    const allItems = [
-                                                      portfolioData.featured,
-                                                      ...portfolioData.items,
-                                                    ];
-                                                    setActiveItemIndex(0);
-                                                    setActiveItem(allItems[0]);
-                                                  }}
-                                                  style={{ cursor: "pointer" }}
-                                                />
-                                              </div>
-                            
-                                              <div className="portfolio-featured-content">
-                                                <h4 className="portfolio-featured-title">
-                                                  {portfolioData.featured.title}
-                                                </h4>
-                                                <p className="portfolio-featured-desc">
-                                                  {portfolioData.featured.description}
-                                                </p>
-                                                <div className="portfolio-featured-cost">
-                                                  <span className="cost-label">Project cost</span>
-                                                  <span className="cost-value">
-                                                    {portfolioData.featured.cost}
-                                                  </span>
-                                                </div>
-                                              </div>
-                                            </div>
-                            
-                                            {/* ✅ POPUP MODAL */}
-                                            {activeItem &&
-                                              createPortal(
-                                                <div
-                                                  className="portfolio-modal-backdrop"
-                                                  onClick={() => setActiveItem(null)}
-                                                >
-                                                  <div
-                                                    className={`portfolio-modal-content ${theme}`}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                  >
-                                                    <div className="portfolio-modal-scroll">
-                                                      {/* 🔝 Top Bar */}
-                                                      <div className="portfolio-modal-topbar">
+                                <div className="portfolio-header">
+                                    <h3 className="portfolio-title">
+                                        My Portfolio
+                                    </h3>
+                                    <div className="portfolio-header-line"></div>
+                                </div>
+
+                                {/* ✅ Featured Portfolio Item */}
+                                <div className="portfolio-featured-card">
+                                    <div className="portfolio-featured-image">
+                                        <img
+                                            src={portfolioData.featured.image}
+                                            alt={portfolioData.featured.title}
+                                            onClick={() => {
+                                                const allItems = [
+                                                    portfolioData.featured,
+                                                    ...portfolioData.items,
+                                                ];
+                                                setActiveItemIndex(0);
+                                                setActiveItem(allItems[0]);
+                                            }}
+                                            style={{ cursor: "pointer" }}
+                                        />
+                                    </div>
+
+                                    <div className="portfolio-featured-content">
+                                        <h4 className="portfolio-featured-title">
+                                            {portfolioData.featured.title}
+                                        </h4>
+                                        <p className="portfolio-featured-desc">
+                                            {portfolioData.featured.description}
+                                        </p>
+                                        <div className="portfolio-featured-cost">
+                                            <span className="cost-label">
+                                                Project cost
+                                            </span>
+                                            <span className="cost-value">
+                                                {portfolioData.featured.cost}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ✅ POPUP MODAL */}
+                                {activeItem &&
+                                    createPortal(
+                                        <div
+                                            className="portfolio-modal-backdrop"
+                                            onClick={() => setActiveItem(null)}
+                                        >
+                                            <div
+                                                className={`portfolio-modal-content ${theme}`}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                <div className="portfolio-modal-scroll">
+                                                    {/* 🔝 Top Bar */}
+                                                    <div className="portfolio-modal-topbar">
                                                         <div className="portfolio-modal-brand">
-                                                          <div className="portfolio-brand-circle"></div>
-                                                          <span>Made by Name</span>
+                                                            <div className="portfolio-brand-circle"></div>
+                                                            <span>
+                                                                Made by Name
+                                                            </span>
                                                         </div>
-                            
+
                                                         {/* Right Actions: Arrows + Close */}
                                                         <div className="flex items-center gap-4">
-                                                          <div className="portfolio-modal-nav">
+                                                            <div className="portfolio-modal-nav">
+                                                                <button
+                                                                    className="nav-arrow left"
+                                                                    onClick={() => {
+                                                                        const allItems =
+                                                                            [
+                                                                                portfolioData.featured,
+                                                                                ...portfolioData.items,
+                                                                            ];
+                                                                        const prevIndex =
+                                                                            activeItemIndex >
+                                                                            0
+                                                                                ? activeItemIndex -
+                                                                                  1
+                                                                                : allItems.length -
+                                                                                  1;
+                                                                        setActiveItemIndex(
+                                                                            prevIndex,
+                                                                        );
+                                                                        setActiveItem(
+                                                                            allItems[
+                                                                                prevIndex
+                                                                            ],
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    ◀
+                                                                </button>
+                                                                <span className="portfolio-modal-counter">
+                                                                    {activeItemIndex +
+                                                                        1}{" "}
+                                                                    of{" "}
+                                                                    {
+                                                                        [
+                                                                            portfolioData.featured,
+                                                                            ...portfolioData.items,
+                                                                        ].length
+                                                                    }
+                                                                </span>
+                                                                <button
+                                                                    className="nav-arrow right"
+                                                                    onClick={() => {
+                                                                        const allItems =
+                                                                            [
+                                                                                portfolioData.featured,
+                                                                                ...portfolioData.items,
+                                                                            ];
+                                                                        const nextIndex =
+                                                                            activeItemIndex <
+                                                                            allItems.length -
+                                                                                1
+                                                                                ? activeItemIndex +
+                                                                                  1
+                                                                                : 0;
+                                                                        setActiveItemIndex(
+                                                                            nextIndex,
+                                                                        );
+                                                                        setActiveItem(
+                                                                            allItems[
+                                                                                nextIndex
+                                                                            ],
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    ▶
+                                                                </button>
+                                                            </div>
+
                                                             <button
-                                                              className="nav-arrow left"
-                                                              onClick={() => {
-                                                                const allItems = [
-                                                                  portfolioData.featured,
-                                                                  ...portfolioData.items,
-                                                                ];
-                                                                const prevIndex =
-                                                                  activeItemIndex > 0
-                                                                    ? activeItemIndex - 1
-                                                                    : allItems.length - 1;
-                                                                setActiveItemIndex(prevIndex);
-                                                                setActiveItem(allItems[prevIndex]);
-                                                              }}
+                                                                className="portfolio-modal-close"
+                                                                onClick={() =>
+                                                                    setActiveItem(
+                                                                        null,
+                                                                    )
+                                                                }
                                                             >
-                                                              ◀
+                                                                ✕
                                                             </button>
-                                                            <span className="portfolio-modal-counter">
-                                                              {activeItemIndex + 1} of{" "}
-                                                              {
-                                                                [
-                                                                  portfolioData.featured,
-                                                                  ...portfolioData.items,
-                                                                ].length
-                                                              }
-                                                            </span>
-                                                            <button
-                                                              className="nav-arrow right"
-                                                              onClick={() => {
-                                                                const allItems = [
-                                                                  portfolioData.featured,
-                                                                  ...portfolioData.items,
-                                                                ];
-                                                                const nextIndex =
-                                                                  activeItemIndex < allItems.length - 1
-                                                                    ? activeItemIndex + 1
-                                                                    : 0;
-                                                                setActiveItemIndex(nextIndex);
-                                                                setActiveItem(allItems[nextIndex]);
-                                                              }}
-                                                            >
-                                                              ▶
-                                                            </button>
-                                                          </div>
-                            
-                                                          <button
-                                                            className="portfolio-modal-close"
-                                                            onClick={() => setActiveItem(null)}
-                                                          >
-                                                            ✕
-                                                          </button>
                                                         </div>
-                                                      </div>
-                            
-                                                      {/* 📝 Info */}
-                                                      <div className="portfolio-modal-info">
+                                                    </div>
+
+                                                    {/* 📝 Info */}
+                                                    <div className="portfolio-modal-info">
                                                         <div className="portfolio-info-header">
-                                                          <h3>{activeItem.title}</h3>
+                                                            <h3>
+                                                                {
+                                                                    activeItem.title
+                                                                }
+                                                            </h3>
                                                         </div>
-                                                        <p>{activeItem.description}</p>
-                            
+                                                        <p>
+                                                            {
+                                                                activeItem.description
+                                                            }
+                                                        </p>
+
                                                         <div className="portfolio-modal-cost">
-                                                          <span className="cost-label">Project cost</span>
-                                                          <span className="cost-value">
-                                                            {activeItem.cost}
-                                                          </span>
+                                                            <span className="cost-label">
+                                                                Project cost
+                                                            </span>
+                                                            <span className="cost-value">
+                                                                {
+                                                                    activeItem.cost
+                                                                }
+                                                            </span>
                                                         </div>
-                                                      </div>
-                            
-                                                      {/* 🖼 Main Image */}
-                                                      <div className="portfolio-modal-image">
+                                                    </div>
+
+                                                    {/* 🖼 Main Image */}
+                                                    <div className="portfolio-modal-image">
                                                         <img
-                                                          src={activeItem.image}
-                                                          alt={activeItem.title}
+                                                            src={
+                                                                activeItem.image
+                                                            }
+                                                            alt={
+                                                                activeItem.title
+                                                            }
                                                         />
-                                                      </div>
-                            
-                                                      {/* 🧩 Thumbnails */}
-                                                      <div className="portfolio-modal-thumbs">
+                                                    </div>
+
+                                                    {/* 🧩 Thumbnails */}
+                                                    <div className="portfolio-modal-thumbs">
                                                         {[
-                                                          activeItem.image,
-                                                          activeItem.image,
-                                                          activeItem.image,
-                                                          activeItem.image,
-                                                          activeItem.image,
-                                                          activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
+                                                            activeItem.image,
                                                         ].map((img, i) => (
-                                                          <img key={i} src={img} alt={`thumb-${i}`} />
+                                                            <img
+                                                                key={i}
+                                                                src={img}
+                                                                alt={`thumb-${i}`}
+                                                            />
                                                         ))}
-                                                      </div>
                                                     </div>
-                                                  </div>
-                                                </div>,
-                                                document.body,
-                                              )}
-                            
-                                            {/* ✅ Portfolio Grid */}
-                                            <div className="portfolio-grid-card">
-                                              <div className="portfolio-grid">
-                                                {portfolioData.items.map((item, index) => (
-                                                  <div key={index} className="portfolio-item">
-                                                    <div className="portfolio-item-image">
-                                                      <img
-                                                        src={item.image}
-                                                        alt={item.title}
-                                                        onClick={() => {
-                                                          const allItems = [
-                                                            portfolioData.featured,
-                                                            ...portfolioData.items,
-                                                          ];
-                                                          setActiveItemIndex(index + 1);
-                                                          setActiveItem(allItems[index + 1]);
-                                                        }}
-                                                        style={{ cursor: "pointer" }}
-                                                      />
-                                                    </div>
-                            
-                                                    <div className="portfolio-item-info">
-                                                      <div className="portfolio-item-left">
-                                                        <span className="portfolio-item-title">
-                                                          {item.title}
-                                                        </span>
-                                                        <span className="portfolio-item-desc">
-                                                          {item.description}
-                                                        </span>
-                                                      </div>
-                            
-                                                      <div className="portfolio-item-right">
-                                                        <span className="cost-label">Project cost</span>
-                                                        <span className="cost-value">{item.cost}</span>
-                                                      </div>
-                                                    </div>
-                                                  </div>
-                                                ))}
-                                              </div>
+                                                </div>
                                             </div>
-                                          </section>
+                                        </div>,
+                                        document.body,
+                                    )}
+
+                                {/* ✅ Portfolio Grid */}
+                                <div className="portfolio-grid-card">
+                                    <div className="portfolio-grid">
+                                        {portfolioData.items.map(
+                                            (item, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="portfolio-item"
+                                                >
+                                                    <div className="portfolio-item-image">
+                                                        <img
+                                                            src={item.image}
+                                                            alt={item.title}
+                                                            onClick={() => {
+                                                                const allItems =
+                                                                    [
+                                                                        portfolioData.featured,
+                                                                        ...portfolioData.items,
+                                                                    ];
+                                                                setActiveItemIndex(
+                                                                    index + 1,
+                                                                );
+                                                                setActiveItem(
+                                                                    allItems[
+                                                                        index +
+                                                                            1
+                                                                    ],
+                                                                );
+                                                            }}
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="portfolio-item-info">
+                                                        <div className="portfolio-item-left">
+                                                            <span className="portfolio-item-title">
+                                                                {item.title}
+                                                            </span>
+                                                            <span className="portfolio-item-desc">
+                                                                {
+                                                                    item.description
+                                                                }
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="portfolio-item-right">
+                                                            <span className="cost-label">
+                                                                Project cost
+                                                            </span>
+                                                            <span className="cost-value">
+                                                                {item.cost}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Compare Packages Section */}
+                            <section className="compare-packages-section">
+                                <div className="compare-header">
+                                    <h3 className="compare-title">
+                                        Compare Packages
+                                    </h3>
+                                    <div className="compare-header-line"></div>
+                                </div>
+
+                                <div className="compare-table-container">
+                                    <table className="compare-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Package Features</th>
+                                                <th>Basic</th>
+                                                <th>Standard</th>
+                                                <th>Premium</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {comparisonData.map((row, idx) => (
+                                                <tr key={idx}>
+                                                    <td className="feature-name">
+                                                        {row.feature}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.basic,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.basic.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.basic
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.standard,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.standard.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.standard
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {Array.isArray(
+                                                            row.premium,
+                                                        ) ? (
+                                                            <ul className="compare-list">
+                                                                {row.premium.map(
+                                                                    (
+                                                                        item,
+                                                                        i,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                i
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            row.premium
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
 
                             {/* Listings Section */}
                             <section style={{ width: "100%" }}>
@@ -1162,11 +1437,56 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                 >
                                     <ChevronDown size={20} color="#000" />
                                 </button>
-                            </div> 
+                            </div>
 
+                            {/* Detailed Team Card */}
                             <DetailedTeamCard />
 
-                            <FAQAccordion faqData={faqData} theme={theme} />
+                            {/* FAQ Section */}
+                            <section className="faq-section">
+                                <div className="faq-header">
+                                    <h3 className="faq-title">
+                                        Frequently Asked Questions
+                                    </h3>
+                                    <div className="faq-header-line"></div>
+                                </div>
+
+                                <div className="faq-container">
+                                    {faqData.map((faq, index) => (
+                                        <div
+                                            key={index}
+                                            className={`faq-item ${activeFaq === index ? "active" : ""}`}
+                                        >
+                                            <button
+                                                className="faq-question"
+                                                onClick={() =>
+                                                    setActiveFaq(
+                                                        activeFaq === index
+                                                            ? null
+                                                            : index,
+                                                    )
+                                                }
+                                            >
+                                                <span>{faq.question}</span>
+                                                <ChevronDown
+                                                    size={20}
+                                                    style={{
+                                                        transform:
+                                                            activeFaq === index
+                                                                ? "rotate(180deg)"
+                                                                : "rotate(0)",
+                                                    }}
+                                                />
+                                            </button>
+                                            {activeFaq === index && (
+                                                <div className="faq-answer">
+                                                    <p>{faq.answer}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
 
                             {/* Reviews Section */}
                             <section className="reviews-section">
@@ -1186,7 +1506,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                 {(() => {
                                                     const starColor =
                                                         theme === "dark" ||
-                                                            theme === "dark-theme"
+                                                        theme === "dark-theme"
                                                             ? "#ceff1b"
                                                             : "#FFA500";
                                                     return [1, 2, 3, 4, 5].map(
@@ -1198,9 +1518,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                                 viewBox="0 0 24 24"
                                                                 fill={
                                                                     star <=
-                                                                        Math.round(
-                                                                            reviewsData.average,
-                                                                        )
+                                                                    Math.round(
+                                                                        reviewsData.average,
+                                                                    )
                                                                         ? starColor
                                                                         : "none"
                                                                 }
@@ -1233,7 +1553,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                                 color:
                                                                     theme ===
                                                                         "dark" ||
-                                                                        theme ===
+                                                                    theme ===
                                                                         "dark-theme"
                                                                         ? "#ceff1b"
                                                                         : "#FFA500",
@@ -1254,7 +1574,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                         {
                                                             reviewsData
                                                                 .breakdown[
-                                                            rating
+                                                                rating
                                                             ]
                                                         }
                                                     </span>
@@ -1282,7 +1602,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                                     const starColor =
                                                                         theme ===
                                                                             "dark" ||
-                                                                            theme ===
+                                                                        theme ===
                                                                             "dark-theme"
                                                                             ? "#ceff1b"
                                                                             : "#FFA500";
@@ -1302,7 +1622,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                                                                 viewBox="0 0 24 24"
                                                                                 fill={
                                                                                     star <=
-                                                                                        review.rating
+                                                                                    review.rating
                                                                                         ? starColor
                                                                                         : "none"
                                                                                 }
@@ -1597,4 +1917,4 @@ const DigitalProductListing = ({ theme, setTheme }) => {
     );
 };
 
-export default DigitalProductListing;
+export default ServiceListing;
