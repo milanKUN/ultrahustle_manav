@@ -617,45 +617,26 @@ class TeamController extends Controller
         ]);
     }
 
-    public function showByUsername(Request $request, string $username): JsonResponse
-    {
-        /** @var User $user */
-        $user = $request->user();
+    public function showByUsername(string $username): JsonResponse
+{
+    $team = Team::query()
+        ->whereRaw('LOWER(username) = ?', [strtolower($username)])
+        ->first();
 
-        $team = Team::where('username', $username)->first();
-
-        if (! $team) {
-            return $this->errorResponse('Team not found.', [], 404);
-        }
-
-        if (! $this->canViewTeam($user, $team)) {
-            return $this->errorResponse('Forbidden.', [], 403);
-        }
-
-        $team = $team->fresh();
-
-        $memberships = $team
-            ->memberships()
-            ->with('user:id,full_name,email')
-            ->orderByDesc('id')
-            ->get();
-
-        $invitations = [];
-        if ($this->isOwner($user, $team)) {
-            $invitations = $team
-                ->invitations()
-                ->with('invitedUser:id,full_name,email', 'invitedBy:id,full_name,email')
-                ->orderByDesc('id')
-                ->get()
-                ->map(fn ($inv) => $this->invitationPayload($inv))
-                ->values()
-                ->all();
-        }
-
-        return $this->successResponse('Team fetched.', [
-            'team' => $this->teamPayload($team),
-            'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
-            'invitations' => $invitations,
-        ]);
+    if (! $team) {
+        return $this->errorResponse('Team not found.', [], 404);
     }
+
+    $memberships = $team
+        ->memberships()
+        ->with('user:id,full_name,email')
+        ->whereNull('left_at')
+        ->orderByDesc('id')
+        ->get();
+
+    return $this->successResponse('Team fetched.', [
+        'team' => $this->teamPayload($team->fresh()),
+        'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
+    ]);
+}
 }

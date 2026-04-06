@@ -14,6 +14,11 @@ const api = axios.create({
   },
 });
 
+const publicApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { Accept: "application/json" },
+});
+
 api.interceptors.request.use((config) => {
   const token = getAuthToken();
   if (token) {
@@ -166,4 +171,15 @@ export const getUserName = async () => {
 export const getMyActivity = async () => {
   const res = await api.get("/api/v1/me/my-activity");
   return unwrap(res);
+};
+
+//public user profile
+export const getPublicUserProfile = async (username) => {
+  const res = await publicApi.get(`/api/v1/users/username/${username}`);
+  return res.data;
+};
+
+export const getPublicUserFollowCounts = async (username) => {
+  const res = await publicApi.get(`/api/v1/users/username/${username}/follow-counts`);
+  return res.data;
 };

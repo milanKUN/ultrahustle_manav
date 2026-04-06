@@ -10,6 +10,7 @@ use App\Models\PortfolioMedia;
 use App\Models\Team;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class PortfolioController extends Controller
 {
@@ -114,6 +115,21 @@ class PortfolioController extends Controller
             'portfolio' => $portfolio,
             'projects'  => $projects,
         ]);
+    }
+
+    public function showTeamPublic(string $username)
+    {
+        $team = Team::where('username', $username)->firstOrFail();
+
+        return $this->showPortfolio('team', $team->id);
+    }
+
+    public function showUserPublic(string $username)
+    {
+        $user = User::whereRaw('LOWER(username) = ?', [strtolower($username)])
+            ->firstOrFail();
+
+        return $this->showPortfolio('user', $user->id);
     }
 
     protected function syncPortfolio(Request $request, string $ownerType, int $ownerId)
