@@ -1,96 +1,104 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import MobileBottomNav from "./MobileBottomNav";
 
 import {
-  LayoutGrid,
-  Store,
-  Folder,
-  Settings,
-  ChevronDown,
   ChevronLeft,
-  Users,
-  MessageCircle,
-  TrendingUp,
-  Maximize2,
-  Package,
   FilePlus,
+  Folder,
+  HeartIcon,
+  LayoutGrid,
+  Maximize2,
+  MessageCircle,
+  Settings,
   ShoppingBag,
   ShoppingCart,
-  HeartIcon,
+  Store,
+  Users,
 } from "lucide-react";
 import { CiSaveDown1 } from "react-icons/ci";
-
-/* ================= DATA ================= */
+import { LuTrendingUp } from "react-icons/lu";
 
 const CREATOR_ITEMS = [
-  { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
-  {
-    label: "Marketplace",
-    icon: Store,
-    children: [
-      { label: "My Listings", icon: CiSaveDown1, path: "/my-listings" },
-      { label: "Add New Listings", icon: FilePlus, path: "/add-listing" },
-    ],
-  },
-  {
-    label: "My Team",
-    icon: Users,
-    children: [
-      { label: "Create Team", icon: Maximize2, path: "/create-team" },
-      { label: "Manage Team", icon: Users, path: "/manage-team" },
-    ],
-  },
-  {
-    label: "My Projects",
-    icon: Folder,
-    children: [
-      { label: "Active Projects", icon: Folder, path: "/milestones" },
-      { label: "My Orders", icon: ShoppingBag, path: "/orders" },
-    ],
-  },
-  { label: "Message", icon: MessageCircle, path: "/messages" },
-  {
-    label: "Growth Tools",
-    icon: TrendingUp,
-    children: [{ label: "Analytics & Earning", icon: TrendingUp, path: "/analytics" }],
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    children: [
-      { label: "Profile & Settings", icon: Users, path: "/setting" },
-      { label: "Payout / Wallet", icon: ShoppingBag, path: "/wallet" },
-    ],
-  },
+    { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+    {
+        label: "Marketplace",
+        icon: Store,
+        children: [
+            { label: "My Listings", icon: CiSaveDown1, path: "/my-listings" },
+            { label: "Add New Listings", icon: FilePlus, path: "/add-listing" },
+        ],
+    },
+    { label: "My Orders", icon: ShoppingBag, path: "/creator-orders" },
+    {
+        label: "My Team",
+        icon: Users,
+        children: [
+            { label: "Create Team", icon: Maximize2, path: "/create-team" },
+            { label: "Manage Team", icon: Users, path: "/manage-team" },
+        ],
+    },
+    {
+        label: "My Projects",
+        icon: Folder,
+        children: [
+            {
+                label: "Active Projects",
+                icon: Folder,
+                path: "/active-projects",
+            },
+        ],
+    },
+    { label: "Message", icon: MessageCircle, path: "/messages" },
+    {
+        label: "Growth Tools",
+        icon: LuTrendingUp,
+        children: [
+            {
+                label: "Analytics & Earning",
+                icon: LuTrendingUp,
+                path: "/analytics",
+            },
+        ],
+    },
+    {
+        label: "Settings",
+        icon: Settings,
+        children: [
+            { label: "Profile & Settings", icon: Users, path: "/setting" },
+            { label: "Payout / Wallet", icon: ShoppingBag, path: "/wallet" },
+        ],
+    },
 ];
 
 const CLIENT_ITEMS = [
-  { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
-  { label: "Marketplace", icon: Store, path: "/marketplace" },
-  { label: "My Cart", icon: ShoppingCart, path: "/cart" },
-  {
-    label: "My Projects",
-    icon: Folder,
-    children: [
-      { label: "Active Projects", icon: Folder, path: "/milestones" },
-      { label: "My Orders", icon: ShoppingBag, path: "/orders" },
-    ],
-  },
-  { label: "Message", icon: MessageCircle, path: "/messages" },
-  { label: "Saved", icon: HeartIcon, path: "/saved" },
-  {
-    label: "Settings",
-    icon: Settings,
-    children: [
-      { label: "Profile & Settings", icon: Users, path: "/setting" },
-      { label: "Payout / Wallet", icon: ShoppingBag, path: "/wallet" },
-    ],
-  },
+    { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+    { label: "Marketplace", icon: Store, path: "/marketplace" },
+    { label: "My Orders", icon: ShoppingBag, path: "/client-orders" },
+    { label: "My Cart", icon: ShoppingCart, path: "/cart" },
+    {
+        label: "My Projects",
+        icon: Folder,
+        children: [
+            {
+                label: "Active Projects",
+                icon: Folder,
+                path: "/active-projects",
+            },
+        ],
+    },
+    { label: "Message", icon: MessageCircle, path: "/messages" },
+    { label: "Saved", icon: HeartIcon, path: "/saved" },
+    {
+        label: "Settings",
+        icon: Settings,
+        children: [
+            { label: "Profile & Settings", icon: Users, path: "/setting" },
+            { label: "Payout / Wallet", icon: ShoppingBag, path: "/wallet" },
+        ],
+    },
 ];
-
-/* ================= COMPONENT ================= */
 
 export default function Sidebar({
   expanded,
@@ -107,34 +115,27 @@ export default function Sidebar({
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(null);
   const [userType, setUserType] = useState("creator");
-
   const [activeMain, setActiveMain] = useState("Dashboard");
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeBottomTab, setActiveBottomTab] = useState("Marketplace");
 
   const path = location.pathname;
+  const sidebarItems = userType === "creator" ? CREATOR_ITEMS : CLIENT_ITEMS;
 
   useEffect(() => {
-
     let detectedMain = null;
     let detectedMenu = null;
-    let detectedSub = null;
+
     if (path.includes("/dashboard")) {
       detectedMain = "Dashboard";
-      detectedMenu = null;
     } else if (path.includes("/messages")) {
       detectedMain = "Message";
-      detectedMenu = null;
-    }
-
-    // ✅ SETTINGS (dropdown) + IMPORTANT: open full sidebar + settings panel
-    else if (path.includes("/setting") || path.includes("/settings")) {
+    } else if (path.includes("/setting") || path.includes("/settings")) {
       detectedMain = "Settings";
       detectedMenu = "Settings";
       setExpanded?.(true);
       setShowSettings?.(true);
-    }
-
-    // ✅ MARKETPLACE (dropdown)
-    else if (
+    } else if (
       path.includes("/marketplace") ||
       path.includes("/listing") ||
       path.includes("/contracts") ||
@@ -143,39 +144,34 @@ export default function Sidebar({
     ) {
       detectedMain = "Marketplace";
       detectedMenu = "Marketplace";
-    }
-
-    // ✅ TEAM (dropdown)
-    else if (path.includes("/team") || path.includes("/create-team") || path.includes("/manage-team")) {
+    } else if (
+      path.includes("/team") ||
+      path.includes("/create-team") ||
+      path.includes("/manage-team")
+    ) {
       detectedMain = "My Team";
       detectedMenu = "My Team";
-    }
-
-    // ✅ PROJECTS (dropdown)
-    else if (
-      path.includes("/project") ||
-      path.includes("/milestones") ||
-      path.includes("/orders") ||
-      path.includes("/my-orders")
+    } else if (
+        path.includes("/project") ||
+        path.includes("/milestones") ||
+        path.includes("/active-projects") ||
+        path.includes("/orders") ||
+        path.includes("/my-orders")
     ) {
-      detectedMain = "My Projects";
-      detectedMenu = "My Projects";
+        detectedMain = "My Projects";
+        detectedMenu = "My Projects";
+    } else if (path.includes("/creator-orders")) {
+        detectedMain = "My Orders";
     }
 
     setActiveMain(detectedMain);
     setOpenMenu(detectedMenu);
 
-    // ✅ force client
     if (forceClient) {
       setUserType("client");
       setShowSettings?.(false);
     }
-  }, [path, forceClient, setExpanded, setShowSettings]);
-
-  const SIDEBAR_ITEMS = userType === "creator" ? CREATOR_ITEMS : CLIENT_ITEMS;
-
-  const [isMobile, setIsMobile] = useState(false);
-  const [activeBottomTab, setActiveBottomTab] = useState("Marketplace");
+  }, [forceClient, path, setExpanded, setShowSettings]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 950);
@@ -198,21 +194,32 @@ export default function Sidebar({
     }
   }, [userType]);
 
+  const handleMainItemClick = (item) => {
+    if (item.path && !item.children) {
+      setActiveMain(item.label);
+      setOpenMenu(null);
+      navigate(item.path);
+      return;
+    }
+
+    setActiveMain(item.label);
+    setOpenMenu(openMenu === item.label ? null : item.label);
+  };
+
   return (
     <>
       <div className="flex">
-        {/* ================= ICON RAIL ================= */}
         {!isMobile && !expanded && (
           <aside
             className="sidebar w-14 flex flex-col items-center py-4 sticky top-[85px] h-[calc(100vh-85px)] overflow-y-auto scrollbar-hide"
             style={{
               backgroundColor: "var(--card)",
               msOverflowStyle: "none",
-              scrollbarWidth: "none"
+              scrollbarWidth: "none",
             }}
           >
             <button
-              onClick={() => setExpanded((p) => !p)}
+              onClick={() => setExpanded((prev) => !prev)}
               className="w-10 h-10 rounded-full flex items-center justify-center mb-6 transition"
               style={{ backgroundColor: "var(--bg)" }}
             >
@@ -220,29 +227,30 @@ export default function Sidebar({
             </button>
 
             <div className="flex flex-col space-y-4">
-              {SIDEBAR_ITEMS.map((item) => {
+              {sidebarItems.map((item) => {
                 const isActive = activeMain === item.label;
+
                 return (
                   <button
                     key={item.label}
                     onClick={() => {
-                      // Always expand on click as requested
                       setExpanded(true);
 
                       if (item.path) {
                         navigate(item.path);
                         setActiveMain(item.label);
                         setOpenMenu(null);
-                      } else if (item.children && item.children.length > 0) {
+                      } else if (item.children?.length) {
                         setActiveMain(item.label);
                         setOpenMenu(item.label);
                       }
                     }}
                     className={`
                       w-10 h-10 rounded-xl flex items-center justify-center duration-300
-                      ${isActive
-                        ? "bg-[#CEFF1B] shadow-[0_0_15px_rgba(206,255,27,0.4)]"
-                        : "bg-transparent"
+                      ${
+                        isActive
+                          ? "bg-[#CEFF1B] shadow-[0_0_15px_rgba(206,255,27,0.4)]"
+                          : "bg-transparent"
                       }
                     `}
                     title={item.label}
@@ -258,7 +266,6 @@ export default function Sidebar({
           </aside>
         )}
 
-        {/* ===== BACKDROP BLUR (MOBILE ONLY) ===== */}
         {isMobile && expanded && (
           <div
             className="fixed inset-0 backdrop-blur-xl bg-black/30 z-[9998]"
@@ -266,13 +273,13 @@ export default function Sidebar({
           />
         )}
 
-        {/* ================= MAIN SIDEBAR ================= */}
         {expanded && (
           <aside
             className={`
-              ${isMobile
-                ? "fixed top-0 left-0 h-screen w-[289px] z-[9999] pt-[85px]"
-                : "sticky top-[85px] w-[289px] min-w-[289px] h-[calc(100vh-85px)]"
+              ${
+                isMobile
+                  ? "fixed top-0 left-0 h-screen w-[289px] z-[9999] pt-[85px]"
+                  : "sticky top-[85px] w-[289px] min-w-[289px] h-[calc(100vh-85px)]"
               }
               px-6 py-6 flex flex-col
               overflow-y-auto scrollbar-hide
@@ -280,7 +287,7 @@ export default function Sidebar({
             style={{
               backgroundColor: "var(--card)",
               msOverflowStyle: "none",
-              scrollbarWidth: "none"
+              scrollbarWidth: "none",
             }}
           >
             <style>{`
@@ -288,23 +295,23 @@ export default function Sidebar({
                 display: none;
               }
             `}</style>
-            {/* CREATOR / CLIENT TOGGLE & CLOSE BTN */}
+
             <div className="flex items-center gap-2 mb-8 mt-2">
               <div className="creator-client-toggle flex-1 flex bg-[#CEFF1B] rounded-xl p-1">
-                {["creator", "client"].map((t) => {
-                  const isActive = userType === t;
+                {["creator", "client"].map((type) => {
+                  const isActive = userType === type;
 
                   return (
                     <button
-                      key={t}
-                      onClick={() => setUserType(t)}
+                      key={type}
+                      onClick={() => setUserType(type)}
                       className="flex-1 py-2 rounded-xl text-sm font-semibold transition"
                       style={{
                         backgroundColor: isActive ? "#ffffff" : "transparent",
                         color: "#000000",
                       }}
                     >
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
                     </button>
                   );
                 })}
@@ -321,14 +328,10 @@ export default function Sidebar({
               )}
             </div>
 
-            {/* NAV */}
             <nav className="space-y-4">
-              {SIDEBAR_ITEMS.map((item) => {
+              {sidebarItems.map((item) => {
                 const isNeon = activeMain === item.label && !item.children;
-                const itemBgColor = isNeon
-                  ? "#CEFF1B"
-                  : "transparent";
-
+                const itemBgColor = isNeon ? "#CEFF1B" : "transparent";
                 const itemTextColor = isNeon
                   ? "#000000"
                   : theme === "dark"
@@ -338,53 +341,32 @@ export default function Sidebar({
                 return (
                   <div key={item.label}>
                     <button
-                      onClick={() => {
-                        // ✅ Dashboard
-                        if (item.label === "Dashboard") {
-                          setActiveMain("Dashboard");
-                          setOpenMenu(null);
-                          navigate("/dashboard");
-                          return;
-                        }
-
-                        // ✅ Message
-                        if (item.label === "Message") {
-                          setActiveMain("Message");
-                          setOpenMenu(null);
-                          navigate("/messages");
-                          return;
-                        }
-
-                        // ✅ Client single pages
-                        if (userType === "client" && !item.children) {
-                          setActiveMain(item.label);
-                          setOpenMenu(null);
-
-                          if (item.label === "Marketplace")
-                            navigate("/marketplace");
-                          else if (item.label === "My Cart") navigate("/cart");
-                          return;
-                        }
-
-                        // ✅ Dropdowns
-                        setActiveMain(item.label);
-                        setOpenMenu(openMenu === item.label ? null : item.label);
-                      }}
+                      onClick={() => handleMainItemClick(item)}
                       className="w-full flex items-center gap-3 font-medium px-3 py-2 rounded-md transition"
                       style={{
                         backgroundColor: itemBgColor,
                         color: itemTextColor,
                       }}
                     >
-                      <item.icon size={18} color={itemTextColor} style={{ flexShrink: 0 }} />
+                      <item.icon
+                        size={18}
+                        color={itemTextColor}
+                        style={{ flexShrink: 0 }}
+                      />
                       <span className="flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis">
                         {item.label}
                       </span>
 
                       {item.children && (
                         <span
-                          className={`ml-auto inline-flex items-center justify-center transition-transform ${openMenu === item.label ? "rotate-180" : ""}`}
-                          style={{ flexShrink: 0, color: itemTextColor, lineHeight: 0 }}
+                          className={`ml-auto inline-flex items-center justify-center transition-transform ${
+                            openMenu === item.label ? "rotate-180" : ""
+                          }`}
+                          style={{
+                            flexShrink: 0,
+                            color: itemTextColor,
+                            lineHeight: 0,
+                          }}
                           aria-hidden="true"
                         >
                           <svg
@@ -407,7 +389,9 @@ export default function Sidebar({
                       <div className="ml-8 mt-2 space-y-1">
                         {item.children.map((sub) => {
                           const Icon = sub.icon;
-                          const isSubActive = path === sub.path || (sub.path === "/setting" && path === "/settings");
+                          const isSubActive =
+                            path === sub.path ||
+                            (sub.path === "/setting" && path === "/settings");
 
                           return (
                             <div
@@ -435,7 +419,6 @@ export default function Sidebar({
               })}
             </nav>
 
-            {/* THEME TOGGLE */}
             <div className="w-full px-4 pb-4 mt-auto ml-2">
               <button
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
@@ -456,9 +439,10 @@ export default function Sidebar({
                     flex items-center justify-center
                     shadow-md shadow-black/30
                     transition-all duration-300 ease-in-out
-                    ${theme === "dark"
-                      ? "left-[96px] bg-[#24272C]"
-                      : "left-[6px] bg-[#24272C]"
+                    ${
+                      theme === "dark"
+                        ? "left-[96px] bg-[#24272C]"
+                        : "left-[6px] bg-[#24272C]"
                     }
                   `}
                 >
@@ -496,8 +480,6 @@ export default function Sidebar({
           </aside>
         )}
 
-        {/* ================= SETTINGS SIDEBAR ================= */}
-        {/* ✅ CHANGE: expanded dependency removed + client bhi allow */}
         {showSettings && !isMobile && (
           <aside
             className="w-[238px] border-l sticky top-[85px] h-[calc(100vh-85px)] overflow-y-auto scrollbar-hide"
@@ -505,7 +487,7 @@ export default function Sidebar({
               backgroundColor: "var(--card)",
               borderColor: "var(--border)",
               msOverflowStyle: "none",
-              scrollbarWidth: "none"
+              scrollbarWidth: "none",
             }}
           >
             <div className="pt-8 space-y-1">
@@ -537,7 +519,7 @@ export default function Sidebar({
                             : "var(--text)",
                     }}
                   >
-                    {item.replace(/\b\w/g, (c) => c.toUpperCase())}
+                    {item.replace(/\b\w/g, (char) => char.toUpperCase())}
                   </div>
                 );
               })}
@@ -546,7 +528,6 @@ export default function Sidebar({
         )}
       </div>
 
-      {/* ================= MOBILE BOTTOM NAV ================= */}
       {isMobile && !expanded && (
         <MobileBottomNav
           active={activeBottomTab}

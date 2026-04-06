@@ -36,6 +36,7 @@ import MilestonesPage from "./features/marketplace/pages/MilestonesPage";
 import SoloMilestonesPage from "./features/marketplace/pages/SoloMilestonesPage";
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
+import Marketplace from "./features/marketplace/pages/Marketplace";
 import AddNewListing from "./features/marketplace/pages/AddNewListing";
 import TeamServiceListing from "./features/marketplace/pages/TeamServiceListing";
 import ServiceListing from "./features/marketplace/pages/ServiceListing";
@@ -49,20 +50,27 @@ import CourseDeliverables from "./features/marketplace/pages/CourseDeliverables"
 import WebinarDeliverables from "./features/marketplace/pages/WebinarDeliverables";
 import WebinarListing from "./features/marketplace/pages/WebinarListing";
 import CreateWebinar from "./features/marketplace/pages/CreateWebinar";
+import MessageBox from "./features/marketplace/pages/MessageBox";
+import MyCartPage from "./features/marketplace/pages/MyCartPage";
+import MyOrderCreatorPage from "./features/marketplace/pages/MyOrderCreatorPage";
+import MyOrderClientPage from "./features/marketplace/pages/MyOrderClientPage";
+import ActiveProjectPage from "./features/marketplace/pages/ActiveProjectPage";
+
+
 
 
 export default function App() {
-  const THEME_KEY = "user-theme";
+    const THEME_KEY = "user-theme";
 
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem(THEME_KEY) || "light";
-  });
-  useEffect(() => {
-    // body classes safe way
-    document.body.classList.remove("light", "dark");
-    document.body.classList.add(theme);
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem(THEME_KEY) || "light";
+    });
+    useEffect(() => {
+        // body classes safe way
+        document.body.classList.remove("light", "dark");
+        document.body.classList.add(theme);
+        localStorage.setItem(THEME_KEY, theme);
+    }, [theme]);
 
   return (
     <Router>
@@ -111,17 +119,113 @@ export default function App() {
           <Route path="/team-service-listing" element={<TeamServiceListing theme={theme} setTheme={setTheme} />} />
           <Route path="/service-listing" element={<ServiceListing theme={theme} setTheme={setTheme} />} />
 
-          <Route path="/digital-product-listing" element={<DigitalProductListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/my-listings" element={<MyListings theme={theme} setTheme={setTheme} />} />
-          <Route path="/create-course" element={<CreateCourse theme={theme} setTheme={setTheme} />} />
-          <Route path="/course-listing" element={<CourseListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/product-deliverables" element={<ProductDeliverables theme={theme} setTheme={setTheme} />} />
-          <Route path="/course-deliverables" element={<CourseDeliverables theme={theme} setTheme={setTheme} />} />
-          <Route path="/webinar-deliverables" element={<WebinarDeliverables theme={theme} setTheme={setTheme} />} />
-          <Route path="/webinar-listing" element={<WebinarListing theme={theme} setTheme={setTheme} />} />
-          <Route path="/create-webinar" element={<CreateWebinar theme={theme} setTheme={setTheme} />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+                    <Route
+                        path="/digital-product-listing"
+                        element={
+                            <DigitalProductListing
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/cart"
+                        element={
+                            <MyCartPage theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/my-listings"
+                        element={
+                            <MyListings theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/create-course"
+                        element={
+                            <CreateCourse theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/course-listing"
+                        element={
+                            <CourseListing theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/product-deliverables"
+                        element={
+                            <ProductDeliverables
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/course-deliverables"
+                        element={
+                            <CourseDeliverables
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/webinar-deliverables"
+                        element={
+                            <WebinarDeliverables
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/webinar-listing"
+                        element={
+                            <WebinarListing theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/create-webinar"
+                        element={
+                            <CreateWebinar theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/messages"
+                        element={
+                            <MessageBox theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/creator-orders"
+                        element={
+                            <MyOrderCreatorPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/client-orders"
+                        element={
+                            <MyOrderClientPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/active-projects"
+                        element={
+                            <ActiveProjectPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                </Routes>
+            </div>
+        </Router>
+    );
 }

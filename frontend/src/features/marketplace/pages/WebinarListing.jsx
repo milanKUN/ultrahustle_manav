@@ -24,8 +24,8 @@ import UserNavbar from '../../../components/layout/UserNavbar';
 import '../../../Darkuser.css';
 import '../../dashboard/pages/TeamProfileLight.css';
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
-import DetailedTeamCard from '../components/DetailedTeamCard';
 import FAQAccordion from '../components/FAQAccordion';
+import DetailedTeamCard from "../components/DetailedTeamCard";
 
 const WebinarListing = ({ theme, setTheme }) => {
     const navigate = useNavigate();

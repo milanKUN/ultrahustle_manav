@@ -9,7 +9,7 @@ import {
 import "./DetailedTeamCard.css";
 
 const DetailedTeamCard = ({
-    teamName = "Name of the team",
+    teamName = "Sara Johnson",
     location = "San Francisco, CA",
     rating = 4.9,
     reviewCount = 247,

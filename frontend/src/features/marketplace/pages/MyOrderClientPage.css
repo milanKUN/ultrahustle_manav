@@ -1,0 +1,502 @@
+.my-order-client-page {
+  background: var(--bg, #f4f5f7);
+  color: var(--text, #111827);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.my-order-client-main {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px 22px 48px;
+}
+
+.my-order-client-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.my-order-client-head {
+  margin-bottom: 12px;
+}
+
+.my-order-client-title {
+  margin: 0;
+  color: #202020;
+  font-size: 1.95rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.my-order-client-subtitle {
+  margin: 4px 0 0;
+  color: #666666;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.my-order-client-summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 16px;
+}
+
+.my-order-client-summaryItem h2 {
+  margin: 0 0 6px;
+  color: #1f1f1f;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.my-order-client-summaryCard {
+  min-height: 48px;
+  border: 1px solid #9ca3af;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.my-order-client-summaryCard span {
+  color: #9a9a9a;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.my-order-client-summaryCard strong {
+  color: #3f3f46;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.my-order-client-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px 94px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.my-order-client-search,
+.my-order-client-selectWrap {
+  min-height: 46px;
+  border: 1px solid #9ca3af;
+  border-radius: 4px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+.my-order-client-search {
+  color: #7a7a7a;
+}
+
+.my-order-client-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  background: transparent;
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.my-order-client-search input::placeholder {
+  color: #9f9f9f;
+}
+
+.my-order-client-selectWrap {
+  position: relative;
+  padding: 0;
+}
+
+.my-order-client-selectWrap.open {
+  border-color: #ceff1b;
+  box-shadow: 0 0 0 2px rgba(206, 255, 27, 0.16);
+}
+
+.my-order-client-selectButton {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  background: transparent;
+  color: #3f3f46;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.my-order-client-selectButton svg {
+  flex-shrink: 0;
+  color: #5b5b5b;
+}
+
+.my-order-client-selectMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  border: 1px solid #dfe4ea;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+  padding: 8px 0;
+  z-index: 30;
+}
+
+.my-order-client-selectOption {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #1f2937;
+  font-size: 0.92rem;
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.my-order-client-selectOption:hover,
+.my-order-client-selectOption.active {
+  background: #d9ff00;
+}
+
+.my-order-client-filterBtn {
+  min-height: 46px;
+  border: 0;
+  border-radius: 4px;
+  background: #ceff1b;
+  color: #202020;
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.my-order-client-filterBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(206, 255, 27, 0.32);
+}
+
+.my-order-client-statusTabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: nowrap;
+  margin-bottom: 18px;
+}
+
+.my-order-client-statusTab {
+  min-height: 38px;
+  min-width: 0;
+  padding: 0 18px;
+  border: 1px solid #9ca3af;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #434343;
+  font-size: 0.86rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.my-order-client-statusTab:hover,
+.my-order-client-statusTab.active {
+  background: #ceff1b;
+  border-color: #b9d926;
+  color: #202020;
+}
+
+.my-order-client-groupTitle {
+  margin: 0 0 12px;
+  color: #202020;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.my-order-client-tableCard {
+  border: 1px solid #9ca3af;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.my-order-client-tableScroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.my-order-client-table {
+  width: 100%;
+  min-width: 1280px;
+  border-collapse: collapse;
+}
+
+.my-order-client-table th,
+.my-order-client-table td {
+  padding: 18px 14px;
+  border-bottom: 1px solid #d6d9de;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.my-order-client-table th {
+  color: #3f3f46;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.my-order-client-table td {
+  color: #555555;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.my-order-client-table td:nth-child(3) {
+  max-width: 126px;
+  line-height: 1.35;
+}
+
+.my-order-client-table th:nth-child(1),
+.my-order-client-table td:nth-child(1) {
+  width: 92px;
+}
+
+.my-order-client-table th:nth-child(2),
+.my-order-client-table td:nth-child(2) {
+  width: 118px;
+}
+
+.my-order-client-table th:nth-child(3),
+.my-order-client-table td:nth-child(3) {
+  width: 136px;
+}
+
+.my-order-client-table th:nth-child(4),
+.my-order-client-table td:nth-child(4),
+.my-order-client-table th:nth-child(5),
+.my-order-client-table td:nth-child(5),
+.my-order-client-table th:nth-child(6),
+.my-order-client-table td:nth-child(6) {
+  width: 102px;
+}
+
+.my-order-client-table th:nth-child(7),
+.my-order-client-table td:nth-child(7) {
+  width: 120px;
+}
+
+.my-order-client-table th:nth-child(8),
+.my-order-client-table td:nth-child(8) {
+  width: 220px;
+}
+
+.my-order-client-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.my-order-client-statusBadge {
+  min-width: 64px;
+  min-height: 30px;
+  padding: 8px 15px;
+  border: 0;
+  border-radius: 4px;
+  background: #ceff1b;
+  color: #202020;
+  font-size: 0.72rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.my-order-client-actionsCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.my-order-client-actionBtn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #b9d926;
+  border-radius: 12px;
+  background: #ceff1b;
+  color: #202020;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.my-order-client-empty {
+  border: 1px dashed #cfd4dc;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 28px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.my-order-client-page.dark .my-order-client-title,
+.my-order-client-page.dark .my-order-client-groupTitle,
+.my-order-client-page.dark .my-order-client-summaryItem h2 {
+  color: #ffffff !important;
+}
+
+.my-order-client-page.dark .my-order-client-subtitle,
+.my-order-client-page.dark .my-order-client-summaryCard strong,
+.my-order-client-page.dark .my-order-client-table td,
+.my-order-client-page.dark .my-order-client-tableFooter span,
+.my-order-client-page.dark .my-order-client-empty {
+  color: #b9bcc5;
+}
+
+.my-order-client-page.dark .my-order-client-summaryCard,
+.my-order-client-page.dark .my-order-client-tableCard,
+.my-order-client-page.dark .my-order-client-empty {
+  background: #1f1f1f;
+  border-color: #3a3a3a;
+}
+
+.my-order-client-page.dark .my-order-client-summaryCard span {
+  color: #b9bcc5;
+}
+
+.my-order-client-page.dark .my-order-client-table th {
+  color: #ceff1b;
+}
+
+.my-order-client-page.dark .my-order-client-search,
+.my-order-client-page.dark .my-order-client-selectWrap {
+  background: #1f1f1f;
+  border-color: #343434;
+}
+
+.my-order-client-page.dark .my-order-client-search,
+.my-order-client-page.dark .my-order-client-selectButton,
+.my-order-client-page.dark .my-order-client-selectButton svg {
+  color: #d4d4d8;
+}
+
+.my-order-client-page.dark .my-order-client-search input {
+  color: #ffffff !important;
+}
+
+.my-order-client-page.dark .my-order-client-search input::placeholder {
+  color: #8c8c95 !important;
+}
+
+.my-order-client-page.dark .my-order-client-selectMenu {
+  background: #1f1f1f;
+  border-color: #343434;
+}
+
+.my-order-client-page.dark .my-order-client-selectOption {
+  color: #f4f4f5;
+}
+
+.my-order-client-page.dark .my-order-client-selectOption:hover,
+.my-order-client-page.dark .my-order-client-selectOption.active {
+  color: #202020;
+}
+
+.my-order-client-page.dark .my-order-client-statusTab {
+  background: #262626;
+  border-color: #4a4a4a;
+  color: #e4e4e7;
+}
+
+.my-order-client-page.dark .my-order-client-statusTab:hover,
+.my-order-client-page.dark .my-order-client-statusTab.active {
+  background: #ceff1b;
+  border-color: #ceff1b;
+  color: #202020;
+}
+
+.my-order-client-page.dark .my-order-client-table th,
+.my-order-client-page.dark .my-order-client-table td,
+.my-order-client-page.dark .my-order-client-tableFooter {
+  border-color: #2d2d2d;
+}
+
+.my-order-client-page.dark .my-order-client-actionBtn {
+  border-color: #ceff1b;
+  color: #202020;
+}
+
+@media (max-width: 1024px) {
+  .my-order-client-main {
+    padding-inline: 18px;
+  }
+
+  .my-order-client-summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .my-order-client-toolbar {
+    grid-template-columns: minmax(0, 1fr) 180px 94px;
+  }
+}
+
+@media (max-width: 767px) {
+  .my-order-client-main {
+    padding: 20px 16px 110px;
+  }
+
+  .my-order-client-title {
+    font-size: 1.5rem;
+  }
+
+  .my-order-client-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .my-order-client-summaryGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .my-order-client-filterBtn {
+    width: 100%;
+  }
+
+  .my-order-client-statusTabs {
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .my-order-client-statusTab {
+    min-width: calc(50% - 5px);
+    font-size: 0.82rem;
+  }
+
+  .my-order-client-table th,
+  .my-order-client-table td {
+    padding: 16px 12px;
+  }
+}

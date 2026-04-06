@@ -112,6 +112,7 @@
 .tsl-profile-details h4,
 .tsl-skills-panel h4 {
     margin: 0 0 12px;
+    text-align: left;
     color: #000;
     font-size: 18px;
     font-weight: 700;
@@ -328,5 +329,120 @@
 
     .tsl-skills-panel {
         padding: 24px;
+    }
+}
+
+@media (max-width: 540px) {
+    .tsl-team-profile-card {
+        padding: 16px;
+        gap: 18px;
+        border-radius: 18px;
+    }
+
+    .tsl-profile-left,
+    .tsl-profile-right {
+        gap: 18px;
+    }
+
+    .tsl-profile-header {
+        gap: 12px;
+    }
+
+    .tsl-avatar-container {
+        width: 72px;
+        height: 72px;
+    }
+
+    .tsl-online-indicator {
+        right: 3px;
+        bottom: 3px;
+        width: 12px;
+        height: 12px;
+        border-width: 2px;
+    }
+
+    .tsl-profile-title-box h3 {
+        font-size: 8px;
+    }
+
+    .tsl-location,
+    .tsl-rating-text,
+    .tsl-languages-section h5,
+    .tsl-team-profile-card .stat-label {
+        font-size: 12px;
+    }
+
+    .tsl-location svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .tsl-stars svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .tsl-profile-details h4,
+    .tsl-skills-panel h4 {
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+
+    .tsl-profile-details p {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .tsl-languages-section {
+        margin-top: 14px;
+    }
+
+    .tsl-lang-tags {
+        gap: 8px;
+    }
+
+    .tsl-team-profile-card .tsl-lang-tags span {
+        min-width: 88px;
+        height: 28px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .tsl-team-profile-card .tsl-full-profile-btn {
+        width: 100% !important;
+        margin-top: 18px;
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+    }
+
+    .tsl-stat-card,
+    .tsl-skills-panel {
+        padding: 16px;
+    }
+
+    .tsl-stat-card {
+        gap: 6px;
+    }
+
+    .tsl-team-profile-card .stat-header {
+        gap: 6px;
+    }
+
+    .tsl-team-profile-card .stat-icon-svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .tsl-team-profile-card .stat-value {
+        font-size: 18px;
+    }
+
+    .tsl-skills-grid {
+        gap: 8px;
+    }
+
+    .tsl-skill-tag {
+        padding: 8px 12px;
+        font-size: 12px;
     }
 }
