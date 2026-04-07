@@ -5,6 +5,7 @@ import MobileBottomNav from "./MobileBottomNav";
 
 import {
   ChevronLeft,
+  X,
   FilePlus,
   Folder,
   HeartIcon,
@@ -295,6 +296,17 @@ export default function Sidebar({
                 display: none;
               }
             `}</style>
+
+            {isMobile && (
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="absolute top-5 left-5 z-[10000] flex h-10 w-10 items-center justify-center rounded-full bg-[#CEFF1B] text-[#000]"
+                aria-label="Close sidebar"
+              >
+                <X size={20} strokeWidth={2.4} />
+              </button>
+            )}
 
             <div className="flex items-center gap-2 mb-8 mt-2">
               <div className="creator-client-toggle flex-1 flex bg-[#CEFF1B] rounded-xl p-1">

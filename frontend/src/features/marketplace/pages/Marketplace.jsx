@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import UserNavbar from "../../../components/layout/UserNavbar";
+import Sidebar from "../../../components/layout/Sidebar";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 import heroImg from "../../../assets/marketplacehero.png";
 import heroImgDark from "../../../assets/marketplacedark.png";
@@ -1851,14 +1852,11 @@ const categories = [
 ];
 
 export default function Marketplace({ theme, setTheme }) {
-    const [sidebarOpen, setSidebarOpen] = useState(() => {
-        const saved = localStorage.getItem("sidebarOpen");
-        return saved ? JSON.parse(saved) : false;
-    });
-
-    useEffect(() => {
-        localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
-    }, [sidebarOpen]);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [isMobileView, setIsMobileView] = useState(
+        () => typeof window !== "undefined" && window.innerWidth < 950,
+    );
 
     const [activeCat, setActiveCat] = useState("Service");
     const [openChip, setOpenChip] = useState(null);
@@ -1878,6 +1876,32 @@ export default function Marketplace({ theme, setTheme }) {
     const [sortBy, setSortBy] = useState("most_relevant");
     const [isSortOpen, setIsSortOpen] = useState(false);
     const sortRef = useRef(null);
+    const [activeSetting, setActiveSetting] = useState("");
+
+    useEffect(() => {
+        setSidebarOpen(false);
+        setShowSettings(false);
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return undefined;
+        }
+
+        const handleResize = () => {
+            const mobile = window.innerWidth < 950;
+            setIsMobileView(mobile);
+
+            if (!mobile) {
+                setSidebarOpen(false);
+                setShowSettings(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     // Searchable Filter States
     const [langSearch, setLangSearch] = useState("");
@@ -2260,7 +2284,18 @@ export default function Marketplace({ theme, setTheme }) {
                 />
 
                 <div className="mp-content-wrapper flex flex-1 relative z-10">
-
+                    {isMobileView && (
+                        <Sidebar
+                            expanded={sidebarOpen}
+                            setExpanded={setSidebarOpen}
+                            showSettings={showSettings}
+                            setShowSettings={setShowSettings}
+                            activeSetting={activeSetting}
+                            onSectionChange={setActiveSetting}
+                            theme={theme}
+                            setTheme={setTheme}
+                        />
+                    )}
 
                     {/* MAIN CONTENT */}
                     <div className="relative flex-1 min-w-5 overflow-hidden">

@@ -523,6 +523,389 @@
 }
 
 /* =========================
+   MILESTONES TAB REFINEMENT
+========================= */
+
+.ms-wrap {
+  width: 100%;
+  max-width: 1120px;
+  padding: 0 10px 24px;
+}
+
+.ms-topbar {
+  margin-bottom: 16px;
+}
+
+.ms-seg {
+  margin-top: 10px;
+  padding: 3px;
+  gap: 4px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(173, 214, 16, 0.28);
+}
+
+.ms-segBtn {
+  min-height: 24px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 7px;
+}
+
+.ms-segBtn.active {
+  font-weight: 600;
+}
+
+.ms-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ms-card {
+  width: auto;
+  min-height: 132px;
+  height: auto;
+  padding: 16px 18px;
+  border: 1px solid #bfc0c2;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.ms-cardTitle {
+  margin-bottom: 12px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ms-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #b7b7b7;
+  overflow: hidden;
+}
+
+.ms-barFill {
+  background: #ceff1b;
+}
+
+.ms-sub,
+.ms-item,
+.ms-revLine,
+.ms-nextLine {
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #4d4d4d;
+}
+
+.ms-sub {
+  margin-top: 14px;
+}
+
+.ms-item {
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.ms-bullet {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  background: #8b8b8b;
+}
+
+.ms-bullet.hollow {
+  border-color: #8b8b8b;
+}
+
+.ms-nextLine.sub {
+  margin-top: 8px;
+}
+
+.ms-controls {
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+.ms-status-actions {
+  display: none;
+}
+
+.ms-dd-trigger {
+  width: 140px;
+  min-width: 140px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1;
+  border-color: #b8b8b8;
+  box-shadow: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-wrap: nowrap;
+  position: relative;
+  padding-right: 30px;
+}
+
+.ms-dd-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  pointer-events: none;
+}
+
+.ms-dd-arrow::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #222;
+  display: block;
+}
+
+.ms-notice {
+  width: 100%;
+  min-height: 36px;
+  height: auto;
+  margin: 0 0 16px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+  border-radius: 5px;
+  background: rgba(206, 255, 27, 0.7);
+  border-color: #bddc2e;
+}
+
+.ms-status {
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 22px;
+}
+
+.ms-pill {
+  min-width: 74px;
+  padding: 8px 14px;
+  font-size: 11px;
+  border-radius: 8px;
+  border-color: #bfc0c2;
+  box-shadow: none;
+}
+
+.ms-pill.active {
+  border-color: #bfc0c2;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+.ms-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.95fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.ms-feed {
+  gap: 14px;
+}
+
+.ms-event {
+  width: auto;
+  min-height: 150px;
+  padding: 18px;
+  border: 1px solid #c8c8c8;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.ms-feed .ms-event:nth-child(3),
+.ms-feed .ms-event:nth-child(4),
+.ms-feed .ms-event:nth-child(5),
+.ms-feed .ms-event:nth-child(6),
+.ms-feed .ms-event:nth-child(7),
+.ms-feed .ms-event:nth-child(8) {
+  height: auto;
+}
+
+.ms-event.highlight {
+  border-color: #c5e72c;
+  box-shadow: none;
+}
+
+.ms-eventLeft {
+  gap: 12px;
+}
+
+.ms-eventTitle {
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6b6b6b;
+}
+
+.ms-eventTs {
+  font-size: 12px;
+  color: #9a9a9a;
+}
+
+.ms-miniPill {
+  padding: 5px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  border-color: #d7ef78;
+  background: rgba(206, 255, 27, 0.5);
+}
+
+.ms-eventDesc {
+  margin: 10px 0 14px;
+  font-size: 16px;
+  color: #8a8a8a;
+}
+
+.ms-tagRow {
+  width: auto;
+  height: auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ms-tag {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 8px;
+  color: #7a7a7a;
+  background: #fff;
+  border-color: #d8d8d8;
+}
+
+.ms-fileBtn {
+  padding: 7px 10px;
+  font-size: 10px;
+}
+
+.ms-chat,
+.ms-amount {
+  font-size: 14px;
+}
+
+.ms-side {
+  gap: 16px;
+}
+
+.ms-panel {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.ms-panel-action,
+.ms-panel-revision {
+  width: auto;
+  height: auto;
+}
+
+.ms-panelTitle {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.ms-panelSub,
+.ms-descText {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ms-actionBtn {
+  height: 42px;
+  margin-top: 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ms-timer {
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.ms-timeBox {
+  padding: 14px 10px;
+  border-radius: 6px;
+}
+
+.ms-timeNum {
+  font-size: 24px;
+}
+
+.ms-timeLbl {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ms-panelTitle.small {
+  margin-top: 14px;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.ms-tagRow {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ms-tag {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+
+.ms-fileRow {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ms-fileBtn {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+
+.ms-open {
+  font-size: 11px;
+}
+
+@media (max-width: 980px) {
+  .ms-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ms-lower {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-status {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================
    DETAILS TAB (Invoice UI)
 ========================= */
 
@@ -756,9 +1139,14 @@
   color: var(--d-text);
 }
 
+.user-page.dark .ms-seg {
+  background: #ceff1b;
+  box-shadow: inset 0 0 0 1px rgba(206, 255, 27, 0.28);
+}
+
 .user-page.dark .ms-card {
-  background: var(--d-card);
-  border-color: var(--d-border);
+  background: #101010;
+  border-color: #ceff1b;
   box-shadow: none;
 }
 
@@ -766,7 +1154,7 @@
 .user-page.dark .ms-item,
 .user-page.dark .ms-revLine,
 .user-page.dark .ms-nextLine {
-  color: var(--d-text);
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-sub,
@@ -777,28 +1165,42 @@
 .user-page.dark .ms-panelSub,
 .user-page.dark .ms-panelTitle.small,
 .user-page.dark .ms-descText {
-  color: var(--d-muted);
+  color: #b8b8b8;
+}
+
+.user-page.dark .ms-bar {
+  background: #6f6f6f;
+}
+
+.user-page.dark .ms-bullet {
+  background: #ceff1b;
+}
+
+.user-page.dark .ms-bullet.hollow {
+  background: transparent;
+  border-color: #ceff1b;
 }
 
 .user-page.dark .ms-pill {
-  background: #121212;
-  border-color: var(--d-border);
-  color: var(--d-text);
+  background: #101010;
+  border-color: #6a6a6a;
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-pill:hover,
 .user-page.dark .ms-pill.active {
   border-color: var(--accent);
+  background: #151515;
 }
 
 .user-page.dark .ms-event {
-  background: var(--d-card);
-  border-color: var(--d-border);
+  background: #101010;
+  border-color: #6f6f6f;
 }
 
 .user-page.dark .ms-event.highlight {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(206, 255, 27, 0.15);
+  box-shadow: 0 0 0 1px rgba(206, 255, 27, 0.22);
 }
 
 .user-page.dark .ms-eventTitle,
@@ -806,34 +1208,44 @@
 .user-page.dark .ms-panelTitle,
 .user-page.dark .ms-timeNum,
 .user-page.dark .ms-timeLbl {
-  color: var(--d-text);
+  color: #f5f5f5;
+}
+
+.user-page.dark .ms-eventTs {
+  color: #9c9c9c;
+}
+
+.user-page.dark .ms-miniPill {
+  border-color: #ceff1b;
+  background: rgba(206, 255, 27, 0.88);
+  color: #101010;
 }
 
 .user-page.dark .ms-tag {
-  background: #121212;
-  border-color: var(--d-border);
-  color: var(--d-text);
+  background: #181818;
+  border-color: #6f6f6f;
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-fileBtn {
-  background: #121212;
-  border-color: var(--d-border);
-  color: var(--d-text);
+  background: #181818;
+  border-color: #6f6f6f;
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-fileBtn .ms-open {
-  color: var(--d-text);
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-panel {
-  background: var(--d-card);
+  background: #101010;
   border-color: var(--accent);
 }
 
 .user-page.dark .ms-actionBtn {
-  background: #121212;
-  border-color: var(--d-border);
-  color: var(--d-text);
+  background: #141414;
+  border-color: #7c7c7c;
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-actionBtn.lime {
@@ -843,19 +1255,25 @@
 }
 
 .user-page.dark .ms-segBtn {
-  color: var(--d-text);
+  color: #101010;
 }
 
 .user-page.dark .ms-segBtn.active {
-  background: #121212;
-  color: var(--d-text);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: #ffffff;
+  color: #111111;
+  box-shadow: none;
 }
 
 .user-page.dark .ms-select {
   background: #121212;
   color: var(--d-text);
   border-color: var(--d-border);
+}
+
+.user-page.dark .ms-notice {
+  background: rgba(206, 255, 27, 0.85);
+  border-color: #ceff1b;
+  color: #111111;
 }
 
 
@@ -937,92 +1355,125 @@
 }
 
 /* Drodown Styles */
+.ms-dd-wrap {
+  position: relative;
+  z-index: 20;
+}
+
 .ms-dd-trigger {
   background: #fff;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #d1d5db;
   border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: #2a2a2a;
+  padding: 0 34px 0 12px;
+  font-size: 14px;
+  color: #374151;
   display: flex;
   align-items: center;
-  gap: 8px;
   cursor: pointer;
-  width: 232px;
-  height: 50px;
+  width: 220px;
+  min-width: 220px;
+  height: 42px;
   justify-content: space-between;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.ms-dd-trigger:hover {
+  background: #e5e7eb;
+}
+
+.ms-dd-trigger.open {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: 0 0 15px #CEFF1B;
 }
 
 .ms-dd-arrow {
-  font-size: 10px;
-  color: #888;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.ms-dd-arrow::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #6b7280;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.ms-dd-trigger.open .ms-dd-arrow::before {
+  transform: rotate(180deg);
 }
 
 .ms-dd-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
-  margin-top: 4px;
+  width: 100%;
+  margin-top: 0;
   background: #fff;
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 8px;
-  padding: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 50;
-  min-width: 140px;
+  padding: 4px 0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  z-index: 999;
+  min-width: 220px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
+  overflow: hidden;
 }
 
 .ms-dd-item {
   background: transparent;
   border: 0;
   text-align: left;
-  padding: 8px 10px;
-  font-size: 12px;
-  color: #2a2a2a;
-  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #374151;
+  border-radius: 0;
   cursor: pointer;
   width: 100%;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .ms-dd-item:hover {
-  background: #f5f5f5;
-}
-
-.ms-dd-item.disabled {
-  color: #aaa;
-  cursor: not-allowed;
-}
-
-.ms-dd-item.disabled:hover {
-  background: transparent;
+  background: #CEFF1B;
+  color: #000;
 }
 
 /* Dark Mode Dropdown */
 .user-page.dark .ms-dd-trigger {
-  background: #121212;
-  border-color: var(--d-border);
-  color: var(--d-text);
+  background: #101010;
+  border-color: #6f6f6f;
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-dd-menu {
-  background: #141414;
-  border-color: var(--d-border);
+  background: #101010;
+  border: 1px solid #2a2a2a;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .user-page.dark .ms-dd-item {
-  color: var(--d-text);
+  color: #f5f5f5;
 }
 
 .user-page.dark .ms-dd-item:hover {
-  background: #1f1f1f;
+  background: #ceff1b;
+  color: #101010;
 }
 
-.user-page.dark .ms-dd-item.disabled {
-  color: #555;
+.user-page.dark .ms-dd-arrow::before {
+  border-top-color: #f5f5f5;
 }
 
 /* =========================

@@ -150,27 +150,43 @@
 }
 
 /* ================= Contract Type Switch Toggle ================= */
-.cnc-type-switch-wrapper {
+.cnc-input--switchWrap {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  height: 50px;
+  justify-content: space-between;
+  padding: 0 12px;
+  gap: 16px;
+  overflow: hidden;
 }
 
-.cnc-type-label {
+.cnc-inputInner {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  height: 100%;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text);
+  background: transparent;
+}
+
+.cnc-inputInner::placeholder {
+  color: #9b9b9b;
+}
+
+.cnc-switchArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cnc-switchText {
   font-size: 14px;
   font-weight: 700;
-  color: #666;
-  transition: all 0.3s ease;
-}
-
-.cnc-type-label.active {
-  color: #111;
-}
-
-.cnc-contract-type-field {
-  text-align: right;
+  color: #2a2a2a;
+  white-space: nowrap;
 }
 
 /* Toggle Switch */
@@ -180,7 +196,7 @@
 
   border-radius: 999px;
   border: 1px solid #d5d5d5;
-  background: #909090;
+  background: #D9D9D9;
   padding: 0;
   position: relative;
   cursor: pointer;
@@ -191,7 +207,7 @@
   width: 22px;
   height: 22px;
   border-radius: 999px;
-  background: #CEFF1B;
+  background: #ffffff;
   position: absolute;
   top: 50%;
   left: 4px;
@@ -201,7 +217,7 @@
 }
 
 .cnc-switch.is-on {
-  background: #D9D9D9;
+  background: #CEFF1B;
   border-color: #D9D9D9;
 }
 
@@ -210,15 +226,12 @@
 }
 
 /* Dark Mode */
-.user-page.dark .cnc-type-label {
-  color: #666;
-  /* Dimmed state */
+.user-page.dark .cnc-inputInner {
+  color: var(--d-text);
 }
 
-.user-page.dark .cnc-type-label.active {
-  color: #CEFF1B;
-  text-shadow: 0 0 10px rgba(206, 255, 27, 0.5);
-  /* Neon glow */
+.user-page.dark .cnc-switchText {
+  color: var(--d-text);
 }
 
 .user-page.dark .cnc-switch {
@@ -886,11 +899,11 @@
   }
 
   /* Adjust switch alignment on mobile if needed */
-  .cnc-contract-type-field {
-    text-align: left;
+  .cnc-input--switchWrap {
+    padding: 0 12px;
   }
 
-  .cnc-type-switch-wrapper {
-    justify-content: flex-start;
+  .cnc-switchText {
+    font-size: 13px;
   }
 }

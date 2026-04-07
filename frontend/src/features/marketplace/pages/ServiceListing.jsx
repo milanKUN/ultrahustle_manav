@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
     Share2,
@@ -44,6 +45,8 @@ const ServiceListing = ({ theme, setTheme }) => {
     const [activeFaq, setActiveFaq] = useState(null);
     const recommendedGridRef = useRef(null);
     const moreFromSarahGridRef = useRef(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const shouldLockScroll = Boolean(activeItem || showImageModal);
@@ -791,7 +794,8 @@ const ServiceListing = ({ theme, setTheme }) => {
                                         </div>
 
                                         <div className="tsl-pricing-actions">
-                                            <button className="tsl-btn-primary">
+                                            <button onClick={() => navigate("/contracts-listing")}
+                                                className="tsl-btn-primary">
                                                 Create Contract
                                             </button>
                                             <button className="tsl-btn-outline">
