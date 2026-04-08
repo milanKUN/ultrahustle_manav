@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('digital_product_package_items', function (Blueprint $table) {
-            $table->json('item_value_json')->nullable()->after('item_value');
+            $table->json('item_value_json')->nullable();
+            $table->dropColumn('item_value');
         });
     }
 
