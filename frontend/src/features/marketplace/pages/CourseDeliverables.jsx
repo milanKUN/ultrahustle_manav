@@ -33,7 +33,7 @@ const CourseDeliverables = ({ theme, setTheme }) => {
             id: 2,
             title: "Design Handoff",
             updated: "Nov 20, 2025",
-            size: "128 MB",
+            size: "128 MB", 
             tags: ["PDF", "Final"],
             type: "download",
             buttonText: "Download"
@@ -67,21 +67,26 @@ const CourseDeliverables = ({ theme, setTheme }) => {
             id: 1,
             number: "Lesson 1",
             title: "Final Deliverables (ZIP) — UI Kit + Source",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            description:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         },
         {
             id: 2,
             number: "Lesson 2",
             title: "Final Deliverables (ZIP) — UI Kit + Source",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever more..."
+            description:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever more...",
         },
         {
             id: 3,
             number: "Lesson 3",
             title: "Final Deliverables (ZIP) — UI Kit + Source",
-            description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever more..."
-        }
+            description:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever more...",
+        },
     ];
+
+    const languages = ['English', 'Hindi', 'Tamil'];
 
     const [activeFaq, setActiveFaq] = useState(1);
 
@@ -90,7 +95,9 @@ const CourseDeliverables = ({ theme, setTheme }) => {
     };
 
     return (
-        <div className={`user-page course-deliverables-page ${theme} min-h-screen relative overflow-hidden`}>
+        <div
+            className={`user-page course-deliverables-page ${theme} min-h-screen relative overflow-hidden`}
+        >
             <UserNavbar
                 toggleSidebar={() => setSidebarOpen((p) => !p)}
                 theme={theme}
@@ -112,12 +119,18 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                             {/* Main Header Card */}
                             <div className="cd-header-card">
                                 <div className="cd-header-content">
-                                    <h1>Online Course Cover + Digital Product Mockup Bundle</h1>
-                                    <p>Access your delivered files, notes, and project chat.</p>
+                                    <h1>
+                                        Online Course Cover + Digital Product
+                                        Mockup Bundle
+                                    </h1>
+                                    <p>
+                                        Access your delivered files, notes, and
+                                        project chat.
+                                    </p>
                                 </div>
-                                <button className="cd-download-all-btn">
+                                {/* <button className="cd-download-all-btn">
                                     Download all
-                                </button>
+                                </button> */}
                             </div>
 
                             {/* Info Cards Grid */}
@@ -126,27 +139,39 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                     <div className="cd-info-icon">
                                         <Package size={24} />
                                     </div>
-                                    <div className="cd-info-text">
-                                        <span className="cd-info-label">Order ID</span>
-                                        <span className="cd-info-value">#PRJ-20419</span>
+                                    <div className="cd-info-card-text">
+                                        <span className="cd-info-label">
+                                            Order ID
+                                        </span>
+                                        <span className="cd-info-value">
+                                            #PRJ-20419
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="cd-info-card">
                                     <div className="cd-info-icon">
                                         <Package size={24} />
                                     </div>
-                                    <div className="cd-info-text">
-                                        <span className="cd-info-label">Purchased</span>
-                                        <span className="cd-info-value">Feb 12, 2025</span>
+                                    <div className="cd-info-card-text">
+                                        <span className="cd-info-label">
+                                            Purchased
+                                        </span>
+                                        <span className="cd-info-value">
+                                            Feb 12, 2025
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="cd-info-card">
                                     <div className="cd-info-icon lime">
                                         <DollarSign size={32} />
                                     </div>
-                                    <div className="cd-info-text">
-                                        <span className="cd-info-label">Price</span>
-                                        <span className="cd-info-value">$2340</span>
+                                    <div className="cd-info-card-text">
+                                        <span className="cd-info-label">
+                                            Price
+                                        </span>
+                                        <span className="cd-info-value">
+                                            $2340
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -154,40 +179,81 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                             {/* Course Info Section */}
                             <div className="cd-info-section">
                                 <div className="cd-info-block">
-                                    <h2 className="cd-info-title">Description</h2>
-                                    <p className="cd-info-text">He is the best in the game. Always have time to explain to me and made sure I was satisfied at every stage. Don't skip him if you want the best. He's great</p>
+                                    <h2 className="cd-info-title">
+                                        Description
+                                    </h2>
+                                    <p className="cd-info-text">
+                                        He is the best in the game. Always have
+                                        time to explain to me and made sure I
+                                        was satisfied at every stage. Don't skip
+                                        him if you want the best. He's great
+                                    </p>
                                 </div>
 
                                 <div className="cd-info-block">
-                                    <h2 className="cd-info-title">Tools needed</h2>
+                                    <h2 className="cd-info-title">
+                                        Tools needed
+                                    </h2>
                                     <div className="cd-tools-list">
-                                        {['Notion', 'Tailwind CSS', 'Photoshop', 'Figma', 'Illustrator', 'TypeScript', 'Webflow'].map(tool => (
-                                            <span key={tool} className="cd-tool-tag">{tool}</span>
+                                        {[
+                                            "Notion",
+                                            "Tailwind CSS",
+                                            "Photoshop",
+                                            "Figma",
+                                            "Illustrator",
+                                            "TypeScript",
+                                            "Webflow",
+                                        ].map((tool) => (
+                                            <span
+                                                key={tool}
+                                                className="cd-tool-tag"
+                                            >
+                                                {tool}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div className="cd-info-block">
-                                    <h2 className="cd-info-title">Prerequisites</h2>
-                                    <p className="cd-info-text">He is the best in the game. Always have time to explain to me and made sure I was satisfied at every stage. Don't skip him if you want the best. He's great</p>
+                                    <h2 className="cd-info-title">
+                                        Prerequisites
+                                    </h2>
+                                    <p className="cd-info-text">
+                                        He is the best in the game. Always have
+                                        time to explain to me and made sure I
+                                        was satisfied at every stage. Don't skip
+                                        him if you want the best. He's great
+                                    </p>
                                 </div>
 
                                 <div className="cd-info-block">
-                                    <h2 className="cd-info-title">What you will learn</h2>
+                                    <h2 className="cd-info-title">
+                                        What you will learn
+                                    </h2>
                                     <div className="cd-info-grid-2">
                                         <ul className="cd-learn-list">
                                             <li>He is the best in the game.</li>
-                                            <li>Always have time to explain to me and made sure.</li>
+                                            <li>
+                                                Always have time to explain to
+                                                me and made sure.
+                                            </li>
                                         </ul>
                                         <ul className="cd-learn-list">
-                                            <li>I was satisfied at every stage.</li>
-                                            <li>Don't skip him if you want the best. He's great</li>
+                                            <li>
+                                                I was satisfied at every stage.
+                                            </li>
+                                            <li>
+                                                Don't skip him if you want the
+                                                best. He's great
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
 
                                 <div className="cd-info-block">
-                                    <h2 className="cd-info-title">Course includes</h2>
+                                    <h2 className="cd-info-title">
+                                        Course includes
+                                    </h2>
                                     <div className="cd-info-grid-2">
                                         <div className="cd-include-item">
                                             <Check size={18} />
@@ -199,7 +265,10 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                         </div>
                                         <div className="cd-include-item">
                                             <Check size={18} />
-                                            <span>Advanced wireframing & prototyping</span>
+                                            <span>
+                                                Advanced wireframing &
+                                                prototyping
+                                            </span>
                                         </div>
                                         <div className="cd-include-item">
                                             <Check size={18} />
@@ -207,7 +276,9 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                         </div>
                                         <div className="cd-include-item">
                                             <Check size={18} />
-                                            <span>Custom color scheme & typography</span>
+                                            <span>
+                                                Custom color scheme & typography
+                                            </span>
                                         </div>
                                         <div className="cd-include-item">
                                             <Check size={18} />
@@ -215,14 +286,25 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                         </div>
                                         <div className="cd-include-item">
                                             <Check size={18} />
-                                            <span>Mobile & tablet responsive</span>
+                                            <span>
+                                                Mobile & tablet responsive
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="cd-info-block">
                                     <h2 className="cd-info-title">Languages</h2>
-                                    <p className="cd-languages-text">English Hindi Tamil</p>
+                                    <p className="cd-languages-text">
+                                        {languages.map((language) => (
+                                            <span
+                                                key={language}
+                                                className="cd-language-item"
+                                            >
+                                                {language}
+                                            </span>
+                                        ))}
+                                    </p>
                                 </div>
                             </div>
 
@@ -241,11 +323,20 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                             {/* Lessons Section */}
                             <div className="cd-lessons-section">
                                 {lessonsData.map((lesson) => (
-                                    <div key={lesson.id} className="cd-lesson-card">
+                                    <div
+                                        key={lesson.id}
+                                        className="cd-lesson-card"
+                                    >
                                         <div className="cd-lesson-content">
-                                            <div className="cd-lesson-badge">{lesson.number}</div>
-                                            <h3 className="cd-lesson-title">{lesson.title}</h3>
-                                            <p className="cd-lesson-description">{lesson.description}</p>
+                                            <div className="cd-lesson-badge">
+                                                {lesson.number}
+                                            </div>
+                                            <h3 className="cd-lesson-title">
+                                                {lesson.title}
+                                            </h3>
+                                            <p className="cd-lesson-description">
+                                                {lesson.description}
+                                            </p>
                                         </div>
                                         <button className="cd-watch-btn">
                                             Watch
@@ -261,30 +352,58 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                 <div className="cd-files-list-container">
                                     <div className="cd-files-list">
                                         {deliverables.map((item) => (
-                                            <div key={item.id} className="cd-file-item">
+                                            <div
+                                                key={item.id}
+                                                className="cd-file-item"
+                                            >
                                                 <div className="cd-file-info">
                                                     <h3>{item.title}</h3>
                                                     <div className="cd-file-meta">
-                                                        <span>Updated {item.updated}</span>
-                                                        <span className="cd-meta-dot">•</span>
+                                                        <span>
+                                                            Updated{" "}
+                                                            {item.updated}
+                                                        </span>
+                                                        <span className="cd-meta-dot">
+                                                            •
+                                                        </span>
                                                         <span>{item.size}</span>
                                                     </div>
                                                     <div className="cd-file-tags">
-                                                        {item.tags.map(tag => (
-                                                            <span key={tag} className={`cd-tag ${tag.toLowerCase()}`}>
-                                                                {tag}
-                                                            </span>
-                                                        ))}
+                                                        {item.tags.map(
+                                                            (tag) => (
+                                                                <span
+                                                                    key={tag}
+                                                                    className={`cd-tag ${tag.toLowerCase()}`}
+                                                                >
+                                                                    {tag}
+                                                                </span>
+                                                            ),
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="cd-file-actions">
                                                     <button className="cd-action-btn primary">
-                                                        {item.type === 'download' ? <Download size={18} /> : <ExternalLink size={18} />}
+                                                        {item.type ===
+                                                        "download" ? (
+                                                            <Download
+                                                                size={18}
+                                                            />
+                                                        ) : (
+                                                            <ExternalLink
+                                                                size={18}
+                                                            />
+                                                        )}
                                                         {item.buttonText}
                                                     </button>
                                                     <button
                                                         className="cd-action-btn secondary"
-                                                        onClick={() => setSelectedNote({ title: item.title, content: "This is a dummy note for the deliverable. You can add more details here." })}
+                                                        onClick={() =>
+                                                            setSelectedNote({
+                                                                title: item.title,
+                                                                content:
+                                                                    "This is a dummy note for the deliverable. You can add more details here.",
+                                                            })
+                                                        }
                                                     >
                                                         <FileText size={18} />
                                                         View note
@@ -294,6 +413,10 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+
+                            <div style={{ marginTop: "40px" }}>
+                                <DetailedTeamCard />
                             </div>
 
                             {/* FAQ Section */}
@@ -307,14 +430,20 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                     {faqData.map((faq) => (
                                         <div
                                             key={faq.id}
-                                            className={`cd-faq-item ${activeFaq === faq.id ? 'active' : ''}`}
+                                            className={`cd-faq-item ${activeFaq === faq.id ? "active" : ""}`}
                                         >
                                             <div
                                                 className="cd-faq-question"
-                                                onClick={() => toggleFaq(faq.id)}
+                                                onClick={() =>
+                                                    toggleFaq(faq.id)
+                                                }
                                             >
                                                 <span>{faq.question}</span>
-                                                {activeFaq === faq.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                                                {activeFaq === faq.id ? (
+                                                    <ChevronUp size={24} />
+                                                ) : (
+                                                    <ChevronDown size={24} />
+                                                )}
                                             </div>
                                             {activeFaq === faq.id && (
                                                 <div className="cd-faq-answer">
@@ -324,10 +453,6 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
-
-                            <div style={{ marginTop: '40px' }}>
-                                <DetailedTeamCard />
                             </div>
 
                             {/* Review Section */}
@@ -340,18 +465,36 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                                 <div className="cd-review-card">
                                     <div className="cd-review-content">
                                         <p className="cd-review-text">
-                                            Exceptional designer! Sovan delivered a comprehensive design system that transformed our product.
-                                            His attention to detail and communication throughout the project was outstanding.
-                                            Highly recommend for any serious design work!
+                                            Exceptional designer! Sovan
+                                            delivered a comprehensive design
+                                            system that transformed our product.
+                                            His attention to detail and
+                                            communication throughout the project
+                                            was outstanding. Highly recommend
+                                            for any serious design work!
                                         </p>
                                         <div className="cd-review-footer">
                                             <div className="cd-stars">
-                                                {[1, 2, 3, 4, 5].map(s => (
+                                                {[1, 2, 3, 4, 5].map((s) => (
                                                     <Star
                                                         key={s}
                                                         size={20}
-                                                        fill={s <= 4 ? (theme === 'dark' ? "#CEFF1B" : "#FFE100") : "#444"}
-                                                        stroke={s <= 4 ? (theme === 'dark' ? "#CEFF1B" : "#FFE100") : "#444"}
+                                                        fill={
+                                                            s <= 4
+                                                                ? theme ===
+                                                                  "dark"
+                                                                    ? "#CEFF1B"
+                                                                    : "#FFE100"
+                                                                : "#444"
+                                                        }
+                                                        stroke={
+                                                            s <= 4
+                                                                ? theme ===
+                                                                  "dark"
+                                                                    ? "#CEFF1B"
+                                                                    : "#FFE100"
+                                                                : "#444"
+                                                        }
                                                     />
                                                 ))}
                                             </div>

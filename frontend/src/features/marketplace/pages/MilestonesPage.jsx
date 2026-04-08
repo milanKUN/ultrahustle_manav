@@ -20,7 +20,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
   const [activeStatus, setActiveStatus] = useState("All");
 
   // ✅ VIEW ONLY STATE
-  const isViewOnly = true;
+  const [isViewOnly, setIsViewOnly] = useState(true);
 
   // dropdown
   const [projectOpen, setProjectOpen] = useState(false);
@@ -41,6 +41,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeSetting, setActiveSetting] = useState("basic");
+  const handleSectionChange = (id) => setActiveSetting(id);
 
   React.useEffect(() => {
     setSidebarOpen(true);
@@ -130,22 +131,6 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
         desc: "Client requested changes on hero section and mobile menu",
         tags: ["Milestone: Design phase", "Revision round: 1 of 3"],
         files: ["hero_v2.fig", "Mobilemenu_v2.mov"],
-        chat: "Discuss in chat",
-      },
-      {
-        title: "Upcoming Milestone",
-        pill: "Client",
-        ts: "Dec 20, 2025, 10:00 AM",
-        desc: "Planning for the next phase",
-        tags: ["Milestone: Development"],
-        chat: "Discuss in chat",
-      },
-      {
-        title: "Project Update",
-        pill: "Creator",
-        ts: "Dec 21, 2025, 04:00 PM",
-        desc: "Weekly progress report submitted",
-        tags: ["Update"],
         chat: "Discuss in chat",
       },
     ],
@@ -830,24 +815,26 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                     <div className="ms-card">
                       <div className="ms-cardTitle">Timeline</div>
                       <div className="ms-item">
-                        ● Start date: <b>{data.startedAt}</b>
+                        <span className="ms-bullet" />
+                        <span>Project start: <b>{data.startedAt}</b></span>
                       </div>
                       <div className="ms-item">
-                        ○ End date: <b>{data.targetAt}</b>
+                        <span className="ms-bullet hollow" />
+                        <span>Target completion: <b>{data.targetAt}</b></span>
                       </div>
                     </div>
 
                     <div className="ms-card">
                       <div className="ms-cardTitle">Revisions</div>
-                      <div className="ms-item">
+                      <div className="ms-revLine">
                         Used: <b>{data.revisionsUsed}</b> / {data.revisionsTotal}
                       </div>
                     </div>
 
                     <div className="ms-card">
                       <div className="ms-cardTitle">Next action</div>
-                      <div className="ms-item">{data.nextActionTitle}</div>
-                      <div className="ms-sub">{data.nextActionDate}</div>
+                      <div className="ms-nextLine">{data.nextActionTitle}</div>
+                      <div className="ms-nextLine sub">{data.nextActionDate}</div>
                     </div>
                   </div>
 
@@ -858,26 +845,23 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                         onClick={() => setProjectOpen(!projectOpen)}
                       >
                         <span>{projectValue}</span>
-                        <span className="ms-dd-arrow">▼</span>
+                        <span className="ms-dd-arrow" aria-hidden="true" />
                       </button>
 
                       {projectOpen && (
                         <div className="ms-dd-menu">
                           <button className="ms-dd-item">Full project</button>
-                          <button className="ms-dd-item disabled" disabled>
+                          <button className="ms-dd-item" type="button">
                             Current milestone
                           </button>
-                          <button className="ms-dd-item disabled" disabled>
+                          <button className="ms-dd-item" type="button">
                             Previous Milestone
                           </button>
                         </div>
                       )}
                     </div>
 
-                    <div className="ms-status-actions">
-                      <button className="ms-btn-late">Late</button>
-                      <button className="ms-btn-very-late">Very late</button>
-                    </div>
+
                   </div>
 
                   <div className="ms-notice">{data.notice}</div>
@@ -1014,3 +998,5 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
     </div>
   );
 }
+
+

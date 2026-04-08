@@ -2,12 +2,11 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
-    padding: 48px;
+    padding: 32px;
     margin-bottom: 24px;
     background: #f7f7f7;
-    border: 1px solid #ceff1b;
-    border-radius: 32px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border: 1.5px solid #ceff1b;
+    border-radius: 24px;
 }
 
 .user-page.dark .tsl-team-profile-card {
@@ -82,8 +81,7 @@
     gap: 6px;
     margin: 4px 0;
     color: #666;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14px;
 }
 
 .tsl-location svg {
@@ -113,14 +111,15 @@
 
 .tsl-profile-details h4,
 .tsl-skills-panel h4 {
-    margin: 0 0 16px;
+    margin: 0 0 12px;
+    text-align: left;
     color: #000;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
 }
 
 .tsl-profile-details h4 {
-    margin-top: 32px;
+    margin-top: 0;
 }
 
 .user-page.dark .tsl-profile-details h4,
@@ -131,8 +130,7 @@
 .tsl-profile-details p {
     margin: 0;
     color: #444;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 14px;
     line-height: 1.6;
 }
 
@@ -141,13 +139,13 @@
 }
 
 .tsl-languages-section {
-    margin-top: 32px;
+    margin-top: 20px;
 }
 
 .tsl-languages-section h5 {
-    margin: 0 0 12px;
+    margin: 0 0 8px;
     color: #000;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -161,39 +159,54 @@
     gap: 12px;
 }
 
-.tsl-lang-tags span {
-    padding: 10px 32px;
-    background: #f0f0f0;
-    border-radius: 14px;
-    color: #555;
-    font-size: 15px;
-    font-weight: 600;
+.tsl-team-profile-card .tsl-lang-tags span {
+    min-width: 106px;
+    height: 32px;
+    padding: 0 18px;
+    background: #ffffff;
+    border: 1px solid #d8ef72;
+    border-radius: 999px;
+    color: #6b6b6b;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
-.user-page.dark .tsl-lang-tags span {
-    background: #252525;
-    color: #ccc;
+.user-page.dark .tsl-team-profile-card .tsl-lang-tags span {
+    background: #ffffff;
+    color: #6b6b6b;
+    border-color: #d8ef72;
 }
 
-.tsl-full-profile-btn {
-    width: 100%;
-    max-width: 240px;
-    margin-top: 32px;
-    padding: 14px 0;
-    background: #ceff1b;
-    border: 1px solid #888;
-    border-radius: 12px;
-    color: #000;
-    font-size: 15px;
-    font-weight: 700;
+.tsl-team-profile-card .tsl-full-profile-btn {
+    margin-top: 24px;
+    background: #c6ff00 !important;
+    color: #000000 !important;
+    border: 1.5px solid #2a2a2a !important;
+    padding: 11px 28px !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    width: 214px !important;
+    min-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+        background-color 0.2s ease;
 }
 
-.tsl-full-profile-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(206, 255, 27, 0.3);
+.tsl-team-profile-card .tsl-full-profile-btn:hover {
+    background: #d2ff33 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14) !important;
 }
 
 .user-page.dark .tsl-full-profile-btn {
@@ -212,23 +225,22 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    padding: 24px 32px;
+    gap: 8px;
+    padding: 24px;
     background: #fff;
     border: 1px solid #ddd;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
 }
 
 .user-page.dark .tsl-stat-card {
-    background: #252525;
+    background: #1e1e1e;
     border-color: #ceff1b;
 }
 
 .tsl-team-profile-card .stat-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     color: #666;
 }
 
@@ -241,15 +253,19 @@
 }
 
 .tsl-team-profile-card .stat-label {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .tsl-team-profile-card .stat-value {
     color: #000;
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.1;
+    text-align: left;
+    align-self: flex-start;
+    display: block;
+    width: 100%;
 }
 
 .user-page.dark .tsl-team-profile-card .stat-value {
@@ -257,10 +273,10 @@
 }
 
 .tsl-skills-panel {
-    padding: 32px 40px;
-    background: #f7f7f7;
-    border: 1px solid #aaa;
-    border-radius: 24px;
+    padding: 32px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
 }
 
 .user-page.dark .tsl-skills-panel {
@@ -271,21 +287,29 @@
 .tsl-skills-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
 }
 
 .tsl-skill-tag {
-    padding: 10px 18px;
+    padding: 10px 20px;
     background: #ceff1b;
-    border: 1px solid #888;
-    border-radius: 10px;
+    border: 1px solid #000;
+    border-radius: 8px;
     color: #000;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.user-page.dark .tsl-skill-tag {
-    border-color: #000;
+.user-page.dark .tsl-skills-panel {
+    background: #1a1a1a;
+    border-color: #ceff1b;
+}
+
+.user-page.dark .tsl-skills-panel h4,
+.user-page.dark .tsl-profile-title-box h3,
+.user-page.dark .tsl-profile-details h4,
+.user-page.dark .tsl-languages-section h5 {
+    color: #ceff1b !important;
 }
 
 @media (max-width: 768px) {
@@ -305,5 +329,120 @@
 
     .tsl-skills-panel {
         padding: 24px;
+    }
+}
+
+@media (max-width: 540px) {
+    .tsl-team-profile-card {
+        padding: 16px;
+        gap: 18px;
+        border-radius: 18px;
+    }
+
+    .tsl-profile-left,
+    .tsl-profile-right {
+        gap: 18px;
+    }
+
+    .tsl-profile-header {
+        gap: 12px;
+    }
+
+    .tsl-avatar-container {
+        width: 72px;
+        height: 72px;
+    }
+
+    .tsl-online-indicator {
+        right: 3px;
+        bottom: 3px;
+        width: 12px;
+        height: 12px;
+        border-width: 2px;
+    }
+
+    .tsl-profile-title-box h3 {
+        font-size: 8px;
+    }
+
+    .tsl-location,
+    .tsl-rating-text,
+    .tsl-languages-section h5,
+    .tsl-team-profile-card .stat-label {
+        font-size: 12px;
+    }
+
+    .tsl-location svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .tsl-stars svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .tsl-profile-details h4,
+    .tsl-skills-panel h4 {
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+
+    .tsl-profile-details p {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .tsl-languages-section {
+        margin-top: 14px;
+    }
+
+    .tsl-lang-tags {
+        gap: 8px;
+    }
+
+    .tsl-team-profile-card .tsl-lang-tags span {
+        min-width: 88px;
+        height: 28px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .tsl-team-profile-card .tsl-full-profile-btn {
+        width: 100% !important;
+        margin-top: 18px;
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+    }
+
+    .tsl-stat-card,
+    .tsl-skills-panel {
+        padding: 16px;
+    }
+
+    .tsl-stat-card {
+        gap: 6px;
+    }
+
+    .tsl-team-profile-card .stat-header {
+        gap: 6px;
+    }
+
+    .tsl-team-profile-card .stat-icon-svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .tsl-team-profile-card .stat-value {
+        font-size: 18px;
+    }
+
+    .tsl-skills-grid {
+        gap: 8px;
+    }
+
+    .tsl-skill-tag {
+        padding: 8px 12px;
+        font-size: 12px;
     }
 }

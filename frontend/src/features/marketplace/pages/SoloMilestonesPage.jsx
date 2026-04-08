@@ -20,7 +20,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
   const [activeStatus, setActiveStatus] = useState("All");
 
   // ✅ VIEW ONLY STATE
-  const isViewOnly = true;
+  const [isViewOnly, setIsViewOnly] = useState(true);
 
   // dropdown
   const [projectOpen, setProjectOpen] = useState(false);
@@ -898,7 +898,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                         onClick={() => setProjectOpen(!projectOpen)}
                       >
                         <span>{projectValue}</span>
-                        <span className="ms-dd-arrow">▼</span>
+                        <span className="ms-dd-arrow" aria-hidden="true" />
                       </button>
 
                       {projectOpen && (
@@ -1054,3 +1054,4 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
     </div>
   );
 }
+

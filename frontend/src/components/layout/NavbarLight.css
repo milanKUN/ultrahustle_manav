@@ -14,6 +14,11 @@
   display: none;
 }
 
+.hamburger-btn svg {
+  display: block;
+  stroke: currentColor;
+}
+
 /* Header Styles */
 .inreview-header {
   display: flex;

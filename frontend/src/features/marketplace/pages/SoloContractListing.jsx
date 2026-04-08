@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import { Trash2 } from "lucide-react";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "./SoloContractListing.css";
@@ -304,24 +305,27 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
                         onChange={onChange("title")}
                       />
                     </div>
-                    <div className="cnc-field cnc-contract-type-field">
-                      <label className="cnc-label">Contract Type</label>
-                      <div className="cnc-type-switch-wrapper">
-                        <span className={`cnc-type-label ${!form.soloTeam ? "active" : ""}`}>
-                          Solo
-                        </span>
-                        <button
-                          type="button"
-                          className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
-                          onClick={onToggle("soloTeam")}
-                          aria-pressed={form.soloTeam}
-                          aria-label="Solo/team toggle"
-                        >
-                          <span className="cnc-knob" />
-                        </button>
-                        <span className={`cnc-type-label ${form.soloTeam ? "active" : ""}`}>
-                          Team
-                        </span>
+                    <div className="cnc-field">
+                      <div className="cnc-input cnc-input--switchWrap mt-7">
+                        <input
+                          className="cnc-inputInner text-black text-lg placeholder:text-black disabled:text-black disabled:opacity-100"
+                          placeholder="Contract Type"
+                          disabled
+                          value={form.contractType}
+                          onChange={onChange("contractType")}
+                        />
+                        <div className="cnc-switchArea">
+                          <span className="cnc-switchText">Solo/team</span>
+                          <button
+                            type="button"
+                            className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
+                            onClick={onToggle("soloTeam")}
+                            aria-pressed={form.soloTeam}
+                            aria-label="Solo/team toggle"
+                          >
+                            <span className="cnc-knob" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="cnc-field">
@@ -491,7 +495,7 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
                             onClick={() => removeDeliverable(d.id)}
                             title="Remove row"
                           >
-                            ✕
+                            X
                           </button>
                         </div>
                       </div>
@@ -1052,3 +1056,4 @@ function Calendar({ onClose, onSelect, initialDate }) {
     </div>
   );
 }
+

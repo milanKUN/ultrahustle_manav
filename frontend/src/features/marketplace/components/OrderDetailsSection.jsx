@@ -45,27 +45,27 @@ const OrderDetailsSection = ({ prefix = "ods" }) => {
                         </div>
                         {order.items.map((item, iIdx) => (
                             <div key={iIdx} className={`${prefix}-tr`}>
-                                <div>{item.name}</div>
-                                <div>{item.qty}</div>
-                                <div>{item.duration}</div>
-                                <div className={`${prefix}-right`}>${item.price}</div>
+                                <div data-label="Item">{item.name}</div>
+                                <div data-label="Qty">{item.qty}</div>
+                                <div data-label="Duration">{item.duration}</div>
+                                <div data-label="Price" className={`${prefix}-right`}>${item.price}</div>
                             </div>
                         ))}
                         {order.subtotal !== undefined && (
                             <div className={`${prefix}-tr ${prefix}-sum`}>
-                                <div className={`${prefix}-span3`}>Subtotal</div>
-                                <div className={`${prefix}-right`}>${order.subtotal}</div>
+                                <div data-label="Subtotal" className={`${prefix}-span3`}>Subtotal</div>
+                                <div data-label="Amount" className={`${prefix}-right`}>${order.subtotal}</div>
                             </div>
                         )}
                         {order.fee !== undefined && (
                             <div className={`${prefix}-tr ${prefix}-sum`}>
-                                <div className={`${prefix}-span3`}>Service fee</div>
-                                <div className={`${prefix}-right`}>${order.fee}</div>
+                                <div data-label="Service Fee" className={`${prefix}-span3`}>Service fee</div>
+                                <div data-label="Amount" className={`${prefix}-right`}>${order.fee}</div>
                             </div>
                         )}
                         <div className={`${prefix}-tr ${prefix}-total`}>
-                            <div className={`${prefix}-span3`}>Total</div>
-                            <div className={`${prefix}-right`}>${order.total}</div>
+                            <div data-label="Total" className={`${prefix}-span3`}>Total</div>
+                            <div data-label="Amount" className={`${prefix}-right`}>${order.total}</div>
                         </div>
                     </div>
                 </div>

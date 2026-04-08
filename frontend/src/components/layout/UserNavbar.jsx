@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import "./NavbarLight.css";
 import { logout } from "../../features/auth/api/authApi";
 import { getUserName, getMyPersonalInfo } from "../../features/dashboard/api/personalInfoApi";
@@ -7,6 +8,9 @@ import { getUserName, getMyPersonalInfo } from "../../features/dashboard/api/per
 const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth <= 950 : false
+  );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
@@ -19,6 +23,10 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
   // ✅ (optional) input value
   const [searchQuery, setSearchQuery] = useState("");
   const [avatar, setAvatar] = useState("");
+  const resolvedSidebarOpen =
+    externalIsSidebarOpen !== undefined
+      ? externalIsSidebarOpen
+      : isSidebarOpen;
   const isAnyDropdownOpen =
     isDropdownOpen || isMessagesOpen || isNotificationsOpen || isSearchOpen;
 
@@ -28,8 +36,12 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
   };
 
   const handleSidebarToggle = () => {
+    if (toggleSidebar) {
+      toggleSidebar();
+      return;
+    }
+
     setIsSidebarOpen((prev) => !prev);
-    if (toggleSidebar) toggleSidebar();
   };
 
   const toggleDropdown = () => {
@@ -84,6 +96,13 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobileViewport(window.innerWidth <= 950);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   //get user full name
@@ -388,9 +407,23 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
       {/* Header/Navbar */}
       <header className={`inreview-header border-b border-[#CEFF1B] shadow-[0_2px_12px_3px_rgba(206,255,  27,0.35)] backdrop-blur-xl bg-gradient-to-r from-[#D9D9D9] via-[#CFCFCF] to-[#C6C6C6] ${theme} !z-[200] pointer-events-auto`}>
         <div className="header-left">
-          <button className="hamburger-btn" onClick={handleSidebarToggle}>
-            {(externalIsSidebarOpen !== undefined ? externalIsSidebarOpen : isSidebarOpen) ? "✕" : "☰"}
-          </button>
+          {isMobileViewport && (
+            <button
+              className="hamburger-btn"
+              onClick={handleSidebarToggle}
+              aria-label={
+                resolvedSidebarOpen
+                  ? "Close sidebar"
+                  : "Open sidebar"
+              }
+            >
+              {resolvedSidebarOpen ? (
+                <X size={20} strokeWidth={2.3} />
+              ) : (
+                <Menu size={20} strokeWidth={2.3} />
+              )}
+            </button>
+          )}
 
           <Link to="/">
             <img src="/logo.png" alt="UltraHustle" className="logo" />

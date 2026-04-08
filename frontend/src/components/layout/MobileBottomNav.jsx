@@ -64,9 +64,8 @@ export default function MobileBottomNav({ active, setActive, theme = "light" }) 
   return (
     <div
       className={`
-      fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-3
+      fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-3 min-[950px]:hidden
       transition-all duration-300 ease-in-out
-      min-[550px]:hidden
     `}
       style={{
         transform: isVisible
@@ -87,6 +86,12 @@ export default function MobileBottomNav({ active, setActive, theme = "light" }) 
           ${isDark ? "bg-[#0b0b0b]/85" : "bg-white/75"}
         `}
         style={{
+          width: "min(400px, 92vw)",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "stretch",
+          justifyContent: "space-between",
+          flexWrap: "nowrap",
           border: "2px solid #CEFF1B", // Slightly thicker for visibility
           boxShadow: isDark
             ? "0 10px 28px rgba(0,0,0,0.4)"
@@ -106,6 +111,13 @@ export default function MobileBottomNav({ active, setActive, theme = "light" }) 
                 navigate(item.path);
               }}
               className="flex-1 h-[52px] flex items-center justify-center"
+              style={{
+                flex: "1 1 0",
+                minWidth: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               {isActive ? (
                 // ✅ Active = neon big pill like image

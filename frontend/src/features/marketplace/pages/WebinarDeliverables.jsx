@@ -250,12 +250,12 @@ const WebinarDeliverables = ({ theme, setTheme }) => {
                                                 </div>
                                                 <h3 className="wd-session-title">{session.title}</h3>
                                                 <p className="wd-session-desc">{session.description}</p>
-                                                <button
+                                                {/* <button
                                                     className="wd-notes-btn"
                                                     onClick={() => setSelectedNote({ title: session.title, content: session.description })}
                                                 >
                                                     View note
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </div>
                                     ))}
