@@ -23,7 +23,7 @@ export default function PersonalInformation() {
 
   const [popup, setPopup] = useState({
     open: false,
-    variant: "success", // success | error
+    variant: "success",
     title: "",
     message: "",
     showProgress: false,
@@ -36,15 +36,12 @@ export default function PersonalInformation() {
 
   const lastLoadedRef = useRef(null);
 
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
 
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [street, setStreet] = useState("");
-  // const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
 
   const [title, setTitle] = useState("");
@@ -53,9 +50,6 @@ export default function PersonalInformation() {
   const [availability, setAvailability] = useState("");
   const [open, setOpen] = useState(false);
   const [dob, setDob] = useState("");
-  // const [country, setCountry] = useState("");
-  // const [stateVal, setStateVal] = useState("");
-  // const [openCountry, setOpenCountry] = useState(false);
   const [openState, setOpenState] = useState(false);
   const [gender, setGender] = useState("");
   const [openGender, setOpenGender] = useState(false);
@@ -67,8 +61,8 @@ export default function PersonalInformation() {
   const genderRef = useRef(null);
 
   const [countries, setCountries] = useState([]);
-  const [country, setCountry] = useState(""); // name (for display)
-  const [countryId, setCountryId] = useState(""); // id (for API)
+  const [country, setCountry] = useState(""); // full name for address field
+  const [countryId, setCountryId] = useState(""); // id for states API
 
   const [states, setStates] = useState([]);
   const [stateVal, setStateVal] = useState("");
@@ -82,19 +76,39 @@ export default function PersonalInformation() {
   const [languageOptions, setLanguageOptions] = useState([]);
   const [openCountry, setOpenCountry] = useState(false);
 
-  const [phoneCountry, setPhoneCountry] = useState(null);
+  const [phoneCountry, setPhoneCountry] = useState(null); // full object
   const [openPhoneCountry, setOpenPhoneCountry] = useState(false);
   const phoneCountryRef = useRef(null);
   const hasFetchedLanguages = useRef(false);
+
   const [countrySearch, setCountrySearch] = useState("");
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
-  //get counties
+
+  const [skills, setSkills] = useState([]);
+  const [hashtag, setHashtag] = useState([]);
+  const [hashtagDraft, setHashtagDraft] = useState("");
+  const [tools, setTools] = useState([]);
+  const [toolsDraft, setToolsDraft] = useState("");
+  const [skillsDraft, setSkillsDraft] = useState("");
+  const [languages, setLanguages] = useState([]);
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [focusedId, setFocusedId] = useState(null);
+
+  const availabilityOptions = [
+    "Available",
+    "Unavailable",
+    "Working On A Project",
+  ];
+
+  // =========================
+  // FETCH COUNTRIES
+  // =========================
   useEffect(() => {
     const fetchCountries = async () => {
       try {
         const res = await getCountries();
-        setCountries(res);
+        setCountries(res || []);
       } catch (err) {
         console.error(err);
       }
@@ -103,7 +117,9 @@ export default function PersonalInformation() {
     fetchCountries();
   }, []);
 
-  //get states from selected country
+  // =========================
+  // FETCH STATES
+  // =========================
   useEffect(() => {
     const fetchStates = async () => {
       if (!countryId) {
@@ -113,7 +129,7 @@ export default function PersonalInformation() {
 
       try {
         const data = await getStates(countryId);
-        setStates(data);
+        setStates(data || []);
       } catch (err) {
         console.error(err);
       }
@@ -121,7 +137,10 @@ export default function PersonalInformation() {
 
     fetchStates();
   }, [countryId]);
-  //get cities
+
+  // =========================
+  // FETCH CITIES
+  // =========================
   useEffect(() => {
     const fetchCities = async () => {
       if (!stateId) {
@@ -131,7 +150,7 @@ export default function PersonalInformation() {
 
       try {
         const data = await getCities(stateId);
-        setCities(data);
+        setCities(data || []);
       } catch (err) {
         console.error(err);
       }
@@ -140,14 +159,17 @@ export default function PersonalInformation() {
     fetchCities();
   }, [stateId]);
 
-  //get languages
+  // =========================
+  // FETCH LANGUAGES
+  // =========================
   useEffect(() => {
     if (hasFetchedLanguages.current) return;
     hasFetchedLanguages.current = true;
+
     const fetchLanguages = async () => {
       try {
         const res = await getLanguages();
-        setLanguageOptions(res); // ✅ store full objects
+        setLanguageOptions(res || []);
       } catch (err) {
         console.error(err);
       }
@@ -156,14 +178,48 @@ export default function PersonalInformation() {
     fetchLanguages();
   }, []);
 
-  //phone country // by default India will be selected
-  useEffect(() => {
-    if (countries.length > 0 && !phoneCountry) {
-      const india = countries.find(c => c.name === "India");
-      setPhoneCountry(india || countries[0]);
-    }
-  }, [countries]);
+  // =========================
+  // COUNTRY SYNC HELPER
+  // =========================
+  const syncCountrySelection = (selectedCountry) => {
+    if (!selectedCountry) return;
 
+    const selectedId = String(selectedCountry.id);
+    const currentId = String(countryId || "");
+    const countryChanged = currentId !== selectedId;
+
+    // Phone country object
+    setPhoneCountry(selectedCountry);
+
+    // Address country
+    setCountry(selectedCountry.name || "");
+    setCountryId(selectedCountry.id || "");
+    setCountrySearch(selectedCountry.name || "");
+
+    // Reset dependent fields only if country changed
+    if (countryChanged) {
+      setStateVal("");
+      setStateId("");
+      setStateSearch("");
+      setCity("");
+      setCityId("");
+      setCitySearch("");
+    }
+  };
+
+  // =========================
+  // DEFAULT PHONE + ADDRESS COUNTRY = INDIA
+  // =========================
+  useEffect(() => {
+    if (countries.length > 0 && !phoneCountry && !countryId) {
+      const india = countries.find((c) => c.name === "India") || countries[0];
+      syncCountrySelection(india);
+    }
+  }, [countries, phoneCountry, countryId]);
+
+  // =========================
+  // CLOSE DROPDOWNS OUTSIDE CLICK
+  // =========================
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (countryRef.current && !countryRef.current.contains(event.target)) setOpenCountry(false);
@@ -173,6 +229,7 @@ export default function PersonalInformation() {
       if (genderRef.current && !genderRef.current.contains(event.target)) setOpenGender(false);
       if (phoneCountryRef.current && !phoneCountryRef.current.contains(event.target)) setOpenPhoneCountry(false);
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -233,7 +290,6 @@ export default function PersonalInformation() {
     }
   };
 
-  // Required helper: showSuccessPopup(message)
   const showSuccessPopup = (message) => {
     openPopup({
       variant: "success",
@@ -341,10 +397,8 @@ export default function PersonalInformation() {
   const applyLoadedPersonalInfo = (info) => {
     const normalized = info?.data || info;
 
-    // setFirstName(normalized?.first_name ?? normalized?.firstName ?? "");
-    // setLastName(normalized?.last_name ?? normalized?.lastName ?? "");
     setUsername(normalized?.username ?? "");
-    setFullName(normalized?.display_name ?? "");
+    setFullName(normalized?.display_name ?? normalized?.full_name ?? "");
 
     setEmail(normalized?.contact_email ?? normalized?.email ?? "");
 
@@ -371,13 +425,56 @@ export default function PersonalInformation() {
     const loadedLanguages = normalizeStringArray(normalized?.languages);
 
     if (loadedHashtags.length > 0) setHashtag(loadedHashtags);
+    else setHashtag([]);
+
     if (loadedSkills.length > 0) setSkills(loadedSkills);
+    else setSkills([]);
+
     if (loadedTools.length > 0) setTools(loadedTools);
-    if (loadedLanguages.length > 0) setLanguages(loadedLanguages);
+    else setTools([]);
+
+    if (loadedLanguages.length > 0) {
+      setLanguages(
+        loadedLanguages.map((lang) => ({
+          id: lang,
+          name: lang,
+          value: lang,
+        }))
+      );
+    } else {
+      setLanguages([]);
+    }
 
     setHashtagDraft("");
     setSkillsDraft("");
     setToolsDraft("");
+
+    // Sync phone country from loaded country / phone country code if possible
+    if (countries.length > 0) {
+      const loadedCountryName = String(normalized?.country || "").trim();
+      const loadedPhoneCountryCode = String(normalized?.phone_country || "").trim().toUpperCase();
+
+      let matchedCountry = null;
+
+      if (loadedCountryName) {
+        matchedCountry = countries.find(
+          (c) => String(c.name || "").toLowerCase() === loadedCountryName.toLowerCase()
+        );
+      }
+
+      if (!matchedCountry && loadedPhoneCountryCode) {
+        matchedCountry = countries.find(
+          (c) => String(c.shortname || "").toUpperCase() === loadedPhoneCountryCode
+        );
+      }
+
+      if (matchedCountry) {
+        setPhoneCountry(matchedCountry);
+        setCountry(matchedCountry.name || "");
+        setCountryId(matchedCountry.id || "");
+        setCountrySearch(matchedCountry.name || "");
+      }
+    }
   };
 
   const loadPersonalInfo = async () => {
@@ -390,7 +487,6 @@ export default function PersonalInformation() {
       lastLoadedRef.current = info;
       applyLoadedPersonalInfo(info);
     } catch (err) {
-      // If backend returns 404 when no record exists yet, treat it as empty.
       const message = err?.message || "Failed to load personal info.";
       setSubmitError(message);
       showErrorPopup(message);
@@ -404,34 +500,12 @@ export default function PersonalInformation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-  // (skipping for brevety in replacement chunk but keeping logic)
-  const [skills, setSkills] = useState([
-
-  ]);
-  const [hashtag, setHashtag] = useState([
-
-  ]);
-  const [hashtagDraft, setHashtagDraft] = useState("");
-  const availabilityOptions = [
-    "Available",
-    "Unavailable",
-    "Working On A Project",
-  ];
-
-  const [tools, setTools] = useState([
-
-  ]);
-  const [toolsDraft, setToolsDraft] = useState("");
-
-  const [skillsDraft, setSkillsDraft] = useState("");
-
-  const [languages, setLanguages] = useState([]);
-
-  const [openCalendar, setOpenCalendar] = useState(false);
-
-  /* ---------- TAG INPUT HANDLERS ---------- */
-  const [focusedId, setFocusedId] = useState(null);
+  // Re-sync loaded country after countries API arrives
+  useEffect(() => {
+    if (!countries.length || !lastLoadedRef.current) return;
+    applyLoadedPersonalInfo(lastLoadedRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countries]);
 
   const removeTag = (index, list, setList) => {
     setList(list.filter((_, i) => i !== index));
@@ -457,14 +531,16 @@ export default function PersonalInformation() {
     const finalLanguages = languages.map((l) => l.value);
 
     const payload = {
-      // first_name: String(firstName || "").trim() || null,
-      // last_name: String(lastName || "").trim() || null,
       full_name: String(fullName || "").trim() || null,
       username: String(username || "").trim() || null,
       date_of_birth: toIsoDate(dob),
       contact_email: String(email || "").trim().toLowerCase() || null,
       phone_country: phoneCountry?.shortname || null,
-      phone_country_code: phoneCountry?.phoneCode ? phoneCountry.phoneCode.startsWith("+") ? phoneCountry.phoneCode.trim() : `+${phoneCountry.phoneCode.trim()}` : null,
+      phone_country_code: phoneCountry?.phoneCode
+        ? phoneCountry.phoneCode.startsWith("+")
+          ? phoneCountry.phoneCode.trim()
+          : `+${phoneCountry.phoneCode.trim()}`
+        : null,
       phone_number: phoneNumber || null,
       gender: normalizeGenderForApi(gender),
       street: String(street || "").trim() || null,
@@ -482,10 +558,9 @@ export default function PersonalInformation() {
       languages: finalLanguages,
     };
 
-    console.log('payload', payload);
+    console.log("payload", payload);
 
     try {
-      // Keep UI in sync with what we send
       setHashtag(finalHashtags);
       setSkills(finalSkills);
       setTools(finalTools);
@@ -524,16 +599,15 @@ export default function PersonalInformation() {
         {/* ================= PERSONAL INFO ================= */}
         <Section title="Personal Information">
           <TwoCol>
-            {/* <Input label="First Name" placeholder="First Name" value={firstName} onChange={setFirstName} />
-            <Input label="Last Name" placeholder="Last Name" value={lastName} onChange={setLastName} /> */}
             <Input label="Full Name" placeholder="Full Name" value={fullName} onChange={setFullName} />
 
             {/* USERNAME */}
             <div>
               <Label>User Name</Label>
               <div
-                className={`flex items-center w-full border border-black rounded-md px-3 py-2 text-sm transition-shadow ${focusedId === "username" ? "shadow-[0_0_15px_#CEFF1B] !border-transparent" : ""
-                  }`}
+                className={`flex items-center w-full border border-black rounded-md px-3 py-2 text-sm transition-shadow ${
+                  focusedId === "username" ? "shadow-[0_0_15px_#CEFF1B] !border-transparent" : ""
+                }`}
               >
                 <span className="text-gray-400 mr-1 select-none">@</span>
                 <input
@@ -559,7 +633,7 @@ export default function PersonalInformation() {
             <div>
               <Label>Date of Birth</Label>
 
-              <div className="relative w-full" style={{ position: 'relative', width: '100%', display: 'block' }}>
+              <div className="relative w-full" style={{ position: "relative", width: "100%", display: "block" }}>
                 <input
                   type="text"
                   placeholder="DD-MM-YYYY"
@@ -571,7 +645,7 @@ export default function PersonalInformation() {
                 <div
                   onClick={() => setOpenCalendar(true)}
                   className="cursor-pointer flex items-center justify-center p-1 bg-transparent hover:!bg-transparent text-gray-500 hover:text-black dynamic-yellow-icon"
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+                  style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", zIndex: 10 }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -600,10 +674,9 @@ export default function PersonalInformation() {
               <Label>Phone Number</Label>
 
               <div
-                className={`flex items-center w-full border border-black rounded-md px-3 py-2 text-sm transition-shadow gap-2 ${focusedId === "phone"
-                    ? "shadow-[0_0_15px_#CEFF1B] !border-transparent"
-                    : ""
-                  }`}
+                className={`flex items-center w-full border border-black rounded-md px-3 py-2 text-sm transition-shadow gap-2 ${
+                  focusedId === "phone" ? "shadow-[0_0_15px_#CEFF1B] !border-transparent" : ""
+                }`}
               >
                 {/* COUNTRY SELECT */}
                 <div
@@ -626,7 +699,7 @@ export default function PersonalInformation() {
                           key={c.id}
                           className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
                           onClick={() => {
-                            setPhoneCountry(c);
+                            syncCountrySelection(c);
                             setOpenPhoneCountry(false);
                           }}
                         >
@@ -702,7 +775,8 @@ export default function PersonalInformation() {
         <Section title="Address">
           <TwoCol>
             <Input label="Street" placeholder="Street" value={street} onChange={setStreet} />
-            {/* <Input label="City" placeholder="City" value={city} onChange={setCity} /> */}
+
+            {/* COUNTRY */}
             <div
               className={`onboarding-custom-select ${openCountry ? "active" : ""}`}
               ref={countryRef}
@@ -755,13 +829,7 @@ export default function PersonalInformation() {
                           key={c.id}
                           className={country === c.name ? "active" : ""}
                           onClick={() => {
-                            setCountry(c.name);
-                            setCountryId(c.id);
-                            setCountrySearch(c.name);
-                            setStateVal("");
-                            setStateId("");
-                            setCity("");
-                            setCityId("");
+                            syncCountrySelection(c);
                             setOpenCountry(false);
                           }}
                         >
@@ -776,7 +844,6 @@ export default function PersonalInformation() {
                 </ul>
               )}
             </div>
-
 
             {/* STATE */}
             <div
@@ -837,10 +904,10 @@ export default function PersonalInformation() {
                           key={s.id}
                           className={stateVal === s.name ? "active" : ""}
                           onClick={() => {
-                            setStateVal(s.name);   // display selected state
-                            setStateId(s.id);      // store selected state id
+                            setStateVal(s.name);
+                            setStateId(s.id);
                             setStateSearch(s.name);
-                            setCity("");           // reset city
+                            setCity("");
                             setCityId("");
                             setCitySearch("");
                             setOpenState(false);
@@ -857,83 +924,9 @@ export default function PersonalInformation() {
                 </ul>
               )}
             </div>
-            {/* CITY */}
-            {/* <div
-              className={`onboarding-custom-select ${openCity ? "active" : ""}`}
-              ref={cityRef}
-            >
-              <Label>City</Label>
 
-              <div
-                className={`onboarding-selected-option ${openCity ? "open" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!stateId) return;
-
-                  setOpenCity((prev) => !prev);
-
-                  if (!openCity) {
-                    setCitySearch("");
-                  }
-                }}
-              >
-                <input
-                  type="text"
-                  value={openCity ? citySearch : city}
-                  placeholder={stateId ? "Select city" : "Select state first"}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!stateId) return;
-                    setOpenCity(true);
-                  }}
-                  onFocus={() => {
-                    if (!stateId) return;
-                    setOpenCity(true);
-                    setCitySearch("");
-                  }}
-                  onChange={(e) => {
-                    if (!stateId) return;
-                    setCitySearch(e.target.value);
-                    setOpenCity(true);
-                  }}
-                  disabled={!stateId}
-                  className="w-full bg-transparent outline-none border-none disabled:opacity-60 disabled:cursor-not-allowed"
-                />
-                <span className="onboarding-arrow">▼</span>
-              </div>
-
-              {openCity && (
-                <ul className="onboarding-options-list max-h-60 overflow-y-auto">
-                  {cities?.filter((c) =>
-                    c.name.toLowerCase().includes(citySearch.toLowerCase())
-                  ).length > 0 ? (
-                    cities
-                      .filter((c) =>
-                        c.name.toLowerCase().includes(citySearch.toLowerCase())
-                      )
-                      .map((c) => (
-                        <li
-                          key={c.id}
-                          className={city === c.name ? "active" : ""}
-                          onClick={() => {
-                            setCity(c.name);       // display selected city
-                            setCityId(c.id);       // store selected city id
-                            setCitySearch(c.name);
-                            setOpenCity(false);
-                          }}
-                        >
-                          {c.name}
-                        </li>
-                      ))
-                  ) : (
-                    <li className="opacity-70 cursor-not-allowed px-3 py-2">
-                      No city found
-                    </li>
-                  )}
-                </ul>
-              )}
-            </div> */}
             <Input label="City" placeholder="City" value={city} onChange={setCity} />
+
             <div>
               <Label>Pincode</Label>
               <input
@@ -955,7 +948,6 @@ export default function PersonalInformation() {
         {/* ================= BIO ================= */}
         <Section title="Bio">
           <TwoCol>
-            {/* TITLE */}
             <div>
               <Label>Title</Label>
               <textarea
@@ -971,7 +963,6 @@ export default function PersonalInformation() {
               </p>
             </div>
 
-            {/* SHORT BIO */}
             <div>
               <Label>Short Bio</Label>
               <textarea
@@ -1017,7 +1008,6 @@ export default function PersonalInformation() {
           />
         </Section>
 
-        {/* ================= SKILLS ================= */}
         <Section title="Skills & Expertise">
           <TagInput
             placeholder="Add skills"
@@ -1029,7 +1019,6 @@ export default function PersonalInformation() {
           />
         </Section>
 
-        {/* ================= TOOLS ================= */}
         <Section title="Tools & Technologies">
           <TagInput
             placeholder="Add tools"
@@ -1073,10 +1062,9 @@ export default function PersonalInformation() {
           </div>
         </Section>
 
-        {/* ================= LANGUAGES ================= */}
         <Section title="Languages">
           <TagSelect
-            options={languageOptions}   // ✅ full objects
+            options={languageOptions}
             tags={languages}
             setTags={setLanguages}
             onRemove={(id) => {
