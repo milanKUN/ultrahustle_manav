@@ -43,6 +43,54 @@
   margin: 0;
 }
 
+.cnc-readonlyWrap {
+  position: relative;
+}
+
+.cnc-readonlyWrap.is-readonly {
+  user-select: none;
+}
+
+.cnc-readonlyOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+  cursor: default;
+}
+
+.cnc-embed-mode {
+  min-height: auto;
+  background: transparent;
+}
+
+.cnc-embed-mode > header,
+.cnc-embed-mode aside,
+.cnc-embed-mode .blur-overlay {
+  display: none !important;
+}
+
+.cnc-embed-mode .cnc-pageLayout {
+  display: block;
+  padding-top: 0 !important;
+  height: auto;
+}
+
+.cnc-embed-mode .cnc-pageContent {
+  width: 100%;
+  overflow: visible;
+}
+
+.cnc-embed-mode .cnc-pageScroll {
+  height: auto !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+.cnc-embed-mode .cnc-main {
+  padding: 0;
+}
+
 .cnc-title {
   margin: 0 0 14px;
   font-size: 22px;
@@ -365,6 +413,11 @@
   gap: 14px;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.cnc-del-row-wrapper,
+.cnc-mil-row-wrapper {
+  position: relative;
 }
 
 .cnc-addBtn {
@@ -711,10 +764,10 @@
 
   .cnc-del-row-remove,
   .cnc-mil-row-remove {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    height: 32px;
+    position: static;
+    justify-self: end;
+    align-self: center;
+    height: 40px;
   }
 
   .cnc-milestones-inner {
@@ -878,18 +931,18 @@
   /* Prevent tabular inputs from squeezing */
   .cnc-deliverables,
   .cnc-milestones {
-    overflow-x: auto;
+    overflow-x: visible;
     padding-bottom: 12px;
   }
 
   .cnc-del-header,
   .cnc-del-grid {
-    min-width: 650px;
+    min-width: 0;
   }
 
   .cnc-mil-header,
   .cnc-mil-grid {
-    min-width: 550px;
+    min-width: 0;
   }
 
   .cnc-card,
@@ -898,12 +951,79 @@
     padding: 16px;
   }
 
+  .cnc-main,
+  .cnc-wrap,
+  .cnc-pageContent,
+  .cnc-pageScroll {
+    min-width: 0;
+  }
+
+  .cnc-payTop,
+  .cnc-payout-row {
+    grid-template-columns: 1fr;
+  }
+
   /* Adjust switch alignment on mobile if needed */
   .cnc-input--switchWrap {
-    padding: 0 12px;
+    height: auto;
+    min-height: 50px;
+    padding: 10px 12px;
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .cnc-switchText {
     font-size: 13px;
+  }
+
+  .cnc-switchArea {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 520px) {
+  .cnc-title {
+    font-size: 20px;
+  }
+
+  .cnc-card,
+  .cnc-parties-outer-box,
+  .cnc-subcard,
+  .cnc-confirmArea,
+  .cnc-confirmCard {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .cnc-grid,
+  .cnc-timelineGrid,
+  .cnc-slaGrid,
+  .cnc-confirmRow,
+  .cnc-del-grid,
+  .cnc-mil-grid,
+  .cnc-payTop {
+    grid-template-columns: 1fr;
+  }
+
+  .cnc-del-grid,
+  .cnc-mil-grid {
+    gap: 10px;
+  }
+
+  .cnc-del-row-remove,
+  .cnc-mil-row-remove {
+    width: 100%;
+    justify-self: stretch;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+  }
+
+  .cnc-tableWrap {
+    overflow-x: auto;
+  }
+
+  .cnc-table {
+    min-width: 640px;
   }
 }

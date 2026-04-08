@@ -156,6 +156,7 @@ export default function Sidebar({
         path.includes("/project") ||
         path.includes("/milestones") ||
         path.includes("/active-projects") ||
+        path.includes("/resolution-center") ||
         path.includes("/orders") ||
         path.includes("/my-orders")
     ) {

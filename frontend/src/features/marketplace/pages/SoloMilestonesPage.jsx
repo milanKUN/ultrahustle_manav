@@ -1,6 +1,6 @@
 // ... same imports
 import React, { useMemo, useState, useRef, useEffect } from "react";
-import "./MilestonesPage.css";
+import "./CreatorMilestonesPage.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "../../../Darkuser.css";

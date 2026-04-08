@@ -32,7 +32,10 @@ import PublicUserProfile from "./features/dashboard/pages/PublicUserProfile";
 import SoloContractListing from "./features/marketplace/pages/SoloContractListing";
 import Dashboard from "./features/dashboard/pages/Dashboard";
 import ManageTeam from "./features/dashboard/pages/ManageTeam";
-import MilestonesPage from "./features/marketplace/pages/MilestonesPage";
+import CreatorMilestonesPage from "./features/marketplace/pages/CreatorMilestonesPage";
+import ClientMilestonePage from "./features/marketplace/pages/ClientMilestonePage";
+import CreatorMilestoneCancellation from "./features/marketplace/pages/CreatorMilestoneCancellation";
+import ClientMilestoneCancellation from "./features/marketplace/pages/ClientMilestoneCancellation";
 import SoloMilestonesPage from "./features/marketplace/pages/SoloMilestonesPage";
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
@@ -55,6 +58,7 @@ import MyCartPage from "./features/marketplace/pages/MyCartPage";
 import MyOrderCreatorPage from "./features/marketplace/pages/MyOrderCreatorPage";
 import MyOrderClientPage from "./features/marketplace/pages/MyOrderClientPage";
 import ActiveProjectPage from "./features/marketplace/pages/ActiveProjectPage";
+import ResolutionCenter from "./features/marketplace/pages/ResolutionCenter";
 
 
 
@@ -204,9 +208,39 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/milestones"
+                        path="/creator-milestone"
                         element={
-                            <MilestonesPage theme={theme} setTheme={setTheme} />
+                            <CreatorMilestonesPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/client-milestone"
+                        element={
+                            <ClientMilestonePage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/creator-milestone-cancellation"
+                        element={
+                            <CreatorMilestoneCancellation
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/client-milestone-cancellation"
+                        element={
+                            <ClientMilestoneCancellation
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
                         }
                     />
                     <Route
@@ -384,6 +418,15 @@ export default function App() {
                         path="/active-projects"
                         element={
                             <ActiveProjectPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/resolution-center"
+                        element={
+                            <ResolutionCenter
                                 theme={theme}
                                 setTheme={setTheme}
                             />

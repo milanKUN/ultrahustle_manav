@@ -5,7 +5,7 @@ import Sidebar from "../../../components/layout/Sidebar";
 import "./SoloContractListing.css";
 import '../../../Darkuser.css';
 
-export default function SoloContractListing({ theme = "light", setTheme }) {
+export default function SoloContractListing({ theme = "light", setTheme, embedded = false, readOnly = false }) {
 
 
   const contractId = useMemo(() => "AUTO-123456", []);
@@ -263,626 +263,970 @@ export default function SoloContractListing({ theme = "light", setTheme }) {
   );
 
   return (
-    <div className={`user-page ${theme} min-h-screen relative overflow-hidden`}>
-      {/* ---------- NAVBAR ---------- */}
-      <UserNavbar
-        toggleSidebar={() => setSidebarOpen((p) => !p)}
-        theme={theme}
-      />
+      <div
+          className={`user-page ${theme} min-h-screen relative overflow-hidden ${embedded ? "cnc-embed-mode" : ""}`}
+      >
+          {/* ---------- NAVBAR ---------- */}
+          <UserNavbar
+              toggleSidebar={() => setSidebarOpen((p) => !p)}
+              theme={theme}
+          />
 
-      <div className="pt-[85px] flex relative z-10 w-full h-full">
-        {/* ---------- SIDEBAR ---------- */}
-        <Sidebar
-          expanded={sidebarOpen}
-          setExpanded={setSidebarOpen}
-          showSettings={showSettings}
-          setShowSettings={setShowSettings}
-          activeSetting={activeSetting}
-          onSectionChange={handleSectionChange}
-          theme={theme}
-          setTheme={setTheme}
-        />
+          <div className="pt-[85px] flex relative z-10 w-full h-full cnc-pageLayout">
+              {/* ---------- SIDEBAR ---------- */}
+              <Sidebar
+                  expanded={sidebarOpen}
+                  setExpanded={setSidebarOpen}
+                  showSettings={showSettings}
+                  setShowSettings={setShowSettings}
+                  activeSetting={activeSetting}
+                  onSectionChange={handleSectionChange}
+                  theme={theme}
+                  setTheme={setTheme}
+              />
 
-        {/* Main Content Wrapper */}
-        <div className="relative flex-1 min-w-5 overflow-hidden">
-          {/* Scrollable Area */}
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] p-4">
-            <main className="cnc-main w-full">
-              {/* Full width contract */}
-              <div className="cnc-wrap">
-                <h1 className="cnc-title">Create New Contract</h1>
+              {/* Main Content Wrapper */}
+              <div className="relative flex-1 min-w-5 overflow-hidden cnc-pageContent">
+                  {/* Scrollable Area */}
+                  <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] p-4 cnc-pageScroll">
+                      <div className={`cnc-readonlyWrap ${readOnly ? "is-readonly" : ""}`}>
+                          {readOnly && <div className="cnc-readonlyOverlay" aria-hidden="true" />}
+                      <main className="cnc-main w-full">
+                          {/* Full width contract */}
+                          <div className="cnc-wrap">
+                              <h1 className="cnc-title">Create New Contract</h1>
 
-                {/* Contract Basics */}
-                <div className="cnc-card">
-                  <h2 className="cnc-card-title">Contract Basics</h2>
-                  <div className="cnc-grid">
-                    <div className="cnc-field">
-                      <label className="cnc-label">Contract Title</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Contract Title"
-                        value={form.title}
-                        onChange={onChange("title")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <div className="cnc-input cnc-input--switchWrap mt-7">
-                        <input
-                          className="cnc-inputInner text-black text-lg placeholder:text-black disabled:text-black disabled:opacity-100"
-                          placeholder="Contract Type"
-                          disabled
-                          value={form.contractType}
-                          onChange={onChange("contractType")}
-                        />
-                        <div className="cnc-switchArea">
-                          <span className="cnc-switchText">Solo/team</span>
-                          <button
-                            type="button"
-                            className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
-                            onClick={onToggle("soloTeam")}
-                            aria-pressed={form.soloTeam}
-                            aria-label="Solo/team toggle"
-                          >
-                            <span className="cnc-knob" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Contract ID</label>
-                      <input className="cnc-input" value={contractId} readOnly />
-                    </div>
-                    <div className="cnc-field cnc-field--empty" />
-                  </div>
-                </div>
+                              {/* Contract Basics */}
+                              <div className="cnc-card">
+                                  <h2 className="cnc-card-title">
+                                      Contract Basics
+                                  </h2>
+                                  <div className="cnc-grid">
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Contract Title
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Contract Title"
+                                              value={form.title}
+                                              onChange={onChange("title")}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <div className="cnc-input cnc-input--switchWrap mt-7">
+                                              <input
+                                                  className="cnc-inputInner text-black text-lg placeholder:text-black disabled:text-black disabled:opacity-100"
+                                                  placeholder="Contract Type"
+                                                  disabled
+                                                  value={form.contractType}
+                                                  onChange={onChange(
+                                                      "contractType",
+                                                  )}
+                                              />
+                                              <div className="cnc-switchArea">
+                                                  <span className="cnc-switchText">
+                                                      Solo/team
+                                                  </span>
+                                                  <button
+                                                      type="button"
+                                                      className={`cnc-switch ${form.soloTeam ? "is-on" : ""}`}
+                                                      onClick={onToggle(
+                                                          "soloTeam",
+                                                      )}
+                                                      aria-pressed={
+                                                          form.soloTeam
+                                                      }
+                                                      aria-label="Solo/team toggle"
+                                                  >
+                                                      <span className="cnc-knob" />
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Contract ID
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              value={contractId}
+                                              readOnly
+                                          />
+                                      </div>
+                                      <div className="cnc-field cnc-field--empty" />
+                                  </div>
+                              </div>
 
+                              {/* Parties Involved */}
+                              <div className="cnc-parties-outer-box">
+                                  <h2 className="cnc-card-title cnc-title-standalone">
+                                      Parties Involved
+                                  </h2>
+                                  <div className="cnc-parties-wrapper">
+                                      <div className="cnc-subcard">
+                                          <div className="cnc-subTitle">
+                                              Client
+                                          </div>
+                                          <div className="cnc-subGrid">
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      Client username
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Client username"
+                                                      value={
+                                                          form.clientUsername
+                                                      }
+                                                      onChange={onChange(
+                                                          "clientUsername",
+                                                      )}
+                                                  />
+                                              </div>
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      Full name
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Full name"
+                                                      value={
+                                                          form.clientFullName
+                                                      }
+                                                      onChange={onChange(
+                                                          "clientFullName",
+                                                      )}
+                                                  />
+                                              </div>
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      Email
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Email"
+                                                      value={form.clientEmail}
+                                                      onChange={onChange(
+                                                          "clientEmail",
+                                                      )}
+                                                  />
+                                              </div>
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      Name and company
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Name and company"
+                                                      value={form.clientCompany}
+                                                      onChange={onChange(
+                                                          "clientCompany",
+                                                      )}
+                                                  />
+                                              </div>
+                                          </div>
+                                      </div>
 
+                                      <div className="cnc-subcard">
+                                          <div className="cnc-subTitle">
+                                              {form.soloTeam
+                                                  ? "Team Details"
+                                                  : "Service Provider"}
+                                          </div>
+                                          <div className="cnc-subGrid">
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      {form.soloTeam
+                                                          ? "Team"
+                                                          : "Creator"}{" "}
+                                                      username
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder={
+                                                          form.soloTeam
+                                                              ? "Team username"
+                                                              : "Creator username"
+                                                      }
+                                                      value={
+                                                          form.creatorUsername
+                                                      }
+                                                      onChange={onChange(
+                                                          "creatorUsername",
+                                                      )}
+                                                  />
+                                              </div>
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      {form.soloTeam
+                                                          ? "Team"
+                                                          : "Creator"}{" "}
+                                                      full name
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder={
+                                                          form.soloTeam
+                                                              ? "Team full name"
+                                                              : "Full name"
+                                                      }
+                                                      value={
+                                                          form.creatorFullName
+                                                      }
+                                                      onChange={onChange(
+                                                          "creatorFullName",
+                                                      )}
+                                                  />
+                                              </div>
+                                              <div className="cnc-field">
+                                                  <label className="cnc-label">
+                                                      {form.soloTeam
+                                                          ? "Team"
+                                                          : "Creator"}{" "}
+                                                      email
+                                                  </label>
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder={
+                                                          form.soloTeam
+                                                              ? "Team email"
+                                                              : "Email"
+                                                      }
+                                                      value={form.creatorEmail}
+                                                      onChange={onChange(
+                                                          "creatorEmail",
+                                                      )}
+                                                  />
+                                              </div>
+                                              {!form.soloTeam && (
+                                                  <div className="cnc-field">
+                                                      <label className="cnc-label">
+                                                          Name and company
+                                                      </label>
+                                                      <input
+                                                          className="cnc-input"
+                                                          placeholder="Country"
+                                                          value={
+                                                              form.creatorCompany
+                                                          }
+                                                          onChange={onChange(
+                                                              "creatorCompany",
+                                                          )}
+                                                      />
+                                                  </div>
+                                              )}
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
 
-                {/* Parties Involved */}
-                <div className="cnc-parties-outer-box">
-                  <h2 className="cnc-card-title cnc-title-standalone">Parties Involved</h2>
-                  <div className="cnc-parties-wrapper">
-                    <div className="cnc-subcard">
-                      <div className="cnc-subTitle">Client</div>
-                      <div className="cnc-subGrid">
-                        <div className="cnc-field">
-                          <label className="cnc-label">Client username</label>
-                          <input
-                            className="cnc-input"
-                            placeholder="Client username"
-                            value={form.clientUsername}
-                            onChange={onChange("clientUsername")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">Full name</label>
-                          <input
-                            className="cnc-input"
-                            placeholder="Full name"
-                            value={form.clientFullName}
-                            onChange={onChange("clientFullName")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">Email</label>
-                          <input
-                            className="cnc-input"
-                            placeholder="Email"
-                            value={form.clientEmail}
-                            onChange={onChange("clientEmail")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">Name and company</label>
-                          <input
-                            className="cnc-input"
-                            placeholder="Name and company"
-                            value={form.clientCompany}
-                            onChange={onChange("clientCompany")}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                              {/* Scope and Deliverables */}
+                              <div className="cnc-card cnc-card--mt">
+                                  <h2 className="cnc-card-title">
+                                      Scope and Deliverables
+                                  </h2>
+                                  <div className="cnc-field">
+                                      <label className="cnc-label">
+                                          Project Summary
+                                      </label>
+                                      <textarea
+                                          className="cnc-textarea"
+                                          placeholder="Short explanation"
+                                          value={form.projectSummary}
+                                          onChange={onChange("projectSummary")}
+                                      />
+                                  </div>
 
-                    <div className="cnc-subcard">
-                      <div className="cnc-subTitle">
-                        {form.soloTeam ? "Team Details" : "Service Provider"}
-                      </div>
-                      <div className="cnc-subGrid">
-                        <div className="cnc-field">
-                          <label className="cnc-label">
-                            {form.soloTeam ? "Team" : "Creator"} username
-                          </label>
-                          <input
-                            className="cnc-input"
-                            placeholder={form.soloTeam ? "Team username" : "Creator username"}
-                            value={form.creatorUsername}
-                            onChange={onChange("creatorUsername")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">
-                            {form.soloTeam ? "Team" : "Creator"} full name
-                          </label>
-                          <input
-                            className="cnc-input"
-                            placeholder={form.soloTeam ? "Team full name" : "Full name"}
-                            value={form.creatorFullName}
-                            onChange={onChange("creatorFullName")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">
-                            {form.soloTeam ? "Team" : "Creator"} email
-                          </label>
-                          <input
-                            className="cnc-input"
-                            placeholder={form.soloTeam ? "Team email" : "Email"}
-                            value={form.creatorEmail}
-                            onChange={onChange("creatorEmail")}
-                          />
-                        </div>
-                        <div className="cnc-field">
-                          <label className="cnc-label">Name and company</label>
-                          <input
-                            className="cnc-input"
-                            placeholder="Country"
-                            value={form.creatorCompany}
-                            onChange={onChange("creatorCompany")}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                                  <div className="cnc-deliverables">
+                                      <div className="cnc-del-title">
+                                          Deliverables
+                                      </div>
 
-                {/* Scope and Deliverables */}
-                <div className="cnc-card cnc-card--mt">
-                  <h2 className="cnc-card-title">Scope and Deliverables</h2>
-                  <div className="cnc-field">
-                    <label className="cnc-label">Project Summary</label>
-                    <textarea
-                      className="cnc-textarea"
-                      placeholder="Short explanation"
-                      value={form.projectSummary}
-                      onChange={onChange("projectSummary")}
-                    />
-                  </div>
+                                      {deliverables.length > 0 && (
+                                          <div className="cnc-del-header">
+                                              <label className="cnc-label">
+                                                  Title
+                                              </label>
+                                              <label className="cnc-label">
+                                                  Format/file type
+                                              </label>
+                                              <label className="cnc-label">
+                                                  Quantity
+                                              </label>
+                                              <label className="cnc-label">
+                                                  Acceptance Criteria
+                                              </label>
+                                              <div /> {/* remove btn space */}
+                                          </div>
+                                      )}
 
-                  <div className="cnc-deliverables">
-                    <div className="cnc-del-title">Deliverables</div>
+                                      {deliverables.map((d, index) => (
+                                          <div
+                                              className="cnc-del-row-wrapper"
+                                              key={d.id}
+                                          >
+                                              <div className="cnc-del-grid">
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Title"
+                                                      value={d.title}
+                                                      onChange={(e) =>
+                                                          updateDeliverable(
+                                                              index,
+                                                              "title",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Format/file type"
+                                                      value={d.format}
+                                                      onChange={(e) =>
+                                                          updateDeliverable(
+                                                              index,
+                                                              "format",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Quantity"
+                                                      value={d.qty}
+                                                      onChange={(e) =>
+                                                          updateDeliverable(
+                                                              index,
+                                                              "qty",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="Acceptance Criteria"
+                                                      value={d.acceptance}
+                                                      onChange={(e) =>
+                                                          updateDeliverable(
+                                                              index,
+                                                              "acceptance",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <button
+                                                      type="button"
+                                                      className="cnc-del-row-remove"
+                                                      onClick={() =>
+                                                          removeDeliverable(
+                                                              d.id,
+                                                          )
+                                                      }
+                                                      title="Remove row"
+                                                  >
+                                                      X
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      ))}
+                                      <button
+                                          type="button"
+                                          className="cnc-addBtn mt-2"
+                                          onClick={addDeliverable}
+                                      >
+                                          + Add More Deliverables
+                                      </button>
+                                  </div>
 
-                    {deliverables.length > 0 && (
-                      <div className="cnc-del-header">
-                        <label className="cnc-label">Title</label>
-                        <label className="cnc-label">Format/file type</label>
-                        <label className="cnc-label">Quantity</label>
-                        <label className="cnc-label">Acceptance Criteria</label>
-                        <div /> {/* remove btn space */}
-                      </div>
-                    )}
+                                  <div className="cnc-field cnc-outScope">
+                                      <label className="cnc-label">
+                                          Out of scope
+                                      </label>
+                                      <textarea
+                                          className="cnc-textarea"
+                                          placeholder="Free text"
+                                          value={form.outOfScope}
+                                          onChange={onChange("outOfScope")}
+                                      />
+                                  </div>
+                              </div>
 
-                    {deliverables.map((d, index) => (
-                      <div className="cnc-del-row-wrapper" key={d.id}>
-                        <div className="cnc-del-grid">
-                          <input
-                            className="cnc-input"
-                            placeholder="Title"
-                            value={d.title}
-                            onChange={(e) => updateDeliverable(index, "title", e.target.value)}
-                          />
-                          <input
-                            className="cnc-input"
-                            placeholder="Format/file type"
-                            value={d.format}
-                            onChange={(e) => updateDeliverable(index, "format", e.target.value)}
-                          />
-                          <input
-                            className="cnc-input"
-                            placeholder="Quantity"
-                            value={d.qty}
-                            onChange={(e) => updateDeliverable(index, "qty", e.target.value)}
-                          />
-                          <input
-                            className="cnc-input"
-                            placeholder="Acceptance Criteria"
-                            value={d.acceptance}
-                            onChange={(e) => updateDeliverable(index, "acceptance", e.target.value)}
-                          />
-                          <button
-                            type="button"
-                            className="cnc-del-row-remove"
-                            onClick={() => removeDeliverable(d.id)}
-                            title="Remove row"
-                          >
-                            X
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    <button type="button" className="cnc-addBtn mt-2" onClick={addDeliverable}>
-                      + Add More Deliverables
-                    </button>
-                  </div>
+                              {/* Timeline and Revisions */}
+                              <div className="cnc-card cnc-card--mt">
+                                  <h2 className="cnc-card-title">
+                                      Timeline and Revisions
+                                  </h2>
+                                  <div className="cnc-timelineGrid">
+                                      {/* Initial delivery deadline */}
+                                      <DateInput
+                                          label="Initial delivery deadline"
+                                          value={form.initialDeliveryDeadline}
+                                          onOpen={() =>
+                                              setCalendarConfig({
+                                                  value: form.initialDeliveryDeadline,
+                                                  onSelect: (val) =>
+                                                      setFormField(
+                                                          "initialDeliveryDeadline",
+                                                          val,
+                                                      ),
+                                              })
+                                          }
+                                      />
 
-                  <div className="cnc-field cnc-outScope">
-                    <label className="cnc-label">Out of scope</label>
-                    <textarea
-                      className="cnc-textarea"
-                      placeholder="Free text"
-                      value={form.outOfScope}
-                      onChange={onChange("outOfScope")}
-                    />
-                  </div>
-                </div>
+                                      {/* Client review window */}
+                                      <SoloSelect
+                                          id="clientReviewWindow"
+                                          label="Client review window (1–7 days)"
+                                          value={form.clientReviewWindow}
+                                          options={[1, 2, 3, 4, 5, 6, 7].map(
+                                              (n) => ({
+                                                  value: String(n),
+                                                  label: `${n} day${n > 1 ? "s" : ""}`,
+                                              }),
+                                          )}
+                                          onChange={(val) =>
+                                              handleSelectValue(
+                                                  "clientReviewWindow",
+                                                  val,
+                                              )
+                                          }
+                                      />
 
-                {/* Timeline and Revisions */}
-                <div className="cnc-card cnc-card--mt">
-                  <h2 className="cnc-card-title">Timeline and Revisions</h2>
-                  <div className="cnc-timelineGrid">
-                    {/* Initial delivery deadline */}
-                    <DateInput
-                      label="Initial delivery deadline"
-                      value={form.initialDeliveryDeadline}
-                      onOpen={() =>
-                        setCalendarConfig({
-                          value: form.initialDeliveryDeadline,
-                          onSelect: (val) =>
-                            setFormField("initialDeliveryDeadline", val),
-                        })
-                      }
-                    />
+                                      {/* Included revision rounds */}
+                                      <SoloSelect
+                                          id="includedRevisionRounds"
+                                          label="Included revision rounds"
+                                          value={form.includedRevisionRounds}
+                                          options={[
+                                              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                          ].map((n) => ({
+                                              value: String(n),
+                                              label: String(n),
+                                          }))}
+                                          onChange={(val) =>
+                                              handleSelectValue(
+                                                  "includedRevisionRounds",
+                                                  val,
+                                              )
+                                          }
+                                      />
 
-                    {/* Client review window */}
-                    <SoloSelect
-                      id="clientReviewWindow"
-                      label="Client review window (1–7 days)"
-                      value={form.clientReviewWindow}
-                      options={[1, 2, 3, 4, 5, 6, 7].map((n) => ({
-                        value: String(n),
-                        label: `${n} day${n > 1 ? "s" : ""}`,
-                      }))}
-                      onChange={(val) => handleSelectValue("clientReviewWindow", val)}
-                    />
+                                      {/* Revision turnaround time */}
+                                      <SoloSelect
+                                          id="revisionTurnaroundDays"
+                                          label="Revision turnaround time (days)"
+                                          value={form.revisionTurnaroundDays}
+                                          options={[
+                                              1, 2, 3, 4, 5, 7, 10, 14, 21, 30,
+                                          ].map((n) => ({
+                                              value: String(n),
+                                              label: `${n} day${n > 1 ? "s" : ""}`,
+                                          }))}
+                                          onChange={(val) =>
+                                              handleSelectValue(
+                                                  "revisionTurnaroundDays",
+                                                  val,
+                                              )
+                                          }
+                                      />
 
-                    {/* Included revision rounds */}
-                    <SoloSelect
-                      id="includedRevisionRounds"
-                      label="Included revision rounds"
-                      value={form.includedRevisionRounds}
-                      options={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({
-                        value: String(n),
-                        label: String(n),
-                      }))}
-                      onChange={(val) => handleSelectValue("includedRevisionRounds", val)}
-                    />
+                                      {/* Late delivery consequence */}
+                                      <SoloSelect
+                                          id="lateDeliveryConsequence"
+                                          label="Late delivery consequence"
+                                          value={form.lateDeliveryConsequence}
+                                          options={[
+                                              {
+                                                  value: "discount_5",
+                                                  label: "5% discount",
+                                              },
+                                              {
+                                                  value: "discount_10",
+                                                  label: "10% discount",
+                                              },
+                                              {
+                                                  value: "refund_partial",
+                                                  label: "Partial refund",
+                                              },
+                                              {
+                                                  value: "refund_full",
+                                                  label: "Full refund",
+                                              },
+                                              {
+                                                  value: "extend_deadline",
+                                                  label: "Extend deadline",
+                                              },
+                                          ]}
+                                          placeholder="Select"
+                                          onChange={(val) =>
+                                              handleSelectValue(
+                                                  "lateDeliveryConsequence",
+                                                  val,
+                                              )
+                                          }
+                                      />
+                                  </div>
+                              </div>
 
-                    {/* Revision turnaround time */}
-                    <SoloSelect
-                      id="revisionTurnaroundDays"
-                      label="Revision turnaround time (days)"
-                      value={form.revisionTurnaroundDays}
-                      options={[1, 2, 3, 4, 5, 7, 10, 14, 21, 30].map((n) => ({
-                        value: String(n),
-                        label: `${n} day${n > 1 ? "s" : ""}`,
-                      }))}
-                      onChange={(val) => handleSelectValue("revisionTurnaroundDays", val)}
-                    />
+                              {/* SLA Snapshot */}
+                              <div className="cnc-card cnc-card--mt">
+                                  <h2 className="cnc-card-title">
+                                      SLA Snapshot
+                                  </h2>
+                                  <div className="cnc-slaGrid">
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Delivery SLA
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Delivery SLA"
+                                              value={form.deliverySLA}
+                                              onChange={onChange("deliverySLA")}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Communication SLA
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Communication SLA"
+                                              value={form.communicationSLA}
+                                              onChange={onChange(
+                                                  "communicationSLA",
+                                              )}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Revision SLA
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Revision SLA"
+                                              value={form.revisionSLA}
+                                              onChange={onChange("revisionSLA")}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Quality standards
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Quality standards"
+                                              value={form.qualityStandards}
+                                              onChange={onChange(
+                                                  "qualityStandards",
+                                              )}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Client responsibilities
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Client responsibilities"
+                                              value={
+                                                  form.clientResponsibilities
+                                              }
+                                              onChange={onChange(
+                                                  "clientResponsibilities",
+                                              )}
+                                          />
+                                      </div>
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Creator/team responsibilities
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Creator/team responsibilities"
+                                              value={
+                                                  form.creatorResponsibilities
+                                              }
+                                              onChange={onChange(
+                                                  "creatorResponsibilities",
+                                              )}
+                                          />
+                                      </div>
+                                  </div>
+                              </div>
 
-                    {/* Late delivery consequence */}
-                    <SoloSelect
-                      id="lateDeliveryConsequence"
-                      label="Late delivery consequence"
-                      value={form.lateDeliveryConsequence}
-                      options={[
-                        { value: "discount_5", label: "5% discount" },
-                        { value: "discount_10", label: "10% discount" },
-                        { value: "refund_partial", label: "Partial refund" },
-                        { value: "refund_full", label: "Full refund" },
-                        { value: "extend_deadline", label: "Extend deadline" },
-                      ]}
-                      placeholder="Select"
-                      onChange={(val) => handleSelectValue("lateDeliveryConsequence", val)}
-                    />
-                  </div>
-                </div>
+                              {/* Payment and Escrow */}
+                              <div className="cnc-card cnc-card--mt">
+                                  <h2 className="cnc-card-title">
+                                      Payment and Escrow
+                                  </h2>
+                                  <div className="cnc-payTop">
+                                      <SoloSelect
+                                          id="paymentType"
+                                          label="Payment Type"
+                                          value={form.paymentType}
+                                          options={[
+                                              {
+                                                  value: "fixed",
+                                                  label: "Fixed",
+                                              },
+                                              {
+                                                  value: "milestone",
+                                                  label: "Milestone based",
+                                              },
+                                              {
+                                                  value: "hourly",
+                                                  label: "Hourly",
+                                              },
+                                          ]}
+                                          onChange={(val) =>
+                                              handleSelectValue(
+                                                  "paymentType",
+                                                  val,
+                                              )
+                                          }
+                                      />
+                                      <div className="cnc-field">
+                                          <label className="cnc-label">
+                                              Project cost
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="$50000"
+                                              value={form.projectCost}
+                                              onChange={onChange("projectCost")}
+                                          />
+                                      </div>
+                                      <div className="cnc-field cnc-span-all">
+                                          <label className="cnc-label">
+                                              Escrow Rules
+                                          </label>
+                                          <input
+                                              className="cnc-input"
+                                              placeholder="Funds lock before work starts. Release after approval or review expiry."
+                                              value={form.escrowRules}
+                                              onChange={onChange("escrowRules")}
+                                          />
+                                      </div>
+                                  </div>
 
-                {/* SLA Snapshot */}
-                <div className="cnc-card cnc-card--mt">
-                  <h2 className="cnc-card-title">SLA Snapshot</h2>
-                  <div className="cnc-slaGrid">
-                    <div className="cnc-field">
-                      <label className="cnc-label">Delivery SLA</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Delivery SLA"
-                        value={form.deliverySLA}
-                        onChange={onChange("deliverySLA")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Communication SLA</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Communication SLA"
-                        value={form.communicationSLA}
-                        onChange={onChange("communicationSLA")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Revision SLA</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Revision SLA"
-                        value={form.revisionSLA}
-                        onChange={onChange("revisionSLA")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Quality standards</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Quality standards"
-                        value={form.qualityStandards}
-                        onChange={onChange("qualityStandards")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Client responsibilities</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Client responsibilities"
-                        value={form.clientResponsibilities}
-                        onChange={onChange("clientResponsibilities")}
-                      />
-                    </div>
-                    <div className="cnc-field">
-                      <label className="cnc-label">Creator/team responsibilities</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Creator/team responsibilities"
-                        value={form.creatorResponsibilities}
-                        onChange={onChange("creatorResponsibilities")}
-                      />
-                    </div>
-                  </div>
-                </div>
+                                  <div className="cnc-milestones">
+                                      <div className="cnc-del-title">
+                                          Milestones
+                                      </div>
 
-                {/* Payment and Escrow */}
-                <div className="cnc-card cnc-card--mt">
-                  <h2 className="cnc-card-title">Payment and Escrow</h2>
-                  <div className="cnc-payTop">
-                    <SoloSelect
-                      id="paymentType"
-                      label="Payment Type"
-                      value={form.paymentType}
-                      options={[
-                        { value: "fixed", label: "Fixed" },
-                        { value: "milestone", label: "Milestone based" },
-                        { value: "hourly", label: "Hourly" },
-                      ]}
-                      onChange={(val) => handleSelectValue("paymentType", val)}
-                    />
-                    <div className="cnc-field">
-                      <label className="cnc-label">Project cost</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="$50000"
-                        value={form.projectCost}
-                        onChange={onChange("projectCost")}
-                      />
-                    </div>
-                    <div className="cnc-field cnc-span-all">
-                      <label className="cnc-label">Escrow Rules</label>
-                      <input
-                        className="cnc-input"
-                        placeholder="Funds lock before work starts. Release after approval or review expiry."
-                        value={form.escrowRules}
-                        onChange={onChange("escrowRules")}
-                      />
-                    </div>
-                  </div>
+                                      {milestones.length > 0 && (
+                                          <div className="cnc-mil-header">
+                                              <label className="cnc-label">
+                                                  Milestone Name
+                                              </label>
+                                              <label className="cnc-label">
+                                                  Amount
+                                              </label>
+                                              <label className="cnc-label">
+                                                  Deadline
+                                              </label>
+                                              <div /> {/* remove btn space */}
+                                          </div>
+                                      )}
 
-                  <div className="cnc-milestones">
-                    <div className="cnc-del-title">Milestones</div>
+                                      {milestones.map((m, index) => (
+                                          <div
+                                              className="cnc-mil-row-wrapper"
+                                              key={m.id}
+                                          >
+                                              <div className="cnc-mil-grid">
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder={`Milestone ${index + 1}`}
+                                                      value={m.name}
+                                                      onChange={(e) =>
+                                                          updateMilestone(
+                                                              index,
+                                                              "name",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <input
+                                                      className="cnc-input"
+                                                      placeholder="$1000"
+                                                      value={m.amount}
+                                                      onChange={(e) =>
+                                                          updateMilestone(
+                                                              index,
+                                                              "amount",
+                                                              e.target.value,
+                                                          )
+                                                      }
+                                                  />
+                                                  <DateInput
+                                                      label=""
+                                                      value={m.deadline}
+                                                      onOpen={() =>
+                                                          setCalendarConfig({
+                                                              value: m.deadline,
+                                                              onSelect: (val) =>
+                                                                  updateMilestone(
+                                                                      index,
+                                                                      "deadline",
+                                                                      val,
+                                                                  ),
+                                                          })
+                                                      }
+                                                  />
+                                                  <button
+                                                      type="button"
+                                                      className="cnc-mil-row-remove"
+                                                      onClick={() =>
+                                                          removeMilestone(m.id)
+                                                      }
+                                                      title="Remove milestone"
+                                                  >
+                                                      ✕
+                                                  </button>
+                                              </div>
+                                          </div>
+                                      ))}
+                                      <button
+                                          type="button"
+                                          className="cnc-addBtn mt-2"
+                                          onClick={addMilestone}
+                                      >
+                                          + Add Milestone
+                                      </button>
+                                  </div>
+                              </div>
 
-                    {milestones.length > 0 && (
-                      <div className="cnc-mil-header">
-                        <label className="cnc-label">Milestone Name</label>
-                        <label className="cnc-label">Amount</label>
-                        <label className="cnc-label">Deadline</label>
-                        <div /> {/* remove btn space */}
-                      </div>
-                    )}
+                              {/* Team Payout Configuration (Conditional) */}
+                              {form.soloTeam && (
+                                  <div className="cnc-card cnc-card--mt cnc-teamPayoutCard">
+                                      <h2 className="cnc-card-title">
+                                          Team Payout Configuration
+                                      </h2>
+                                      <div className="cnc-payout-list">
+                                          {form.teamPayouts.map((payout) => (
+                                              <div
+                                                  className="cnc-payout-row"
+                                                  key={payout.id}
+                                              >
+                                                  <div className="cnc-field">
+                                                      <input
+                                                          className="cnc-input cnc-payout-input cursor-not-allowed"
+                                                          placeholder="Member Name"
+                                                          value={payout.name}
+                                                          onChange={(e) =>
+                                                              handlePayoutChange(
+                                                                  payout.id,
+                                                                  "name",
+                                                                  e.target
+                                                                      .value,
+                                                              )
+                                                          }
+                                                          disabled
+                                                      />
+                                                  </div>
+                                                  <div className="cnc-field">
+                                                      <input
+                                                          className="cnc-input cnc-payout-input"
+                                                          placeholder="Role"
+                                                          value={payout.role}
+                                                          onChange={(e) =>
+                                                              handlePayoutChange(
+                                                                  payout.id,
+                                                                  "role",
+                                                                  e.target
+                                                                      .value,
+                                                              )
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="cnc-field">
+                                                      <input
+                                                          className="cnc-input cnc-payout-input"
+                                                          placeholder="Percentage"
+                                                          value={
+                                                              payout.percentage
+                                                          }
+                                                          onChange={(e) =>
+                                                              handlePayoutChange(
+                                                                  payout.id,
+                                                                  "percentage",
+                                                                  e.target
+                                                                      .value,
+                                                              )
+                                                          }
+                                                      />
+                                                  </div>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  </div>
+                              )}
 
-                    {milestones.map((m, index) => (
-                      <div className="cnc-mil-row-wrapper" key={m.id}>
-                        <div className="cnc-mil-grid">
-                          <input
-                            className="cnc-input"
-                            placeholder={`Milestone ${index + 1}`}
-                            value={m.name}
-                            onChange={(e) => updateMilestone(index, "name", e.target.value)}
-                          />
-                          <input
-                            className="cnc-input"
-                            placeholder="$1000"
-                            value={m.amount}
-                            onChange={(e) => updateMilestone(index, "amount", e.target.value)}
-                          />
-                          <DateInput
-                            label=""
-                            value={m.deadline}
-                            onOpen={() => setCalendarConfig({
-                              value: m.deadline,
-                              onSelect: (val) => updateMilestone(index, "deadline", val)
-                            })}
-                          />
-                          <button
-                            type="button"
-                            className="cnc-mil-row-remove"
-                            onClick={() => removeMilestone(m.id)}
-                            title="Remove milestone"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    <button type="button" className="cnc-addBtn mt-2" onClick={addMilestone}>
-                      + Add Milestone
-                    </button>
-                  </div>
-                </div>
+                              {/* Final Confirmation Section */}
+                              <div className="cnc-confirmArea cnc-card--mt">
+                                  <div className="cnc-confirmRow">
+                                      {/* Client Box */}
+                                      <div className="cnc-confirmCard">
+                                          <div className="cnc-confirmTitle">
+                                              Final Confirmation (Client)
+                                          </div>
+                                          <div className="cnc-field">
+                                              <label className="cnc-label">
+                                                  Full Name
+                                              </label>
+                                              <input
+                                                  className="cnc-input"
+                                                  placeholder="Full Name"
+                                                  value={form.finalClientName}
+                                                  onChange={onChange(
+                                                      "finalClientName",
+                                                  )}
+                                              />
+                                          </div>
+                                          <label className="cnc-checkRow">
+                                              <input
+                                                  type="checkbox"
+                                                  checked={form.clientAgree}
+                                                  onChange={onToggle(
+                                                      "clientAgree",
+                                                  )}
+                                              />
+                                              <span>
+                                                  I accept and agree to the{" "}
+                                                  <a href="#">
+                                                      terms and conditions
+                                                  </a>
+                                              </span>
+                                          </label>
+                                          <button
+                                              type="button"
+                                              className="cnc-primaryBtn"
+                                          >
+                                              Ready to fund escrow
+                                          </button>
+                                          <div className="cnc-confirmActions">
+                                              <button
+                                                  type="button"
+                                                  className="cnc-ghostBtn"
+                                              >
+                                                  Send for review
+                                              </button>
+                                              <button
+                                                  type="button"
+                                                  className="cnc-ghostBtn"
+                                              >
+                                                  Edit Contract
+                                              </button>
+                                          </div>
+                                      </div>
 
-                {/* Team Payout Configuration (Conditional) */}
-                {form.soloTeam && (
-                  <div className="cnc-card cnc-card--mt cnc-teamPayoutCard">
-                    <h2 className="cnc-card-title">Team Payout Configuration</h2>
-                    <div className="cnc-payout-list">
-                      {form.teamPayouts.map((payout) => (
-                        <div className="cnc-payout-row" key={payout.id}>
-                          <div className="cnc-field">
-                            <input
-                              className="cnc-input cnc-payout-input"
-                              placeholder="Member Name"
-                              value={payout.name}
-                              onChange={(e) => handlePayoutChange(payout.id, "name", e.target.value)}
-                            />
+                                      {/* Team Box */}
+                                      <div className="cnc-confirmCard">
+                                          <div className="cnc-confirmTitle">
+                                              Final Confirmation (Team)
+                                          </div>
+                                          <div className="cnc-field">
+                                              <label className="cnc-label">
+                                                  Team Name
+                                              </label>
+                                              <input
+                                                  className="cnc-input"
+                                                  placeholder="Team Name"
+                                                  value={form.finalCreatorName}
+                                                  onChange={onChange(
+                                                      "finalCreatorName",
+                                                  )}
+                                              />
+                                          </div>
+                                          <label className="cnc-checkRow">
+                                              <input
+                                                  type="checkbox"
+                                                  checked={form.creatorAgree}
+                                                  onChange={onToggle(
+                                                      "creatorAgree",
+                                                  )}
+                                              />
+                                              <span>
+                                                  I accept and agree to the{" "}
+                                                  <a href="#">
+                                                      terms and conditions
+                                                  </a>
+                                              </span>
+                                          </label>
+                                          <button
+                                              type="button"
+                                              className="cnc-primaryBtn"
+                                          >
+                                              Accept contract
+                                          </button>
+                                          <div className="cnc-confirmActions">
+                                              <button
+                                                  type="button"
+                                                  className="cnc-ghostBtn"
+                                              >
+                                                  Cancelled
+                                              </button>
+                                              <button
+                                                  type="button"
+                                                  className="cnc-ghostBtn"
+                                              >
+                                                  Decline
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              {/* Activity Log */}
+                              <div className="cnc-card cnc-card--mt">
+                                  <h2 className="cnc-card-title">
+                                      Activity Log
+                                  </h2>
+                                  <div className="cnc-tableWrap">
+                                      <table className="cnc-table">
+                                          <thead>
+                                              <tr>
+                                                  <th>Timestamp</th>
+                                                  <th>Actor</th>
+                                                  <th>Action</th>
+                                                  <th>Details</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                              {activity.map((r, idx) => (
+                                                  <tr key={idx}>
+                                                      <td>{r.ts}</td>
+                                                      <td>{r.actor}</td>
+                                                      <td>{r.action}</td>
+                                                      <td>{r.details}</td>
+                                                  </tr>
+                                              ))}
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
                           </div>
-                          <div className="cnc-field">
-                            <input
-                              className="cnc-input cnc-payout-input"
-                              placeholder="Role"
-                              value={payout.role}
-                              onChange={(e) => handlePayoutChange(payout.id, "role", e.target.value)}
-                            />
-                          </div>
-                          <div className="cnc-field">
-                            <input
-                              className="cnc-input cnc-payout-input"
-                              placeholder="Percentage"
-                              value={payout.percentage}
-                              onChange={(e) => handlePayoutChange(payout.id, "percentage", e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                      </main>
+                      </div>
                   </div>
-                )}
-
-                {/* Final Confirmation Section */}
-                <div className="cnc-confirmArea cnc-card--mt">
-                  <div className="cnc-confirmRow">
-                    {/* Client Box */}
-                    <div className="cnc-confirmCard">
-                      <div className="cnc-confirmTitle">Final Confirmation (Client)</div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Full Name</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Full Name"
-                          value={form.finalClientName}
-                          onChange={onChange("finalClientName")}
-                        />
-                      </div>
-                      <label className="cnc-checkRow">
-                        <input
-                          type="checkbox"
-                          checked={form.clientAgree}
-                          onChange={onToggle("clientAgree")}
-                        />
-                        <span>
-                          I accept and agree to the <a href="#">terms and conditions</a>
-                        </span>
-                      </label>
-                      <button type="button" className="cnc-primaryBtn">
-                        Ready to fund escrow
-                      </button>
-                      <div className="cnc-confirmActions">
-                        <button type="button" className="cnc-ghostBtn">Send for review</button>
-                        <button type="button" className="cnc-ghostBtn">Edit Contract</button>
-                      </div>
-                    </div>
-
-                    {/* Team Box */}
-                    <div className="cnc-confirmCard">
-                      <div className="cnc-confirmTitle">Final Confirmation (Team)</div>
-                      <div className="cnc-field">
-                        <label className="cnc-label">Team Name</label>
-                        <input
-                          className="cnc-input"
-                          placeholder="Team Name"
-                          value={form.finalCreatorName}
-                          onChange={onChange("finalCreatorName")}
-                        />
-                      </div>
-                      <label className="cnc-checkRow">
-                        <input
-                          type="checkbox"
-                          checked={form.creatorAgree}
-                          onChange={onToggle("creatorAgree")}
-                        />
-                        <span>
-                          I accept and agree to the <a href="#">terms and conditions</a>
-                        </span>
-                      </label>
-                      <button type="button" className="cnc-primaryBtn">
-                        Accept contract
-                      </button>
-                      <div className="cnc-confirmActions">
-                        <button type="button" className="cnc-ghostBtn">Cancelled</button>
-                        <button type="button" className="cnc-ghostBtn">Decline</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Activity Log */}
-                <div className="cnc-card cnc-card--mt">
-                  <h2 className="cnc-card-title">Activity Log</h2>
-                  <div className="cnc-tableWrap">
-                    <table className="cnc-table">
-                      <thead>
-                        <tr>
-                          <th>Timestamp</th>
-                          <th>Actor</th>
-                          <th>Action</th>
-                          <th>Details</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {activity.map((r, idx) => (
-                          <tr key={idx}>
-                            <td>{r.ts}</td>
-                            <td>{r.actor}</td>
-                            <td>{r.action}</td>
-                            <td>{r.details}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
               </div>
-            </main>
           </div>
-        </div>
-      </div>
 
-      {/* ================= CALENDAR MODAL ================= */}
-      {calendarConfig && (
-        <Calendar
-          initialDate={calendarConfig.value}
-          onClose={() => setCalendarConfig(null)}
-          onSelect={(date) => {
-            calendarConfig.onSelect(date);
-            setCalendarConfig(null);
-          }}
-        />
-      )}
-    </div>
+          {/* ================= CALENDAR MODAL ================= */}
+          {calendarConfig && (
+              <Calendar
+                  initialDate={calendarConfig.value}
+                  onClose={() => setCalendarConfig(null)}
+                  onSelect={(date) => {
+                      calendarConfig.onSelect(date);
+                      setCalendarConfig(null);
+                  }}
+              />
+          )}
+      </div>
   );
 }
 
@@ -1056,4 +1400,3 @@ function Calendar({ onClose, onSelect, initialDate }) {
     </div>
   );
 }
-

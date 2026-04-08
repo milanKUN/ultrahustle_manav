@@ -1,11 +1,14 @@
 // ... same imports
 import React, { useMemo, useState, useRef, useEffect } from "react";
-import "./MilestonesPage.css";
+import { useNavigate } from "react-router-dom";
+import "./CreatorMilestonesPage.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "../../../Darkuser.css";
+import SoloContractListing from "./SoloContractListing";
 
 export default function MilestoneBoard({ theme = "light", setTheme }) {
+  const navigate = useNavigate();
   const topTabs = ["Milestones", "Contract", "Details"];
   const statusTabs = [
     "All",
@@ -18,6 +21,10 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
 
   const [activeTop, setActiveTop] = useState("Milestones");
   const [activeStatus, setActiveStatus] = useState("All");
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [deliveryLink, setDeliveryLink] = useState("");
+  const [deliveryFileName, setDeliveryFileName] = useState("");
+  const uploadInputRef = useRef(null);
 
   // ✅ VIEW ONLY STATE
   const [isViewOnly, setIsViewOnly] = useState(true);
@@ -195,7 +202,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
 
         <div className="relative flex-1 min-w-5 overflow-hidden">
           <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
-            <div className="ms-wrap">
+            <div className={`ms-wrap ${isUploadModalOpen ? "ms-wrap--blurred" : ""}`}>
               {/* Top tabs */}
               <div className="ms-topbar">
                 <div className="ms-seg">
@@ -217,6 +224,45 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
 
               {/* ✅ CONTRACT TAB */}
               {activeTop === "Contract" && (
+                <div className={`ms-contract-page ${isViewOnly ? "is-viewonly" : ""}`}>
+                  <div className="ms-contract-top">
+                    <h2 className="ms-contract-title">Create New Contract</h2>
+
+                    <div className="ms-contract-actions">
+                      <button
+                        type="button"
+                        className="ms-ct-btn lime"
+                        onClick={() => window.print()}
+                      >
+                        Save as PDF
+                      </button>
+
+                      <button
+                        type="button"
+                        className="ms-ct-btn lime ms-ct-btn-viewOnly"
+                        aria-pressed={isViewOnly}
+                        onClick={() => setIsViewOnly((p) => !p)}
+                      >
+                        <span className="ms-eye" aria-hidden="true">
+                          {isViewOnly ? "👁" : "👁‍🗨"}
+                        </span>
+                        <span>{isViewOnly ? "View only" : "Editing"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="ms-contractEmbed">
+                    <SoloContractListing
+                      theme={theme}
+                      setTheme={setTheme}
+                      embedded
+                      readOnly={isViewOnly}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {false && activeTop === "Contract" && (
                 <div className={`ms-contract-page ${isViewOnly ? "is-viewonly" : ""}`}>
                   {/* Header (always clickable) */}
                   <div className="ms-contract-top">
@@ -881,7 +927,10 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                   <div className="ms-lower">
                     <div className="ms-feed">
                       {feed.map((it, idx) => (
-                        <div key={idx} className={`ms-event ${it.highlight ? "highlight" : ""}`}>
+                        <div
+                          key={idx}
+                          className={`ms-event ${it.highlight ? "highlight" : ""} ${idx < 2 ? "muted" : ""}`}
+                        >
                           <div className="ms-eventHead">
                             <div className="ms-eventLeft">
                               <div className="ms-eventTitle">{it.title}</div>
@@ -926,13 +975,21 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                     <div className="ms-side">
                       <div className="ms-panel ms-panel-action">
                         <div className="ms-panelTitle">Action</div>
-                        <button className="ms-actionBtn lime" type="button">
+                        <button
+                          className="ms-actionBtn lime"
+                          type="button"
+                          onClick={() => setIsUploadModalOpen(true)}
+                        >
                           Upload
                         </button>
                         <button className="ms-actionBtn lime" type="button">
                           Message Client
                         </button>
-                        <button className="ms-actionBtn" type="button">
+                        <button
+                          className="ms-actionBtn"
+                          type="button"
+                          onClick={() => navigate("/resolution-center")}
+                        >
                           Resolution Center
                         </button>
                       </div>
@@ -995,8 +1052,97 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
           </div>
         </div>
       </div>
+
+      {isUploadModalOpen && (
+        <div
+          className="ms-uploadModalOverlay"
+          onClick={() => setIsUploadModalOpen(false)}
+        >
+          <div
+            className="ms-uploadModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ms-upload-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 id="ms-upload-modal-title" className="ms-uploadModalTitle">
+              Deliver work
+            </h3>
+
+            <div className="ms-uploadModalCard">
+              <input
+                ref={uploadInputRef}
+                type="file"
+                className="ms-uploadModalInputFile"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  setDeliveryFileName(file ? file.name : "");
+                }}
+              />
+
+              <button
+                type="button"
+                className="ms-uploadDropzone"
+                onClick={() => uploadInputRef.current?.click()}
+              >
+                <span className="ms-uploadDropzoneIcon" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 16V4" />
+                    <path d="m7 9 5-5 5 5" />
+                    <path d="M20 16.74A5 5 0 0 1 18 21H6a5 5 0 0 1-2-4.26" />
+                  </svg>
+                </span>
+                <span className="ms-uploadDropzoneText">
+                  <span className="ms-uploadDropzonePrimary">Click to upload</span> or Drag or drop file
+                </span>
+                <span className="ms-uploadDropzoneMeta">
+                  PDF, JPG, JPEG, PNG less than 10MB.
+                </span>
+                <span className="ms-uploadDropzoneMeta">
+                  Ensure your document are in good condition and readable
+                </span>
+                {deliveryFileName && (
+                  <span className="ms-uploadDropzoneFileName">{deliveryFileName}</span>
+                )}
+              </button>
+
+              <div className="ms-uploadField">
+                <label className="ms-uploadLabel" htmlFor="ms-upload-link">
+                  Link (optional)
+                </label>
+                <input
+                  id="ms-upload-link"
+                  type="text"
+                  className="ms-uploadInput"
+                  placeholder="Website"
+                  value={deliveryLink}
+                  onChange={(event) => setDeliveryLink(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="ms-uploadActions">
+              <button
+                type="button"
+                className="ms-uploadSubmitBtn"
+                onClick={() => setIsUploadModalOpen(false)}
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-
