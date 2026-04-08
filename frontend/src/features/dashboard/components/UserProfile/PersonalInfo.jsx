@@ -1252,14 +1252,20 @@ function Calendar({ onClose, onSelect }) {
   ];
 
   const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
 
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(currentMonth);
   const [openYear, setOpenYear] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const yearRef = useRef(null);
 
-  const years = Array.from({ length: 101 }, (_, i) => 1950 + i);
+  // ✅ Show years only till current year
+  const years = Array.from(
+    { length: currentYear - 1950 + 1 },
+    (_, i) => 1950 + i
+  );
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -1278,14 +1284,25 @@ function Calendar({ onClose, onSelect }) {
   const changeMonth = (dir) => {
     if (dir === "prev") {
       if (month === 0) {
-        setMonth(11);
-        setYear((y) => y - 1);
-      } else setMonth((m) => m - 1);
+        if (year > 1950) {
+          setMonth(11);
+          setYear((y) => y - 1);
+        }
+      } else {
+        setMonth((m) => m - 1);
+      }
     } else {
+      // ✅ Prevent going beyond current month/current year
+      if (year === currentYear && month === currentMonth) return;
+
       if (month === 11) {
-        setMonth(0);
-        setYear((y) => y + 1);
-      } else setMonth((m) => m + 1);
+        if (year < currentYear) {
+          setMonth(0);
+          setYear((y) => y + 1);
+        }
+      } else {
+        setMonth((m) => m + 1);
+      }
     }
   };
 
@@ -1327,6 +1344,12 @@ function Calendar({ onClose, onSelect }) {
                       className={y === year ? "active" : ""}
                       onClick={() => {
                         setYear(y);
+
+                        // ✅ If current year selected, don't allow future month
+                        if (y === currentYear && month > currentMonth) {
+                          setMonth(currentMonth);
+                        }
+
                         setOpenYear(false);
                       }}
                     >
@@ -1351,7 +1374,11 @@ function Calendar({ onClose, onSelect }) {
             </span>
             <span
               onClick={() => changeMonth("next")}
-              className="cursor-pointer"
+              className={`cursor-pointer ${
+                year === currentYear && month === currentMonth
+                  ? "opacity-30 pointer-events-none"
+                  : ""
+              }`}
             >
               ›
             </span>
@@ -1384,17 +1411,27 @@ function Calendar({ onClose, onSelect }) {
               const formatted = formatDate(day);
               const isSelected = selectedDate === formatted;
 
+              // ✅ Disable future dates in current month/year
+              const isFutureDate =
+                year === currentYear &&
+                month === currentMonth &&
+                day > today.getDate();
+
               return (
                 <div
                   key={day}
                   onClick={() => {
+                    if (isFutureDate) return;
                     setSelectedDate(formatted);
                     onSelect(formatted);
                   }}
-                  className={`mx-auto w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition
-                    ${isSelected
-                      ? "bg-[#CEFF1B] text-black font-bold"
-                      : "hover:bg-[#CEFF1B] hover:!text-black"
+                  className={`mx-auto w-7 h-7 rounded-full flex items-center justify-center transition
+                    ${
+                      isFutureDate
+                        ? "text-gray-400 cursor-not-allowed opacity-50"
+                        : isSelected
+                        ? "bg-[#CEFF1B] text-black font-bold cursor-pointer"
+                        : "cursor-pointer hover:bg-[#CEFF1B] hover:!text-black"
                     }`}
                 >
                   {day}
