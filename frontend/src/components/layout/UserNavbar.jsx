@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import "./NavbarLight.css";
 import { logout } from "../../features/auth/api/authApi";
 import { getUserName, getMyPersonalInfo } from "../../features/dashboard/api/personalInfoApi";
+import defaultAvatar from "./default-avatar.png";
 
 const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
@@ -144,30 +145,12 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
   // Sample messages data
   const messagesData = [
     { id: 1, name: "John Smith", text: "Thanks for your help!", time: "2m ago" },
-    { id: 2, name: "Ayesha Khan", text: "Can you share the file?", time: "10m ago" },
-    { id: 3, name: "Rahul Sharma", text: "Let’s connect tomorrow.", time: "1d ago" },
-    { id: 4, name: "Mike Chen", text: "Approved ✅", time: "1d ago" },
-    { id: 5, name: "Priya Patel", text: "Sent the update.", time: "2d ago" },
   ];
 
 
   // Sample notifications data
   const notificationsData = [
     { id: 1, text: "You have 5 save on your listings", time: "2m ago" },
-    { id: 2, text: "Mike Chen started following you", time: "10m ago" },
-    { id: 3, text: "Your service received 10 new likes", time: "1d ago" },
-    {
-      id: 4,
-      text: "Your profile was viewed\n50 times today",
-      time: "1d ago",
-      twoLines: true,
-    },
-    {
-      id: 5,
-      text: "You made a sale: Web\nDesign Package",
-      time: "2d ago",
-      twoLines: true,
-    },
   ];
 
   // ✅ Tabs
@@ -190,64 +173,12 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
           description: "Service description",
           category: "Service",
         },
-        {
-          id: 2,
-          title: "Logo Design Service",
-          description: "Minimal + modern logo for brands",
-          category: "Service",
-        },
-        {
-          id: 3,
-          title: "Logo Design Service",
-          description: "Minimal + modern logo for brands",
-          category: "Service",
-        },
-        {
-          id: 4,
-          title: "Logo Design Service",
-          description: "Minimal + modern logo for brands",
-          category: "Service",
-        },
-        {
-          id: 5,
-          title: "Logo Design Service",
-          description: "Minimal + modern logo for brands",
-          category: "Service",
-        },
       ],
       "Digital Products": [
         {
           id: 11,
           title: "UI Kit (Title)",
           description: "Figma UI kit for dashboards",
-          category: "Digital Products",
-          avatarColor: "#5B5B5B",
-        },
-        {
-          id: 12,
-          title: "Brand Guidelines Pack",
-          description: "Editable brand guide templates",
-          category: "Digital Products",
-          avatarColor: "#5B5B5B",
-        },
-        {
-          id: 13,
-          title: "Brand Guidelines Pack",
-          description: "Editable brand guide templates",
-          category: "Digital Products",
-          avatarColor: "#5B5B5B",
-        },
-        {
-          id: 14,
-          title: "Brand Guidelines Pack",
-          description: "Editable brand guide templates",
-          category: "Digital Products",
-          avatarColor: "#5B5B5B",
-        },
-        {
-          id: 15,
-          title: "Brand Guidelines Pack",
-          description: "Editable brand guide templates",
           category: "Digital Products",
           avatarColor: "#5B5B5B",
         },
@@ -259,60 +190,12 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
           description: "Live session description",
           category: "Webinars",
         },
-        {
-          id: 22,
-          title: "Design System Webinar",
-          description: "Tokens, components, and scaling",
-          category: "Webinars",
-        },
-        {
-          id: 23,
-          title: "Design System Webinar",
-          description: "Tokens, components, and scaling",
-          category: "Webinars",
-        },
-        {
-          id: 24,
-          title: "Design System Webinar",
-          description: "Tokens, components, and scaling",
-          category: "Webinars",
-        },
-        {
-          id: 25,
-          title: "Design System Webinar",
-          description: "Tokens, components, and scaling",
-          category: "Webinars",
-        },
       ],
       Course: [
         {
           id: 31,
           title: "Course Listing (Title)",
           description: "Course description",
-          category: "Course",
-        },
-        {
-          id: 32,
-          title: "React Mastery",
-          description: "Build real-world apps fast",
-          category: "Course",
-        },
-        {
-          id: 33,
-          title: "React Mastery",
-          description: "Build real-world apps fast",
-          category: "Course",
-        },
-        {
-          id: 34,
-          title: "React Mastery",
-          description: "Build real-world apps fast",
-          category: "Course",
-        },
-        {
-          id: 35,
-          title: "React Mastery",
-          description: "Build real-world apps fast",
           category: "Course",
         },
       ],
@@ -325,31 +208,6 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
           description: "Product design + full-stack dev team",
           category: "Team",
         },
-        {
-          id: 102,
-          title: "Creative Squad",
-          description: "Branding, motion & social creatives",
-          category: "Team",
-        },
-        {
-          id: 103,
-          title: "Marketing Gurus",
-          description: "Ads + landing pages + conversion",
-          category: "Team",
-        },
-        {
-          id: 104,
-          title: "Ultra Hustle Team",
-          description: "Product design + full-stack dev team",
-          category: "Team",
-        },
-        {
-          id: 105,
-          title: "Creative Squad",
-          description: "Branding, motion & social creatives",
-          category: "Team",
-        },
-
       ],
 
       // ✅ USER TAB (User Name + Description)
@@ -359,31 +217,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
           title: "Rahul Sharma",
           description: "UI/UX Designer • India",
           category: "Profile",
-        },
-        {
-          id: 202,
-          title: "Ayesha Khan",
-          description: "Frontend Dev • React",
-          category: "Profile",
-        },
-        {
-          id: 203,
-          title: "Mike Chen",
-          description: "Brand Designer • Logo & identity",
-          category: "Profile",
-        },
-        {
-          id: 204,
-          title: "Priya Patel",
-          description: "Backend Dev • Node.js & Python",
-          category: "Profile",
-        },
-        {
-          id: 205,
-          title: "Rajesh Kumar",
-          description: "DevOps Engineer • CI/CD & Cloud",
-          category: "Profile",
-        },
+        }
       ],
     }),
     [],
@@ -705,12 +539,12 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
               tabIndex={0}
             >
               <img
-                src={avatar || "/default-avatar.png"}
+                src={avatar || defaultAvatar}
                 alt={username || "User"}
                 className="w-[34px] h-[34px] rounded-full object-cover border border-[#5C5C5C]"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/default-avatar.png";
+                  e.target.src = defaultAvatar;
                 }}
               />
             </div>
