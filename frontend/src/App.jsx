@@ -37,6 +37,8 @@ import ClientMilestonePage from "./features/marketplace/pages/ClientMilestonePag
 import CreatorMilestoneCancellation from "./features/marketplace/pages/CreatorMilestoneCancellation";
 import ClientMilestoneCancellation from "./features/marketplace/pages/ClientMilestoneCancellation";
 import SoloMilestonesPage from "./features/marketplace/pages/SoloMilestonesPage";
+import CreatorWallet from "./features/marketplace/pages/CreatorWallet";
+import ClientWallet from "./features/marketplace/pages/ClientWallet";
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
 import Marketplace from "./features/marketplace/pages/Marketplace";
@@ -247,6 +249,24 @@ export default function App() {
                         path="/solo-milestones"
                         element={
                             <SoloMilestonesPage
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/creator-wallet"
+                        element={
+                            <CreatorWallet
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/client-wallet"
+                        element={
+                            <ClientWallet
                                 theme={theme}
                                 setTheme={setTheme}
                             />
