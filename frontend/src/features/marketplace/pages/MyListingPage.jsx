@@ -1,326 +1,453 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Box,
-  ChevronDown,
-  Copy,
-  GraduationCap,
-  Headphones,
-  MoreHorizontal,
-  MonitorPlay,
-  PauseCircle,
-  Pencil,
-  Search,
-  Trash2,
-  Users,
-} from "lucide-react";
-
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
+import { getMyListings } from "../api/listingApi";
+import "./MyListings.css";
 import "../../../Darkuser.css";
-import listingCover from "../../../assets/web-design.jpg";
-import "./MyListingPage.css";
 
-const CATEGORY_TABS = [
-  { id: "Products", label: "Products", icon: Box },
-  { id: "Services", label: "Services", icon: Headphones },
-  { id: "Courses", label: "Courses", icon: GraduationCap },
-  { id: "Webinar", label: "Webinar", icon: MonitorPlay },
-  { id: "Teams", label: "Teams", icon: Users },
-];
+// SVG Icons for tabs and cards
+const PackageIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m7.5 4.27 9 5.15" />
+    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+    <path d="m3.3 7 8.7 5 8.7-5" />
+    <path d="M12 22V12" />
+  </svg>
+);
 
-const STATUS_OPTIONS = ["All Statuses", "Active", "Paused", "Draft"];
+const HeadsetsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
+    <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+  </svg>
+);
 
-const LISTINGS = [
-  {
-    id: 1,
-    title: "Notion Content Calendar",
-    category: "Products",
-    status: "Active",
-    updatedAt: "Updated Feb 26, 2026",
-    image: listingCover,
-  },
-  {
-    id: 2,
-    title: "Notion Content Calendar",
-    category: "Products",
-    status: "Paused",
-    updatedAt: "Updated Feb 26, 2026",
-    image: listingCover,
-  },
-  {
-    id: 3,
-    title: "Notion Content Calendar",
-    category: "Products",
-    status: "Draft",
-    updatedAt: "Updated Feb 26, 2026",
-    image: listingCover,
-  },
-  {
-    id: 4,
-    title: "Creator Strategy Sprint",
-    category: "Services",
-    status: "Active",
-    updatedAt: "Updated Feb 24, 2026",
-    image: listingCover,
-  },
-  {
-    id: 5,
-    title: "Audience Growth Masterclass",
-    category: "Courses",
-    status: "Paused",
-    updatedAt: "Updated Feb 21, 2026",
-    image: listingCover,
-  },
-  {
-    id: 6,
-    title: "Launch Funnel Live Session",
-    category: "Webinar",
-    status: "Draft",
-    updatedAt: "Updated Feb 20, 2026",
-    image: listingCover,
-  },
-  {
-    id: 7,
-    title: "Studio Ops Team",
-    category: "Teams",
-    status: "Active",
-    updatedAt: "Updated Feb 18, 2026",
-    image: listingCover,
-  },
-];
+const PlayCircleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="10 8 16 12 10 16 10 8" />
+  </svg>
+);
 
-function PackageMark(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
-      <path d="M12 3 4.75 7 12 11 19.25 7 12 3Z" />
-      <path d="M4.75 7v10L12 21l7.25-4V7" />
-      <path d="M12 11v10" />
-    </svg>
-  );
-}
+const VideoIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m22 8-6 4 6 4V8Z" />
+    <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+  </svg>
+);
 
-export default function MyListingPage({ theme, setTheme }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+);
+
+const DotsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="19" cy="12" r="1" />
+    <circle cx="5" cy="12" r="1" />
+  </svg>
+);
+
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+  </svg>
+);
+
+const PauseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="10" x2="10" y1="15" y2="9" />
+    <line x1="14" x2="14" y1="15" y2="9" />
+  </svg>
+);
+
+const DuplicateIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 6h18" />
+    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    <line x1="10" x2="10" y1="11" y2="17" />
+    <line x1="14" x2="14" y1="11" y2="17" />
+  </svg>
+);
+
+const listingTypeToTab = {
+  digital_product: "Products",
+  service: "Services",
+  course: "Courses",
+  webinar: "Webinar",
+};
+
+const tabToListingType = {
+  Products: "digital_product",
+  Services: "service",
+  Courses: "course",
+  Webinar: "webinar",
+};
+
+const getImageUrl = (path = "") => {
+  if (!path) return "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/storage/")) return path;
+  if (path.startsWith("storage/")) return `/${path}`;
+  return `/storage/${path}`;
+};
+
+const formatDate = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+};
+
+export default function MyListings({ theme = "light", setTheme }) {
+  const navigate = useNavigate();
+
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem("sidebarOpen");
+    return saved ? JSON.parse(saved) : true;
+  });
+
   const [showSettings, setShowSettings] = useState(false);
-  const [activeSetting, setActiveSetting] = useState("basic");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeSetting, setActiveSetting] = useState("");
   const [activeTab, setActiveTab] = useState("Products");
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("All Statuses");
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [openActionMenu, setOpenActionMenu] = useState(null);
-  const statusDropdownRef = useRef(null);
-  const actionMenuRef = useRef(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("All Statuses");
+  const [openStatusDropdown, setOpenStatusDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [listings, setListings] = useState([]);
+  const [teamCards, setTeamCards] = useState([]); // keep separate if you later fetch teams
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    setSidebarOpen(false);
-    setShowSettings(false);
+    localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenDropdown(null);
+      setOpenStatusDropdown(false);
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setIsStatusOpen(false);
-      }
-      const clickedInsideActions =
-        event.target.closest(".my-listings-actionsWrap") ||
-        event.target.closest(".my-listings-actions");
+    const loadListings = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-      if (actionMenuRef.current && !clickedInsideActions) {
-        setOpenActionMenu(null);
+        const res = await getMyListings();
+
+        const rawListings =
+          res?.listings ||
+          res?.data?.listings ||
+          [];
+
+        const mapped = Array.isArray(rawListings)
+          ? rawListings.map((item) => ({
+              id: item.id,
+              title: item.title || "Untitled Listing",
+              price: item.price ? `$${item.price}` : item.price_text || "—",
+              updated: formatDate(item.updated_at || item.created_at),
+              status: item.status || "draft",
+              img: getImageUrl(item.cover_media_path || item.cover_media_url || ""),
+              listingType: item.listing_type,
+              raw: item,
+            }))
+          : [];
+
+        setListings(mapped);
+      } catch (e) {
+        setError(e?.message || "Failed to load listings.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    loadListings();
   }, []);
 
+  const toggleDropdown = (id, e) => {
+    e.stopPropagation();
+    setOpenDropdown(openDropdown === id ? null : id);
+  };
+
+  const handleSectionChange = (id) => {
+    setActiveSetting(id);
+  };
+
+  const tabs = [
+    { name: "Products", icon: <PackageIcon /> },
+    { name: "Services", icon: <HeadsetsIcon /> },
+    { name: "Courses", icon: <PlayCircleIcon /> },
+    { name: "Webinar", icon: <VideoIcon /> },
+    { name: "Teams", icon: <UsersIcon /> },
+  ];
+
   const filteredListings = useMemo(() => {
-    return LISTINGS.filter((item) => {
-      const matchesTab = item.category === activeTab;
-      const matchesStatus = status === "All Statuses" || item.status === status;
-      const matchesSearch = item.title.toLowerCase().includes(search.trim().toLowerCase());
-      return matchesTab && matchesStatus && matchesSearch;
+    if (activeTab === "Teams") return teamCards;
+
+    const selectedType = tabToListingType[activeTab];
+
+    return listings.filter((item) => {
+      const typeMatch = item.listingType === selectedType;
+
+      const statusMatch =
+        statusFilter === "All Statuses" ||
+        String(item.status).toLowerCase() === statusFilter.toLowerCase();
+
+      const searchMatch =
+        !searchTerm.trim() ||
+        String(item.title).toLowerCase().includes(searchTerm.trim().toLowerCase());
+
+      return typeMatch && statusMatch && searchMatch;
     });
-  }, [activeTab, search, status]);
+  }, [listings, teamCards, activeTab, statusFilter, searchTerm]);
+
+  const getRoute = (item) => {
+    if (activeTab === "Teams") {
+      return "/team-profile";
+    }
+
+    switch (item.listingType) {
+      case "digital_product":
+        return `/edit-digital-product/${item.id}`;
+      case "service":
+        return `/edit-service/${item.id}`;
+      case "course":
+        return `/edit-course/${item.id}`;
+      case "webinar":
+        return `/edit-webinar/${item.id}`;
+      default:
+        return "/marketplace";
+    }
+  };
 
   return (
-    <div className={`my-listings-page user-page ${theme || "light"} min-h-screen relative overflow-hidden`}>
+    <div className={`user-page ${theme} min-h-screen relative overflow-hidden mylis-shell`}>
       <UserNavbar
-        toggleSidebar={() => setSidebarOpen((prev) => !prev)}
+        toggleSidebar={() => setSidebarOpen((p) => !p)}
         theme={theme}
-        onDropdownChange={setIsDropdownOpen}
       />
 
-      <div className="pt-[85px] flex relative z-10 w-full">
+      <div className="pt-[85px] flex relative z-10 w-full h-full">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
           showSettings={showSettings}
           setShowSettings={setShowSettings}
           activeSetting={activeSetting}
-          onSectionChange={setActiveSetting}
+          onSectionChange={handleSectionChange}
           theme={theme}
           setTheme={setTheme}
         />
 
-        <div className="relative flex-1 min-w-0 overflow-hidden w-full">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] w-full">
-            <main className={`my-listings-main ${isDropdownOpen ? "blurred" : ""}`}>
-              <section className="my-listings-shell">
-                <div className="my-listings-head">
-                  <h1 className="my-listings-title">My Listings</h1>
-                  <p className="my-listings-subtitle">
-                    One place to manage products, services, courses, webinars, and teams.
-                  </p>
+        <div className="relative flex-1 min-w-5 overflow-hidden">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+            <main className="mylis-main w-full">
+              <div className="mylis-header-row">
+                <h1 className="mylis-title">My Listings</h1>
+                <button
+                  className="mylis-add-btn"
+                  onClick={() => navigate("/add-listing")}
+                >
+                  + Add New Listing
+                </button>
+              </div>
+
+              <p className="mylis-subtitle">
+                One place to manage products, services, courses, webinars, and teams.
+              </p>
+
+              <div className="mylis-toolbar">
+                <div className="mylis-search-wrap">
+                  <span className="mylis-search-icon">
+                    <SearchIcon />
+                  </span>
+                  <input
+                    type="text"
+                    className="mylis-search-input"
+                    placeholder="Search listing"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
 
-                <div className="my-listings-toolbar">
-                  <label className="my-listings-search" aria-label="Search product">
-                    <Search size={16} />
-                    <input
-                      type="text"
-                      placeholder="Search product"
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value)}
-                    />
-                  </label>
-
+                <div className="mylis-status-wrap">
                   <div
-                    className={`my-listings-selectWrap ${isStatusOpen ? "open" : ""}`}
-                    aria-label="Filter by status"
-                    ref={statusDropdownRef}
+                    className={`mylis-status-btn ${openStatusDropdown ? "open" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenStatusDropdown(!openStatusDropdown);
+                      setOpenDropdown(null);
+                    }}
+                    role="button"
+                    tabIndex={0}
                   >
-                    <button
-                      type="button"
-                      className="my-listings-selectButton"
-                      aria-haspopup="listbox"
-                      aria-expanded={isStatusOpen}
-                      onClick={() => setIsStatusOpen((prev) => !prev)}
-                    >
-                      <span>{status}</span>
-                      <ChevronDown size={16} />
-                    </button>
-
-                    {isStatusOpen && (
-                      <div className="my-listings-selectMenu" role="listbox" aria-label="Status options">
-                        {STATUS_OPTIONS.map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            role="option"
-                            aria-selected={status === option}
-                            className={`my-listings-selectOption ${status === option ? "active" : ""}`}
-                            onClick={() => {
-                              setStatus(option);
-                              setIsStatusOpen(false); 
-                            }}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    {statusFilter}
+                    <span className="arrow">▼</span>
                   </div>
-                </div>
 
-                <div className="my-listings-tabs" role="tablist" aria-label="Listing categories">
-                  {CATEGORY_TABS.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={activeTab === tab.id}
-                        className={`my-listings-tab ${activeTab === tab.id ? "active" : ""}`}
-                        onClick={() => setActiveTab(tab.id)}
-                      >
-                        <Icon size={14} />
-                        <span>{tab.label}</span>
-                      </button>
-                    );
-                  })}
+                  {openStatusDropdown && (
+                    <ul className="status-menu" onClick={(e) => e.stopPropagation()}>
+                      {["All Statuses", "published", "draft", "paused", "active"].map((status) => (
+                        <li
+                          key={status}
+                          className={statusFilter === status ? "active" : ""}
+                          onClick={() => {
+                            setStatusFilter(status);
+                            setOpenStatusDropdown(false);
+                          }}
+                        >
+                          {status === "published"
+                            ? "Published"
+                            : status === "draft"
+                              ? "Draft"
+                              : status === "paused"
+                                ? "Paused"
+                                : status === "active"
+                                  ? "Active"
+                                  : "All Statuses"}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
+              </div>
 
-                <div className="my-listings-grid">
-                  {filteredListings.map((listing) => (
-                    <article key={listing.id} className="my-listings-card">
-                      <div className="my-listings-cardImage">
-                        <img src={listing.image} alt={listing.title} />
+              <div className="mylis-tabs-wrap">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.name}
+                    className={`mylis-tab ${activeTab === tab.name ? "active" : ""}`}
+                    onClick={() => setActiveTab(tab.name)}
+                  >
+                    {tab.icon}
+                    {tab.name}
+                  </button>
+                ))}
+              </div>
+
+              {loading ? (
+                <div className="p-6 text-sm text-gray-600">Loading listings...</div>
+              ) : error ? (
+                <div className="p-6 text-sm text-red-600">{error}</div>
+              ) : filteredListings.length === 0 ? (
+                <div className="p-6 text-sm text-gray-600">
+                  No {activeTab.toLowerCase()} found.
+                </div>
+              ) : (
+                <div className="mylis-grid">
+                  {filteredListings.map((item) => (
+                    <div
+                      className={`mylis-card ${openDropdown === item.id ? "active-dropdown" : ""}`}
+                      key={item.id}
+                      onClick={() => navigate(getRoute(item))}
+                    >
+                      <div className="mylis-card-img-wrap">
+                        <img src={item.img} alt={item.title} className="mylis-card-img" />
                       </div>
 
-                      <div className="my-listings-cardBody">
-                        <div className="my-listings-cardTop">
-                          <div className="my-listings-cardMeta">
-                            <span className="my-listings-cardIcon">
-                              <PackageMark width={14} height={14} />
-                            </span>
-                            <div>
-                              <h2>{listing.title}</h2>
-                              <p>$29 | {listing.updatedAt}</p>
+                      <div className="mylis-card-body">
+                        <div className="mylis-card-top">
+                          <div className="mylis-card-icon-title">
+                            <div className="mylis-card-type-icon">
+                              {item.listingType === "digital_product" ? (
+                                <PackageIcon />
+                              ) : item.listingType === "service" ? (
+                                <HeadsetsIcon />
+                              ) : item.listingType === "course" ? (
+                                <PlayCircleIcon />
+                              ) : item.listingType === "webinar" ? (
+                                <VideoIcon />
+                              ) : (
+                                <PackageIcon />
+                              )}
+                            </div>
+
+                            <div className="mylis-card-info">
+                              <h3>{item.title}</h3>
+                              <p>
+                                {item.price} • Updated {item.updated || "—"}
+                              </p>
                             </div>
                           </div>
 
-                          <div
-                            className="my-listings-actionsWrap"
-                            ref={openActionMenu === listing.id ? actionMenuRef : null}
-                          >
+                          <div className="mylis-dropdown-wrap">
                             <button
-                              type="button"
-                              className={`my-listings-menu ${openActionMenu === listing.id ? "active" : ""}`}
-                              aria-label="More options"
-                              onClick={() =>
-                                setOpenActionMenu((prev) => (prev === listing.id ? null : listing.id))
-                              }
+                              className="mylis-card-dots"
+                              aria-label="Menu"
+                              onClick={(e) => toggleDropdown(item.id, e)}
                             >
-                              <MoreHorizontal size={16} />
+                              <DotsIcon />
                             </button>
+
+                            {openDropdown === item.id && (
+                              <div className="mylis-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                                <div className="mylis-dropdown-header">Actions</div>
+
+                                <button
+                                  className="mylis-dropdown-item"
+                                  onClick={() => navigate(getRoute(item))}
+                                >
+                                  <EditIcon /> Edit
+                                </button>
+
+                                <button className="mylis-dropdown-item">
+                                  <PauseIcon /> Pause
+                                </button>
+
+                                <button className="mylis-dropdown-item">
+                                  <DuplicateIcon /> Duplicate
+                                </button>
+
+                                <div className="mylis-dropdown-divider"></div>
+
+                                <button className="mylis-dropdown-item danger">
+                                  <TrashIcon /> Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {openActionMenu === listing.id && (
-                          <div className="my-listings-actions">
-                            <div className="my-listings-actionsHeader">Actions</div>
-
-                            <button type="button" className="my-listings-actionItem">
-                              <Pencil size={18} />
-                              <span>Edit</span>
-                            </button>
-
-                            <button type="button" className="my-listings-actionItem">
-                              <PauseCircle size={18} />
-                              <span>Pause</span>
-                            </button>
-
-                            <button type="button" className="my-listings-actionItem">
-                              <Copy size={18} />
-                              <span>Duplicate</span>
-                            </button>
-
-                            <div className="my-listings-actionsDivider" />
-
-                            <button type="button" className="my-listings-actionItem delete">
-                              <Trash2 size={18} />
-                              <span>Delete</span>
-                            </button>
-                          </div>
-                        )}
-
-                        <span className={`my-listings-status my-listings-status-${listing.status.toLowerCase()}`}>
-                          {listing.status}
-                        </span>
+                        <div className={`mylis-badge ${String(item.status).toLowerCase()}`}>
+                          {String(item.status).charAt(0).toUpperCase() + String(item.status).slice(1)}
+                        </div>
                       </div>
-                    </article>
+                    </div>
                   ))}
                 </div>
-
-                {filteredListings.length === 0 && (
-                  <div className="my-listings-empty">
-                    No listings match your current search and filter.
-                  </div>
-                )}
-              </section>
+              )}
             </main>
           </div>
         </div>

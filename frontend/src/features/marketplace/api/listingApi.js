@@ -82,17 +82,37 @@ export const createListing = async (payload) => {
 
     const details = payload.details || {};
 
-    Object.keys(details).forEach((key) => {
-      if (key === "packages") return;
+    if (details.product_type) {
+      formData.append("details[product_type]", details.product_type);
+    }
 
-      const value = details[key];
+    if (details.course_level) {
+      formData.append("details[course_level]", details.course_level);
+    }
 
-      if (Array.isArray(value)) {
-        value.forEach((item, index) => {
-          formData.append(`details[${key}][${index}]`, item);
-        });
-      } else if (value !== undefined && value !== null) {
-        formData.append(`details[${key}]`, value);
+    (details.tools || []).forEach((tool, index) => {
+      formData.append(`details[tools][${index}]`, tool);
+    });
+
+    (details.learning_points || []).forEach((point, index) => {
+      formData.append(`details[learning_points][${index}]`, point);
+    });
+
+    (details.languages || []).forEach((language, index) => {
+      formData.append(`details[languages][${index}]`, language);
+    });
+
+    if (details.preview_video_file) {
+      formData.append("details[preview_video_file]", details.preview_video_file);
+    }
+
+    (details.lessons || []).forEach((lesson, index) => {
+      formData.append(`details[lessons][${index}][title]`, lesson.title || "");
+      formData.append(`details[lessons][${index}][description]`, lesson.description || "");
+      formData.append(`details[lessons][${index}][media_type]`, lesson.media_type || "");
+
+      if (lesson.media_file) {
+        formData.append(`details[lessons][${index}][media_file]`, lesson.media_file);
       }
     });
 
@@ -102,10 +122,6 @@ export const createListing = async (payload) => {
 
       (pkg.included || []).forEach((item, itemIndex) => {
         formData.append(`details[packages][${index}][included][${itemIndex}]`, item);
-      });
-
-      (pkg.toolsUsed || []).forEach((item, itemIndex) => {
-        formData.append(`details[packages][${index}][toolsUsed][${itemIndex}]`, item);
       });
 
       (pkg.deliveryFormats || []).forEach((item, itemIndex) => {
@@ -119,6 +135,16 @@ export const createListing = async (payload) => {
       },
     });
 
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+//my listings
+export const getMyListings = async () => {
+  try {
+    const res = await api.get("/api/v1/my-listings");
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));

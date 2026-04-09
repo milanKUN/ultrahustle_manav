@@ -57,6 +57,21 @@ class ListingController extends Controller
             'details.packages.*.included.*' => 'nullable|string|max:255',
             'details.packages.*.deliveryFormats' => 'nullable|array',
             'details.packages.*.deliveryFormats.*' => 'nullable|string|max:255',
+            'details.course_level' => 'nullable|string|max:100',
+
+            'details.learning_points' => 'nullable|array',
+            'details.learning_points.*' => 'nullable|string|max:255',
+
+            'details.languages' => 'nullable|array',
+            'details.languages.*' => 'nullable|string|max:100',
+
+            'details.preview_video_file' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm|max:51200',
+
+            'details.lessons' => 'nullable|array',
+            'details.lessons.*.title' => 'nullable|string|max:255',
+            'details.lessons.*.description' => 'nullable|string',
+            'details.lessons.*.media_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,mkv,webm|max:20480',
+            'details.lessons.*.media_type' => 'nullable|in:image,video',
         ]);
 
         $listing = DB::transaction(function () use ($request, $user, $validated) {
@@ -228,6 +243,87 @@ class ListingController extends Controller
                     }
                 }
             }
+            //course specific data
+            if (($validated['listing_type'] ?? '') === 'course') {
+                $learningPoints = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.learning_points', [])
+                )));
+
+                $languages = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.languages', [])
+                )));
+
+                $previewVideo = $request->file('details.preview_video_file');
+
+                $previewVideoPath = null;
+                $previewVideoName = null;
+                $previewVideoMime = null;
+                $previewVideoSize = null;
+
+                if ($previewVideo) {
+                    $previewVideoPath = $previewVideo->store('listings/course/preview-videos', 'public');
+                    $previewVideoName = $previewVideo->getClientOriginalName();
+                    $previewVideoMime = $previewVideo->getMimeType();
+                    $previewVideoSize = $previewVideo->getSize();
+                }
+
+                DB::table('course_listing_details')->insert([
+                    'listing_id' => $listingId,
+                    'course_level' => data_get($validated, 'details.course_level'),
+                    'learning_points_json' => !empty($learningPoints) ? json_encode($learningPoints) : null,
+                    'languages_json' => !empty($languages) ? json_encode($languages) : null,
+                    'preview_video_path' => $previewVideoPath,
+                    'preview_video_name' => $previewVideoName,
+                    'preview_video_mime' => $previewVideoMime,
+                    'preview_video_size' => $previewVideoSize,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                foreach ((data_get($validated, 'details.lessons') ?? []) as $index => $lesson) {
+                    $title = trim((string) ($lesson['title'] ?? ''));
+                    $description = trim((string) ($lesson['description'] ?? ''));
+                    $mediaType = $lesson['media_type'] ?? null;
+
+                    $mediaFile = $request->file("details.lessons.$index.media_file");
+
+                    if ($title === '' && $description === '' && !$mediaFile) {
+                        continue;
+                    }
+
+                    $mediaPath = null;
+                    $mediaName = null;
+                    $mediaMime = null;
+                    $mediaSize = null;
+
+                    if ($mediaFile) {
+                        $mediaPath = $mediaFile->store('listings/course/lessons', 'public');
+                        $mediaName = $mediaFile->getClientOriginalName();
+                        $mediaMime = $mediaFile->getMimeType();
+                        $mediaSize = $mediaFile->getSize();
+
+                        if (!$mediaType) {
+                            $mediaType = str_starts_with((string) $mediaMime, 'video/') ? 'video' : 'image';
+                        }
+                    }
+
+                    DB::table('course_listing_lessons')->insert([
+                        'listing_id' => $listingId,
+                        'title' => $title ?: null,
+                        'description' => $description ?: null,
+                        'media_type' => $mediaType,
+                        'media_path' => $mediaPath,
+                        'media_name' => $mediaName,
+                        'media_mime' => $mediaMime,
+                        'media_size' => $mediaSize,
+                        'sort_order' => $index,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
 
             return DB::table('listings')->where('id', $listingId)->first();
         });
@@ -239,4 +335,28 @@ class ListingController extends Controller
             'listing' => $listing,
         ]);
     }
+
+    //my listings
+    public function myListings(Request $request): JsonResponse
+{
+    $user = $request->user();
+
+    $listings = DB::table('listings')
+        ->where('user_id', $user->id)
+        ->orderByDesc('id')
+        ->get([
+            'id',
+            'title',
+            'listing_type',
+            'status',
+            'cover_media_path',
+            'created_at',
+            'updated_at',
+        ]);
+
+    return response()->json([
+        'success' => true,
+        'listings' => $listings,
+    ]);
+}
 }

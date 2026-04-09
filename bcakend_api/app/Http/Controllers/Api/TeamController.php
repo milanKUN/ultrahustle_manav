@@ -577,11 +577,21 @@ class TeamController extends Controller
         $user = $request->user();
 
         $teams = Team::query()
-            ->where('owner_user_id', $user->id)
-            ->withCount('memberships as members_count')
+            ->where(function ($query) use ($user) {
+                $query->where('owner_user_id', $user->id)
+                    ->orWhereHas('memberships', function ($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                        ->whereNull('left_at'); // only active joined teams
+                    });
+            })
+            ->withCount([
+                'memberships as members_count' => function ($q) {
+                    $q->whereNull('left_at'); // count only active members
+                }
+            ])
             ->orderByDesc('id')
             ->get()
-            ->map(function ($team) {
+            ->map(function ($team) use ($user) {
                 // Team portfolio
                 $portfolio = Portfolio::where('owner_type', 'team')
                     ->where('owner_id', $team->id)
@@ -596,6 +606,15 @@ class TeamController extends Controller
                 // If you have listings/services/gigs table later, replace this
                 $listingsCount = 0;
 
+                // Check if current user is owner
+                $isOwner = (int) $team->owner_user_id === (int) $user->id;
+
+                // Current user's membership row (if joined)
+                $membership = $team->memberships()
+                    ->where('user_id', $user->id)
+                    ->whereNull('left_at')
+                    ->first();
+
                 return [
                     'id' => $team->id,
                     'name' => $team->name,
@@ -609,6 +628,11 @@ class TeamController extends Controller
                     'listings' => (int) $listingsCount,
                     'projects' => (int) $projectsCount,
                     'isActive' => (bool) $team->is_active,
+
+                    // extra useful fields
+                    'is_owner' => $isOwner,
+                    'joined_as' => $membership?->role,
+                    'member_title' => $membership?->member_title,
                 ];
             });
 
@@ -618,25 +642,25 @@ class TeamController extends Controller
     }
 
     public function showByUsername(string $username): JsonResponse
-{
-    $team = Team::query()
-        ->whereRaw('LOWER(username) = ?', [strtolower($username)])
-        ->first();
+    {
+        $team = Team::query()
+            ->whereRaw('LOWER(username) = ?', [strtolower($username)])
+            ->first();
 
-    if (! $team) {
-        return $this->errorResponse('Team not found.', [], 404);
+        if (! $team) {
+            return $this->errorResponse('Team not found.', [], 404);
+        }
+
+        $memberships = $team
+            ->memberships()
+            ->with('user:id,full_name,email')
+            ->whereNull('left_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return $this->successResponse('Team fetched.', [
+            'team' => $this->teamPayload($team->fresh()),
+            'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
+        ]);
     }
-
-    $memberships = $team
-        ->memberships()
-        ->with('user:id,full_name,email')
-        ->whereNull('left_at')
-        ->orderByDesc('id')
-        ->get();
-
-    return $this->successResponse('Team fetched.', [
-        'team' => $this->teamPayload($team->fresh()),
-        'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
-    ]);
-}
 }
