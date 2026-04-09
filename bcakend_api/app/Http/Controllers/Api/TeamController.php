@@ -6,19 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Teams\PatchTeamMemberRequest;
 use App\Http\Requests\Teams\PatchTeamRequest;
 use App\Http\Requests\Teams\StoreTeamRequest;
+use App\Models\Portfolio;
+use App\Models\PortfolioProject;
 use App\Models\Team;
 use App\Models\TeamMembership;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
-use App\Models\Portfolio;
-use App\Models\PortfolioProject;
+
 class TeamController extends Controller
 {
     public function store(StoreTeamRequest $request): JsonResponse
@@ -80,7 +81,11 @@ class TeamController extends Controller
 
             report($e);
 
-            return $this->errorResponse('Failed to create team.', $this->exceptionPayload($e, $this->queryHint($e)), 500);
+            return $this->errorResponse(
+                'Failed to create team.',
+                $this->exceptionPayload($e, $this->queryHint($e)),
+                500
+            );
         }
     }
 
@@ -158,7 +163,11 @@ class TeamController extends Controller
 
             report($e);
 
-            return $this->errorResponse('Failed to update team.', $this->exceptionPayload($e, $this->queryHint($e)), 500);
+            return $this->errorResponse(
+                'Failed to update team.',
+                $this->exceptionPayload($e, $this->queryHint($e)),
+                500
+            );
         }
     }
 
@@ -336,6 +345,102 @@ class TeamController extends Controller
         ]);
     }
 
+    public function manageTeams(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $teams = Team::query()
+            ->where(function ($query) use ($user) {
+                $query->where('owner_user_id', $user->id)
+                    ->orWhereHas('memberships', function ($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                            ->whereNull('left_at');
+                    });
+            })
+            ->withCount([
+                'memberships as members_count' => function ($q) {
+                    $q->whereNull('left_at');
+                },
+            ])
+            ->orderByDesc('id')
+            ->get()
+            ->map(function (Team $team) use ($user) {
+                $portfolio = Portfolio::where('owner_type', 'team')
+                    ->where('owner_id', $team->id)
+                    ->first();
+
+                $projectsCount = 0;
+                if ($portfolio) {
+                    $projectsCount = PortfolioProject::where('portfolio_id', $portfolio->id)->count();
+                }
+
+                $listingsCount = 0;
+
+                $isOwner = (int) $team->owner_user_id === (int) $user->id;
+
+                return [
+                    'id' => $team->id,
+                    'name' => $team->name,
+                    'username' => $team->username,
+                    'title' => $team->title,
+                    'bio' => $team->bio,
+                    'avatar' => $team->avatar_path
+                        ? asset('storage/' . ltrim($team->avatar_path, '/'))
+                        : null,
+                    'members' => (int) $team->members_count,
+                    'listings' => (int) $listingsCount,
+                    'projects' => (int) $projectsCount,
+                    'isActive' => (bool) $team->is_active,
+                    'isOwner' => $isOwner,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'teams' => $teams,
+        ]);
+    }
+
+    public function toggleStatus(Request $request, Team $team): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (! $this->isOwner($user, $team)) {
+            return $this->errorResponse('Forbidden.', [], 403);
+        }
+
+        $team->is_active = ! (bool) $team->is_active;
+        $team->save();
+
+        return $this->successResponse('Team status updated.', [
+            'team' => [
+                'id' => $team->id,
+                'isActive' => (bool) $team->is_active,
+            ],
+        ]);
+    }
+
+    public function showByUsername(string $username): JsonResponse
+    {
+        $team = Team::query()
+            ->whereRaw('LOWER(username) = ?', [strtolower($username)])
+            ->first();
+
+        if (! $team) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Team not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'team' => $this->teamPayload($team),
+        ]);
+    }
+
     private function canViewTeam(User $user, Team $team): bool
     {
         if ($this->isOwner($user, $team)) {
@@ -372,17 +477,16 @@ class TeamController extends Controller
             'tools' => [],
             'languages' => [],
             'rules' => [],
-
             'avatar_url' => null,
             'avatar_filename' => null,
             'avatar_path' => null,
             'avatar_mime' => null,
             'avatar_size' => null,
             'avatar_updated_at' => null,
-
             'created_at' => null,
             'updated_at' => null,
             'deleted_at' => null,
+            'is_active' => null,
         ];
 
         $data = array_merge($defaults, $team->only(array_keys($defaults)));
@@ -469,7 +573,7 @@ class TeamController extends Controller
             return null;
         }
 
-        return url('/storage/'.ltrim($path, '/'));
+        return url('/storage/' . ltrim($path, '/'));
     }
 
     private function avatarExtensionFromMime(string $mime): ?string
@@ -569,98 +673,5 @@ class TeamController extends Controller
             'message' => $message,
             'errors' => $errors,
         ], $statusCode);
-    }
-
-    //manage teams
-    public function manageTeams(Request $request)
-    {
-        $user = $request->user();
-
-        $teams = Team::query()
-            ->where(function ($query) use ($user) {
-                $query->where('owner_user_id', $user->id)
-                    ->orWhereHas('memberships', function ($q) use ($user) {
-                        $q->where('user_id', $user->id)
-                        ->whereNull('left_at'); // only active joined teams
-                    });
-            })
-            ->withCount([
-                'memberships as members_count' => function ($q) {
-                    $q->whereNull('left_at'); // count only active members
-                }
-            ])
-            ->orderByDesc('id')
-            ->get()
-            ->map(function ($team) use ($user) {
-                // Team portfolio
-                $portfolio = Portfolio::where('owner_type', 'team')
-                    ->where('owner_id', $team->id)
-                    ->first();
-
-                $projectsCount = 0;
-
-                if ($portfolio) {
-                    $projectsCount = PortfolioProject::where('portfolio_id', $portfolio->id)->count();
-                }
-
-                // If you have listings/services/gigs table later, replace this
-                $listingsCount = 0;
-
-                // Check if current user is owner
-                $isOwner = (int) $team->owner_user_id === (int) $user->id;
-
-                // Current user's membership row (if joined)
-                $membership = $team->memberships()
-                    ->where('user_id', $user->id)
-                    ->whereNull('left_at')
-                    ->first();
-
-                return [
-                    'id' => $team->id,
-                    'name' => $team->name,
-                    'username' => $team->username,
-                    'title' => $team->title,
-                    'bio' => $team->bio,
-                    'avatar' => $team->avatar_path
-                        ? asset('storage/' . ltrim($team->avatar_path, '/'))
-                        : null,
-                    'members' => (int) $team->members_count,
-                    'listings' => (int) $listingsCount,
-                    'projects' => (int) $projectsCount,
-                    'isActive' => (bool) $team->is_active,
-
-                    // extra useful fields
-                    'is_owner' => $isOwner,
-                    'joined_as' => $membership?->role,
-                    'member_title' => $membership?->member_title,
-                ];
-            });
-
-        return response()->json([
-            'teams' => $teams,
-        ]);
-    }
-
-    public function showByUsername(string $username): JsonResponse
-    {
-        $team = Team::query()
-            ->whereRaw('LOWER(username) = ?', [strtolower($username)])
-            ->first();
-
-        if (! $team) {
-            return $this->errorResponse('Team not found.', [], 404);
-        }
-
-        $memberships = $team
-            ->memberships()
-            ->with('user:id,full_name,email')
-            ->whereNull('left_at')
-            ->orderByDesc('id')
-            ->get();
-
-        return $this->successResponse('Team fetched.', [
-            'team' => $this->teamPayload($team->fresh()),
-            'memberships' => $memberships->map(fn ($m) => $this->membershipPayload($m))->values()->all(),
-        ]);
     }
 }

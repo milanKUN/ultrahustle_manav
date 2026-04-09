@@ -120,7 +120,7 @@ class TeamInviteController extends Controller
         });
 
         $frontendUrl = rtrim((string) (config('app.frontend_url') ?: config('app.url')), '/');
-        $inviteLink = $frontendUrl.'/team-invite?token='.$plainToken;
+        $inviteLink = $frontendUrl . '/team-invite?token=' . $plainToken;
 
         Mail::to($email)->send(new TeamInvitationMail(
             teamName: (string) $team->name,
@@ -184,25 +184,33 @@ class TeamInviteController extends Controller
         }
 
         $emailMatches = strtolower((string) $user->email) === strtolower((string) $invite->email);
-        $idMatches = $invite->invited_user_id ? ((int) $invite->invited_user_id === (int) $user->id) : false;
+        $idMatches = $invite->invited_user_id
+            ? ((int) $invite->invited_user_id === (int) $user->id)
+            : false;
 
         if (! $emailMatches && ! $idMatches) {
             return $this->errorResponse('This invite is not for your account.', [], 403);
         }
 
         DB::transaction(function () use ($invite, $user): void {
-            TeamMembership::updateOrCreate([
-                'team_id' => $invite->team_id,
-                'user_id' => $user->id,
-            ], [
-                'role' => $invite->role,
-                'member_title' => $invite->member_title,
-                'joined_at' => now(),
-                'left_at' => null,
-            ]);
+            TeamMembership::updateOrCreate(
+                [
+                    'team_id' => $invite->team_id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'role' => $invite->role,
+                    'member_title' => $invite->member_title,
+                    'joined_at' => now(),
+                    'left_at' => null,
+                ]
+            );
 
             $invite->forceFill([
+                'invited_user_id' => $user->id,
                 'accepted_at' => now(),
+                'declined_at' => null,
+                'revoked_at' => null,
             ])->save();
         });
 
@@ -267,6 +275,16 @@ class TeamInviteController extends Controller
             'revoked_at' => $invitation->revoked_at,
             'last_sent_at' => $invitation->last_sent_at,
             'send_count' => $invitation->send_count,
+            'invited_user' => $invitation->relationLoaded('invitedUser') && $invitation->invitedUser ? [
+                'id' => $invitation->invitedUser->id,
+                'full_name' => $invitation->invitedUser->full_name,
+                'email' => $invitation->invitedUser->email,
+            ] : null,
+            'invited_by' => $invitation->relationLoaded('invitedBy') && $invitation->invitedBy ? [
+                'id' => $invitation->invitedBy->id,
+                'full_name' => $invitation->invitedBy->full_name,
+                'email' => $invitation->invitedBy->email,
+            ] : null,
             'created_at' => $invitation->created_at,
             'updated_at' => $invitation->updated_at,
         ];
