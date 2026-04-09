@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /* Schema::table('listings', function (Blueprint $table) {
+        Schema::table('listings', function (Blueprint $table) {
             $table->json('tags_json')->nullable()->after('team_name');
             $table->json('tools_json')->nullable()->after('tags_json');
-        }); */
+        });
 
-        Schema::table('digital_product_package_items', function (Blueprint $table) {
+        /* Schema::table('digital_product_package_items', function (Blueprint $table) {
             
             $table->enum('item_type', ['included','delivery_format'])->change();
 
-        });
+        }); */
     }
 
     /**
