@@ -25,7 +25,7 @@
 /bcakend_api/node_modules
 /bcakend_api/public/build
 /bcakend_api/public/hot
-/bcakend_api/public/storage
+!/bcakend_api/public/storage
 /bcakend_api/storage/*.key
 /bcakend_api/storage/pail
 /bcakend_api/vendor
