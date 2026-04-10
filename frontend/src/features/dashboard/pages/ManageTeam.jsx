@@ -291,16 +291,16 @@ const ManageTeam = (props) => {
                           }`}
                         >
                           <div className="flex items-center gap-2 md:gap-2.5">
-                            <button
-                              onClick={() =>
-                                navigate(`/edit-team/${team.id}`)
-                              }
-                              disabled={!team.isActive}
-                              className="manage-team-action-btn flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] transition-colors border"
-                              title={!team.isActive ? "Activate team to edit" : ""}
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" /> Edit Team
-                            </button>
+                            {team.isOwner && (
+                              <button
+                                onClick={() => navigate(`/edit-team/${team.id}`)}
+                                disabled={!team.isActive}
+                                className="manage-team-action-btn flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] transition-colors border"
+                                title={!team.isActive ? "Activate team to edit" : ""}
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" /> Edit Team
+                              </button>
+                            )}
 
                             <button
                               onClick={() => openDeactivateModal(team)}
@@ -315,7 +315,11 @@ const ManageTeam = (props) => {
 
                           <button
                             onClick={() =>
-                              navigate(`/team-profile/${team.username}`)
+                              navigate(
+                                team.isOwner
+                                  ? `/team-profile/${team.username}`
+                                  : `/public-team-profile/${team.username}`
+                              )
                             }
                             disabled={!team.isActive}
                             className="manage-team-view-btn w-full flex items-center justify-center border-1 border-black gap-2 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] font-medium transition-colors"

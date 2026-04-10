@@ -172,14 +172,9 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/public-team-profile"
-                        element={
-                            <PublicTeamProfile
-                                theme={theme}
-                                setTheme={setTheme}
-                            />
-                        }
-                    />
+                        path="/public-team-profile/:username"
+                        element={<PublicTeamProfile theme={theme} setTheme={setTheme} />}
+                        />
                     <Route
                         path="/user-profile"
                         element={
@@ -192,7 +187,7 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/public-user-profile"
+                        path="/public-user-profile/:username"
                         element={
                             <PublicUserProfile
                                 theme={theme}
