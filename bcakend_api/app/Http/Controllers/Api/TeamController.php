@@ -136,8 +136,9 @@ class TeamController extends Controller
         }
 
         $validated = $request->validated();
+        unset($validated['username']);
 
-        if (array_key_exists('username', $validated)) {
+        /* if (array_key_exists('username', $validated)) {
             $username = $validated['username'];
             if (! is_null($username) && $this->usernameTakenByAnotherTeam($team->id, (string) $username)) {
                 return $this->errorResponse('Username already taken.', [
@@ -148,7 +149,7 @@ class TeamController extends Controller
             if (! is_null($username)) {
                 $validated['username'] = strtolower((string) $username);
             }
-        }
+        } */
 
         try {
             $team->fill($validated);
@@ -677,4 +678,39 @@ class TeamController extends Controller
             'errors' => $errors,
         ], $statusCode);
     }
+
+    public function checkUsername(Request $request): JsonResponse
+    {
+        $username = strtolower(trim((string) $request->query('username', '')));
+        $teamId = $request->query('team_id');
+
+        if ($username === '') {
+            return response()->json([
+                'available' => false,
+                'message' => 'Username is required.',
+            ], 422);
+        }
+
+        if (! preg_match('/^[a-z0-9_-]+$/', $username)) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Use only lowercase letters, numbers, underscore, or hyphen.',
+            ], 422);
+        }
+
+        $query = Team::query()
+            ->whereRaw('LOWER(username) = ?', [$username]);
+
+        if ($teamId) {
+            $query->where('id', '!=', (int) $teamId);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists ? 'Username already taken.' : 'Username is available.',
+        ]);
+    }
+    
 }

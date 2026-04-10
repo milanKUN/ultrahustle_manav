@@ -119,6 +119,7 @@ Route::post('/v1/team-invites/{token}/decline', [\App\Http\Controllers\Api\TeamI
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/teams', [TeamController::class, 'store']);
+	Route::get('/teams/check-username', [TeamController::class, 'checkUsername']);
 
 
     Route::get('/teams/{team}', [TeamController::class, 'show']);
@@ -139,7 +140,6 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 	Route::post('/team-invites/{token}/accept', [\App\Http\Controllers\Api\TeamInviteController::class, 'accept']);
 
 	Route::get('/creators/search', [\App\Http\Controllers\Api\CreatorSearchController::class, 'search'])->middleware('throttle:30,1');
-
 });
 Route::get('/v1/teams/username/{username}/portfolio', [PortfolioController::class, 'showTeamPublic']);
 Route::get('/v1/users/username/{username}', [PublicUserController::class, 'profile']);

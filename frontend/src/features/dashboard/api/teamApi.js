@@ -210,3 +210,18 @@ export const toggleTeamStatus = async (teamId) => {
     throw new Error(extractErrorMessage(err));
   }
 };
+
+//check team username availability
+export const checkTeamUsernameAvailability = async (username, teamId = null) => {
+  try {
+    const res = await api.get(`${V1}/teams/check-username`, {
+      params: {
+        username,
+        team_id: teamId || undefined,
+      },
+    });
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};

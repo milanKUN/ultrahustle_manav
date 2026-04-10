@@ -18,6 +18,7 @@ import {
   sendTeamInvite,
   uploadTeamAvatar,
   patchTeamMember,
+  checkTeamUsernameAvailability,
 } from "../api/teamApi";
 
 const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) => {
@@ -76,6 +77,13 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
     });
   };
 
+  //username status
+  const [usernameStatus, setUsernameStatus] = useState({
+    checking: false,
+    available: null,
+    message: "",
+  });
+
   // Inputs state for adding new tags
   const [inputStates, setInputStates] = useState({
     hashtag: '',
@@ -114,6 +122,10 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
 
   const handleInputChange = (e) => {
     let { name, value } = e.target;
+
+    if (name === "teamUsername") {
+      value = value.toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    }
     if (LIMITS[name] && value.length > LIMITS[name]) {
       value = value.slice(0, LIMITS[name]);
     }
@@ -169,6 +181,70 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
 
   const isHydratingRef = useRef(false);
   const hasBootstrappedRef = useRef(false);
+
+
+  //check username status
+  useEffect(() => {
+    if (mode === "edit") {
+      setUsernameStatus({
+        checking: false,
+        available: true,
+        message: "Username cannot be changed after creation.",
+      });
+      return;
+    }
+
+    const username = String(formData.teamUsername || "").trim().toLowerCase();
+
+    if (!username) {
+      setUsernameStatus({
+        checking: false,
+        available: null,
+        message: "",
+      });
+      return;
+    }
+
+    if (!/^[a-z0-9_-]+$/.test(username)) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: "Use only lowercase letters, numbers, underscore, or hyphen.",
+      });
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setUsernameStatus({
+          checking: true,
+          available: null,
+          message: "Checking availability...",
+        });
+
+        const res = await checkTeamUsernameAvailability(username);
+
+        const available =
+          res?.available ??
+          res?.data?.available ??
+          false;
+
+        setUsernameStatus({
+          checking: false,
+          available,
+          message: available ? "Username is available." : "Username is already taken.",
+        });
+      } catch (err) {
+        setUsernameStatus({
+          checking: false,
+          available: false,
+          message: err?.message || "Could not verify username.",
+        });
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [formData.teamUsername, mode]);
 
   // Restore draft + teamId on first mount.
   useEffect(() => {
@@ -506,7 +582,22 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
       window.alert("Please fill all required team fields before inviting or creating.");
       return null;
     }
+    const username = String(formData.teamUsername || "").trim().toLowerCase();
 
+    if (!username) {
+      window.alert("Team username is required.");
+      return null;
+    }
+
+    if (!/^[a-z0-9_-]+$/.test(username)) {
+      window.alert("Username must contain only lowercase letters, numbers, underscore, or hyphen.");
+      return null;
+    }
+
+    if (usernameStatus.available === false) {
+      window.alert("This team username is already taken.");
+      return null;
+    }
     setIsSaving(true);
     try {
       const res = await createTeam(normalizeTeamPayload());
@@ -789,11 +880,29 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
                       <input
                         type="text"
                         name="teamUsername"
-                        className="form-input"
+                        className={`form-input ${mode === "edit" ? "opacity-60 cursor-not-allowed bg-gray-100" : ""}`}
                         placeholder="teamusername"
                         value={formData.teamUsername}
                         onChange={handleInputChange}
+                        readOnly={mode === "edit"}
                       />
+                      {mode === "edit" ? (
+                        <div className="text-xs text-gray-500 mt-2">
+                          Username cannot be changed after creation.
+                        </div>
+                      ) : usernameStatus.message ? (
+                        <div
+                          className={`text-xs mt-2 ${
+                            usernameStatus.checking
+                              ? "text-yellow-600"
+                              : usernameStatus.available
+                                ? "text-green-600"
+                                : "text-red-600"
+                          }`}
+                        >
+                          {usernameStatus.message}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
 
