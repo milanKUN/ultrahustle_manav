@@ -191,7 +191,7 @@
                   <tr>
                     <td class="hero-img">
                       <img
-                        src="{{ asset('images/ultrahustle.png') }}" 
+                        src="{{ url('images/ultrahustle.png') }}" 
                         alt="Ultra Hustle"
                         width="932"
                       />
