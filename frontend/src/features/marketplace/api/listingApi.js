@@ -105,7 +105,12 @@ export const createListing = async (payload) => {
     if (details.preview_video_file) {
       formData.append("details[preview_video_file]", details.preview_video_file);
     }
-        if (details.webinar_level) {
+
+    if (details.ticket_price) {
+      formData.append("details[ticket_price]", details.ticket_price);
+    }
+
+    if (details.webinar_level) {
       formData.append("details[webinar_level]", details.webinar_level);
     }
 
