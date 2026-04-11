@@ -50,6 +50,7 @@ import DigitalProductListing from "./features/marketplace/pages/DigitalProductLi
 import MyListings from "./features/marketplace/pages/MyListings";
 import MyListingPage from "./features/marketplace/pages/MyListingPage";
 import CreateCourse from "./features/marketplace/pages/CreateCourse";
+import EditCourse from "./features/marketplace/pages/EditCourse";
 import CourseListing from "./features/marketplace/pages/CourseListing";
 import ProductDeliverables from "./features/marketplace/pages/ProductDeliverables.jsx";
 import CourseDeliverables from "./features/marketplace/pages/CourseDeliverables";
@@ -377,6 +378,7 @@ export default function App() {
                     />
                     <Route path="/digital-product/:username" element={<ProductDeliverables />} />
                     <Route path="/course/:username" element={<CourseDeliverables />} />
+                    <Route path="/edit-course/:username" element={<EditCourse />} />
                     <Route path="/webinar/:username" element={<WebinarDeliverables />} />
                     <Route path="/edit-webinar/:username" element={<EditWebinar />} />
                     <Route

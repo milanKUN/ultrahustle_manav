@@ -8,21 +8,31 @@ import PreviewVideo from "../components/PreviewVideo";
 import CoverSection from "../components/CoverSection";
 import DeliverablesSection from "../components/DeliverablesSection";
 import LessonSection from "../components/LessonSection";
-import { createListing } from "../api/listingApi";
+import {
+  createListing,
+  getListingByUsername,
+  updateListing,
+} from "../api/listingApi";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const LISTING_TYPE = "course";
 
-export default function CreateCourse({ theme, setTheme }) {
+export default function CreateCourse({
+  theme,
+  setTheme,
+  mode = "create",
+}) {
   const categories = useMemo(
     () => ["Design", "Development", "Marketing", "Writing", "Education", "Business"],
     [],
   );
 
   const navigate = useNavigate();
-  
+  const { username } = useParams();
+  const isEditMode = mode === "edit";
+
   const subCategoriesMap = useMemo(
     () => ({
       Design: ["Logo Design", "UI/UX", "Branding"],
@@ -51,6 +61,8 @@ export default function CreateCourse({ theme, setTheme }) {
 
   const [uploadStep, setUploadStep] = useState(null);
   const isModalOpen = uploadStep === "grid" || uploadStep === "success";
+
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
 
   React.useEffect(() => {
     if (isModalOpen) document.body.style.overflow = "hidden";
@@ -89,7 +101,7 @@ export default function CreateCourse({ theme, setTheme }) {
       open: true,
       title,
       message,
-      shouldRedirect
+      shouldRedirect,
     });
   };
 
@@ -181,7 +193,7 @@ export default function CreateCourse({ theme, setTheme }) {
     }
   };
 
-  const [mode, setMode] = useState("Solo");
+  const [sellerMode, setSellerMode] = useState("Solo");
   const [teamName, setTeamName] = useState("");
 
   const [cover, setCover] = useState(null);
@@ -204,7 +216,10 @@ export default function CreateCourse({ theme, setTheme }) {
     setFaqs(faqs.map((item, i) => (i === idx ? { ...item, [key]: value } : item)));
   };
 
-  const removeFaq = (idx) => setFaqs(faqs.filter((_, i) => i !== idx));
+  const removeFaq = (idx) => {
+    if (faqs.length === 1) return;
+    setFaqs(faqs.filter((_, i) => i !== idx));
+  };
 
   const [deliverables, setDeliverables] = useState([{ file: null, notes: "" }]);
   const [links, setLinks] = useState([""]);
@@ -245,6 +260,110 @@ export default function CreateCourse({ theme, setTheme }) {
     setList(list.filter((_, i) => i !== idx));
   };
 
+  React.useEffect(() => {
+    const loadListing = async () => {
+      if (!isEditMode || !username) {
+        setInitialLoading(false);
+        return;
+      }
+
+      try {
+        setInitialLoading(true);
+        setSaveError("");
+
+        const res = await getListingByUsername(username);
+        const item = res?.listing || null;
+
+        if (!item) {
+          setSaveError("Listing not found.");
+          return;
+        }
+
+        if (item.listing_type !== LISTING_TYPE) {
+          setSaveError("This listing is not a course.");
+          return;
+        }
+
+        setListingId(item.id || null);
+        setAiPowered(Boolean(item.ai_powered));
+
+        setForm({
+          title: item.title || "",
+          category: item.category || "",
+          subCategory: item.sub_category || "",
+          shortDescription: item.short_description || "",
+          prerequisites: item.about || "",
+          level: item?.details?.course_level || "",
+        });
+
+        setSellerMode(item.seller_mode || "Solo");
+        setTeamName(item.team_name || "");
+        setTags(Array.isArray(item.tags) ? item.tags : []);
+        setTools(Array.isArray(item?.details?.tools) ? item.details.tools : []);
+        setLearningPoints(
+          Array.isArray(item?.details?.learning_points) ? item.details.learning_points : [],
+        );
+        setLanguages(
+          Array.isArray(item?.details?.languages) ? item.details.languages : [],
+        );
+
+        setFaqs(
+          Array.isArray(item.faqs) && item.faqs.length
+            ? item.faqs.map((faq) => ({
+                q: faq.q || "",
+                a: faq.a || "",
+              }))
+            : [{ q: "", a: "" }],
+        );
+
+        setLinks(
+          Array.isArray(item.links) && item.links.length ? item.links : [""],
+        );
+
+        setDeliverables(
+          Array.isArray(item.deliverables) && item.deliverables.length
+            ? item.deliverables.map((d) => ({
+                file: null,
+                notes: d.notes || "",
+                existing_file_name: d.file_name || "",
+                existing_file_url: d.file_url || "",
+              }))
+            : [{ file: null, notes: "" }],
+        );
+
+        setLessons(
+          Array.isArray(item?.details?.lessons) && item.details.lessons.length
+            ? item.details.lessons.map((lesson) => ({
+                title: lesson.title || "",
+                description: lesson.description || "",
+                media: lesson.media_url
+                  ? {
+                      preview: lesson.media_url,
+                      file: null,
+                      type: lesson.media_type || null,
+                    }
+                  : null,
+              }))
+            : [{ title: "", description: "", media: null }],
+        );
+
+        if (item.cover_media_url || item.cover_media_path) {
+          setCover(item.cover_media_url || item.cover_media_path);
+        }
+
+        if (item?.details?.preview_video_url) {
+          setPreviewVideo(item.details.preview_video_url);
+        }
+      } catch (e) {
+        setSaveError(e?.message || "Failed to load course.");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    loadListing();
+  }, [isEditMode, username]);
+
   const validateBeforeSave = () => {
     if (!String(form.title || "").trim()) return "Course title is required.";
     if (!String(form.category || "").trim()) return "Category is required.";
@@ -262,13 +381,18 @@ export default function CreateCourse({ theme, setTheme }) {
     short_description: form.shortDescription,
     about: form.prerequisites,
     ai_powered: aiPowered,
-    seller_mode: mode,
-    team_name: mode === "Team" ? teamName : "",
+    seller_mode: sellerMode,
+    team_name: sellerMode === "Team" ? teamName : "",
     cover_file: coverFile,
     tags,
     faqs: faqs.filter((f) => String(f.q || "").trim() || String(f.a || "").trim()),
     links: links.map((l) => String(l || "").trim()).filter(Boolean),
-    deliverables: deliverables.filter((d) => d.file || String(d.notes || "").trim()),
+    deliverables: deliverables.filter(
+      (d) =>
+        d.file ||
+        String(d.notes || "").trim() ||
+        String(d.existing_file_url || "").trim(),
+    ),
     details: {
       course_level: form.level,
       preview_video_file: previewVideoFile,
@@ -280,7 +404,8 @@ export default function CreateCourse({ theme, setTheme }) {
           (lesson) =>
             String(lesson.title || "").trim() ||
             String(lesson.description || "").trim() ||
-            lesson.media?.file,
+            lesson.media?.file ||
+            lesson.media?.preview,
         )
         .map((lesson) => ({
           title: lesson.title,
@@ -304,32 +429,75 @@ export default function CreateCourse({ theme, setTheme }) {
       setSaveError("");
       setSaveSuccess("");
 
-      const res = await createListing(buildPayload(status));
+      const res = isEditMode
+        ? await updateListing(username, buildPayload(status))
+        : await createListing(buildPayload(status));
 
       const newListingId =
         res?.listing_id ||
         res?.data?.listing_id ||
         res?.listing?.id ||
+        listingId ||
         null;
 
       if (newListingId) {
         setListingId(newListingId);
       }
 
-      const message =
-        status === "draft"
+      const message = isEditMode
+        ? status === "draft"
+          ? "Your course draft has been updated successfully."
+          : "Your course has been updated successfully."
+        : status === "draft"
           ? "Your course draft has been saved successfully."
           : "Your course has been created successfully.";
 
       setSaveSuccess(message);
-      showSuccess(status === "draft" ? "Draft Saved!" : "Course Created!", message, status !== "draft");
+      showSuccess(
+        isEditMode
+          ? status === "draft"
+            ? "Draft Updated!"
+            : "Course Updated!"
+          : status === "draft"
+            ? "Draft Saved!"
+            : "Course Created!",
+        message,
+        status !== "draft",
+      );
     } catch (e) {
-      setSaveError(e?.message || "Failed to save course.");
+      setSaveError(e?.message || `Failed to ${isEditMode ? "update" : "save"} course.`);
       setSaveSuccess("");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className={`create-service-page user-page ${theme} min-h-screen relative overflow-hidden`}>
+        <UserNavbar
+          toggleSidebar={() => setSidebarOpen((p) => !p)}
+          isSidebarOpen={sidebarOpen}
+          theme={theme}
+        />
+        <div className="pt-[85px] flex relative z-10">
+          <Sidebar
+            expanded={sidebarOpen}
+            setExpanded={setSidebarOpen}
+            showSettings={showSettings}
+            setShowSettings={setShowSettings}
+            activeSetting={activeSetting}
+            onSectionChange={handleSectionChange}
+            theme={theme}
+            setTheme={setTheme}
+          />
+          <div className="relative flex-1 min-w-5 overflow-hidden p-6">
+            Loading course...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -363,8 +531,12 @@ export default function CreateCourse({ theme, setTheme }) {
                   <div className="csl-card">
                     <div className="csl-header">
                       <div>
-                        <h1 className="csl-title">Create Course Listing</h1>
-                        <p className="csl-subtitle">Fill out each section</p>
+                        <h1 className="csl-title">
+                          {isEditMode ? "Edit Course Listing" : "Create Course Listing"}
+                        </h1>
+                        <p className="csl-subtitle">
+                          {isEditMode ? "Update each section" : "Fill out each section"}
+                        </p>
                       </div>
                     </div>
 
@@ -454,8 +626,8 @@ export default function CreateCourse({ theme, setTheme }) {
                         <div className="csl-field">
                           <label className="csl-label">Seller Type</label>
                           <CustomSelect
-                            value={mode}
-                            onChange={(val) => setMode(val)}
+                            value={sellerMode}
+                            onChange={(val) => setSellerMode(val)}
                             options={["Solo", "Team"]}
                             placeholder="Select mode"
                           />
@@ -465,7 +637,7 @@ export default function CreateCourse({ theme, setTheme }) {
 
                     <div className="csl-group-box">
                       <div className="csl-field">
-                        <label className={`csl-label ${mode !== "Team" ? "opacity-50" : ""}`}>
+                        <label className={`csl-label ${sellerMode !== "Team" ? "opacity-50" : ""}`}>
                           Team Name
                         </label>
                         <CustomSelect
@@ -473,7 +645,7 @@ export default function CreateCourse({ theme, setTheme }) {
                           onChange={(val) => setTeamName(val)}
                           options={teamList}
                           placeholder="Select team name"
-                          disabled={mode !== "Team"}
+                          disabled={sellerMode !== "Team"}
                         />
                       </div>
                     </div>
@@ -769,6 +941,7 @@ export default function CreateCourse({ theme, setTheme }) {
                     onRemoveFaq={removeFaq}
                     showFooter={true}
                     isSaving={isSubmitting}
+                    submitMode={isEditMode ? "edit" : "create"}
                     onSave={() => handleSaveListing("published")}
                     onSaveDraft={() => handleSaveListing("draft")}
                   />
@@ -803,46 +976,8 @@ export default function CreateCourse({ theme, setTheme }) {
             </div>,
             document.body,
           )}
-
-        {/* {successPopup.open &&
-          createPortal(
-            <div className="fixed inset-0 z-[12000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-              <div className="w-full max-w-[420px] rounded-[24px] bg-white border border-[#CEFF1B] shadow-[0_0_30px_rgba(206,255,27,0.35)] p-6 text-center">
-                <div className="w-20 h-20 bg-[#CEFF1B] rounded-full flex items-center justify-center mx-auto mb-5">
-                  <img src="/right.svg" alt="success" />
-                </div>
-
-                <h3 className="text-2xl font-semibold text-black mb-3">
-                  {successPopup.title}
-                </h3>
-
-                <p className="text-sm text-gray-600 mb-6">
-                  {successPopup.message}
-                </p>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSuccessPopup({
-                      open: false,
-                      title: "",
-                      message: "",
-                      shouldRedirect: false,
-                    });
-
-                    if (successPopup.shouldRedirect) {
-                      navigate("/my-listings");
-                    }
-                  }}
-                  className="px-8 py-3 rounded-lg bg-[#CEFF1B] border border-black font-semibold text-black"
-                >
-                  OK
-                </button>
-              </div>
-            </div>,
-            document.body,
-          )} */}
       </div>
+
       <SuccessPopup
         open={successPopup.open}
         title={successPopup.title}

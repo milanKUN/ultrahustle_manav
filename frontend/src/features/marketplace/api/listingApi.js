@@ -248,6 +248,36 @@ export const updateListing = async (username, payload) => {
 
     const details = payload.details || {};
 
+    if (details.course_level) {
+      formData.append("details[course_level]", details.course_level);
+    }
+
+    (details.tools || []).forEach((tool, index) => {
+      formData.append(`details[tools][${index}]`, tool);
+    });
+
+    (details.learning_points || []).forEach((point, index) => {
+      formData.append(`details[learning_points][${index}]`, point);
+    });
+
+    (details.languages || []).forEach((language, index) => {
+      formData.append(`details[languages][${index}]`, language);
+    });
+
+    if (details.preview_video_file) {
+      formData.append("details[preview_video_file]", details.preview_video_file);
+    }
+
+    (details.lessons || []).forEach((lesson, index) => {
+      formData.append(`details[lessons][${index}][title]`, lesson.title || "");
+      formData.append(`details[lessons][${index}][description]`, lesson.description || "");
+      formData.append(`details[lessons][${index}][media_type]`, lesson.media_type || "");
+
+      if (lesson.media_file) {
+        formData.append(`details[lessons][${index}][media_file]`, lesson.media_file);
+      }
+    });
+    
     if (details.webinar_level) {
       formData.append("details[webinar_level]", details.webinar_level);
     }
