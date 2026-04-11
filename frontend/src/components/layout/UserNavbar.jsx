@@ -516,17 +516,17 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
                   ))}
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  to="/notification"
                   className={`notifications-view-all ${activeViewAll === "notifications" ? "active" : ""
                     }`}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setActiveViewAll("notifications");
+                    closeAllDropdowns();
                   }}
                 >
                   View all
-                </a>
+                </Link>
               </div>
             )}
           </div>

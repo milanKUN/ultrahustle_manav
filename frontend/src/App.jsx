@@ -32,6 +32,9 @@ import PublicUserProfile from "./features/dashboard/pages/PublicUserProfile";
 import SoloContractListing from "./features/marketplace/pages/SoloContractListing";
 import Dashboard from "./features/dashboard/pages/Dashboard";
 import ClientDashboard from "./features/dashboard/pages/ClientDashboard";
+import AnalyticsPage from "./features/dashboard/pages/AnalyticsPage";
+import NotificationPage from "./features/dashboard/pages/NotificationPage";
+import ReviewPage from "./features/dashboard/pages/ReviewPage";
 import ManageTeam from "./features/dashboard/pages/ManageTeam";
 import CreatorMilestonesPage from "./features/marketplace/pages/CreatorMilestonesPage";
 import ClientMilestonePage from "./features/marketplace/pages/ClientMilestonePage";
@@ -299,7 +302,43 @@ export default function App() {
                         path="/client-dashboard"
                         element={
                             <ProtectedRoute>
-                                <ClientDashboard theme={theme} setTheme={setTheme} />
+                                <ClientDashboard
+                                    theme={theme}
+                                    setTheme={setTheme}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/analytics"
+                        element={
+                            <ProtectedRoute>
+                                <AnalyticsPage
+                                    theme={theme}
+                                    setTheme={setTheme}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/notification"
+                        element={
+                            <ProtectedRoute>
+                                <NotificationPage
+                                    theme={theme}
+                                    setTheme={setTheme}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/review"
+                        element={
+                            <ProtectedRoute>
+                                <ReviewPage
+                                    theme={theme}
+                                    setTheme={setTheme}
+                                />
                             </ProtectedRoute>
                         }
                     />
@@ -376,11 +415,26 @@ export default function App() {
                             <CourseListing theme={theme} setTheme={setTheme} />
                         }
                     />
-                    <Route path="/digital-product/:username" element={<ProductDeliverables />} />
-                    <Route path="/course/:username" element={<CourseDeliverables />} />
-                    <Route path="/edit-course/:username" element={<EditCourse />} />
-                    <Route path="/webinar/:username" element={<WebinarDeliverables />} />
-                    <Route path="/edit-webinar/:username" element={<EditWebinar />} />
+                    <Route
+                        path="/digital-product/:username"
+                        element={<ProductDeliverables />}
+                    />
+                    <Route
+                        path="/course/:username"
+                        element={<CourseDeliverables />}
+                    />
+                    <Route
+                        path="/edit-course/:username"
+                        element={<EditCourse />}
+                    />
+                    <Route
+                        path="/webinar/:username"
+                        element={<WebinarDeliverables />}
+                    />
+                    <Route
+                        path="/edit-webinar/:username"
+                        element={<EditWebinar />}
+                    />
                     <Route
                         path="/product-deliverables"
                         element={
@@ -420,7 +474,7 @@ export default function App() {
                             <CreateWebinar theme={theme} setTheme={setTheme} />
                         }
                     />
-                    
+
                     <Route
                         path="/messages"
                         element={

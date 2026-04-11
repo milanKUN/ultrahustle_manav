@@ -1,0 +1,316 @@
+/* Layout Shell */
+.review-layout-wrapper {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-layout-body {
+  padding-top: 85px;
+  display: flex;
+  position: relative;
+  z-index: 10;
+  flex: 1;
+}
+
+.review-main-content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-scroll-area {
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+  height: calc(100vh - 85px);
+  width: 100%;
+}
+
+/* Page Container */
+.review-page-container {
+  padding: 40px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f4f4;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Two Column Grid */
+.review-content-grid {
+  display: flex;
+  gap: 60px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Left Column: Stats */
+.review-stats-column {
+  flex: 0 0 40%;
+  max-width: 400px;
+}
+
+.review-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 24px 0;
+}
+
+.review-average-aggregate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.avg-rating-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.avg-rating-count {
+  font-size: 14px;
+  color: #777777;
+}
+
+.star-rating {
+  color: #ffdf00; /* Rich yellow */
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star-rating .empty {
+  color: #d1d1d1;
+}
+
+.review-breakdown-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.breakdown-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  width: 25px;
+}
+
+.breakdown-label .tiny-star {
+  color: #ffdf00;
+  font-size: 12px;
+}
+
+.breakdown-bar-shell {
+  flex: 1;
+  height: 6px;
+  background-color: #fbf5cd; /* Pale yellow */
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  height: 100%;
+  background-color: #ffdf00;
+  border-radius: 4px;
+}
+
+.breakdown-count {
+  font-size: 13px;
+  color: #666666;
+  width: 20px;
+  text-align: right;
+}
+
+/* Right Column: Reviews List */
+.review-list-column {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+/* Custom Styled Scrollbar for the review list */
+.reviews-scroll-container {
+  height: calc(100vh - 165px);
+  overflow-y: auto;
+  padding-right: 20px; /* Space for the custom scroll graphic */
+}
+
+/* The neon green thumb scrollbar styling specifically targeting webkit browsers */
+.reviews-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.reviews-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.reviews-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #ceff1b; /* The neon green from screenshot */
+  border-radius: 10px;
+}
+
+/* Up/Down arrow hints around the scrollbar could be done with pseudo elements, but standard scrollbar usually suffices. To exactly match the visual, we are styling the scrollbar. */
+
+.review-item-card {
+  display: flex;
+  gap: 16px;
+  padding: 24px 0;
+  border-bottom: 1px solid #dcdcdc;
+}
+
+.review-item-card:first-child {
+  padding-top: 0;
+}
+
+.reviewer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.review-item-body {
+  flex: 1;
+}
+
+.review-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.review-name-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.reviewer-date {
+  font-size: 13px;
+  color: #888888;
+}
+
+.reviewer-text {
+  font-size: 13px;
+  color: #555555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Dark Mode Styles --- */
+.dark .review-page-container {
+  background-color: transparent;
+}
+
+.dark .review-page-title {
+  color: #ffffff;
+}
+
+.dark .avg-rating-number {
+  color: #ffffff;
+}
+
+.dark .avg-rating-count {
+  color: #aaaaaa;
+}
+
+.dark .breakdown-label {
+  color: #ffffff;
+}
+
+.dark .breakdown-bar-shell {
+  background-color: #333333;
+}
+
+.dark .breakdown-count {
+  color: #aaaaaa;
+}
+
+.dark .review-item-card {
+  border-bottom-color: #333333;
+}
+
+.dark .reviewer-name {
+  color: #ffffff;
+}
+
+.dark .reviewer-text {
+  color: #dddddd;
+}
+
+.dark .star-rating .empty {
+  color: #444444;
+}
+
+/* --- Responsive Styling --- */
+@media screen and (max-width: 992px) {
+  .review-layout-body {
+    padding-top: 70px;
+  }
+  .review-scroll-area {
+    height: calc(100vh - 70px);
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .review-content-grid {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .review-stats-column {
+    max-width: 100%;
+  }
+  .reviews-scroll-container {
+    height: auto;
+    overflow-y: visible;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .review-page-container {
+    padding: 24px 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .review-page-container {
+    padding: 16px 12px;
+  }
+  .reviewer-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  .review-item-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .reviewer-date {
+    font-size: 11px;
+  }
+}
