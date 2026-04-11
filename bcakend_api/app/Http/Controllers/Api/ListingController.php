@@ -418,6 +418,8 @@ class ListingController extends Controller
                 'username',
                 'listing_type',
                 'status',
+                // 'price',
+                'views_count',
                 'cover_media_path',
                 'created_at',
                 'updated_at',

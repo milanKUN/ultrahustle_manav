@@ -45,6 +45,7 @@ import CreatorWallet from "./features/marketplace/pages/CreatorWallet";
 import ClientWallet from "./features/marketplace/pages/ClientWallet";
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
+import EditDigitalProduct from "./features/marketplace/pages/EditDigitalProduct";
 import Marketplace from "./features/marketplace/pages/Marketplace";
 import AddNewListing from "./features/marketplace/pages/AddNewListing";
 import TeamServiceListing from "./features/marketplace/pages/TeamServiceListing";
@@ -435,6 +436,12 @@ export default function App() {
                         path="/edit-webinar/:username"
                         element={<EditWebinar />}
                     />
+                    <Route path="/edit-digital-product/:username" element={<EditDigitalProduct />} />
+                    {/* <Route path="/digital-product/:username" element={<ProductDeliverables />} /> */}
+                    {/* <Route path="/course/:username" element={<CourseDeliverables />} /> */}
+                    <Route path="/edit-course/:username" element={<EditCourse />} />
+                    {/* <Route path="/webinar/:username" element={<WebinarDeliverables />} /> */}
+                    <Route path="/edit-webinar/:username" element={<EditWebinar />} />
                     <Route
                         path="/product-deliverables"
                         element={

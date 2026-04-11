@@ -19,7 +19,7 @@ import {
   removeFollower as apiRemoveFollower,
   unfollowUser,
 } from "../api/followApi";
-
+import { getMyListings } from "../../marketplace/api/listingApi";
 
 const UserProfile = (props) => {
   const navigate = useNavigate();
@@ -121,6 +121,50 @@ const UserProfile = (props) => {
       tag: "Social Media Manager",
     },
   ];
+
+  const getListingImageUrl = (path = "") => {
+    if (!path) {
+      return "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+    }
+    if (path.startsWith("http")) return path;
+    if (path.startsWith("/storage/")) return path;
+    if (path.startsWith("storage/")) return `/${path}`;
+    return `/storage/${path}`;
+  };
+
+  const formatListingTypeLabel = (type) => {
+    switch (type) {
+      case "digital_product":
+        return "Product";
+      case "service":
+        return "Service";
+      case "course":
+        return "Course";
+      case "webinar":
+        return "Webinar";
+      default:
+        return "Listing";
+    }
+  };
+
+  const getListingViewRoute = (listing) => {
+    const username = listing?.username || listing?.raw?.username || "";
+
+    if (!username) return "/marketplace";
+
+    switch (listing?.listing_type || listing?.raw?.listing_type) {
+      case "digital_product":
+        return `/digital-product/${username}`;
+      case "service":
+        return `/service/${username}`;
+      case "course":
+        return `/course/${username}`;
+      case "webinar":
+        return `/webinar/${username}`;
+      default:
+        return "/marketplace";
+    }
+  };
 
   const handleScroll = useCallback(() => {
     // Placeholder for scroll spy if needed later
@@ -489,7 +533,7 @@ const UserProfile = (props) => {
     };
   }, []);
 
-  const listingsData = [
+  /* const listingsData = [
     {
       image:
         "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
@@ -498,7 +542,57 @@ const UserProfile = (props) => {
       views: '',
       price: "",
     },
-  ];
+  ]; */ 
+
+  const [listingsData, setListingsData] = useState([]);
+  const [listingsLoading, setListingsLoading] = useState(false);
+  const [listingsError, setListingsError] = useState("");
+
+    useEffect(() => {
+      let mounted = true;
+
+      const loadMyListings = async () => {
+        try {
+          setListingsLoading(true);
+          setListingsError("");
+
+          const res = await getMyListings();
+          const rawListings = res?.listings || res?.data?.listings || [];
+
+          if (!mounted) return;
+
+          const mapped = Array.isArray(rawListings)
+            ? rawListings.map((item) => ({
+                id: item.id,
+                username: item.username || "",
+                title: item.title || "Untitled Listing",
+                type: formatListingTypeLabel(item.listing_type),
+                listing_type: item.listing_type,
+                views: item.views_count || item.views || 0,
+                price: item.price ? `$${item.price}` : item.price_text || "—",
+                image: getListingImageUrl(item.cover_media_path || item.cover_media_url || ""),
+                status: item.status || "",
+                raw: item,
+              }))
+            : [];
+
+          setListingsData(mapped);
+        } catch (e) {
+          if (!mounted) return;
+          setListingsError(e?.message || "Failed to load listings.");
+          setListingsData([]);
+        } finally {
+          if (!mounted) return;
+          setListingsLoading(false);
+        }
+      };
+
+      loadMyListings();
+
+      return () => {
+        mounted = false;
+      };
+    }, []);
 
   const reviewsData = {
     average: '',
@@ -1349,65 +1443,118 @@ const UserProfile = (props) => {
 
                 {/* ================= CONTENT ================= */}
                 {mainTab === "listings" ? (
-                  <div className="listings-grid">
-                    {listingsData
-                      .filter((l) => {
-                        if (filter === "All") return true;
-                        return l.type === filter.slice(0, -1);
-                      })
-                      .map((listing, index) => (
-                        <div key={index} className="listing-card">
-                          <div className="listing-image">
-                            <img src={listing.image} alt={listing.title} />
+                  listingsLoading ? (
+                    <div
+                      style={{
+                        padding: "80px 20px",
+                        textAlign: "center",
+                        color: "#777",
+                        fontSize: "16px",
+                      }}
+                    >
+                      Loading listings...
+                    </div>
+                  ) : listingsError ? (
+                    <div
+                      style={{
+                        padding: "80px 20px",
+                        textAlign: "center",
+                        color: "#dc2626",
+                        fontSize: "16px",
+                      }}
+                    >
+                      {listingsError}
+                    </div>
+                  ) : listingsData.filter((l) => {
+                      if (filter === "All") return true;
+                      return l.type === filter.slice(0, -1);
+                    }).length === 0 ? (
+                    <div
+                      style={{
+                        padding: "80px 20px",
+                        textAlign: "center",
+                        color: "#777",
+                        fontSize: "16px",
+                      }}
+                    >
+                      No listings added yet.
+                    </div>
+                  ) : (
+                    <div className="listings-grid">
+                      {listingsData
+                        .filter((l) => {
+                          if (filter === "All") return true;
+                          return l.type === filter.slice(0, -1);
+                        })
+                        .map((listing, index) => (
+                          <div key={listing.id || index} className="listing-card">
+                            <div className="listing-image">
+                              <img src={listing.image} alt={listing.title} />
 
-                            <button className="listing-nav-btn left">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m15 18-6-6 6-6" />
-                              </svg>
-                            </button>
-                            <button className="listing-nav-btn right">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m9 18 6-6-6-6" />
-                              </svg>
-                            </button>
-                          </div>
-
-                          <div className="listing-info">
-                            <div className="listing-title-row">
-                              <h4 className="listing-title">{listing.title}</h4>
-                              <span className="listing-type">{listing.type}</span>
-                            </div>
-
-                            <div className="listing-meta">
-                              <div className="listing-views">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                  <circle cx="12" cy="12" r="3" />
+                              <button className="listing-nav-btn left" type="button">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="m15 18-6-6 6-6" />
                                 </svg>
-                                <span>{listing.views} views</span>
+                              </button>
+
+                              <button className="listing-nav-btn right" type="button">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="m9 18 6-6-6-6" />
+                                </svg>
+                              </button>
+                            </div>
+
+                            <div className="listing-info">
+                              <div className="listing-title-row">
+                                <h4 className="listing-title">{listing.title}</h4>
+                                <span className="listing-type">{listing.type}</span>
                               </div>
-                              <div className="listing-price">{listing.price}</div>
+
+                              <div className="listing-meta">
+                                <div className="listing-views">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                  </svg>
+                                  <span>{listing.views} views</span>
+                                </div>
+
+                                <div className="listing-price">{listing.price}</div>
+                              </div>
+                            </div>
+
+                            <div className="listing-actions">
+                              <button
+                                className="btn-view-listing"
+                                type="button"
+                                onClick={() => navigate(getListingViewRoute(listing))}
+                              >
+                                View Listing
+                              </button>
+
+                              <button
+                                className="btn-favorite"
+                                type="button"
+                                onClick={() => toggleFavorite(index)}
+                              >
+                                <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill={favorites.has(index) ? "#ef4444" : "none"}
+                                  stroke={favorites.has(index) ? "#ef4444" : "currentColor"}
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                                </svg>
+                              </button>
                             </div>
                           </div>
-
-                          <div className="listing-actions">
-                            <button className="btn-view-listing">View Listing</button>
-                            <button
-                              className="btn-favorite"
-                              onClick={() => toggleFavorite(index)}
-                            >
-                              <svg width="20" height="20" viewBox="0 0 24 24"
-                                fill={favorites.has(index) ? "#ef4444" : "none"}
-                                stroke={favorites.has(index) ? "#ef4444" : "currentColor"}
-                                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                              >
-                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                    </div>
+                  )
                 ) : (
                   /* ================= EMPTY PROJECTS ================= */
                   <div
