@@ -885,3 +885,119 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
     </div>
   );
 }
+
+function UploadGrid({ onSelect, onBack, blurred }) {
+  const fileRef = useRef(null);
+  const [files, setFiles] = useState([]);
+  const activeIndexRef = useRef(null);
+
+  const handleFiles = (e) => {
+    const selected = Array.from(e.target.files || []);
+    if (activeIndexRef.current === null || selected.length === 0) return;
+
+    setFiles((prev) => {
+      const updated = [...prev];
+      updated[activeIndexRef.current] = selected[0];
+      return updated;
+    });
+
+    activeIndexRef.current = null;
+    e.target.value = "";
+  };
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
+      <div className={`upload-card rounded-2xl p-4 w-[95%] max-w-[820px] h-auto max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1A] shadow-[0_0_20px_#CEFF1B] transition-all duration-200 ${blurred ? "blur-sm scale-[0.98] pointer-events-none select-none opacity-95" : ""}`}>
+        <div className="upload-header flex items-center gap-3 mb-3 shrink-0">
+          <button type="button" onClick={onBack} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 shrink-0" title="Back">
+            <img src="/backarrow.svg" alt="back" />
+          </button>
+
+          <h4 className="text-sm font-medium text-black dark:text-black">Select and upload your file</h4>
+
+          <button type="button" onClick={onBack} className="ml-auto w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#CEFF1B]" title="Close">
+            ✕
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 flex-1 overflow-y-auto pr-2 custom-scroll">
+          {Array.from({ length: 9 }).map((_, i) => {
+            const file = files[i];
+            return (
+              <div
+                key={i}
+                onClick={() => {
+                  activeIndexRef.current = i;
+                  fileRef.current?.click();
+                }}
+                className="upload-slot relative h-[110px] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800"
+              >
+                {i === 0 && (
+                  <span className="absolute inset-0 z-10 flex items-center justify-center px-2 pointer-events-none">
+                    <span className="bg-[#CEFF1B] text-black font-medium text-[10px] sm:text-xs px-2 py-[3px] rounded max-w-[90%] text-center whitespace-normal leading-tight">
+                      Upload Cover Image
+                    </span>
+                  </span>
+                )}
+
+                {file ? (
+                  <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  i !== 0 && (
+                    <div className="relative pointer-events-none">
+                      <img src="/video2.svg" className="w-10 mr-8 mt-2 opacity-60" alt="" />
+                      <img src="/video1.svg" className="w-12 absolute -right-2 -top-3 opacity-60" alt="" />
+                      <div className="absolute bottom-4 right-6 w-6 h-6 rounded-full bg-[#CEFF1B] flex items-center justify-center text-black font-bold">+</div>
+                    </div>
+                  )
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex justify-end items-center mt-3 shrink-0">
+          <div className="flex gap-3">
+            <button type="button" onClick={onBack} className="upload-btn-cancel px-4 py-2 rounded-lg text-sm border border-black dark:border-white/20 dark:text-white">
+              Cancel
+            </button>
+
+            {files.filter(Boolean).length > 0 && (
+              <button type="button" onClick={() => onSelect(files.filter(Boolean))} className="upload-btn-confirm px-5 py-2 rounded-lg text-sm font-medium bg-[#CEFF1B] border border-black">
+                Upload
+              </button>
+            )}
+          </div>
+        </div>
+
+        <input ref={fileRef} type="file" accept="image/*,video/*" onChange={handleFiles} className="hidden" />
+      </div>
+    </div>
+  );
+}
+
+function UploadSuccess({ onBack }) {
+  return (
+    <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-auto p-4">
+      <div className="upload-success-card rounded-2xl w-[90%] max-w-[600px] h-auto min-h-[300px] md:h-[400px] py-10 flex flex-col items-center justify-center shadow-[0_0_20px_#CEFF1B] bg-white dark:bg-[#2B2B2B]">
+        <div className="w-24 h-24 bg-[#CEFF1B] rounded-full flex items-center justify-center mb-6">
+          <img src="/right.svg" alt="success" />
+        </div>
+
+        <h3 className="text-2xl font-semibold mb-8 text-black dark:text-white text-center px-4">
+          You have successfully uploaded!
+        </h3>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={onBack}
+            className="upload-btn-confirm px-12 py-3 rounded-lg bg-[#CEFF1B] border border-black font-semibold text-black transition-transform hover:scale-105"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
