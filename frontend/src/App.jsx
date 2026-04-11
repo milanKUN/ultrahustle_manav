@@ -378,10 +378,10 @@ export default function App() {
                         }
                     />
                     <Route path="/edit-digital-product/:username" element={<EditDigitalProduct />} />
-                    <Route path="/digital-product/:username" element={<ProductDeliverables />} />
-                    <Route path="/course/:username" element={<CourseDeliverables />} />
+                    {/* <Route path="/digital-product/:username" element={<ProductDeliverables />} /> */}
+                    {/* <Route path="/course/:username" element={<CourseDeliverables />} /> */}
                     <Route path="/edit-course/:username" element={<EditCourse />} />
-                    <Route path="/webinar/:username" element={<WebinarDeliverables />} />
+                    {/* <Route path="/webinar/:username" element={<WebinarDeliverables />} /> */}
                     <Route path="/edit-webinar/:username" element={<EditWebinar />} />
                     <Route
                         path="/product-deliverables"
