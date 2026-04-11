@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('webinar_listing_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('listing_id')->unique();
+            $table->string('webinar_level', 100)->nullable();
+            $table->date('schedule_date')->nullable();
+            $table->string('schedule_start_time', 50)->nullable();
+            $table->integer('schedule_duration')->nullable();
+            $table->string('schedule_timezone', 100)->nullable();
+            $table->text('webinar_link')->nullable();
+            $table->json('learning_points_json')->nullable();
+            $table->json('languages_json')->nullable();
+            $table->timestamps();
+
+            $table->foreign('listing_id')
+                ->references('id')
+                ->on('listings')
+                ->onDelete('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('webinar_listing_details');
+    }
+};

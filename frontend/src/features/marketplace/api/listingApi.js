@@ -105,6 +105,47 @@ export const createListing = async (payload) => {
     if (details.preview_video_file) {
       formData.append("details[preview_video_file]", details.preview_video_file);
     }
+        if (details.webinar_level) {
+      formData.append("details[webinar_level]", details.webinar_level);
+    }
+
+    if (details.schedule_date) {
+      formData.append("details[schedule_date]", details.schedule_date);
+    }
+
+    if (details.schedule_start_time) {
+      formData.append("details[schedule_start_time]", details.schedule_start_time);
+    }
+
+    if (details.schedule_duration) {
+      formData.append("details[schedule_duration]", details.schedule_duration);
+    }
+
+    if (details.schedule_timezone) {
+      formData.append("details[schedule_timezone]", details.schedule_timezone);
+    }
+
+    if (details.webinar_link) {
+      formData.append("details[webinar_link]", details.webinar_link);
+    }
+
+    (details.learning_points || []).forEach((point, index) => {
+      formData.append(`details[learning_points][${index}]`, point);
+    });
+
+    (details.languages || []).forEach((language, index) => {
+      formData.append(`details[languages][${index}]`, language);
+    });
+
+    (details.tools || []).forEach((tool, index) => {
+      formData.append(`details[tools][${index}]`, tool);
+    });
+
+    (details.agenda || []).forEach((item, index) => {
+      formData.append(`details[agenda][${index}][time]`, item.time || "");
+      formData.append(`details[agenda][${index}][topic]`, item.topic || "");
+      formData.append(`details[agenda][${index}][description]`, item.description || "");
+    });
 
     (details.lessons || []).forEach((lesson, index) => {
       formData.append(`details[lessons][${index}][title]`, lesson.title || "");
@@ -202,12 +243,26 @@ export const updateListing = async (username, payload) => {
 
     const details = payload.details || {};
 
-    if (details.product_type) {
-      formData.append("details[product_type]", details.product_type);
+    if (details.webinar_level) {
+      formData.append("details[webinar_level]", details.webinar_level);
     }
-
-    if (details.course_level) {
-      formData.append("details[course_level]", details.course_level);
+    if (details.ticket_price) {
+      formData.append("details[ticket_price]", details.ticket_price);
+    }
+    if (details.schedule_date) {
+      formData.append("details[schedule_date]", details.schedule_date);
+    }
+    if (details.schedule_start_time) {
+      formData.append("details[schedule_start_time]", details.schedule_start_time);
+    }
+    if (details.schedule_duration) {
+      formData.append("details[schedule_duration]", details.schedule_duration);
+    }
+    if (details.schedule_timezone) {
+      formData.append("details[schedule_timezone]", details.schedule_timezone);
+    }
+    if (details.webinar_link) {
+      formData.append("details[webinar_link]", details.webinar_link);
     }
 
     (details.tools || []).forEach((tool, index) => {
@@ -222,31 +277,10 @@ export const updateListing = async (username, payload) => {
       formData.append(`details[languages][${index}]`, language);
     });
 
-    if (details.preview_video_file) {
-      formData.append("details[preview_video_file]", details.preview_video_file);
-    }
-
-    (details.lessons || []).forEach((lesson, index) => {
-      formData.append(`details[lessons][${index}][title]`, lesson.title || "");
-      formData.append(`details[lessons][${index}][description]`, lesson.description || "");
-      formData.append(`details[lessons][${index}][media_type]`, lesson.media_type || "");
-
-      if (lesson.media_file) {
-        formData.append(`details[lessons][${index}][media_file]`, lesson.media_file);
-      }
-    });
-
-    Object.entries(details.packages || {}).forEach(([packageName, pkg], index) => {
-      formData.append(`details[packages][${index}][package_name]`, packageName);
-      formData.append(`details[packages][${index}][price]`, pkg.price || "");
-
-      (pkg.included || []).forEach((item, itemIndex) => {
-        formData.append(`details[packages][${index}][included][${itemIndex}]`, item);
-      });
-
-      (pkg.deliveryFormats || []).forEach((item, itemIndex) => {
-        formData.append(`details[packages][${index}][deliveryFormats][${itemIndex}]`, item);
-      });
+    (details.agenda || []).forEach((item, index) => {
+      formData.append(`details[agenda][${index}][time]`, item.time || "");
+      formData.append(`details[agenda][${index}][topic]`, item.topic || "");
+      formData.append(`details[agenda][${index}][description]`, item.description || "");
     });
 
     const res = await api.post(`/api/v1/listings/${encodeURIComponent(username)}`, formData, {

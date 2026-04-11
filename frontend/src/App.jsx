@@ -55,6 +55,7 @@ import CourseDeliverables from "./features/marketplace/pages/CourseDeliverables"
 import WebinarDeliverables from "./features/marketplace/pages/WebinarDeliverables";
 import WebinarListing from "./features/marketplace/pages/WebinarListing";
 import CreateWebinar from "./features/marketplace/pages/CreateWebinar";
+import EditWebinar from "./features/marketplace/pages/EditWebinar";
 import MessageBox from "./features/marketplace/pages/MessageBox";
 import MyCartPage from "./features/marketplace/pages/MyCartPage";
 import MyOrderCreatorPage from "./features/marketplace/pages/MyOrderCreatorPage";
@@ -369,6 +370,7 @@ export default function App() {
                     <Route path="/digital-product/:username" element={<ProductDeliverables />} />
                     <Route path="/course/:username" element={<CourseDeliverables />} />
                     <Route path="/webinar/:username" element={<WebinarDeliverables />} />
+                    <Route path="/edit-webinar/:username" element={<EditWebinar />} />
                     <Route
                         path="/product-deliverables"
                         element={

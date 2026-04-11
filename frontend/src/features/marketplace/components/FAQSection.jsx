@@ -13,7 +13,10 @@ const FAQSection = ({
   onSave,
   onSaveDraft,
   isSaving = false,
+  submitMode = "create",
 }) => {
+  const isEditMode = submitMode === "edit";
+
   return (
     <div
       className="faq-section-container"
@@ -72,11 +75,23 @@ const FAQSection = ({
       {showFooter && (
         <div className="faq-footer">
           <button type="button" className="draft-btn" onClick={onSaveDraft} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save as Draft"}
+            {isSaving
+              ? isEditMode
+                ? "Updating..."
+                : "Saving..."
+              : isEditMode
+                ? "Update as Draft"
+                : "Save as Draft"}
           </button>
 
           <button type="button" className="save-btn" onClick={onSave} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving
+              ? isEditMode
+                ? "Updating..."
+                : "Saving..."
+              : isEditMode
+                ? "Update"
+                : "Save"}
           </button>
         </div>
       )}

@@ -74,6 +74,18 @@ class ListingController extends Controller
             'details.lessons.*.description' => 'nullable|string',
             'details.lessons.*.media_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,mkv,webm|max:20480',
             'details.lessons.*.media_type' => 'nullable|in:image,video',
+
+            'details.webinar_level' => 'nullable|string|max:100',
+            'details.schedule_date' => 'nullable|date',
+            'details.schedule_start_time' => 'nullable',
+            'details.schedule_duration' => 'nullable|integer|min:1',
+            'details.schedule_timezone' => 'nullable|string|max:100',
+            'details.webinar_link' => 'nullable|string|max:2048',
+            'details.ticket_price' => 'nullable|numeric|min:0',
+            'details.agenda' => 'nullable|array',
+            'details.agenda.*.time' => 'nullable|string|max:100',
+            'details.agenda.*.topic' => 'nullable|string|max:255',
+            'details.agenda.*.description' => 'nullable|string',
         ]);
 
         $username = $this->makeUniqueUsername($validated['title']);
@@ -329,6 +341,57 @@ class ListingController extends Controller
                     ]);
                 }
             }
+            //webinar details
+            if (($validated['listing_type'] ?? '') === 'webinar') {
+                $learningPoints = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.learning_points', [])
+                )));
+
+                $languages = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.languages', [])
+                )));
+
+                if (Schema::hasTable('webinar_listing_details')) {
+                    DB::table('webinar_listing_details')->insert([
+                        'listing_id' => $listingId,
+                        'ticket_price' => data_get($validated, 'details.ticket_price'),
+                        'webinar_level' => data_get($validated, 'details.webinar_level'),
+                        'schedule_date' => data_get($validated, 'details.schedule_date'),
+                        'schedule_start_time' => data_get($validated, 'details.schedule_start_time'),
+                        'schedule_duration' => data_get($validated, 'details.schedule_duration'),
+                        'schedule_timezone' => data_get($validated, 'details.schedule_timezone'),
+                        'webinar_link' => data_get($validated, 'details.webinar_link'),
+                        'learning_points_json' => !empty($learningPoints) ? json_encode($learningPoints) : null,
+                        'languages_json' => !empty($languages) ? json_encode($languages) : null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                if (Schema::hasTable('webinar_listing_agendas')) {
+                    foreach ((data_get($validated, 'details.agenda') ?? []) as $index => $agendaItem) {
+                        $time = trim((string) ($agendaItem['time'] ?? ''));
+                        $topic = trim((string) ($agendaItem['topic'] ?? ''));
+                        $description = trim((string) ($agendaItem['description'] ?? ''));
+
+                        if ($time === '' && $topic === '' && $description === '') {
+                            continue;
+                        }
+
+                        DB::table('webinar_listing_agendas')->insert([
+                            'listing_id' => $listingId,
+                            'time' => $time ?: null,
+                            'topic' => $topic ?: null,
+                            'description' => $description ?: null,
+                            'sort_order' => $index,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
 
             return DB::table('listings')->where('id', $listingId)->first();
         });
@@ -466,6 +529,7 @@ class ListingController extends Controller
             $details['tools'] = $tools;
         }
 
+        //digital product
         if ($listing->listing_type === 'digital_product') {
             $productDetails = null;
 
@@ -520,7 +584,8 @@ class ListingController extends Controller
 
             $details['packages'] = $packages;
         }
-
+        
+        //course
         if ($listing->listing_type === 'course') {
             $courseDetails = null;
 
@@ -561,6 +626,48 @@ class ListingController extends Controller
                 : [];
 
             $details['lessons'] = $lessons;
+        }
+
+        //webinar
+        if ($listing->listing_type === 'webinar') {
+            $webinarDetails = null;
+
+            if (Schema::hasTable('webinar_listing_details')) {
+                $webinarDetails = DB::table('webinar_listing_details')
+                    ->where('listing_id', $listingId)
+                    ->first();
+            }
+
+            if ($webinarDetails) {
+                $learningPoints = json_decode($webinarDetails->learning_points_json ?? '[]', true);
+                $languages = json_decode($webinarDetails->languages_json ?? '[]', true);
+
+                $details['webinar_level'] = $webinarDetails->webinar_level;
+                $details['schedule_date'] = $webinarDetails->schedule_date;
+                $details['schedule_start_time'] = $webinarDetails->schedule_start_time;
+                $details['schedule_duration'] = $webinarDetails->schedule_duration;
+                $details['schedule_timezone'] = $webinarDetails->schedule_timezone;
+                $details['webinar_link'] = $webinarDetails->webinar_link;
+                $details['learning_points'] = is_array($learningPoints) ? $learningPoints : [];
+                $details['languages'] = is_array($languages) ? $languages : [];
+                $details['ticket_price'] = $webinarDetails->ticket_price;
+            }
+
+            $agenda = Schema::hasTable('webinar_listing_agendas')
+                ? DB::table('webinar_listing_agendas')
+                    ->where('listing_id', $listingId)
+                    ->orderBy('sort_order')
+                    ->get(['time', 'topic', 'description'])
+                    ->map(fn ($row) => [
+                        'time' => $row->time,
+                        'topic' => $row->topic,
+                        'description' => $row->description,
+                    ])
+                    ->values()
+                    ->all()
+                : [];
+
+            $details['agenda'] = $agenda;
         }
 
         return [
@@ -685,6 +792,18 @@ class ListingController extends Controller
             'details.lessons.*.description' => 'nullable|string',
             'details.lessons.*.media_file' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,mkv,webm|max:20480',
             'details.lessons.*.media_type' => 'nullable|in:image,video',
+
+            'details.webinar_level' => 'nullable|string|max:100',
+            'details.ticket_price' => 'nullable|numeric|min:0',
+            'details.schedule_date' => 'nullable|date',
+            'details.schedule_start_time' => 'nullable',
+            'details.schedule_duration' => 'nullable|integer|min:1',
+            'details.schedule_timezone' => 'nullable|string|max:100',
+            'details.webinar_link' => 'nullable|string|max:2048',
+            'details.agenda' => 'nullable|array',
+            'details.agenda.*.time' => 'nullable|string|max:100',
+            'details.agenda.*.topic' => 'nullable|string|max:255',
+            'details.agenda.*.description' => 'nullable|string',
         ]);
 
         $listing = DB::transaction(function () use ($request, $user, $validated, $existing) {
@@ -817,6 +936,12 @@ class ListingController extends Controller
             }
             if (Schema::hasTable('course_listing_lessons')) {
                 DB::table('course_listing_lessons')->where('listing_id', $existing->id)->delete();
+            }
+            if (Schema::hasTable('webinar_listing_details')) {
+                DB::table('webinar_listing_details')->where('listing_id', $existing->id)->delete();
+            }
+            if (Schema::hasTable('webinar_listing_agendas')) {
+                DB::table('webinar_listing_agendas')->where('listing_id', $existing->id)->delete();
             }
 
             if (($validated['listing_type'] ?? '') === 'digital_product') {
@@ -959,6 +1084,57 @@ class ListingController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                }
+            }
+
+            if (($validated['listing_type'] ?? '') === 'webinar') {
+                $learningPoints = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.learning_points', [])
+                )));
+
+                $languages = array_values(array_filter(array_map(
+                    fn($v) => trim((string) $v),
+                    data_get($validated, 'details.languages', [])
+                )));
+
+                if (Schema::hasTable('webinar_listing_details')) {
+                    DB::table('webinar_listing_details')->insert([
+                        'listing_id' => $existing->id,
+                        'ticket_price' => data_get($validated, 'details.ticket_price'),
+                        'webinar_level' => data_get($validated, 'details.webinar_level'),
+                        'schedule_date' => data_get($validated, 'details.schedule_date'),
+                        'schedule_start_time' => data_get($validated, 'details.schedule_start_time'),
+                        'schedule_duration' => data_get($validated, 'details.schedule_duration'),
+                        'schedule_timezone' => data_get($validated, 'details.schedule_timezone'),
+                        'webinar_link' => data_get($validated, 'details.webinar_link'),
+                        'learning_points_json' => !empty($learningPoints) ? json_encode($learningPoints) : null,
+                        'languages_json' => !empty($languages) ? json_encode($languages) : null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                if (Schema::hasTable('webinar_listing_agendas')) {
+                    foreach ((data_get($validated, 'details.agenda') ?? []) as $index => $agendaItem) {
+                        $time = trim((string) ($agendaItem['time'] ?? ''));
+                        $topic = trim((string) ($agendaItem['topic'] ?? ''));
+                        $description = trim((string) ($agendaItem['description'] ?? ''));
+
+                        if ($time === '' && $topic === '' && $description === '') {
+                            continue;
+                        }
+
+                        DB::table('webinar_listing_agendas')->insert([
+                            'listing_id' => $existing->id,
+                            'time' => $time ?: null,
+                            'topic' => $topic ?: null,
+                            'description' => $description ?: null,
+                            'sort_order' => $index,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
             }
 
