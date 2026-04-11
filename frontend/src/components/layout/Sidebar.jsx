@@ -74,7 +74,7 @@ const CREATOR_ITEMS = [
 ];
 
 const CLIENT_ITEMS = [
-    { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+    { label: "Dashboard", icon: LayoutGrid, path: "/client-dashboard" },
     { label: "Marketplace", icon: Store, path: "/marketplace" },
     { label: "My Orders", icon: ShoppingBag, path: "/client-orders" },
     { label: "My Cart", icon: ShoppingCart, path: "/cart" },

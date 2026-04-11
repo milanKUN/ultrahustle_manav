@@ -31,6 +31,7 @@ import UserProfile from "./features/dashboard/pages/UserProfile";
 import PublicUserProfile from "./features/dashboard/pages/PublicUserProfile";
 import SoloContractListing from "./features/marketplace/pages/SoloContractListing";
 import Dashboard from "./features/dashboard/pages/Dashboard";
+import ClientDashboard from "./features/dashboard/pages/ClientDashboard";
 import ManageTeam from "./features/dashboard/pages/ManageTeam";
 import CreatorMilestonesPage from "./features/marketplace/pages/CreatorMilestonesPage";
 import ClientMilestonePage from "./features/marketplace/pages/ClientMilestonePage";
@@ -174,8 +175,13 @@ export default function App() {
                     />
                     <Route
                         path="/public-team-profile/:username"
-                        element={<PublicTeamProfile theme={theme} setTheme={setTheme} />}
-                        />
+                        element={
+                            <PublicTeamProfile
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
                     <Route
                         path="/user-profile"
                         element={
@@ -253,19 +259,13 @@ export default function App() {
                     <Route
                         path="/creator-wallet"
                         element={
-                            <CreatorWallet
-                                theme={theme}
-                                setTheme={setTheme}
-                            />
+                            <CreatorWallet theme={theme} setTheme={setTheme} />
                         }
                     />
                     <Route
                         path="/client-wallet"
                         element={
-                            <ClientWallet
-                                theme={theme}
-                                setTheme={setTheme}
-                            />
+                            <ClientWallet theme={theme} setTheme={setTheme} />
                         }
                     />
                     <Route
@@ -291,6 +291,14 @@ export default function App() {
                         element={
                             <ProtectedRoute>
                                 <Dashboard theme={theme} setTheme={setTheme} />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/client-dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <ClientDashboard theme={theme} setTheme={setTheme} />
                             </ProtectedRoute>
                         }
                     />
