@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import './NotificationPage.css';
@@ -52,6 +54,26 @@ export default function NotificationPage({ theme, setTheme }) {
           <div className="notification-scroll-area">
             <div className="notification-page-container">
               <div className="notification-content-centered">
+                <Link to="/friend-requests" className="follow-request-banner">
+                  <div className="frb-left">
+                    <div className="frb-avatars">
+                      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="" className="frb-avatar-bg" />
+                      <div className="frb-avatar-fg">
+                        {/* Fallback to text initials if logo isn't available, but we assume /logo.png exists */}
+                        <span style={{color: '#e51e25', fontWeight: 900, fontSize: '11px', lineHeight: 1}}>UH</span>
+                      </div>
+                    </div>
+                    <div className="frb-info">
+                      <div className="frb-title">Follow requests</div>
+                      <div className="frb-subtitle">digitalservices + 24 others</div>
+                    </div>
+                  </div>
+                  <div className="frb-right">
+                    <span className="frb-unread-dot"></span>
+                    <ChevronRight className="frb-chevron" size={20} />
+                  </div>
+                </Link>
+
                 <h2 className="notification-page-title">Notifications</h2>
                 
                 <div className="notification-list-wrapper">

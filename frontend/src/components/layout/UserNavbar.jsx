@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import "./NavbarLight.css";
 import { logout } from "../../features/auth/api/authApi";
 import { getUserName, getMyPersonalInfo } from "../../features/dashboard/api/personalInfoApi";
 import defaultAvatar from "./default-avatar.png";
 
-const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
+const NavbarLight = ({ onDropdownChange, theme = "light", setTheme, toggleSidebar, isSidebarOpen: externalIsSidebarOpen }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
@@ -43,6 +43,31 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
     }
 
     setIsSidebarOpen((prev) => !prev);
+  };
+
+  const toggleTheme = (e) => {
+    e.stopPropagation();
+    const newTheme = theme === "light" ? "dark" : "light";
+    if (setTheme) {
+      setTheme(newTheme);
+    } else {
+      document.documentElement.className = newTheme;
+      localStorage.setItem("theme", newTheme);
+      window.dispatchEvent(new CustomEvent('themeChange', { detail: newTheme }));
+    }
+  };
+
+  // Directly apply a specific theme mode (used by segmented control)
+  const applyTheme = (e, mode) => {
+    e.stopPropagation();
+    if (theme === mode) return;
+    if (setTheme) {
+      setTheme(mode);
+    } else {
+      document.documentElement.className = mode;
+      localStorage.setItem("theme", mode);
+      window.dispatchEvent(new CustomEvent('themeChange', { detail: mode }));
+    }
   };
 
   const toggleDropdown = () => {
@@ -401,16 +426,16 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
                 )}
               </div>
 
-              <a
-                href="#"
+              <Link
+                to="/all-listings"
                 className={`search-view-all ${activeViewAll === "search" ? "active" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   setActiveViewAll("search");
+                  closeAllDropdowns();
                 }}
               >
                 View all
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -561,7 +586,28 @@ const NavbarLight = ({ onDropdownChange, theme = "light", toggleSidebar, isSideb
                 <a href="/setting" className="dropdown-item">
                   Settings
                 </a>
-                <div className="dropdown-divider"></div>
+
+                <div className="dropdown-divider" style={{ display: 'block', height: '1px', width: '100%' }}></div>
+                <div className="dropdown-theme-toggle">
+                  <div className="theme-mode-selector">
+                    <button
+                      className={`theme-mode-btn${theme !== 'dark' ? ' mode-active' : ''}`}
+                      onClick={(e) => applyTheme(e, 'light')}
+                      type="button"
+                    >
+                      <Sun size={15} />
+                      <span>Light</span>
+                    </button>
+                    <button
+                      className={`theme-mode-btn${theme === 'dark' ? ' mode-active' : ''}`}
+                      onClick={(e) => applyTheme(e, 'dark')}
+                      type="button"
+                    >
+                      <Moon size={15} />
+                      <span>Dark</span>
+                    </button>
+                  </div>
+                </div>
                 <button onClick={logout} className="dropdown-item logout">Logout</button>
               </div>
             )}

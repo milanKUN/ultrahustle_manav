@@ -17,6 +17,7 @@ import {
   ShoppingCart,
   Store,
   Users,
+  Rocket
 } from "lucide-react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { LuTrendingUp } from "react-icons/lu";
@@ -48,6 +49,17 @@ const CREATOR_ITEMS = [
                 label: "Active Projects",
                 icon: Folder,
                 path: "/active-projects",
+            },
+        ],
+    },
+    {
+        label: "My Campaign",
+        icon: Rocket,
+        children: [
+            {
+                label: "Campaign Listings",
+                icon: Rocket,
+                path: "/campaign-listing",
             },
         ],
     },

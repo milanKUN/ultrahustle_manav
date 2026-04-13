@@ -68,9 +68,15 @@ import MyOrderCreatorPage from "./features/marketplace/pages/MyOrderCreatorPage"
 import MyOrderClientPage from "./features/marketplace/pages/MyOrderClientPage";
 import ActiveProjectPage from "./features/marketplace/pages/ActiveProjectPage";
 import ResolutionCenter from "./features/marketplace/pages/ResolutionCenter";
-
-
-
+import AllListingPages from "./features/marketplace/pages/AllListingPages";
+import ViewAllServices from "./features/marketplace/pages/ViewAllServices";
+import ViewAllProducts from "./features/marketplace/pages/ViewAllProducts";
+import ViewAllCourses from "./features/marketplace/pages/ViewAllCourses";
+import ViewAllWebinars from "./features/marketplace/pages/ViewAllWebinars";
+import GroupChat from "./features/marketplace/pages/GroupChat";
+import MyCampaign from "./features/marketplace/pages/MyCampaign";
+import BoostCampaign from "./features/marketplace/pages/BoostCampaign";
+import FriendRequestPage from "./features/dashboard/pages/FriendRequestPage";
 
 export default function App() {
     const THEME_KEY = "user-theme";
@@ -84,6 +90,15 @@ export default function App() {
         document.body.classList.add(theme);
         localStorage.setItem(THEME_KEY, theme);
     }, [theme]);
+
+    useEffect(() => {
+        const handleThemeChange = (e) => {
+            setTheme(e.detail);
+        };
+        window.addEventListener("themeChange", handleThemeChange);
+        return () =>
+            window.removeEventListener("themeChange", handleThemeChange);
+    }, []);
 
     return (
         <Router>
@@ -336,10 +351,7 @@ export default function App() {
                         path="/review"
                         element={
                             <ProtectedRoute>
-                                <ReviewPage
-                                    theme={theme}
-                                    setTheme={setTheme}
-                                />
+                                <ReviewPage theme={theme} setTheme={setTheme} />
                             </ProtectedRoute>
                         }
                     />
@@ -436,12 +448,21 @@ export default function App() {
                         path="/edit-webinar/:username"
                         element={<EditWebinar />}
                     />
-                    <Route path="/edit-digital-product/:username" element={<EditDigitalProduct />} />
+                    <Route
+                        path="/edit-digital-product/:username"
+                        element={<EditDigitalProduct />}
+                    />
                     {/* <Route path="/digital-product/:username" element={<ProductDeliverables />} /> */}
                     {/* <Route path="/course/:username" element={<CourseDeliverables />} /> */}
-                    <Route path="/edit-course/:username" element={<EditCourse />} />
+                    <Route
+                        path="/edit-course/:username"
+                        element={<EditCourse />}
+                    />
                     {/* <Route path="/webinar/:username" element={<WebinarDeliverables />} /> */}
-                    <Route path="/edit-webinar/:username" element={<EditWebinar />} />
+                    <Route
+                        path="/edit-webinar/:username"
+                        element={<EditWebinar />}
+                    />
                     <Route
                         path="/product-deliverables"
                         element={
@@ -522,6 +543,77 @@ export default function App() {
                                 theme={theme}
                                 setTheme={setTheme}
                             />
+                        }
+                    />
+                    <Route
+                        path="/friend-requests"
+                        element={
+                            <ProtectedRoute>
+                                <FriendRequestPage
+                                    theme={theme}
+                                    setTheme={setTheme}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/all-listings"
+                        element={
+                            <AllListingPages
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/view-all-services"
+                        element={
+                            <ViewAllServices
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/view-all-products"
+                        element={
+                            <ViewAllProducts
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/view-all-courses"
+                        element={
+                            <ViewAllCourses theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/view-all-webinars"
+                        element={
+                            <ViewAllWebinars
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/group-chat"
+                        element={
+                            <GroupChat theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/campaign-listing"
+                        element={
+                            <MyCampaign theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/boost-campaign"
+                        element={
+                            <BoostCampaign theme={theme} setTheme={setTheme} />
                         }
                     />
                 </Routes>

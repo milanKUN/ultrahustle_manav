@@ -1,0 +1,198 @@
+/* Layout Shell */
+.alp-layout-wrapper {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.alp-layout-body {
+  padding-top: 85px;  /* Match UserNavbar */
+  display: flex;
+  position: relative;
+  z-index: 10;
+  flex: 1;
+}
+
+.alp-main-content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.alp-scroll-area {
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+  height: calc(100vh - 85px);
+  width: 100%;
+}
+
+.alp-page-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Typography */
+.alp-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 30px;
+  margin-top: 0;
+}
+
+.alp-section {
+  margin-bottom: 40px;
+}
+
+.alp-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* Grid layout for cards */
+.alp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+/* View All Button */
+.alp-view-all-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alp-view-all-btn {
+  background-color: #ceff1b;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.alp-view-all-btn:hover {
+  background-color: #bade15;
+}
+
+/* Search Bar */
+.alp-search-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 30px;
+}
+
+.alp-search-input {
+  width: 100%;
+  padding: 12px 20px 12px 42px;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #fff;
+  color: #333;
+}
+
+.alp-search-input:focus {
+  border-color: #a6cc15;
+}
+
+.alp-search-input::placeholder {
+  color: #a0a0a0;
+}
+
+.alp-search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0a0;
+  pointer-events: none;
+}
+
+/* --- Responsive Adjustments --- */
+@media screen and (max-width: 992px) {
+  .alp-layout-body {
+    padding-top: 70px;
+  }
+  .alp-scroll-area {
+    height: calc(100vh - 70px);
+  }
+  .alp-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .alp-page-container {
+    padding: 24px 20px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .alp-page-container {
+    padding: 16px;
+  }
+  .alp-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .alp-page-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .alp-section-title {
+    font-size: 16px;
+  }
+}
+
+/* --- Dark Mode --- */
+.dark .alp-page-container {
+  background-color: transparent;
+}
+
+.dark .alp-page-title,
+.dark .alp-section-title {
+  color: #f0f0f0;
+}
+
+.dark .alp-search-input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #fff;
+}
+
+.dark .alp-search-input:focus {
+  border-color: #ceff1b;
+}
+
+.dark .alp-search-input::placeholder {
+  color: #888;
+}
+
+/* We don't redefine .tsl-mp-card dark classes here 
+   as they should already be handled in TeamServiceListing.css */

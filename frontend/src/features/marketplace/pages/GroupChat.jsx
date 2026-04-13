@@ -14,9 +14,9 @@ import {
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar"; 
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
-import DetailedTeamCard from "../components/DetailedTeamCard";
+import GroupDetailsCard from "../components/GroupDetailsCard";
 import "../../../Darkuser.css";
-import "./MessageBox.css";
+import "./GroupChat.css";
 
 const CONVERSATIONS = [
   {
@@ -456,9 +456,8 @@ export default function MessageBox({ theme, setTheme }) {
                                 </div>
                             </footer>
                         </section>
-
                         <aside className="messagebox-column messagebox-profile pr-1">
-                            <DetailedTeamCard />
+                            <GroupDetailsCard />
                         </aside>
                     </main>
                 </div>

@@ -1,0 +1,408 @@
+.fr-layout-wrapper {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fr-layout-body {
+  padding-top: 55px;
+  display: flex;
+  position: relative;
+  z-index: 10;
+  flex: 1;
+}
+
+.fr-main-content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fr-scroll-area {
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+  height: calc(100vh - 55px);
+  /* Matches padding-top of .fr-layout-body */
+  width: 100%;
+}
+
+.fr-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* changed min-height from 100vh so that it centers properly within scroll area */
+  min-height: 100%;
+  padding: 40px 20px;
+  background-color: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.fr-modal {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 850px;
+  min-height: 600px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 30px 40px;
+  box-sizing: border-box;
+  border-right: none;
+}
+
+.fr-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.fr-close-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.fr-tabs-wrapper {
+  border-bottom: 2px solid #a0a0a0;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 0px;
+  position: relative;
+}
+
+.fr-tabs-container {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  justify-content: center;
+  position: relative;
+  bottom: -2px;
+  /* Pull it down to sit cleanly over the border */
+}
+
+.fr-tab {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  font-weight: 700;
+  font-size: 15px;
+  color: #333;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  /* Slightly rounded top, flat bottom */
+  transition: all 0.2s;
+  position: relative;
+  /* Because we need it to look layered */
+}
+
+.fr-tab.active {
+  background-color: #ceff1b;
+  color: #000;
+  border-radius: 8px;
+  /* Based on image, it looks like a pill/rounded button floating on top or sitting over the line */
+  /* Wait, the image shows it is completely rounded like a pill on top of the line? Or just rounded top? 
+     It has a border radius on all corners in the screenshot. */
+  border-radius: 8px;
+  bottom: 0;
+  /* Align perfectly */
+}
+
+.fr-search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.fr-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.fr-search-input:focus {
+  border-color: #a6cc15;
+  /* slightly darker lime for focus */
+}
+
+.fr-search-input::placeholder {
+  color: #a0a0a0;
+}
+
+.fr-search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0a0a0;
+  pointer-events: none;
+}
+
+.fr-users-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom Scrollbar for list */
+.fr-users-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fr-users-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fr-users-list::-webkit-scrollbar-thumb {
+  background: #ceff1b;
+  border-radius: 4px;
+}
+
+.fr-users-list::-webkit-scrollbar-thumb:hover {
+  background: #bade15;
+}
+
+.fr-user-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  margin-bottom: 10px;
+}
+
+.fr-user-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.fr-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: #d9d9d9;
+  border-radius: 50%;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.fr-username {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.fr-user-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fr-btn-primary {
+  background-color: #ceff1b;
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 90px;
+}
+
+.fr-btn-primary:hover {
+  background-color: #bade15;
+}
+
+.fr-btn-primary.following-state {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.fr-btn-primary.following-state:hover {
+  background-color: #e0e0e0;
+}
+
+.fr-btn-secondary {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #e0e0e0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 70px;
+}
+
+.fr-btn-secondary:hover {
+  background-color: #f9f9f9;
+  border-color: #d0d0d0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 992px) {
+  .fr-layout-body {
+    padding-top: 55px;
+    /* Ensure consistency with UserNavbar */
+  }
+
+  .fr-scroll-area {
+    height: calc(100vh - 55px);
+  }
+
+  .fr-page-container {
+    padding: 20px;
+  }
+}
+
+/* Tablet adjustments */
+@media screen and (max-width: 768px) {
+  .fr-page-container {
+    align-items: flex-start;
+    /* Prevent vertical centering which causes large top margin */
+    padding: 20px 16px;
+  }
+
+  .fr-modal {
+    padding: 30px;
+    height: auto;
+    min-height: 80vh;
+  }
+
+  .fr-btn-primary,
+  .fr-btn-secondary {
+    padding: 8px 12px;
+  }
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 600px) {
+  .fr-page-container {
+    align-items: flex-start;
+    /* Push to the top of the container */
+    padding: 10px;
+  }
+
+  .fr-modal {
+    padding: 24px 20px;
+    height: auto;
+    min-height: 90vh;
+    border-radius: 16px;
+  }
+
+  .fr-user-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fr-btn-primary,
+  .fr-btn-secondary {
+    padding: 6px 12px;
+    font-size: 11px;
+    width: 100%;
+  }
+
+  .fr-avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+
+  .fr-username {
+    font-size: 14px;
+  }
+}
+
+/* --- Dark Mode Styles --- */
+.dark .fr-page-container {
+  background-color: transparent;
+}
+
+.dark .fr-modal {
+  background-color: #1e1e1e;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dark .fr-close-btn:hover {
+  background-color: #333;
+}
+
+.dark .fr-tab {
+  color: #cccccc;
+}
+
+.dark .fr-tab.active {
+  background-color: #ceff1b;
+  color: #000;
+}
+
+.dark .fr-tabs-wrapper {
+  border-bottom-color: #444;
+}
+
+.dark .fr-search-input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #fff;
+}
+
+.dark .fr-search-input:focus {
+  border-color: #ceff1b;
+}
+
+.dark .fr-search-input::placeholder {
+  color: #888;
+}
+
+.dark .fr-avatar {
+  background-color: #444;
+}
+
+.dark .fr-username {
+  color: #e0e0e0;
+}
+
+.dark .fr-btn-secondary {
+  background-color: #2a2a2a;
+  color: #b0b0b0;
+  border-color: #4a4a4a;
+}
+
+.dark .fr-btn-secondary:hover {
+  background-color: #3a3a3a;
+  border-color: #6a6a6a;
+  color: #fff;
+}
+
+.dark .fr-btn-primary.following-state {
+  background-color: #2a2a2a;
+  color: #b0b0b0;
+}
+
+.dark .fr-btn-primary.following-state:hover {
+  background-color: #3a3a3a;
+  color: #fff;
+}
