@@ -764,6 +764,7 @@ class ListingController extends Controller
             ->get([
                 'listings.id',
                 'listings.title',
+                'listings.username as listing_username',
                 'listings.listing_type',
                 'listings.cover_media_path',
                 'users.username as creator_username',
@@ -771,6 +772,7 @@ class ListingController extends Controller
             ->map(fn ($row) => [
                 'id' => $row->id,
                 'title' => $row->title,
+                'listing_username' => $row->listing_username,
                 'listing_type' => $row->listing_type,
                 'cover_media_path' => $row->cover_media_path,
                 'cover_media_url' => $row->cover_media_path ? Storage::disk('public')->url($row->cover_media_path) : null,
@@ -790,6 +792,7 @@ class ListingController extends Controller
             ->get([
                 'listings.id',
                 'listings.title',
+                'listings.username as listing_username',
                 'listings.listing_type',
                 'listings.cover_media_path',
                 'users.username as creator_username',
@@ -797,6 +800,7 @@ class ListingController extends Controller
             ->map(fn ($row) => [
                 'id' => $row->id,
                 'title' => $row->title,
+                'listing_username' => $row->listing_username,
                 'listing_type' => $row->listing_type,
                 'cover_media_path' => $row->cover_media_path,
                 'cover_media_url' => $row->cover_media_path ? Storage::disk('public')->url($row->cover_media_path) : null,

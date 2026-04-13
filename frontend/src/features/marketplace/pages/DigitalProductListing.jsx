@@ -269,7 +269,8 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
   const mapListingCard = (item) => ({
     id: item?.id,
-    username: item?.creator_username || item?.username || "",
+    listingUsername: item?.listing_username || item?.username || "",
+    creatorUsername: item?.creator_username || "",
     image: toMediaUrl(
       item?.cover_media_url ||
         item?.cover_media_path ||
@@ -902,7 +903,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                           <button
                             className="btn-view-listing"
                             onClick={() =>
-                              navigate(`/${listingTypeToRouteSlug(item.listingType)}/${item.username}`)
+                              navigate(`/${listingTypeToRouteSlug(item.listingType)}/${item.listingUsername}`)
                             }
                           >
                             View Listing
