@@ -378,7 +378,7 @@ export default function App() {
                         }
                     />
                     <Route path="/edit-digital-product/:username" element={<EditDigitalProduct />} />
-                    {/* <Route path="/digital-product/:username" element={<ProductDeliverables />} /> */}
+                    <Route path="/digital-product/:username" element={<DigitalProductListing />} />
                     {/* <Route path="/course/:username" element={<CourseDeliverables />} /> */}
                     <Route path="/edit-course/:username" element={<EditCourse />} />
                     {/* <Route path="/webinar/:username" element={<WebinarDeliverables />} /> */}
