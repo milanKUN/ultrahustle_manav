@@ -347,3 +347,13 @@ export const getPublicUserListings = async (username) => {
     throw new Error(extractErrorMessage(err));
   }
 };
+
+//get my teams
+export const getMyTeams = async () => {
+  try {
+    const res = await api.get("/api/v1/my-teams");
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};

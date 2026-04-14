@@ -11,6 +11,7 @@ import {
   createListing,
   getListingByUsername,
   updateListing,
+  getMyTeams,
 } from "../api/listingApi";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
@@ -47,10 +48,8 @@ export default function CreateDigitalProduct({
     [],
   );
 
-  const teamList = useMemo(
-    () => ["Ultra Hustle Studio", "Design Squad", "Dev Crew"],
-    [],
-  );
+  const [teamList, setTeamList] = useState([]);
+  const [teamsLoading, setTeamsLoading] = useState(false);
 
   const TABS = ["Basic", "Standard", "Premium"];
 
@@ -178,6 +177,25 @@ export default function CreateDigitalProduct({
       },
     }));
   };
+
+  React.useEffect(() => {
+    const loadTeams = async () => {
+      if (sellerMode !== "Team") return;
+
+      try {
+        setTeamsLoading(true);
+        const res = await getMyTeams();
+        const teams = Array.isArray(res?.teams) ? res.teams : [];
+        setTeamList(teams.map((item) => item.team_name).filter(Boolean));
+      } catch (e) {
+        setTeamList([]);
+      } finally {
+        setTeamsLoading(false);
+      }
+    };
+
+    loadTeams();
+  }, [sellerMode]);
 
   const [includedInput, setIncludedInput] = useState("");
   const [toolsInput, setToolsInput] = useState("");
@@ -686,7 +704,12 @@ export default function CreateDigitalProduct({
                           <label className="csl-label">Seller Type</label>
                           <CustomSelect
                             value={sellerMode}
-                            onChange={(val) => setSellerMode(val)}
+                            onChange={(val) => {
+                              setSellerMode(val);
+                              if (val !== "Team") {
+                                setTeamName("");
+                              }
+                            }}
                             options={["Solo", "Team"]}
                             placeholder="Select mode"
                           />
@@ -700,8 +723,16 @@ export default function CreateDigitalProduct({
                             value={teamName}
                             onChange={(val) => setTeamName(val)}
                             options={teamList}
-                            placeholder="Select team name"
-                            disabled={sellerMode !== "Team"}
+                            placeholder={
+                              sellerMode !== "Team"
+                                ? "Select team name"
+                                : teamsLoading
+                                  ? "Loading teams..."
+                                  : teamList.length
+                                    ? "Select team name"
+                                    : "No team found"
+                            }
+                            disabled={sellerMode !== "Team" || teamsLoading || teamList.length === 0}
                           />
                         </div>
                       </div>
@@ -1029,9 +1060,9 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
 
       {open && (
         <ul className="onboarding-options-list dark:bg-[#1E1E1E]">
-          {options.map((opt) => (
+          {options.map((opt, index) => (
             <li
-              key={opt}
+              key={`${opt}-${index}`}
               className={value === opt ? "active" : ""}
               onClick={() => {
                 onChange(opt);
