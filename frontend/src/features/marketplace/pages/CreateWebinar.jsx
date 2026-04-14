@@ -52,6 +52,17 @@ export default function CreateWebinar({
     return `${year}-${month}-${day}`;
   };
 
+  const getCurrentTimeString = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
+  const isTodayDate = (value) => value === getTodayDateString();
+
+  
+
   const webinarLevels = useMemo(
     () => ["Beginner", "Intermediate", "Advanced", "Expert"],
     [],
@@ -101,7 +112,8 @@ export default function CreateWebinar({
     link: "",
     ticketPrice: "",
   });
-
+  const minDate = getTodayDateString();
+  const minTime = isTodayDate(schedule.date) ? getCurrentTimeString() : "";
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -332,11 +344,70 @@ export default function CreateWebinar({
     if (!String(schedule.startTime || "").trim()) return "Start time is required.";
 
     const today = getTodayDateString();
+
     if (schedule.date < today) {
       return "Past dates are not allowed for webinar schedule.";
     }
 
+    if (schedule.date === today && schedule.startTime < getCurrentTimeString()) {
+      return "Past time can't be selected for today's webinar.";
+    }
+
     return "";
+  };
+
+  React.useEffect(() => {
+    if (!schedule.date || !schedule.startTime) return;
+
+    if (isTodayDate(schedule.date)) {
+      const currentTime = getCurrentTimeString();
+
+      if (schedule.startTime < currentTime) {
+        setSchedule((prev) => ({
+          ...prev,
+          startTime: "",
+        }));
+      }
+    }
+  }, [schedule.date]);
+
+  const handleScheduleDateChange = (value) => {
+    const today = getTodayDateString();
+
+    setSchedule((prev) => {
+      const next = {
+        ...prev,
+        date: value,
+      };
+
+      if (value === today && prev.startTime && prev.startTime < getCurrentTimeString()) {
+        next.startTime = "";
+      }
+
+      return next;
+    });
+
+    setSaveError("");
+  };
+
+  const handleScheduleTimeChange = (value) => {
+    const today = getTodayDateString();
+    const currentTime = getCurrentTimeString();
+
+    if (schedule.date === today && value < currentTime) {
+      setSaveError("Past time can't be selected for today's webinar.");
+      setSchedule((prev) => ({
+        ...prev,
+        startTime: "",
+      }));
+      return;
+    }
+
+    setSaveError("");
+    setSchedule((prev) => ({
+      ...prev,
+      startTime: value,
+    }));
   };
 
   const buildPayload = (status) => ({
@@ -752,18 +823,24 @@ export default function CreateWebinar({
                           type="date"
                           value={schedule.date || ""}
                           min={getTodayDateString()}
-                          onChange={(e) => updateSchedule("date", e.target.value)}
+                          onChange={(e) => handleScheduleDateChange(e.target.value)}
                         />
                       </div>
 
                       <div className="csl-field">
                         <label className="csl-label">Start time</label>
                         <input
-                          type="time"
                           className="csl-input"
-                          value={schedule.startTime}
-                          onChange={(e) => updateSchedule("startTime", e.target.value)}
+                          type="time"
+                          value={schedule.startTime || ""}
+                          min={schedule.date === getTodayDateString() ? getCurrentTimeString() : ""}
+                          onChange={(e) => handleScheduleTimeChange(e.target.value)}
                         />
+                        {saveError && (
+                          <p style={{ color: "red", marginTop: "8px", fontSize: "14px" }}>
+                            {saveError}
+                          </p>
+                        )}
                       </div>
                     </div>
 
