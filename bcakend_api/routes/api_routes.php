@@ -150,7 +150,7 @@ Route::get('/v1/public/users/{username}/listings', [ListingController::class, 'g
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/listings', [ListingController::class, 'store']);
 	Route::get('/my-listings', [ListingController::class, 'myListings']);
-	
+	Route::get('/my-teams', [ListingController::class, 'myTeams']);
 	Route::get('/listings/{username}', [ListingController::class, 'getListingByUsername']);
     Route::put('/listings/{username}', [ListingController::class, 'updateListing']);
     Route::post('/listings/{username}', [ListingController::class, 'updateListing']);
@@ -162,3 +162,4 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::delete('/media/{media}', [PortfolioController::class, 'destroyListingMedia']);
     });
 });
+Route::get('/v1/languages', [ListingController::class, 'getLanguages']);

@@ -6,7 +6,7 @@ import MyPortfolio from "../../dashboard/components/UserProfile/MyPortfolio";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
 
-export default function ProductListing({ theme, setTheme }) {
+export default function CreateDigitalProduct({ theme, setTheme }) {
   /* ================== CONSTANTS ================== */
   const categories = useMemo(
     () => ["Design", "Development", "Marketing", "Writing"],
@@ -178,6 +178,25 @@ export default function ProductListing({ theme, setTheme }) {
       },
     }));
   };
+
+  // React.useEffect(() => {
+  //   const loadTeams = async () => {
+  //     if (sellerMode !== "Team") return;
+
+  //     try {
+  //       setTeamsLoading(true);
+  //       const res = await getMyTeams();
+  //       const teams = Array.isArray(res?.teams) ? res.teams : [];
+  //       setTeamList(teams.map((item) => item.team_name).filter(Boolean));
+  //     } catch (e) {
+  //       setTeamList([]);
+  //     } finally {
+  //       setTeamsLoading(false);
+  //     }
+  //   };
+
+  //   loadTeams();
+  // }, [sellerMode]);
 
   const [includedInput, setIncludedInput] = useState("");
   const [howInput, setHowInput] = useState("");
@@ -955,9 +974,9 @@ function CustomSelect({
       </div>
       {open && (
         <ul className="onboarding-options-list dark:bg-[#1E1E1E]">
-          {options.map((opt) => (
+          {options.map((opt, index) => (
             <li
-              key={opt}
+              key={`${opt}-${index}`}
               className={value === opt ? "active" : ""}
               onClick={() => {
                 onChange(opt);

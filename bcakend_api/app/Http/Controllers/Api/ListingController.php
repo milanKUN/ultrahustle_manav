@@ -1469,4 +1469,88 @@ class ListingController extends Controller
             'listing' => $this->getListingFullData($listing->id),
         ]);
     }
+
+    //get my teams
+    public function myTeams(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!Schema::hasTable('teams')) {
+            return response()->json([
+                'success' => true,
+                'teams' => [],
+            ]);
+        }
+
+        $query = DB::table('teams')->where('owner_user_id', $user->id);
+
+        $columns = Schema::getColumnListing('teams');
+
+        $nameColumn = 'team_name';
+        if (!in_array('team_name', $columns, true)) {
+            if (in_array('name', $columns, true)) {
+                $nameColumn = 'name';
+            } elseif (in_array('title', $columns, true)) {
+                $nameColumn = 'title';
+            }
+        }
+
+        if (in_array('status', $columns, true)) {
+            $query->where('status', 'active');
+        }
+
+        $teams = $query
+            ->orderByDesc('id')
+            ->get([
+                'id',
+                DB::raw($nameColumn . ' as team_name'),
+            ])
+            ->map(fn ($row) => [
+                'id' => $row->id,
+                'team_name' => $row->team_name,
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'teams' => $teams,
+        ]);
+    }
+
+    public function getLanguages(): JsonResponse
+    {
+        if (!Schema::hasTable('languages')) {
+            return response()->json([
+                'success' => true,
+                'languages' => [],
+            ]);
+        }
+
+        $columns = Schema::getColumnListing('languages');
+
+        $valueColumn = in_array('value', $columns, true) ? 'value' : 'name';
+
+        $query = DB::table('languages');
+
+        if (in_array('status', $columns, true)) {
+            $query->where('status', 'active');
+        }
+
+        $languages = $query
+            ->orderBy($valueColumn)
+            ->get([
+                'id',
+                DB::raw($valueColumn . ' as value'),
+            ])
+            ->map(fn ($row) => [
+                'id' => $row->id,
+                'value' => $row->value,
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'languages' => $languages,
+        ]);
+    }
 }
