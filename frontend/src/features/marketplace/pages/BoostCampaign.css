@@ -407,131 +407,48 @@
   color: #aaa;
 }
 
-/* Step Tracker */
-.bc-steps-tracker {
+/* Step Tracker (rebuilt from scratch) */
+.bc-steps-strip {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 30px;
-  border: none;
-  background: none;
 }
 
-
-.bc-step-item {
+.bc-step-strip-item {
   flex: 1;
   min-width: 180px;
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  border: 1px solid #bba; /* using #bba equivalent for #ccc to ensure no yellow */
-  border-color: #ccc;
-  border-radius: 16px;
-  background-color: #fff;
   gap: 12px;
-  cursor: default; /* Remove any pointer unless clickable */
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: #fff;
+  user-select: none;
+  pointer-events: none;
 }
 
-.bc-step-item:hover {
-  background-color: #fff;
-  border-color: #ccc;
-}
-
-.dark .bc-step-item {
-  background-color: #1a1a1a;
-  border-color: #444;
-}
-
-.dark .bc-step-item:hover {
-  background-color: #1a1a1a;
-  border-color: #444;
-}
-
-.bc-step-item.active {
-  background-color: #d4ff32;
-  border-color: #c4ea2e;
-}
-
-.bc-step-item.active:hover {
-  background-color: #d4ff32;
-  border-color: #c4ea2e;
-}
-
-.dark .bc-step-item.active {
-  background-color: #c4ea2e;
-  border-color: #b0d220;
-}
-
-.dark .bc-step-item.active:hover {
-  background-color: #c4ea2e;
-  border-color: #b0d220;
-}
-
-.bc-step-item.completed {
-  background-color: #fff;
-  border-color: #ccc;
-}
-
-.bc-step-item.completed:hover {
-  background-color: #fff;
-  border-color: #ccc;
-}
-
-.dark .bc-step-item.completed {
-  background-color: #1a1a1a;
-  border-color: #555;
-}
-
-.dark .bc-step-item.completed:hover {
-  background-color: #1a1a1a;
-  border-color: #555;
-}
-
-.bc-step-icon {
+.bc-step-strip-icon {
   width: 34px;
   height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
   flex-shrink: 0;
-  background-color: #d4ff32;
+  font-size: 14px;
+  font-weight: 600;
   color: #111;
+  background: #d4ff32;
 }
 
-.dark .bc-step-item .bc-step-icon {
-  background-color: #c4ea2e;
-  color: #111;
-}
-
-.bc-step-item.active .bc-step-icon {
-  background-color: #2a2a2a;
-  color: #fff;
-}
-
-.dark .bc-step-item.active .bc-step-icon {
-  background-color: #111;
-  color: #fff;
-}
-
-.bc-step-item.completed .bc-step-icon {
-  background-color: #111;
-  color: #fff;
-}
-
-.dark .bc-step-item.completed .bc-step-icon {
-  background-color: #fff;
-  color: #111;
-}
-
-.bc-step-info {
+.bc-step-strip-info {
   display: flex;
   flex-direction: column;
 }
 
-.bc-step-name {
+.bc-step-strip-name {
   font-size: 15px;
   font-weight: 500;
   color: #111;
@@ -539,35 +456,311 @@
   white-space: nowrap;
 }
 
-.dark .bc-step-name {
-  color: #eee;
-}
-
-.bc-step-item.active .bc-step-name,
-.bc-step-item.completed .bc-step-name,
-.dark .bc-step-item.active .bc-step-name,
-.dark .bc-step-item.completed .bc-step-name {
-  color: #111;
-}
-.dark .bc-step-item.active .bc-step-name { color: #111; }
-.dark .bc-step-item.completed .bc-step-name { color: #eee; }
-
-.bc-step-desc {
+.bc-step-strip-desc {
   font-size: 12px;
   color: #777;
   white-space: nowrap;
 }
 
-.dark .bc-step-desc {
-  color: #aaa;
+.bc-step-strip-item.active {
+  background: #d4ff32;
+  border-color: #c4ea2e;
 }
 
-.bc-step-item.active .bc-step-desc {
+.bc-step-strip-item.active .bc-step-strip-icon {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+.bc-step-strip-item.active .bc-step-strip-desc {
   color: #5b6e15;
 }
 
-.dark .bc-step-item.active .bc-step-desc {
+.bc-step-strip-item.completed {
+  background: #fff;
+  border-color: #ccc;
+}
+
+.bc-step-strip-item.completed .bc-step-strip-icon {
+  background: #111;
+  color: #fff;
+}
+
+.dark .bc-step-strip-item {
+  background: #1a1a1a;
+  border-color: #444;
+}
+
+.dark .bc-step-strip-icon {
+  background: #c4ea2e;
+  color: #111;
+}
+
+.dark .bc-step-strip-name {
+  color: #eee;
+}
+
+.dark .bc-step-strip-desc {
+  color: #aaa;
+}
+
+.dark .bc-step-strip-item.active {
+  background: #c4ea2e;
+  border-color: #b0d220;
+}
+
+.dark .bc-step-strip-item.active .bc-step-strip-icon {
+  background: #111;
+  color: #fff;
+}
+
+.dark .bc-step-strip-item.active .bc-step-strip-name {
+  color: #111;
+}
+
+.dark .bc-step-strip-item.active .bc-step-strip-desc {
   color: #38420b;
+}
+
+.dark .bc-step-strip-item.completed {
+  background: #1a1a1a;
+  border-color: #555;
+}
+
+.dark .bc-step-strip-item.completed .bc-step-strip-icon {
+  background: #fff;
+  color: #111;
+}
+
+.bc-manual-audience-layout {
+  display: grid;
+  margin-top: -15px;
+  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
+  gap: 24px;
+}
+
+.bc-manual-audience-main,
+.bc-manual-audience-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-manual-audience-main {
+  gap: 16px;
+}
+
+.bc-manual-audience-side {
+  gap: 20px;
+}
+
+.bc-manual-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-manual-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.dark .bc-manual-label {
+  color: #f2f2f2;
+}
+
+.bc-manual-label-device {
+  margin-bottom: 8px;
+}
+
+.bc-manual-input {
+  height: 40px;
+  width: 100%;
+  border: 1px solid #b7b7b7;
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #444;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.bc-manual-input::placeholder {
+  color: #777;
+}
+
+.bc-manual-input.muted {
+  color: #7b7b7b;
+}
+
+.dark .bc-manual-input {
+  border-color: #505050;
+  background: #1f1f1f;
+  color: #ddd;
+}
+
+.dark .bc-manual-input::placeholder {
+  color: #bdbdbd;
+}
+
+.bc-manual-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: #898989;
+}
+
+.dark .bc-manual-note {
+  color: #a0a0a0;
+}
+
+.bc-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bc-manual-field .bc-chip-row {
+  margin-top: 12px;
+}
+
+.bc-manual-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #dfdfdf;
+  border-radius: 4px;
+  background: #fff;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #575757;
+}
+
+.bc-manual-chip-close {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 8px;
+  line-height: 1;
+  color: inherit;
+}
+
+.dark .bc-manual-chip {
+  border-color: #4a4a4a;
+  background: #232323;
+  color: #ddd;
+}
+
+.bc-manual-panel {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px 8px;
+}
+
+.bc-manual-panel-tight {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dark .bc-manual-panel {
+  background: #1f1f1f;
+}
+
+.bc-mini-chip {
+  border: 1px solid #dfdfdf;
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px 4px;
+  font-size: 12px;
+  color: #575757;
+}
+
+.dark .bc-mini-chip {
+  border-color: #4a4a4a;
+  background: #232323;
+  color: #ddd;
+}
+
+.bc-mini-chip-button {
+  cursor: default;
+  transition: none;
+}
+
+.bc-mini-chip-button.active {
+  border-color: #d4ff32;
+  background: #d4ff32;
+  color: #111;
+}
+
+.bc-manual-side-card {
+  border: 1px solid #d4ff32;
+  border-radius: 10px;
+  background: #fff;
+  padding: 16px 12px;
+}
+
+.dark .bc-manual-side-card {
+  background: #1a1a1a;
+}
+
+.bc-manual-side-title,
+.bc-manual-section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.dark .bc-manual-side-title,
+.dark .bc-manual-section-title {
+  color: #f2f2f2;
+}
+
+.bc-manual-side-text {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.dark .bc-manual-side-text {
+  color: #bbb;
+}
+
+.bc-manual-side-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #9b9b9b;
+}
+
+.dark .bc-manual-side-note {
+  color: #9f9f9f;
+}
+
+.bc-manual-side-section {
+  margin-top: 16px;
+}
+
+.bc-manual-side-section .bc-chip-row {
+  margin-top: 8px;
+}
+
+.bc-manual-progress {
+  width: 100%;
+  height: 10px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: #dddddd;
+  overflow: hidden;
+}
+
+.bc-manual-progress-fill {
+  width: 58%;
+  height: 100%;
+  border-radius: inherit;
+  background: #d4ff32;
 }
 
 /* Step Header Row & Toggles */
@@ -757,6 +950,645 @@
   color: #111;
 }
 
+/* Step 3: Budget & Duration */
+.bc-step3-content {
+  margin-top: -6px;
+}
+
+.bc-step3-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 22px;
+  margin-bottom: 16px;
+}
+
+.bc-step3-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-step3-label-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.bc-step3-label {
+  font-size: 19px;
+  font-weight: 500;
+  color: #202020;
+  margin-bottom: 10px;
+}
+
+.dark .bc-step3-label {
+  color: #f0f0f0;
+}
+
+.bc-step3-hint {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.dark .bc-step3-hint {
+  color: #a5a5a5;
+}
+
+.bc-step3-budget-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bc-step3-budget-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #8a8a8a;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #222;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.bc-step3-budget-input::-webkit-outer-spin-button,
+.bc-step3-budget-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bc-step3-budget-input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.dark .bc-step3-budget-input {
+  border-color: #4c4c4c;
+  background: #1f1f1f;
+  color: #f0f0f0;
+}
+
+.bc-step3-budget-unit {
+  font-size: 12px;
+  color: #555;
+  min-width: 54px;
+}
+
+.dark .bc-step3-budget-unit {
+  color: #adadad;
+}
+
+.bc-step3-duration-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bc-step3-duration-chip {
+  border: 1px solid #8d8d8d;
+  border-radius: 999px;
+  background: #fff;
+  min-width: 96px;
+  padding: 8px 20px;
+  font-size: 12px;
+  color: #3a3a3a;
+  cursor: pointer;
+  text-align: center;
+}
+
+.bc-step3-duration-chip.active {
+  background: #d4ff32;
+  border-color: #d4ff32;
+  color: #111;
+}
+
+.dark .bc-step3-duration-chip {
+  border-color: #5b5b5b;
+  background: #222;
+  color: #dedede;
+}
+
+.dark .bc-step3-duration-chip.active {
+  background: #c4ea2e;
+  border-color: #c4ea2e;
+  color: #111;
+}
+
+.bc-step3-end-date {
+  margin-top: 10px;
+  border: 1px solid #9d9d9d;
+  border-radius: 10px;
+  background: #fff;
+  min-height: 44px;
+  padding: 5px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+  color: #767676;
+}
+
+.bc-step3-end-date-value {
+  font-size: 19px;
+  color: #222;
+  line-height: 1.2;
+}
+
+.dark .bc-step3-end-date {
+  border-color: #4c4c4c;
+  background: #1f1f1f;
+  color: #a1a1a1;
+}
+
+.dark .bc-step3-end-date-value {
+  color: #f1f1f1;
+}
+
+.bc-step3-boost-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.bc-step3-boost-card {
+  border: 1px solid #8d8d8d;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bc-step3-boost-card.active {
+  border-color: #d4ff32;
+  box-shadow: inset 0 0 0 1px #d4ff32;
+}
+
+.dark .bc-step3-boost-card {
+  border-color: #4d4d4d;
+  background: #202020;
+}
+
+.dark .bc-step3-boost-card.active {
+  border-color: #c4ea2e;
+  box-shadow: inset 0 0 0 1px #c4ea2e;
+}
+
+.bc-step3-boost-title {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+}
+
+.bc-step3-boost-subtitle {
+  font-size: 11px;
+  color: #666;
+}
+
+.bc-step3-boost-price {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #111;
+}
+
+.dark .bc-step3-boost-title,
+.dark .bc-step3-boost-price {
+  color: #efefef;
+}
+
+.dark .bc-step3-boost-subtitle {
+  color: #ababab;
+}
+
+.bc-step3-estimated-spend {
+  border: 1px solid #8f8f8f;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.dark .bc-step3-estimated-spend {
+  border-color: #515151;
+  background: #1f1f1f;
+}
+
+.bc-step3-estimated-label {
+  font-size: 16px;
+  color: #222;
+}
+
+.bc-step3-estimated-value {
+  margin-top: 4px;
+  font-size: 28px;
+  line-height: 1;
+  color: #111;
+  font-weight: 500;
+}
+
+.bc-step3-estimated-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #777;
+}
+
+.dark .bc-step3-estimated-label,
+.dark .bc-step3-estimated-value {
+  color: #efefef;
+}
+
+.dark .bc-step3-estimated-note {
+  color: #ababab;
+}
+
+.bc-step3-results-card {
+  border: 1px solid #8f8f8f;
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px 14px;
+}
+
+.dark .bc-step3-results-card {
+  border-color: #515151;
+  background: #1f1f1f;
+}
+
+.bc-step3-results-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.bc-step3-results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bc-step3-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bc-step3-result-label {
+  font-size: 15px;
+  color: #4c4c4c;
+}
+
+.bc-step3-result-value {
+  font-size: 26px;
+  line-height: 1.15;
+  color: #111;
+  font-weight: 400;
+}
+
+.bc-step3-results-note {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #565656;
+}
+
+.dark .bc-step3-results-title,
+.dark .bc-step3-result-value {
+  color: #efefef;
+}
+
+.dark .bc-step3-result-label,
+.dark .bc-step3-results-note {
+  color: #aeaeae;
+}
+
+/* Step 4: Review & Launch */
+.bc-step4-content {
+  margin-top: -4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bc-step4-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.75fr);
+  gap: 12px;
+}
+
+.bc-step4-left-col,
+.bc-step4-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bc-step4-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bc-step4-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.bc-step4-name-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.bc-step4-name-input {
+  flex: 1;
+  height: 40px;
+  border: 1px solid #8f8f8f;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 13px;
+  color: #222;
+  outline: none;
+}
+
+.bc-step4-optional-pill {
+  background: #d4ff32;
+  color: #111;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bc-step4-card,
+.bc-step4-side-card,
+.bc-step4-payment-card {
+  border: 1px solid #9b9b9b;
+  border-radius: 12px;
+  background: #efefef;
+  padding: 10px 12px;
+  margin-bottom: 0;
+}
+
+.bc-step4-card-title {
+  margin: 0;
+  text-align: left;
+  font-size: 27px;
+  font-weight: 600;
+  color: #111;
+}
+
+.bc-step4-review-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bc-step4-review-item {
+  border: 1px solid #b9b9b9;
+  border-radius: 10px;
+  background: #d7d7d7;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bc-step4-review-kicker,
+.bc-step4-review-meta {
+  font-size: 9px;
+  color: #4d4d4d;
+}
+
+.bc-step4-review-name {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #121212;
+}
+
+.bc-step4-results-card {
+  margin-top: 8px;
+  border: 1px solid #9e9e9e;
+  border-radius: 10px;
+  background: #ededed;
+  padding: 8px 10px;
+}
+
+.bc-step4-results-title {
+  font-size: 30px;
+  line-height: 1;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.bc-step4-results-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bc-step4-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bc-step4-result-label {
+  font-size: 13px;
+  color: #414141;
+}
+
+.bc-step4-result-value {
+  font-size: 29px;
+  line-height: 1.15;
+  color: #111;
+}
+
+.bc-step4-results-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #4f4f4f;
+}
+
+.bc-step4-side-text {
+  margin: 4px 0 0;
+  text-align: left;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #4f4f4f;
+}
+
+.bc-step4-checkbox-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #4d4d4d;
+}
+
+.bc-step4-checkbox-row input {
+  margin-top: 1px;
+  width: 22px;
+  height: 22px;
+}
+
+.bc-step4-launch-btn {
+  width: 100%;
+  margin-top: 10px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #bdbdbd;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bc-step4-save-btn {
+  width: 100%;
+  margin-top: 8px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #d4ff32;
+  color: #111;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bc-step4-edit-link {
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: #262626;
+  font-size: 13px;
+}
+
+.bc-step4-status-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bc-step4-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: #111;
+}
+
+.bc-step4-status-pill.gray {
+  background: #b3b3b3;
+}
+
+.bc-step4-status-pill.blue {
+  background: #78c2f5;
+}
+
+.bc-step4-status-pill.lime {
+  background: #b6f115;
+}
+
+.bc-step4-status-pill.yellow {
+  background: #d1ef43;
+}
+
+.bc-step4-status-pill.red {
+  background: #ff2121;
+}
+
+.bc-step4-payment-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bc-step4-payment-btn {
+  border: 1px solid #adadad;
+  border-radius: 12px;
+  background: #cfcfcf;
+  min-height: 74px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  color: #111;
+}
+
+.bc-step4-payment-btn span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bc-step4-payment-btn small {
+  font-size: 10px;
+}
+
+.dark .bc-step4-label,
+.dark .bc-step4-card-title,
+.dark .bc-step4-results-title,
+.dark .bc-step4-result-value,
+.dark .bc-step4-payment-btn,
+.dark .bc-step4-edit-link {
+  color: #efefef;
+}
+
+.dark .bc-step4-name-input {
+  border-color: #4d4d4d;
+  background: #1f1f1f;
+  color: #efefef;
+}
+
+.dark .bc-step4-card,
+.dark .bc-step4-side-card,
+.dark .bc-step4-payment-card,
+.dark .bc-step4-results-card {
+  border-color: #4d4d4d;
+  background: #1f1f1f;
+}
+
+.dark .bc-step4-review-item,
+.dark .bc-step4-payment-btn {
+  border-color: #515151;
+  background: #242424;
+}
+
+.dark .bc-step4-review-kicker,
+.dark .bc-step4-review-meta,
+.dark .bc-step4-result-label,
+.dark .bc-step4-results-note,
+.dark .bc-step4-side-text,
+.dark .bc-step4-checkbox-row,
+.dark .bc-step4-payment-btn small {
+  color: #b0b0b0;
+}
+
+.dark .bc-step4-review-name {
+  color: #f0f0f0;
+}
+
 /* Step Content */
 
 .bc-content-title {
@@ -898,7 +1730,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #eee;
+  border-top: none;
   padding-top: 20px;
   margin-top: auto;
 }
@@ -961,10 +1793,339 @@
   background-color: #fff;
 }
 
+/* Step 4 (rebuilt) */
+.bc-s4-root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bc-s4-campaign {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bc-s4-label {
+  font-size: 13px;
+  color: #333;
+}
+
+.bc-s4-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bc-s4-name-input {
+  flex: 1;
+  height: 40px;
+  border: 1px solid #8f8f8f;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 13px;
+  color: #222;
+  outline: none;
+}
+
+.bc-s4-optional {
+  background: #d4ff32;
+  color: #111;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bc-s4-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.75fr);
+  gap: 12px;
+}
+
+.bc-s4-review,
+.bc-s4-panel,
+.bc-s4-payment {
+  border: 1px solid #9b9b9b;
+  border-radius: 12px;
+  background: #efefef;
+  padding: 10px 12px;
+}
+
+.bc-s4-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bc-s4-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+
+.bc-s4-listings {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bc-s4-listing {
+  border: 1px solid #b9b9b9;
+  border-radius: 10px;
+  background: #d7d7d7;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bc-s4-kicker,
+.bc-s4-meta {
+  font-size: 9px;
+  color: #4d4d4d;
+}
+
+.bc-s4-listing-name {
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #121212;
+}
+
+.bc-s4-results {
+  margin-top: 8px;
+  border: 1px solid #9e9e9e;
+  border-radius: 10px;
+  background: #ededed;
+  padding: 8px 10px;
+}
+
+.bc-s4-results-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bc-s4-result {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bc-s4-result span {
+  font-size: 13px;
+  color: #414141;
+}
+
+.bc-s4-result strong {
+  font-size: 14px;
+  line-height: 1.2;
+  color: #111;
+}
+
+.bc-s4-note {
+  margin: 8px 0 0;
+  font-size: 10px;
+  color: #4f4f4f;
+  line-height: 1.35;
+}
+
+.bc-s4-check {
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 10px;
+  color: #4d4d4d;
+  line-height: 1.35;
+}
+
+.bc-s4-check input {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.bc-s4-btn-launch,
+.bc-s4-btn-save {
+  width: 100%;
+  height: 32px;
+  border: none;
+  border-radius: 999px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bc-s4-btn-launch {
+  background: #bdbdbd;
+  color: #fff;
+}
+
+.bc-s4-btn-save {
+  background: #d4ff32;
+  color: #111;
+}
+
+.bc-s4-btn-link {
+  width: 100%;
+  margin-top: 8px;
+  border: none;
+  background: transparent;
+  color: #262626;
+  font-size: 13px;
+}
+
+.bc-s4-status {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bc-s4-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 10px;
+  color: #111;
+}
+
+.bc-s4-chip-gray { background: #b3b3b3; }
+.bc-s4-chip-blue { background: #78c2f5; }
+.bc-s4-chip-lime { background: #b6f115; }
+.bc-s4-chip-yellow { background: #d1ef43; }
+.bc-s4-chip-red { background: #ff2121; }
+
+.bc-s4-payment-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bc-s4-pay-btn {
+  border: 1px solid #adadad;
+  border-radius: 12px;
+  background: #cfcfcf;
+  min-height: 74px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  color: #111;
+}
+
+.bc-s4-pay-btn span {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bc-s4-pay-btn small {
+  font-size: 10px;
+}
+
+.dark .bc-s4-label,
+.dark .bc-s4-title,
+.dark .bc-s4-result strong,
+.dark .bc-s4-btn-link,
+.dark .bc-s4-pay-btn {
+  color: #efefef;
+}
+
+.dark .bc-s4-name-input {
+  border-color: #4d4d4d;
+  background: #1f1f1f;
+  color: #efefef;
+}
+
+.dark .bc-s4-review,
+.dark .bc-s4-panel,
+.dark .bc-s4-payment,
+.dark .bc-s4-results {
+  border-color: #4d4d4d;
+  background: #1f1f1f;
+}
+
+.dark .bc-s4-listing,
+.dark .bc-s4-pay-btn {
+  border-color: #515151;
+  background: #242424;
+}
+
+.dark .bc-s4-kicker,
+.dark .bc-s4-meta,
+.dark .bc-s4-result span,
+.dark .bc-s4-note,
+.dark .bc-s4-check,
+.dark .bc-s4-pay-btn small {
+  color: #b0b0b0;
+}
+
+.dark .bc-s4-listing-name {
+  color: #f0f0f0;
+}
+
 /* --- Responsive Styles --- */
+
+@media (max-width: 1200px) {
+  .bc-s4-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-s4-payment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bc-step4-main-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .bc-step4-content {
+    gap: 10px;
+  }
+}
 
 /* Tablets and below */
 @media (max-width: 992px) {
+  .bc-s4-root {
+    gap: 10px;
+  }
+
+  .bc-s4-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .bc-s4-side {
+    gap: 10px;
+  }
+
+  .bc-s4-payment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .bc-s4-check input {
+    width: 15px;
+    height: 15px;
+  }
+
+  .bc-s4-btn-launch,
+  .bc-s4-btn-save {
+    height: 34px;
+    font-size: 12px;
+  }
+
   .boost-campaign-layout-body {
     padding-top: 70px;
   }
@@ -988,10 +2149,198 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
+
+  .bc-manual-audience-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-step3-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-step3-boost-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-step3-results-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bc-step4-main-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .bc-step4-payment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .bc-step4-content {
+    gap: 10px;
+  }
+
+  .bc-step4-name-row {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .bc-step4-name-input {
+    height: 44px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .bc-step4-optional-pill {
+    min-width: auto;
+    font-size: 14px;
+    padding: 6px 14px;
+  }
+
+  .bc-step4-card,
+  .bc-step4-side-card,
+  .bc-step4-payment-card {
+    padding: 12px 14px;
+  }
+
+  .bc-step4-card-title {
+    font-size: 18px;
+  }
+
+  .bc-step4-results-title {
+    font-size: 18px;
+  }
+
+  .bc-step4-result-label {
+    font-size: 12px;
+  }
+
+  .bc-step4-result-value {
+    font-size: 14px;
+  }
+
+  .bc-step4-side-text {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .bc-step4-checkbox-row {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .bc-step4-checkbox-row input {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+  }
+
+  .bc-step4-launch-btn,
+  .bc-step4-save-btn {
+    width: 100%;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .bc-step4-edit-link {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .bc-step4-status-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
 }
 
 /* Mobile */
 @media (max-width: 600px) {
+  .bc-s4-root {
+    gap: 8px;
+  }
+
+  .bc-s4-name-row {
+    flex-wrap: wrap;
+  }
+
+  .bc-s4-name-input {
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .bc-s4-optional {
+    font-size: 11px;
+    padding: 4px 12px;
+  }
+
+  .bc-s4-review,
+  .bc-s4-panel,
+  .bc-s4-payment {
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .bc-s4-title {
+    font-size: 14px;
+  }
+
+  .bc-s4-listings,
+  .bc-s4-results-grid,
+  .bc-s4-payment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-s4-listing {
+    border-radius: 8px;
+  }
+
+  .bc-s4-result span {
+    font-size: 12px;
+  }
+
+  .bc-s4-result strong {
+    font-size: 13px;
+  }
+
+  .bc-s4-note,
+  .bc-s4-check {
+    font-size: 10px;
+  }
+
+  .bc-s4-check input {
+    width: 14px;
+    height: 14px;
+  }
+
+  .bc-s4-btn-launch,
+  .bc-s4-btn-save {
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .bc-s4-btn-link {
+    font-size: 12px;
+  }
+
+  .bc-s4-chip {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+
+  .bc-s4-pay-btn {
+    min-height: 64px;
+    border-radius: 10px;
+    padding: 8px;
+  }
+
+  .bc-s4-pay-btn span {
+    font-size: 10px;
+  }
+
+  .bc-s4-pay-btn small {
+    font-size: 9px;
+  }
+
   .boost-campaign-scroll-area {
     padding: 20px;
   }
@@ -1044,7 +2393,191 @@
     grid-template-columns: 1fr;
   }
 
+  .bc-manual-side-card {
+    padding: 14px 10px;
+  }
+
+  .bc-manual-chip,
+  .bc-mini-chip {
+    font-size: 9px;
+  }
+
+  .bc-step3-label {
+    font-size: 17px;
+  }
+
+  .bc-step3-budget-input {
+    font-size: 17px;
+  }
+
+  .bc-step3-boost-price {
+    font-size: 18px;
+  }
+
+  .bc-step3-estimated-value {
+    font-size: 30px;
+  }
+
+  .bc-step3-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-step3-result-value {
+    font-size: 24px;
+  }
+
+  .bc-step4-review-grid,
+  .bc-step4-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-step4-content {
+    margin-top: 0;
+    gap: 8px;
+  }
+
+  .bc-step4-main-grid {
+    gap: 8px;
+  }
+
+  .bc-step4-left-col,
+  .bc-step4-right-col {
+    gap: 8px;
+  }
+
+  .bc-step4-label {
+    font-size: 13px;
+  }
+
+  .bc-step4-name-input {
+    height: 40px;
+    font-size: 15px;
+    padding: 0 12px;
+  }
+
+  .bc-step4-optional-pill {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+
+  .bc-step4-card,
+  .bc-step4-side-card,
+  .bc-step4-payment-card {
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .bc-step4-card-title {
+    font-size: 16px;
+  }
+
+  .bc-step4-review-item {
+    border-radius: 8px;
+    padding: 8px;
+    gap: 2px;
+  }
+
+  .bc-step4-review-kicker,
+  .bc-step4-review-meta {
+    font-size: 8px;
+  }
+
+  .bc-step4-review-name {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .bc-step4-results-card {
+    border-radius: 8px;
+    margin-top: 6px;
+    padding: 8px 10px;
+  }
+
+  .bc-step4-results-title {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .bc-step4-result-label {
+    font-size: 11px;
+  }
+
+  .bc-step4-result-value {
+    font-size: 13px;
+  }
+
+  .bc-step4-results-note {
+    margin-top: 8px;
+    font-size: 10px;
+  }
+
+  .bc-step4-side-text {
+    font-size: 10px;
+    margin-top: 4px;
+    line-height: 1.35;
+  }
+
+  .bc-step4-checkbox-row {
+    margin-top: 8px;
+    font-size: 10px;
+    gap: 8px;
+    line-height: 1.35;
+  }
+
+  .bc-step4-checkbox-row input {
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+  }
+
+  .bc-step4-launch-btn,
+  .bc-step4-save-btn {
+    width: 100%;
+    margin-top: 8px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .bc-step4-edit-link {
+    margin-top: 6px;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .bc-step4-status-list {
+    margin-top: 6px;
+    gap: 6px;
+  }
+
+  .bc-step4-status-pill {
+    font-size: 10px;
+    padding: 2px 10px;
+  }
+
+  .bc-step4-payment-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .bc-step4-payment-btn {
+    min-height: 64px;
+    border-radius: 10px;
+    padding: 8px 10px;
+  }
+
+  .bc-step4-payment-btn span {
+    font-size: 11px;
+  }
+
+  .bc-step4-payment-btn small {
+    font-size: 9px;
+  }
+
   .bc-badge.quality-badge {
     margin-bottom: 5px;
   }
 }
+
+
+
