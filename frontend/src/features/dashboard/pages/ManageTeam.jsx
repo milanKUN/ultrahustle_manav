@@ -301,7 +301,7 @@ const ManageTeam = (props) => {
                                 <ExternalLink className="w-3.5 h-3.5" /> Edit Team
                               </button>
                             )}
-
+                            {team.isOwner && (
                             <button
                               onClick={() => openDeactivateModal(team)}
                               className="manage-team-action-btn flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] transition-colors border"
@@ -311,6 +311,7 @@ const ManageTeam = (props) => {
                                 ? "Deactivate Team"
                                 : "Activate Team"}
                             </button>
+                            )}
                           </div>
 
                           <button

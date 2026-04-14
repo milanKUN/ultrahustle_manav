@@ -419,7 +419,7 @@ class ListingController extends Controller
                 'listing_type',
                 'status',
                 // 'price',
-                'views_count',
+                // 'views_count',
                 'cover_media_path',
                 'created_at',
                 'updated_at',
@@ -462,16 +462,23 @@ class ListingController extends Controller
     {
         $listing = DB::table('listings')->where('id', $listingId)->first();
 
-        if (!$listing) {
+        if (! $listing) {
             abort(404, 'Listing not found.');
         }
+
+        $user = DB::table('users')
+            ->where('id', $listing->user_id)
+            ->first();
 
         $faqs = Schema::hasTable('listing_faqs')
             ? DB::table('listing_faqs')
                 ->where('listing_id', $listingId)
                 ->orderBy('sort_order')
-                ->get(['question', 'answer'])
+                ->get(['id', 'question', 'answer'])
                 ->map(fn ($row) => [
+                    'id' => $row->id,
+                    'question' => $row->question,
+                    'answer' => $row->answer,
                     'q' => $row->question,
                     'a' => $row->answer,
                 ])
@@ -515,23 +522,27 @@ class ListingController extends Controller
 
         $details = [];
         $tags = [];
+        $tools = [];
+        $packagesForResponse = [];
+        $deliveryFormatsForResponse = [];
 
-        if (!empty($listing->tags_json)) {
+        if (! empty($listing->tags_json)) {
             $decodedTags = json_decode($listing->tags_json, true);
             $tags = is_array($decodedTags) ? array_values($decodedTags) : [];
         }
 
-        $tools = [];
-        if (!empty($listing->tools_json)) {
+        if (! empty($listing->tools_json)) {
             $decodedTools = json_decode($listing->tools_json, true);
             $tools = is_array($decodedTools) ? array_values($decodedTools) : [];
         }
 
-        if (!empty($tools)) {
+        if (! empty($tools)) {
             $details['tools'] = $tools;
         }
 
-        //digital product
+        // =========================
+        // DIGITAL PRODUCT
+        // =========================
         if ($listing->listing_type === 'digital_product') {
             $productDetails = null;
 
@@ -563,7 +574,7 @@ class ListingController extends Controller
                             ->get();
 
                         foreach ($items as $item) {
-                            $values = json_decode($item->item_value_json, true);
+                            $values = json_decode($item->item_value_json ?? '[]', true);
                             $values = is_array($values) ? array_values($values) : [];
 
                             if ($item->item_type === 'included') {
@@ -576,18 +587,32 @@ class ListingController extends Controller
                         }
                     }
 
-                    $packages[$packageRow->package_name] = [
+                    $packagePayload = [
+                        'package_name' => $packageRow->package_name,
                         'price' => $packageRow->price,
+                        'description' => $packageRow->description ?? '',
                         'included' => $included,
                         'deliveryFormats' => $deliveryFormats,
+                        'delivery_formats' => $deliveryFormats,
                     ];
+
+                    $packages[$packageRow->package_name] = $packagePayload;
+                    $packagesForResponse[] = $packagePayload;
+
+                    foreach ($deliveryFormats as $fmt) {
+                        if (! in_array($fmt, $deliveryFormatsForResponse, true)) {
+                            $deliveryFormatsForResponse[] = $fmt;
+                        }
+                    }
                 }
             }
 
             $details['packages'] = $packages;
         }
-        
-        //course
+
+        // =========================
+        // COURSE
+        // =========================
         if ($listing->listing_type === 'course') {
             $courseDetails = null;
 
@@ -598,14 +623,13 @@ class ListingController extends Controller
             }
 
             if ($courseDetails) {
-                $details['course_level'] = $courseDetails->course_level;
-
                 $learningPoints = json_decode($courseDetails->learning_points_json ?? '[]', true);
                 $languages = json_decode($courseDetails->languages_json ?? '[]', true);
 
-                $details['learning_points'] = is_array($learningPoints) ? $learningPoints : [];
-                $details['languages'] = is_array($languages) ? $languages : [];
-
+                $details['course_level'] = $courseDetails->course_level;
+                $details['learning_points'] = is_array($learningPoints) ? array_values($learningPoints) : [];
+                $details['languages'] = is_array($languages) ? array_values($languages) : [];
+                $details['preview_video_path'] = $courseDetails->preview_video_path;
                 $details['preview_video_url'] = $courseDetails->preview_video_path
                     ? Storage::disk('public')->url($courseDetails->preview_video_path)
                     : null;
@@ -615,13 +639,22 @@ class ListingController extends Controller
                 ? DB::table('course_listing_lessons')
                     ->where('listing_id', $listingId)
                     ->orderBy('sort_order')
-                    ->get()
+                    ->get([
+                        'id',
+                        'title',
+                        'description',
+                        'media_type',
+                        'media_path',
+                        'sort_order',
+                    ])
                     ->map(fn ($row) => [
+                        'id' => $row->id,
                         'title' => $row->title,
                         'description' => $row->description,
                         'media_type' => $row->media_type,
                         'media_path' => $row->media_path,
                         'media_url' => $row->media_path ? Storage::disk('public')->url($row->media_path) : null,
+                        'sort_order' => $row->sort_order,
                     ])
                     ->values()
                     ->all()
@@ -630,7 +663,9 @@ class ListingController extends Controller
             $details['lessons'] = $lessons;
         }
 
-        //webinar
+        // =========================
+        // WEBINAR
+        // =========================
         if ($listing->listing_type === 'webinar') {
             $webinarDetails = null;
 
@@ -650,8 +685,8 @@ class ListingController extends Controller
                 $details['schedule_duration'] = $webinarDetails->schedule_duration;
                 $details['schedule_timezone'] = $webinarDetails->schedule_timezone;
                 $details['webinar_link'] = $webinarDetails->webinar_link;
-                $details['learning_points'] = is_array($learningPoints) ? $learningPoints : [];
-                $details['languages'] = is_array($languages) ? $languages : [];
+                $details['learning_points'] = is_array($learningPoints) ? array_values($learningPoints) : [];
+                $details['languages'] = is_array($languages) ? array_values($languages) : [];
                 $details['ticket_price'] = $webinarDetails->ticket_price;
             }
 
@@ -659,11 +694,13 @@ class ListingController extends Controller
                 ? DB::table('webinar_listing_agendas')
                     ->where('listing_id', $listingId)
                     ->orderBy('sort_order')
-                    ->get(['time', 'topic', 'description'])
+                    ->get(['id', 'time', 'topic', 'description', 'sort_order'])
                     ->map(fn ($row) => [
+                        'id' => $row->id,
                         'time' => $row->time,
                         'topic' => $row->topic,
                         'description' => $row->description,
+                        'sort_order' => $row->sort_order,
                     ])
                     ->values()
                     ->all()
@@ -672,11 +709,141 @@ class ListingController extends Controller
             $details['agenda'] = $agenda;
         }
 
+        // =========================
+        // LISTING PORTFOLIO ONLY
+        // =========================
+        $portfolioProjects = [];
+        if (Schema::hasTable('portfolios') && Schema::hasTable('portfolio_projects')) {
+            $portfolio = DB::table('portfolios')
+                ->where('owner_type', 'listing')
+                ->where('owner_id', $listing->id)
+                ->first();
+
+            if ($portfolio) {
+                $projectRows = DB::table('portfolio_projects')
+                    ->where('portfolio_id', $portfolio->id)
+                    ->orderBy('sort_order')
+                    ->get([
+                        'id',
+                        'title',
+                        'description',
+                        'cost_cents',
+                        'sort_order',
+                    ]);
+
+                $portfolioProjects = $projectRows->map(function ($project) {
+                    $mediaRows = Schema::hasTable('portfolio_media')
+                        ? DB::table('portfolio_media')
+                            ->where('project_id', $project->id)
+                            ->orderBy('sort_order')
+                            ->get(['id', 'path', 'type', 'sort_order'])
+                        : collect();
+
+                    $cover = $mediaRows->first();
+
+                    return [
+                        'id' => $project->id,
+                        'title' => $project->title,
+                        'description' => $project->description,
+                        'cost_cents' => $project->cost_cents,
+                        'sort_order' => $project->sort_order,
+                        'cover_media' => $cover ? [
+                            'id' => $cover->id,
+                            'path' => $cover->path,
+                            'url' => $cover->path ? Storage::disk('public')->url($cover->path) : null,
+                            'type' => $cover->type,
+                        ] : null,
+                        'media' => $mediaRows->map(fn ($m) => [
+                            'id' => $m->id,
+                            'path' => $m->path,
+                            'url' => $m->path ? Storage::disk('public')->url($m->path) : null,
+                            'type' => $m->type,
+                            'sort_order' => $m->sort_order,
+                        ])->values()->all(),
+                    ];
+                })->values()->all();
+            }
+        }
+
+        // =========================
+        // RECOMMENDED LISTINGS
+        // =========================
+        $recommendedListings = DB::table('listings')
+            ->join('users', 'users.id', '=', 'listings.user_id')
+            ->where('listings.status', 'published')
+            ->where('listings.id', '!=', $listing->id)
+            ->inRandomOrder()
+            ->limit(8)
+            ->get([
+                'listings.id',
+                'listings.title',
+                'listings.username as listing_username',
+                'listings.listing_type',
+                'listings.cover_media_path',
+                'users.username as creator_username',
+            ])
+            ->map(fn ($row) => [
+                'id' => $row->id,
+                'title' => $row->title,
+                'listing_username' => $row->listing_username,
+                'listing_type' => $row->listing_type,
+                'cover_media_path' => $row->cover_media_path,
+                'cover_media_url' => $row->cover_media_path ? Storage::disk('public')->url($row->cover_media_path) : null,
+                'creator_username' => $row->creator_username,
+            ])
+            ->values()
+            ->all();
+
+        // =========================
+        // MORE FROM SAME USER
+        // =========================
+        $moreFromUser = DB::table('listings')
+            ->join('users', 'users.id', '=', 'listings.user_id')
+            ->where('listings.user_id', $listing->user_id)
+            ->where('listings.status', 'published')
+            ->where('listings.id', '!=', $listing->id)
+            ->orderByDesc('listings.id')
+            ->limit(8)
+            ->get([
+                'listings.id',
+                'listings.title',
+                'listings.username as listing_username',
+                'listings.listing_type',
+                'listings.cover_media_path',
+                'users.username as creator_username',
+            ])
+            ->map(fn ($row) => [
+                'id' => $row->id,
+                'title' => $row->title,
+                'listing_username' => $row->listing_username,
+                'listing_type' => $row->listing_type,
+                'cover_media_path' => $row->cover_media_path,
+                'cover_media_url' => $row->cover_media_path ? Storage::disk('public')->url($row->cover_media_path) : null,
+                'creator_username' => $row->creator_username,
+            ])
+            ->values()
+            ->all();
+
+        $creator = $user ? [
+            'id' => $user->id,
+            'username' => $user->username ?? null,
+            'full_name' => $user->full_name ?? null,
+            'bio' => $user->bio ?? null,
+            'avatar_url' => ! empty($user->avatar_path)
+                ? Storage::disk('public')->url($user->avatar_path)
+                : (! empty($user->avatar_url) ? $user->avatar_url : null),
+            'title' => null,
+            'languages' => [],
+            'skills' => [],
+            'avg_response' => '1 hour',
+        ] : null;
+
         return [
             'id' => $listing->id,
             'user_id' => $listing->user_id,
             'title' => $listing->title,
-            'username' => $listing->username,
+            'creator_username' => $creator['username'] ?? null,
+            'listing_username' => $listing->username ?? null,
             'listing_type' => $listing->listing_type,
             'status' => $listing->status,
             'category' => $listing->category,
@@ -693,9 +860,161 @@ class ListingController extends Controller
             'links' => $links,
             'deliverables' => $deliverables,
             'details' => $details,
+            'tools' => $tools,
+            'delivery_formats' => $deliveryFormatsForResponse,
+            'packages' => $packagesForResponse,
+            'creator' => $creator,
+            'portfolio_projects' => $portfolioProjects,
+            'recommended_listings' => $recommendedListings,
+            'more_from_user' => $moreFromUser,
             'created_at' => $listing->created_at,
             'updated_at' => $listing->updated_at,
         ];
+    }
+
+    public function getPublicUserListings(string $username): JsonResponse
+    {
+        $user = DB::table('users')
+            ->where('username', $username)
+            ->first(['id', 'username', 'full_name']);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        $listings = DB::table('listings')
+            ->where('user_id', $user->id)
+            ->where('status', 'published')
+            ->orderByDesc('id')
+            ->get([
+                'id',
+                'user_id',
+                'username as listing_username',
+                'listing_type',
+                'title',
+                'category',
+                'sub_category',
+                'short_description',
+                'cover_media_path',
+                'created_at',
+                'updated_at',
+            ])
+            ->map(function ($row) {
+                $price = null;
+                $priceLabel = null;
+
+                // WEBINAR PRICE
+                if ($row->listing_type === 'webinar' && Schema::hasTable('webinar_listing_details')) {
+                    $webinar = DB::table('webinar_listing_details')
+                        ->where('listing_id', $row->id)
+                        ->first(['ticket_price']);
+
+                    if ($webinar && $webinar->ticket_price !== null) {
+                        $price = (float) $webinar->ticket_price;
+                        $priceLabel = 'Ticket price';
+                    }
+                }
+
+                // DIGITAL PRODUCT PRICE = LOWEST PACKAGE PRICE
+                if ($row->listing_type === 'digital_product' && Schema::hasTable('digital_product_packages')) {
+                    $minPrice = DB::table('digital_product_packages')
+                        ->where('listing_id', $row->id)
+                        ->whereNotNull('price')
+                        ->min('price');
+
+                    if ($minPrice !== null) {
+                        $price = (float) $minPrice;
+                        $priceLabel = 'Starting at';
+                    }
+                }
+
+                // COURSE PRICE
+                // Adjust this only if your course table stores the field under a different column name.
+                if ($row->listing_type === 'course' && Schema::hasTable('course_listing_details')) {
+                    $courseColumns = Schema::getColumnListing('course_listing_details');
+
+                    $coursePriceColumn = null;
+
+                    foreach (['price', 'course_price', 'starting_price'] as $candidate) {
+                        if (in_array($candidate, $courseColumns, true)) {
+                            $coursePriceColumn = $candidate;
+                            break;
+                        }
+                    }
+
+                    if ($coursePriceColumn) {
+                        $course = DB::table('course_listing_details')
+                            ->where('listing_id', $row->id)
+                            ->first([$coursePriceColumn]);
+
+                        if ($course && $course->{$coursePriceColumn} !== null && $course->{$coursePriceColumn} !== '') {
+                            $price = (float) $course->{$coursePriceColumn};
+                            $priceLabel = 'Price';
+                        }
+                    }
+                }
+
+                // SERVICE PRICE
+                // Adjust this only if your service table name/column differs.
+                if ($row->listing_type === 'service' && Schema::hasTable('service_listing_details')) {
+                    $serviceColumns = Schema::getColumnListing('service_listing_details');
+
+                    $servicePriceColumn = null;
+
+                    foreach (['price', 'starting_price', 'base_price', 'service_price'] as $candidate) {
+                        if (in_array($candidate, $serviceColumns, true)) {
+                            $servicePriceColumn = $candidate;
+                            break;
+                        }
+                    }
+
+                    if ($servicePriceColumn) {
+                        $service = DB::table('service_listing_details')
+                            ->where('listing_id', $row->id)
+                            ->first([$servicePriceColumn]);
+
+                        if ($service && $service->{$servicePriceColumn} !== null && $service->{$servicePriceColumn} !== '') {
+                            $price = (float) $service->{$servicePriceColumn};
+                            $priceLabel = $servicePriceColumn === 'starting_price' ? 'Starting at' : 'Price';
+                        }
+                    }
+                }
+
+                return [
+                    'id' => $row->id,
+                    'user_id' => $row->user_id,
+                    'title' => $row->title,
+                    'username' => $row->listing_username,
+                    'listing_username' => $row->listing_username,
+                    'listing_type' => $row->listing_type,
+                    'category' => $row->category,
+                    'sub_category' => $row->sub_category,
+                    'description' => $row->short_description,
+                    'short_description' => $row->short_description,
+                    'price' => $price,
+                    'price_label' => $priceLabel,
+                    'cover_media_path' => $row->cover_media_path,
+                    'cover_media_url' => $row->cover_media_path
+                        ? Storage::disk('public')->url($row->cover_media_path)
+                        : null,
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'full_name' => $user->full_name,
+            ],
+            'listings' => $listings,
+        ]);
     }
 
     public function getListingByUsername(Request $request, string $username): JsonResponse

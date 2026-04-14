@@ -580,7 +580,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", setTheme, toggleSideba
                   Hi, {username || "User"}!
                 </div>
                 <div className="dropdown-divider"></div>
-                <a href="user-profile" className="dropdown-item">
+                <a href="/user-profile" className="dropdown-item">
                   My Profile
                 </a>
                 <a href="/setting" className="dropdown-item">

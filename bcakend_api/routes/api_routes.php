@@ -146,7 +146,7 @@ Route::get('/v1/users/username/{username}', [PublicUserController::class, 'profi
 Route::get('/v1/users/username/{username}/portfolio', [PortfolioController::class, 'showUserPublic']);
 // Route::get('/v1/users/username/{username}/portfolio', [PublicUserController::class, 'portfolio']);
 Route::get('/v1/users/username/{username}/follow-counts', [PublicUserController::class, 'followCounts']);
-
+Route::get('/v1/public/users/{username}/listings', [ListingController::class, 'getPublicUserListings']);
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/listings', [ListingController::class, 'store']);
 	Route::get('/my-listings', [ListingController::class, 'myListings']);

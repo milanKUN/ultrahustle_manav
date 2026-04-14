@@ -13,6 +13,7 @@ import {
   getPublicUserFollowCounts,
 } from "../api/personalInfoApi";
 import { getPublicUserPortfolio } from "../api/portfolioApi";
+import { getPublicUserListings } from "../../marketplace/api/listingApi";
 
 const toMediaUrl = (path = "") => {
   if (!path) return "";
@@ -35,10 +36,62 @@ const firstMediaUrl = (project) => {
   return "";
 };
 
+const firstListingImage = (listing) => {
+  if (listing?.cover_media_url) return listing.cover_media_url;
+  if (listing?.cover_image_url) return listing.cover_image_url;
+  if (listing?.thumbnail_url) return listing.thumbnail_url;
+  if (listing?.image_url) return listing.image_url;
+
+  if (listing?.cover_media?.url) return listing.cover_media.url;
+  if (listing?.cover_media?.path) return toMediaUrl(listing.cover_media.path);
+
+  if (listing?.cover_image?.url) return listing.cover_image.url;
+  if (listing?.cover_image?.path) return toMediaUrl(listing.cover_image.path);
+
+  if (listing?.featured_image?.url) return listing.featured_image.url;
+  if (listing?.featured_image?.path) return toMediaUrl(listing.featured_image.path);
+
+  if (listing?.thumbnail?.url) return listing.thumbnail.url;
+  if (listing?.thumbnail?.path) return toMediaUrl(listing.thumbnail.path);
+
+  const gallery = Array.isArray(listing?.gallery) ? listing.gallery : [];
+  const media = Array.isArray(listing?.media) ? listing.media : [];
+  const files = [...gallery, ...media];
+  const first = files.find((m) => m?.url || m?.path);
+
+  if (first?.url) return first.url;
+  if (first?.path) return toMediaUrl(first.path);
+
+  return "";
+};
+
 const toCurrencyText = (cost, currency = "USD") => {
   if (cost === null || cost === undefined || cost === "") return "—";
   const numeric = Number(cost);
   if (Number.isNaN(numeric)) return String(cost);
+  return `${currency} ${numeric}`;
+};
+
+const toListingPriceText = (listing) => {
+  const currency =
+    listing?.currency ||
+    listing?.price_currency ||
+    listing?.pricing_currency ||
+    "USD";
+
+  const rawPrice =
+    listing?.price ??
+    listing?.starting_price ??
+    listing?.base_price ??
+    listing?.amount ??
+    listing?.budget ??
+    listing?.min_price;
+
+  if (rawPrice === null || rawPrice === undefined || rawPrice === "") return "Price on request";
+
+  const numeric = Number(rawPrice);
+  if (Number.isNaN(numeric)) return String(rawPrice);
+
   return `${currency} ${numeric}`;
 };
 
@@ -76,10 +129,24 @@ const formatJoinedDate = (value) => {
   });
 };
 
+const truncateText = (text, max = 120) => {
+  const value = String(text || "").trim();
+  if (!value) return "";
+  if (value.length <= max) return value;
+  return `${value.slice(0, max).trim()}...`;
+};
+
+const normalizeListingType = (value) => {
+  const type = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-")
+    .replace(/\s+/g, "-");
+  return type || "listing";
+};
+
 const PublicTopbar = ({ theme, onGoHome, onGoLogin, onGoSignup }) => {
-  return (
-    <NavbarLight></NavbarLight>
-  );
+  return <NavbarLight></NavbarLight>;
 };
 
 const PublicUserProfile = (props) => {
@@ -105,6 +172,7 @@ const PublicUserProfile = (props) => {
     featured: null,
     items: [],
   });
+  const [listingData, setListingData] = useState([]);
 
   const toolsContainerRef = useRef(null);
   const languagesContainerRef = useRef(null);
@@ -137,10 +205,11 @@ const PublicUserProfile = (props) => {
         setLoading(true);
         setPageError("");
 
-        const [profileRes, followRes, portfolioRes] = await Promise.allSettled([
+        const [profileRes, followRes, portfolioRes, listingsRes] = await Promise.allSettled([
           getPublicUserProfile(username),
           getPublicUserFollowCounts(username),
           getPublicUserPortfolio(username),
+          getPublicUserListings(username),
         ]);
 
         if (!mounted) return;
@@ -200,6 +269,43 @@ const PublicUserProfile = (props) => {
             featured: null,
             items: [],
           });
+        }
+
+        if (listingsRes.status === "fulfilled") {
+          const rawListings =
+            listingsRes.value?.listings ||
+            listingsRes.value?.data?.listings ||
+            listingsRes.value?.data ||
+            [];
+
+          const mappedListings = Array.isArray(rawListings)
+            ? rawListings.map((listing, index) => ({
+                id: listing?.id ?? index,
+                title: String(listing?.title || listing?.name || "Untitled listing").trim(),
+                username: String(
+                  listing?.username ||
+                    listing?.listing_username ||
+                    listing?.slug ||
+                    ""
+                ).trim(),
+                listingType: normalizeListingType(
+                  listing?.listing_type || listing?.type || listing?.category
+                ),
+                image: firstListingImage(listing),
+                description: String(
+                  listing?.short_description ||
+                    listing?.description ||
+                    listing?.excerpt ||
+                    ""
+                ).trim(),
+                priceText: toListingPriceText(listing),
+                raw: listing,
+              }))
+            : [];
+
+          setListingData(mappedListings);
+        } else {
+          setListingData([]);
         }
       } catch (e) {
         if (!mounted) return;
@@ -284,6 +390,17 @@ const PublicUserProfile = (props) => {
     const nextIndex = activeItemIndex < allPortfolioItems.length - 1 ? activeItemIndex + 1 : 0;
     setActiveItemIndex(nextIndex);
     setActiveItem(allPortfolioItems[nextIndex]);
+  };
+
+  const openListing = (listing) => {
+    if (!listing) return;
+
+    const type = normalizeListingType(listing.listingType);
+    const slug = String(listing.username || "").trim();
+
+    if (!slug) return;
+
+    navigate(`/${type}/${slug}`);
   };
 
   return (
@@ -714,9 +831,138 @@ const PublicUserProfile = (props) => {
                       </div>
                     </div>
 
-                    <div className="content-card">
-                      <p className="card-text">No public listings connected yet.</p>
-                    </div>
+                    {listingData.length > 0 ? (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                          gap: "20px",
+                          width: "100%",
+                        }}
+                      >
+                        {listingData.map((listing) => (
+                          <div
+                            key={listing.id}
+                            className="content-card"
+                            style={{
+                              cursor: "pointer",
+                              overflow: "hidden",
+                              padding: "0",
+                            }}
+                            onClick={() => openListing(listing)}
+                          >
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "220px",
+                                background: "#f3f3f3",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {listing.image ? (
+                                <img
+                                  src={listing.image}
+                                  alt={listing.title}
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    display: "block",
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "#777",
+                                    fontSize: "14px",
+                                  }}
+                                >
+                                  No image available
+                                </div>
+                              )}
+                            </div>
+
+                            <div style={{ padding: "18px" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  gap: "12px",
+                                  marginBottom: "10px",
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: "12px",
+                                    fontWeight: "700",
+                                    textTransform: "capitalize",
+                                    background: "#f5f5f5",
+                                    padding: "6px 10px",
+                                    borderRadius: "999px",
+                                  }}
+                                >
+                                  {String(listing.listingType || "").replace(/-/g, " ")}
+                                </span>
+
+                                <span
+                                  style={{
+                                    fontSize: "14px",
+                                    fontWeight: "700",
+                                    color: "#222",
+                                  }}
+                                >
+                                  {listing.priceText}
+                                </span>
+                              </div>
+
+                              <h4
+                                style={{
+                                  fontSize: "18px",
+                                  fontWeight: "700",
+                                  marginBottom: "8px",
+                                  color: "#111",
+                                  lineHeight: "1.35",
+                                }}
+                              >
+                                {listing.title}
+                              </h4>
+
+                              <p
+                                className="card-text"
+                                style={{
+                                  marginBottom: "14px",
+                                  color: "#666",
+                                }}
+                              >
+                                {truncateText(listing.description, 120) || "No description available."}
+                              </p>
+
+                              <button
+                                type="button"
+                                className="btn-join"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openListing(listing);
+                                }}
+                              >
+                                View Listing
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="content-card">
+                        <p className="card-text">No public listings connected yet.</p>
+                      </div>
+                    )}
                   </section>
 
                   <section className="reviews-section">
@@ -785,9 +1031,7 @@ function PublicFollowModal({ onClose, theme, followers = 0, following = 0 }) {
 
         <div className="content-card">
           <p className="card-text">
-            {tab === "followers"
-              ? `${followers} followers`
-              : `${following} following`}
+            {tab === "followers" ? `${followers} followers` : `${following} following`}
           </p>
           <p className="card-text">Login to see the full list.</p>
         </div>

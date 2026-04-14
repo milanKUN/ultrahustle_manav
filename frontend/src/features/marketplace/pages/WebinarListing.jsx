@@ -1,992 +1,951 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-    Share2,
-    Flag,
-    Heart,
-    ChevronLeft,
-    ChevronRight,
-    Maximize2,
-    Check,
-    Star,
-    ChevronDown,
-    Clock,
-    X,
-    Play,
-    Calendar,
-    Globe,
-    Ticket,
-    CalendarPlus,
-} from 'lucide-react';
-import './WebinarListing.css';
-import UserNavbar from '../../../components/layout/UserNavbar';
-import '../../../Darkuser.css';
-import '../../dashboard/pages/TeamProfileLight.css';
+  Share2,
+  Flag,
+  Heart,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  ChevronDown,
+  Clock,
+  X,
+  Calendar,
+  Globe,
+  Ticket,
+  CalendarPlus,
+} from "lucide-react";
+import "./WebinarListing.css";
+import UserNavbar from "../../../components/layout/UserNavbar";
+import "../../../Darkuser.css";
+import "../../dashboard/pages/TeamProfileLight.css";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
-import FAQAccordion from '../components/FAQAccordion';
+import FAQAccordion from "../components/FAQAccordion";
 import DetailedTeamCard from "../components/DetailedTeamCard";
+import { getListingByUsername } from "../api/listingApi";
+
+const toMediaUrl = (path = "") => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/storage/")) return path;
+  if (path.startsWith("storage/")) return `/${path}`;
+  return `/storage/${path}`;
+};
+
+const getPortfolioImage = (project) => {
+  if (project?.cover_media?.url) return project.cover_media.url;
+  if (project?.cover_media?.path) return toMediaUrl(project.cover_media.path);
+
+  const media = Array.isArray(project?.media) ? project.media : [];
+  const first = media.find((m) => m?.url || m?.path);
+
+  if (first?.url) return first.url;
+  if (first?.path) return toMediaUrl(first.path);
+
+  return "";
+};
+
+const currencyText = (value) => {
+  if (value === null || value === undefined || value === "") return "Free";
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return String(value);
+  return `$${numeric}`;
+};
+
+const listingTypeToRouteSlug = (type = "") => {
+  switch (type) {
+    case "digital_product":
+      return "digital-product";
+    case "service":
+      return "service";
+    case "course":
+      return "course";
+    case "webinar":
+      return "webinar";
+    default:
+      return type || "listing";
+  }
+};
+
+const normalizeFaqs = (faqs = []) =>
+  (Array.isArray(faqs) ? faqs : [])
+    .map((faq, index) => ({
+      id: faq?.id ?? index,
+      question: faq?.question || faq?.q || "",
+      answer: faq?.answer || faq?.a || "",
+    }))
+    .filter((faq) => faq.question || faq.answer);
 
 const WebinarListing = ({ theme, setTheme }) => {
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('Basic');
-    const [activeImg, setActiveImg] = useState(0);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [showSettings, setShowSettings] = useState(false);
-    const [activeSetting, setActiveSetting] = useState('basic');
-    const [showMoreListings, setShowMoreListings] = useState(false);
-    const [showImageModal, setShowImageModal] = useState(false);
-    const [modalImgIndex, setModalImgIndex] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
+  const navigate = useNavigate();
+  const { username } = useParams();
 
-    // Portfolio & Listing State (same as UserProfile.jsx)
-    const [activeItem, setActiveItem] = useState(null);
-    const [activeItemIndex, setActiveItemIndex] = useState(0);
-    const [favorites, setFavorites] = useState(new Set());
-    const [mainTab, setMainTab] = useState('listings');
-    const [filter, setFilter] = useState('All');
-    const recommendedGridRef = useRef(null);
-    const moreFromSarahGridRef = useRef(null);
+  const [activeImg, setActiveImg] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showMoreListings, setShowMoreListings] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImgIndex, setModalImgIndex] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
 
-    const scrollGridRef = (ref, direction) => {
-        if (ref.current) {
-            const scrollAmount = 600;
-            ref.current.scrollBy({
-                left: direction === "left" ? -scrollAmount : scrollAmount,
-                behavior: "smooth",
-            });
+  const [activeItem, setActiveItem] = useState(null);
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [favorites, setFavorites] = useState(new Set());
+  const [filter, setFilter] = useState("All");
+
+  const recommendedGridRef = useRef(null);
+  const moreFromCreatorGridRef = useRef(null);
+
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+
+  const [listing, setListing] = useState(null);
+  const [creator, setCreator] = useState(null);
+  const [portfolioProjects, setPortfolioProjects] = useState([]);
+  const [faqData, setFaqData] = useState([]);
+  const [recommendedListings, setRecommendedListings] = useState([]);
+  const [moreFromUserListings, setMoreFromUserListings] = useState([]);
+
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        setLoading(true);
+        setPageError("");
+
+        const res = await getListingByUsername(username);
+
+        const listingData =
+          res?.listing ||
+          res?.data?.listing ||
+          res?.data ||
+          null;
+
+        if (!listingData) {
+          throw new Error("Webinar listing not found.");
         }
+
+        const creatorData =
+          res?.creator ||
+          res?.data?.creator ||
+          listingData?.creator ||
+          null;
+
+        const portfolio =
+          res?.portfolio_projects ||
+          res?.data?.portfolio_projects ||
+          listingData?.portfolio_projects ||
+          [];
+
+        const faqs =
+          res?.faqs ||
+          res?.data?.faqs ||
+          listingData?.faqs ||
+          [];
+
+        const recommended =
+          res?.recommended_listings ||
+          res?.data?.recommended_listings ||
+          listingData?.recommended_listings ||
+          [];
+
+        const moreFromUser =
+          res?.more_from_user ||
+          res?.data?.more_from_user ||
+          listingData?.more_from_user ||
+          [];
+
+        setListing(listingData);
+        setCreator(creatorData);
+        setPortfolioProjects(Array.isArray(portfolio) ? portfolio : []);
+        setFaqData(normalizeFaqs(faqs));
+        setRecommendedListings(Array.isArray(recommended) ? recommended : []);
+        setMoreFromUserListings(Array.isArray(moreFromUser) ? moreFromUser : []);
+      } catch (err) {
+        setPageError(err?.message || "Failed to load webinar listing.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const toggleFavorite = (index) => {
-        setFavorites((prev) => {
-            const next = new Set(prev);
-            if (next.has(index)) next.delete(index);
-            else next.add(index);
-            return next;
-        });
-    };
+    if (username) {
+      fetchListing();
+    } else {
+      setLoading(false);
+      setPageError("Missing listing username.");
+    }
+  }, [username]);
 
-    const portfolioData = {
-        featured: {
-            image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-            title: 'SalonSync - Revolutionary AI-Powered Salon App UI/UX',
-            description: 'This project involves designing a next-generation salon mobile application with AI-powered recommendations.',
-            cost: '$600-$800',
-        },
-        items: [
-            {
-                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'Title',
-                description: 'Description',
-                cost: '$',
-            },
-            {
-                image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'E-commerce Dashboard Redesign',
-                description: 'This project involves designing more...',
-                cost: '$600-$800',
-            },
-            {
-                image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
-                title: 'E-commerce Dashboard Redesign',
-                description: 'This project involves designing more...',
-                cost: '$600-$800',
-            },
-        ],
-    };
+  const scrollGridRef = (ref, direction) => {
+    if (ref.current) {
+      const scrollAmount = 600;
+      ref.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
-    const listingsData = [
-        { image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', title: 'Complete UI/UX Design for Mobile & Web more...', type: 'Service', views: 3247, price: '$2,500' },
-        { image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=500&q=80', title: 'React & Frontend Development Course', type: 'Course', views: 1890, price: '$99' },
-        { image: 'https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=500&q=80', title: 'E-commerce Website UI Kit', type: 'Product', views: 2460, price: '$49' },
-        { image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80', title: 'Growth Marketing Live Webinar', type: 'Webinar', views: 870, price: 'Free' },
-        { image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=500&q=80', title: 'Brand Identity & Logo Design', type: 'Service', views: 1325, price: '$1,200' },
-        { image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=500&q=80', title: 'Landing Page Conversion Template', type: 'Product', views: 1640, price: '$29' },
-    ];
+  const toggleFavorite = (index) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
 
+  const galleryImages = useMemo(() => {
+    const fromGallery = Array.isArray(listing?.gallery) ? listing.gallery : [];
+    const normalizedGallery = fromGallery
+      .map((item) => item?.url || item?.path || item)
+      .map((item) => toMediaUrl(String(item || "")))
+      .filter(Boolean);
 
+    if (normalizedGallery.length) return normalizedGallery;
 
-    const reviewsData = {
-        average: 4.9,
-        total: 48,
-        breakdown: { 5: 38, 4: 7, 3: 2, 2: 1, 1: 0 },
-        reviews: [
-            { name: 'Emily Chen', date: 'Nov 15, 2025', rating: 5, text: 'Exceptional designer! Delivered beyond expectations with stunning visuals and perfect usability.' },
-            { name: 'James Miller', date: 'Nov 10, 2025', rating: 5, text: 'Incredible work ethic and communication throughout the project. Highly recommended!' },
-            { name: 'Sophia Lee', date: 'Oct 28, 2025', rating: 5, text: 'Professional, talented, and creative. The final product exceeded our goals completely.' },
-            { name: 'David Carter', date: 'Oct 20, 2025', rating: 4, text: 'Great collaboration, fast turnarounds, and very responsive. Would hire again for sure.' },
-        ],
-    };
-    const members = [
-        { id: 1, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 2, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 3, name: 'Abigail Abigail', role: 'Owner', tag: 'Frontend Developer' },
-        { id: 4, name: 'Abigail Abigail', role: 'Owner', tag: 'Social Media Manager' },
-        { id: 5, name: 'Abigail Abigail', role: 'Owner', tag: 'Frontend Developer' },
-        { id: 6, name: 'Abigail Abigail', role: 'Owner', tag: 'Sales' },
-        { id: 7, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 8, name: 'Abigail Abigail', role: 'Owner', tag: 'Designer' },
-        { id: 9, name: 'Abigail Abigail', role: 'Owner', tag: 'Social Media Manager' },
-    ];
+    const cover =
+      listing?.cover_media_url ||
+      listing?.cover_media_path ||
+      listing?.cover ||
+      "";
 
-    const recommendedProducts = [
-        {
-            id: 'r1',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-        {
-            id: 'r2',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Buy Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-        {
-            id: 'r3',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Enroll Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-    ];
+    return cover ? [toMediaUrl(cover)] : [];
+  }, [listing]);
 
-    const agendaData = [
-        {
-            id: 1,
-            duration: '10 min',
-            title: 'Welcome + setup',
-            description: "What we'll cover, prerequisites, and files."
-        },
-        {
-            id: 2,
-            duration: '25 min',
-            title: 'Welcome + setup',
-            description: "What we'll cover, prerequisites, and files."
-        },
-        {
-            id: 3,
-            duration: '10 min',
-            title: 'Welcome + setup',
-            description: "What we'll cover, prerequisites, and files."
-        }
-    ];
+  const webinarDetails = useMemo(() => listing?.details || {}, [listing]);
 
-    const moreFromSarah = [
-        {
-            id: 'm1',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-        {
-            id: 'm2',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Buy Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-        {
-            id: 'm3',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: ₹ 24,000',
-            cta: 'Enroll Now',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-        {
-            id: 'm4',
-            name: 'Abigail',
-            verified: true,
-            ai: true,
-            title: 'Browse services, products, courses, and webinars tailored...',
-            rating: 4.5,
-            reviews: 123,
-            priceLabel: 'Price: From ₹ 24,000',
-            cta: 'Know More',
-            image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop',
-        },
-    ];
-
-    const images = [
-        'https://images.unsplash.com/photo-1586717791821-3f44a563fe4c?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1522542550221-31fd19250226?q=80&w=2070&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop',
-    ];
-
-    const packages = {
-        Basic: {
-            price: 399,
-            delivery: '5 days',
-            revisions: 4,
-            desc: 'Most Popular for medium projects',
-            inclusions: [
-                'Up to 12 screens',
-                'Advanced wireframing & prototyping',
-                'Custom color scheme & typography',
-                'Mobile & tablet responsive',
-                'Interactive prototype',
-                'Source files included',
-                'Commercial use',
-            ],
-        },
-        Standard: {
-            price: 599,
-            delivery: '7 days',
-            revisions: 6,
-            desc: 'Recommended for large scale startups',
-            inclusions: [
-                'Up to 24 screens',
-                'Advanced wireframing & prototyping',
-                'Brand Identity guidelines',
-                'Mobile & tablet responsive',
-                'Interactive prototype',
-                'Source files included',
-                'Commercial use',
-            ],
-        },
-        Premium: {
-            price: 999,
-            delivery: '10 days',
-            revisions: 'Unlimited',
-            desc: 'Enterprise grade design solution',
-            inclusions: [
-                'Unlimited screens',
-                'Full brand design system',
-                'High fidelity animation',
-                'Mobile & tablet responsive',
-                'Usability testing',
-                'Source files included',
-                'Commercial use',
-            ],
-        },
-    };
-
-    const comparisonData = [
-        {
-            feature: 'Price',
-            basic: '$49',
-            standard: '$399',
-            premium: '$799'
-        },
-        {
-            feature: 'Delivery time (days)',
-            basic: '3',
-            standard: '5 days delivery',
-            premium: '3 days delivery'
-        },
-        {
-            feature: 'Number of revisions',
-            basic: '1',
-            standard: '6 screens',
-            premium: '8 screens'
-        },
-        {
-            feature: 'Scope of work',
-            basic: 'Design of 1 core screen or section with clean layout, spacing, and basic interaction logic.',
-            standard: 'UI/UX design for up to 3 screens with consistent layout, components, and basic user flow.',
-            premium: 'End-to-end UI/UX for a small product flow including multiple screens, components, and UX logic.'
-        },
-        {
-            feature: "What's Included",
-            basic: ['1 UI screen', 'Figma file access', 'Clean layout and spacing'],
-            standard: ['Up to 3 UI screens', 'Component consistency', 'Figma source file'],
-            premium: ['Up to 6 screens', 'Reusable components', 'UX flow logic', 'Developer-ready structure']
-        },
-        {
-            feature: 'How it works',
-            basic: ['Client shares requirements', 'I design and deliver the UI', 'One revision included'],
-            standard: ['Requirement discussion', 'Design + review cycles', 'Final delivery'],
-            premium: ['Strategy discussion', 'Structured design execution', 'Review and final polish']
-        },
-        {
-            feature: "What's not included",
-            basic: ['Full design systems', 'Prototyping', 'Developer handoff'],
-            standard: ['Full design system', 'Advanced animations'],
-            premium: ['Frontend development', 'Copywriting']
-        },
-        {
-            feature: 'Tools used',
-            basic: 'Figma, AI Design Assistants',
-            standard: 'Figma, Notion, AI Design Tools',
-            premium: 'Figma, Notion, AI UX Tools'
-        },
-        {
-            feature: 'Delivery format',
-            basic: 'Figma File',
-            standard: 'Figma File',
-            premium: 'Figma File'
-        }
-    ];
-
-    const faqData = [
-        {
-            question: "What information do you need to get started?",
-            answer: "I'll need your app concept, target audience details, any brand guidelines you have, competitor examples, and specific features you want included. The more details you provide, the better I can tailor the design to your needs."
-        },
-        {
-            question: "Do you provide the source files?",
-            answer: "Yes, all packages include the source Figma files with well-organized layers and components ready for development."
-        },
-        {
-            question: "How many revisions are included?",
-            answer: "The number of revisions varies by package: Basic includes 1, Standard includes 6 screens, and Premium offers unlimited revisions until you are completely satisfied."
-        }
-    ];
-
-    return (
-        <div className={`user-page ${theme} min-h-screen`}>
-            {/* NAVBAR */}
-            <UserNavbar
-                toggleSidebar={() => setSidebarOpen(p => !p)}
-                isSidebarOpen={sidebarOpen}
-                theme={theme}
-            />
-
-            <div className="pt-[85px] flex relative z-10 transition-all duration-300">
-
-
-                {/* MAIN CONTENT */}
-                <div className="relative flex-1 min-w-0 overflow-hidden">
-                    <div className="overflow-y-auto h-[calc(100vh-85px)]">
-                        <div className={`cl-page ${theme}`}>
-                            <div className="cl-header">
-                                {/* <div 
-                                    className="cl-back-link" 
-                                    onClick={() => navigate('/my-listings')}
-                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--mylis-muted)', marginBottom: '10px', fontSize: '14px' }}
-                                >
-                                    <ChevronLeft size={16} /> Back to My Listings
-                                </div> */}
-                                <h1 className="cl-title">I will design online course cover and digital product mockup bundle</h1>
-                                <div className="cl-header-actions">
-                                    <button className="cl-icon-btn"><Share2 size={20} /></button>
-                                    <button className="cl-icon-btn"><Flag size={20} /></button>
-                                    <button className="cl-icon-btn" onClick={() => setIsLiked(!isLiked)}>
-                                        <Heart size={20} fill={isLiked ? "red" : "none"} color={isLiked ? "red" : "currentColor"} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="cl-container">
-                                {/* Left Column */}
-                                <div className="cl-main">
-                                    {/* Slider */}
-                                    <div className="cl-slider-wrap">
-                                        <div className="cl-main-img-box">
-                                            <img src={images[activeImg]} alt="Service" className="cl-main-img" />
-                                            <button className="cl-slider-btn left" onClick={() => setActiveImg(prev => (prev === 0 ? images.length - 1 : prev - 1))}>
-                                                <ChevronLeft size={20} />
-                                            </button>
-                                            <button className="cl-slider-btn right" onClick={() => setActiveImg(prev => (prev === images.length - 1 ? 0 : prev + 1))}>
-                                                <ChevronRight size={20} />
-                                            </button>
-                                            <button
-                                                className="cl-expand-btn"
-                                                onClick={() => {
-                                                    setModalImgIndex(activeImg);
-                                                    setShowImageModal(true);
-                                                }}
-                                            >
-                                                <Maximize2 size={16} />
-                                            </button>
-                                        </div>
-                                        <div className="cl-thumbs">
-                                            {images.map((img, idx) => (
-                                                <img
-                                                    key={idx}
-                                                    src={img}
-                                                    alt="Thumb"
-                                                    className={`cl-thumb ${activeImg === idx ? 'active' : ''}`}
-                                                    onClick={() => setActiveImg(idx)}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-
-
-
-                                    {/* Profile Card */}
-                                    <div className="cl-profile-mini-card">
-                                        <div className="cl-pmc-left">
-                                            <div className="cl-pmc-avatar-wrap">
-                                                <div className="cl-pmc-avatar-bg"></div>
-                                                <div className="cl-pmc-status-dot"></div>
-                                            </div>
-                                            <div className="cl-pmc-info">
-                                                <div className="cl-pmc-name-row">
-                                                    <span className="cl-pmc-name">Sarah Anderson</span>
-                                                    <div className="cl-pmc-online-badge">
-                                                        <div className="cl-pmc-online-dot"></div>
-                                                        <span>Online</span>
-                                                    </div>
-                                                </div>
-                                                <div className="cl-pmc-meta">
-                                                    <Clock size={14} />
-                                                    <span>Avg response: 1 hour</span>
-                                                </div>
-                                                <div className="cl-pmc-role-row">
-                                                    <span className="cl-pmc-role">Full Stack Developer</span>
-                                                    <div className="cl-pmc-rating">
-                                                        <Star size={14} fill="#CEFF1B" color="#CEFF1B" />
-                                                        <span>4.9(247 reviews)</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button className="cl-pmc-view-btn">
-                                            View profile
-                                            <ChevronRight size={18} />
-                                        </button>
-                                    </div>
-
-                                    {/* Description */}
-                                    <div className="cl-section">
-                                        <h2>Description</h2>
-                                        <p>
-                                            He is the best in the game. Always have time to explain to me and made sure I was satisfied at every stage. Don't skip him if you want the best. He's great
-                                        </p>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>What you will learn</h2>
-                                        <ul className="cl-bullet-list">
-                                            <li>He is the best in the game.</li>
-                                            <li>Always have time to explain to me and made sure.</li>
-                                            <li>I was satisfied at every stage.</li>
-                                            <li>Don't skip him if you want the best. He's great</li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Key outcomes</h2>
-                                        <ul className="cl-bullet-list">
-                                            <li>He is the best in the game..</li>
-                                            <li>Always have time to explain to me and made sure.</li>
-                                            <li>Don't skip him if you want the best. He's great</li>
-                                        </ul>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Tools needed</h2>
-                                        <div className="cl-tools-list">
-                                            <span>Notion</span>
-                                            <span>Tailwind CSS</span>
-                                            <span>Photoshop</span>
-                                            <span>Figma</span>
-                                            <span>Illustrator</span>
-                                            <span>TypeScript</span>
-                                            <span>Webflow</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="cl-section">
-                                        <h2>Languages</h2>
-                                        <div className="cl-languages-row">
-                                            <strong>English</strong>
-                                            <strong>Hindi</strong>
-                                            <strong>Tamil</strong>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-                                {/* Right Column (Ticket Pricing Card) */}
-                                <div className="webinar-ticket-card">
-                                    <div className="ticket-header">
-                                        <span className="ticket-label">Ticket</span>
-                                        <div className="ticket-price-row">
-                                            <span className="ticket-price-symbol">$</span>
-                                            <h2 className="ticket-price">999</h2>
-                                        </div>
-                                    </div>
-
-                                    <div className="ticket-divider"></div>
-
-                                    <div className="ticket-details-section">
-                                        <div className="ticket-row-split">
-                                            <div className="ticket-info-box">
-                                                <Calendar size={18} />
-                                                <span>2026-03-20</span>
-                                            </div>
-                                            <div className="ticket-info-box">
-                                                <Clock size={18} />
-                                                <span>18:00 • 90 min</span>
-                                            </div>
-                                        </div>
-                                        <div className="ticket-info-box full-width">
-                                            <Globe size={18} />
-                                            <span>Asia/Kolkata (IST)</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="ticket-actions-group">
-                                        <button className="btn-get-ticket">
-                                            <Ticket size={20} />
-                                            Get ticket
-                                        </button>
-                                        <button className="btn-add-calendar">
-                                            <CalendarPlus size={20} />
-                                            Add to calendar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Agenda Section */}
-                            <section className="cl-agenda-section">
-                                <h2 className="cl-section-title">Agenda</h2>
-                                <div className="cl-agenda-container">
-                                    {agendaData.map((item) => (
-                                        <div key={item.id} className="cl-agenda-card">
-                                            <div className="cl-agenda-badge">
-                                                {item.duration}
-                                            </div>
-                                            <h3 className="cl-agenda-title">{item.title}</h3>
-                                            <p className="cl-agenda-desc">{item.description}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-
-                            {/* Listings Section */}
-                            <section style={{ width: "100%" }}>
-                                {/* ================= TOP CONTROLS ================= */}
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        gap: "16px",
-                                        marginBottom: "24px",
-                                    }}
-                                >
-                                    {/* Switch */}
-                                    <div
-                                        style={{
-                                            width: "164.404px",
-                                            height: "60.002px",
-                                            background: "#CEFF1B",
-                                            borderRadius: "18px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            marginBottom: "8px"
-                                        }}
-                                    >
-                                        <span
-                                            style={{
-                                                fontSize: "21px",
-                                                fontWeight: "400",
-                                                color: "#000",
-                                            }}
-                                        >
-                                            Listings
-                                        </span>
-                                    </div>
-
-                                    {/* Pills */}
-                                    <div
-                                        style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}
-                                    >
-                                        {["All", "Services", "Products", "Courses", "Webinars"].map(
-                                            (item) => (
-                                                <button
-                                                    key={item}
-                                                    onClick={() => setFilter(item)}
-                                                    style={{
-                                                        padding: "12px 26px",
-                                                        borderRadius: "999px",
-                                                        border: filter === item ? "1px solid #ddd" : "none",
-                                                        cursor: "pointer",
-                                                        background:
-                                                            filter === item
-                                                                ? "#fff"
-                                                                : "linear-gradient(#f5f5f5,#e9e9e9)",
-                                                        boxShadow:
-                                                            "inset 0 1px 0 rgba(255,255,255,.9),0 2px 8px rgba(0,0,0,.06)",
-                                                        fontSize: "15px",
-                                                        fontWeight: "500",
-                                                        color: "#000",
-                                                    }}
-                                                >
-                                                    {item}
-                                                </button>
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* ================= CONTENT ================= */}
-
-                                <div className="listings-grid">
-                                    {listingsData
-                                        .filter((l) => {
-                                            if (filter === "All") return true;
-                                            return l.type === filter.slice(0, -1);
-                                        })
-                                        .slice(0, showMoreListings ? listingsData.length : 6)
-                                        .map((listing, index) => (
-                                            <div key={index} className="listing-card">
-                                                <div className="listing-image">
-                                                    <img src={listing.image} alt={listing.title} />
-
-                                                    <button className="listing-nav-btn left">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="m15 18-6-6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <button className="listing-nav-btn right">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path d="m9 18 6-6-6-6" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-
-                                                <div className="listing-info">
-                                                    <div className="listing-title-row">
-                                                        <h4 className="listing-title">{listing.title}</h4>
-                                                        <span className="listing-type">{listing.type}</span>
-                                                    </div>
-
-                                                    <div className="listing-meta">
-                                                        <div className="listing-views">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                                <circle cx="12" cy="12" r="3" />
-                                                            </svg>
-                                                            <span>{listing.views} views</span>
-                                                        </div>
-                                                        <div className="listing-price">{listing.price}</div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="listing-actions">
-                                                    <button className="btn-view-listing">View Listing</button>
-                                                    <button
-                                                        className="btn-favorite"
-                                                        onClick={() => toggleFavorite(index)}
-                                                    >
-                                                        <svg width="20" height="20" viewBox="0 0 24 24"
-                                                            fill={favorites.has(index) ? "#ef4444" : "none"}
-                                                            stroke={favorites.has(index) ? "#ef4444" : "currentColor"}
-                                                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                                        >
-                                                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                </div>
-                            </section>
-
-                            {/* Show More Button */}
-                            <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}>
-                                <button
-                                    onClick={() => setShowMoreListings(!showMoreListings)}
-                                    style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        background: '#CEFF1B',
-                                        borderRadius: '50%',
-                                        border: 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                                        transition: 'all 0.3s ease',
-                                        transform: showMoreListings ? 'rotate(180deg)' : 'rotate(0deg)'
-                                    }}
-                                >
-                                    <ChevronDown size={20} color="#000" />
-                                </button>
-                            </div>
-
-                            <DetailedTeamCard />
-                            
-
-                            <FAQAccordion faqData={faqData} theme={theme} />
-
-                            {/* Reviews Section */}
-                            <section className="reviews-section">
-                                <div className="reviews-header">
-                                    <h3 className="reviews-title">Reviews</h3>
-                                    <div className="reviews-header-line"></div>
-                                </div>
-
-                                <div className="reviews-container">
-                                    {/* Left Side - Rating Summary */}
-                                    <div className="reviews-summary">
-                                        <div className="rating-overview">
-                                            <span className="rating-score">
-                                                {reviewsData.average}
-                                            </span>
-                                            <div className="rating-stars">
-                                                {(() => {
-                                                    const starColor = theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500";
-                                                    return [1, 2, 3, 4, 5].map((star) => (
-                                                        <svg
-                                                            key={star}
-                                                            width="16"
-                                                            height="16"
-                                                            viewBox="0 0 24 24"
-                                                            fill={
-                                                                star <= Math.round(reviewsData.average)
-                                                                    ? starColor
-                                                                    : "none"
-                                                            }
-                                                            stroke={starColor}
-                                                            strokeWidth="2"
-                                                        >
-                                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                                        </svg>
-                                                    ));
-                                                })()}
-                                            </div>
-                                            <span className="review-count">
-                                                ({reviewsData.total} reviews)
-                                            </span>
-                                        </div>
-
-                                        <div className="rating-breakdown">
-                                            {[5, 4, 3, 2, 1].map((rating) => (
-                                                <div key={rating} className="rating-bar-row">
-                                                    <span className="rating-label">
-                                                        {rating} <span style={{ color: theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500" }}>★</span>
-                                                    </span>
-                                                    <div className="rating-bar">
-                                                        <div
-                                                            className="rating-bar-fill"
-                                                            style={{
-                                                                width: `${(reviewsData.breakdown[rating] / reviewsData.total) * 100}%`,
-                                                            }}
-                                                        ></div>
-                                                    </div>
-                                                    <span className="rating-count">
-                                                        {reviewsData.breakdown[rating]}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Right Side - Reviews List */}
-                                    <div className="reviews-list">
-                                        {reviewsData.reviews.map((review, index) => (
-                                            <div key={index} className="review-item">
-                                                <div className="review-header">
-                                                    <div className="reviewer-avatar"></div>
-                                                    <div className="reviewer-info">
-                                                        <span className="reviewer-name">{review.name}</span>
-                                                        <div className="review-stars">
-                                                            {(() => {
-                                                                const starColor = theme === "dark" || theme === "dark-theme" ? "#ceff1b" : "#FFA500";
-                                                                return [1, 2, 3, 4, 5].map((star) => (
-                                                                    <svg
-                                                                        key={star}
-                                                                        width="12"
-                                                                        height="12"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill={
-                                                                            star <= review.rating ? starColor : "none"
-                                                                        }
-                                                                        stroke={starColor}
-                                                                        strokeWidth="2"
-                                                                    >
-                                                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                                                    </svg>
-                                                                ));
-                                                            })()}
-                                                        </div>
-                                                    </div>
-                                                    <span className="review-date">{review.date}</span>
-                                                </div>
-                                                <p className="review-text">{review.text}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </section>
-
-
-
-
-
-                            {/* Recommended Section */}
-                            <div className="cl-listing-container">
-                                <h2 className="cl-sectionTitle">Recommended</h2>
-                                <div className="cl-mp-grid" ref={recommendedGridRef}>
-                                    {recommendedProducts.map((p) => (
-                                        <article className="cl-mp-card" key={p.id}>
-                                            <div className="cl-mp-imgWrap">
-                                                <img className="cl-mp-img" src={p.image} alt="" />
-                                            </div>
-                                            <div className="cl-mp-cardBody">
-                                                <div className="cl-mp-topLine">
-                                                    <div className="cl-mp-user">
-                                                        <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">{p.name}</span>
-                                                        {p.verified && (
-                                                            <svg className="cl-mp-verifyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                                <path
-                                                                    fill="#1DA1F2"
-                                                                    d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
-                                                                />
-                                                                <path
-                                                                    stroke="#FFF"
-                                                                    strokeWidth="3"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M8 12.5l3 3 5-5"
-                                                                />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    {p.ai && (
-                                                        <span className="cl-mp-aiBadge">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                                <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
-                                                            </svg>
-                                                            Ai Powered
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="cl-mp-desc">{p.title}</p>
-                                                <div className="cl-mp-metaRow">
-                                                    <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">★</span>
-                                                        <span>{p.rating.toFixed(1)}</span>
-                                                        <span className="cl-mp-rev">({p.reviews})</span>
-                                                    </div>
-                                                </div>
-                                                <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">{p.priceLabel}</div>
-                                                    <button className="cl-mp-cta" type="button">
-                                                        {p.cta}
-                                                        <ChevronRight size={12} className="cl-mp-ctaIcon" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
-                                <button className="cl-mp-floatArrow left" type="button" onClick={() => scrollGridRef(recommendedGridRef, "left")}>
-                                    <ChevronLeft size={24} />
-                                </button>
-                                <button className="cl-mp-floatArrow right" type="button" onClick={() => scrollGridRef(recommendedGridRef, "right")}>
-                                    <ChevronRight size={24} />
-                                </button>
-                            </div>
-
-                            {/* More from Sarah Anderson Section */}
-                            <div className="cl-listing-container" style={{ marginTop: '40px' }}>
-                                <h2 className="cl-sectionTitle">More from Sarah Anderson</h2>
-                                <div className="cl-mp-grid" ref={moreFromSarahGridRef}>
-                                    {moreFromSarah.map((p) => (
-                                        <article className="cl-mp-card" key={p.id}>
-                                            <div className="cl-mp-imgWrap">
-                                                <img className="cl-mp-img" src={p.image} alt="" />
-                                            </div>
-                                            <div className="cl-mp-cardBody">
-                                                <div className="cl-mp-topLine">
-                                                    <div className="cl-mp-user">
-                                                        <div className="cl-mp-avatar"></div>
-                                                        <span className="cl-mp-userName">{p.name}</span>
-                                                        {p.verified && (
-                                                            <svg className="cl-mp-verifyIcon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                                <path
-                                                                    fill="#1DA1F2"
-                                                                    d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
-                                                                />
-                                                                <path
-                                                                    stroke="#FFF"
-                                                                    strokeWidth="3"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M8 12.5l3 3 5-5"
-                                                                />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    {p.ai && (
-                                                        <span className="cl-mp-aiBadge">
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                                <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
-                                                            </svg>
-                                                            Ai Powered
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="cl-mp-desc">{p.title}</p>
-                                                <div className="cl-mp-metaRow">
-                                                    <div className="cl-mp-rating">
-                                                        <span className="cl-mp-star">★</span>
-                                                        <span>{p.rating.toFixed(1)}</span>
-                                                        <span className="cl-mp-rev">({p.reviews})</span>
-                                                    </div>
-                                                </div>
-                                                <div className="cl-mp-bottomRow">
-                                                    <div className="cl-mp-price">{p.priceLabel}</div>
-                                                    <button className="cl-mp-cta" type="button">
-                                                        {p.cta}
-                                                        <ChevronRight size={12} className="cl-mp-ctaIcon" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
-                                <button className="cl-mp-floatArrow left" type="button" onClick={() => scrollGridRef(moreFromSarahGridRef, "left")}>
-                                    <ChevronLeft size={24} />
-                                </button>
-                                <button className="cl-mp-floatArrow right" type="button" onClick={() => scrollGridRef(moreFromSarahGridRef, "right")}>
-                                    <ChevronRight size={24} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <MobileBottomNav theme={theme} />
-        </div>
+  const portfolioData = useMemo(() => {
+    const items = (Array.isArray(portfolioProjects) ? portfolioProjects : []).map(
+      (project) => ({
+        id: project?.id,
+        image: getPortfolioImage(project),
+        title: project?.title || "Untitled Project",
+        description: project?.description || "",
+        cost: currencyText(project?.cost_cents ?? project?.cost),
+      }),
     );
+
+    return {
+      featured: items[0] || null,
+      items: items.slice(1),
+    };
+  }, [portfolioProjects]);
+
+  const mapListingCard = (item) => ({
+    id: item?.id,
+    listingUsername: item?.listing_username || item?.username || "",
+    creatorUsername: item?.creator_username || "",
+    image: toMediaUrl(
+      item?.cover_media_url ||
+        item?.cover_media_path ||
+        item?.cover ||
+        "",
+    ),
+    title: item?.title || "Untitled Listing",
+    type:
+      item?.listing_type === "digital_product"
+        ? "Products"
+        : item?.listing_type === "service"
+          ? "Services"
+          : item?.listing_type === "course"
+            ? "Courses"
+            : item?.listing_type === "webinar"
+              ? "Webinars"
+              : "All",
+    views: item?.views || item?.views_count || 0,
+    price:
+      item?.price !== undefined && item?.price !== null
+        ? currencyText(item.price)
+        : item?.price_text || "—",
+    listingType: item?.listing_type || "webinar",
+  });
+
+  const listingsData = useMemo(
+    () => (Array.isArray(moreFromUserListings) ? moreFromUserListings : []).map(mapListingCard),
+    [moreFromUserListings],
+  );
+
+  const filteredListings = useMemo(() => {
+    return listingsData.filter((l) => {
+      if (filter === "All") return true;
+      return l.type === filter;
+    });
+  }, [listingsData, filter]);
+
+  const recommendedProducts = useMemo(
+    () => (Array.isArray(recommendedListings) ? recommendedListings : []).map(mapListingCard),
+    [recommendedListings],
+  );
+
+  const moreFromCreator = useMemo(
+    () => (Array.isArray(moreFromUserListings) ? moreFromUserListings : []).map(mapListingCard),
+    [moreFromUserListings],
+  );
+
+  const learningPoints = Array.isArray(webinarDetails?.learning_points)
+    ? webinarDetails.learning_points
+    : [];
+
+  const languages = Array.isArray(webinarDetails?.languages)
+    ? webinarDetails.languages
+    : [];
+
+  const agendaItems = Array.isArray(webinarDetails?.agenda)
+    ? webinarDetails.agenda
+    : [];
+
+  if (loading) {
+    return (
+      <div className={`user-page ${theme} min-h-screen`}>
+        <UserNavbar
+          toggleSidebar={() => setSidebarOpen((p) => !p)}
+          isSidebarOpen={sidebarOpen}
+          theme={theme}
+        />
+        <div className="pt-[85px] flex relative z-10">
+          <div className="relative flex-1 min-w-0 overflow-hidden">
+            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+              <div className="cl-page">
+                <div className="content-card">
+                  <p className="card-text">Loading webinar listing...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <MobileBottomNav theme={theme} />
+      </div>
+    );
+  }
+
+  if (pageError || !listing) {
+    return (
+      <div className={`user-page ${theme} min-h-screen`}>
+        <UserNavbar
+          toggleSidebar={() => setSidebarOpen((p) => !p)}
+          isSidebarOpen={sidebarOpen}
+          theme={theme}
+        />
+        <div className="pt-[85px] flex relative z-10">
+          <div className="relative flex-1 min-w-0 overflow-hidden">
+            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+              <div className="cl-page">
+                <div className="content-card">
+                  <p className="card-text text-red-600">
+                    {pageError || "Listing not found."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <MobileBottomNav theme={theme} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`user-page ${theme} min-h-screen`}>
+      <UserNavbar
+        toggleSidebar={() => setSidebarOpen((p) => !p)}
+        isSidebarOpen={sidebarOpen}
+        theme={theme}
+      />
+
+      <div className="pt-[85px] flex relative z-10 transition-all duration-300">
+        <div className="relative flex-1 min-w-0 overflow-hidden">
+          <div className="overflow-y-auto h-[calc(100vh-85px)]">
+            <div className={`cl-page ${theme}`}>
+              <div className="cl-header">
+                <h1 className="cl-title">{listing?.title || "Webinar"}</h1>
+                <div className="cl-header-actions">
+                  <button className="cl-icon-btn">
+                    <Share2 size={20} />
+                  </button>
+                  <button className="cl-icon-btn">
+                    <Flag size={20} />
+                  </button>
+                  <button className="cl-icon-btn" onClick={() => setIsLiked(!isLiked)}>
+                    <Heart
+                      size={20}
+                      fill={isLiked ? "red" : "none"}
+                      color={isLiked ? "red" : "currentColor"}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div className="cl-container">
+                <div className="cl-main">
+                  <div className="cl-slider-wrap">
+                    <div className="cl-main-img-box">
+                      {galleryImages.length ? (
+                        <img
+                          src={galleryImages[activeImg]}
+                          alt={listing?.title}
+                          className="cl-main-img"
+                        />
+                      ) : (
+                        <div className="cl-main-img" />
+                      )}
+
+                      {galleryImages.length > 1 && (
+                        <>
+                          <button
+                            className="cl-slider-btn left"
+                            onClick={() =>
+                              setActiveImg((prev) =>
+                                prev === 0 ? galleryImages.length - 1 : prev - 1,
+                              )
+                            }
+                          >
+                            <ChevronLeft size={20} />
+                          </button>
+                          <button
+                            className="cl-slider-btn right"
+                            onClick={() =>
+                              setActiveImg((prev) =>
+                                prev === galleryImages.length - 1 ? 0 : prev + 1,
+                              )
+                            }
+                          >
+                            <ChevronRight size={20} />
+                          </button>
+                        </>
+                      )}
+
+                      {galleryImages.length > 0 && (
+                        <button
+                          className="cl-expand-btn"
+                          onClick={() => {
+                            setModalImgIndex(activeImg);
+                            setShowImageModal(true);
+                          }}
+                        >
+                          <Maximize2 size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    {!!galleryImages.length && (
+                      <div className="cl-thumbs">
+                        {galleryImages.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img}
+                            alt="Thumb"
+                            className={`cl-thumb ${activeImg === idx ? "active" : ""}`}
+                            onClick={() => setActiveImg(idx)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="cl-profile-mini-card">
+                    <div className="cl-pmc-left">
+                      <div className="cl-pmc-avatar-wrap">
+                        <div className="cl-pmc-avatar-bg"></div>
+                        <div className="cl-pmc-status-dot"></div>
+                      </div>
+                      <div className="cl-pmc-info">
+                        <div className="cl-pmc-name-row">
+                          <span className="cl-pmc-name">
+                            {creator?.full_name || creator?.name || username}
+                          </span>
+                          <div className="cl-pmc-online-badge">
+                            <div className="cl-pmc-online-dot"></div>
+                            <span>Online</span>
+                          </div>
+                        </div>
+                        <div className="cl-pmc-meta">
+                          <Clock size={14} />
+                          <span>Avg response: {creator?.avg_response || "1 hour"}</span>
+                        </div>
+                        <div className="cl-pmc-role-row">
+                          <span className="cl-pmc-role">
+                            {creator?.title || "Creator"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      className="cl-pmc-view-btn"
+                      onClick={() =>
+                        creator?.username
+                          ? navigate(`/public-user-profile/${creator.username}`)
+                          : null
+                      }
+                    >
+                      View profile
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+
+                  <div className="cl-section">
+                    <h2>Description</h2>
+                    <p>{listing?.short_description || listing?.about || "No description added yet."}</p>
+                  </div>
+
+                  <div className="cl-section">
+                    <h2>What you will learn</h2>
+                    {learningPoints.length ? (
+                      <ul className="cl-bullet-list">
+                        {learningPoints.map((point, index) => (
+                          <li key={`${point}-${index}`}>{point}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No learning points added yet.</p>
+                    )}
+                  </div>
+
+                  <div className="cl-section">
+                    <h2>Tools needed</h2>
+                    <div className="cl-tools-list">
+                      {(Array.isArray(listing?.tools) ? listing.tools : []).length ? (
+                        listing.tools.map((tool) => <span key={tool}>{tool}</span>)
+                      ) : (
+                        <span>No tools added</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="cl-section">
+                    <h2>Languages</h2>
+                    <div className="cl-languages-row">
+                      {languages.length ? (
+                        languages.map((language) => <strong key={language}>{language}</strong>)
+                      ) : (
+                        <strong>Not specified</strong>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="webinar-ticket-card">
+                  <div className="ticket-header">
+                    <span className="ticket-label">Ticket</span>
+                    <div className="ticket-price-row">
+                      <span className="ticket-price-symbol">$</span>
+                      <h2 className="ticket-price">
+                        {webinarDetails?.ticket_price ?? "Free"}
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="ticket-divider"></div>
+
+                  <div className="ticket-details-section">
+                    <div className="ticket-row-split">
+                      <div className="ticket-info-box">
+                        <Calendar size={18} />
+                        <span>{webinarDetails?.schedule_date || "—"}</span>
+                      </div>
+                      <div className="ticket-info-box">
+                        <Clock size={18} />
+                        <span>
+                          {webinarDetails?.schedule_start_time || "—"} •{" "}
+                          {webinarDetails?.schedule_duration || "—"} min
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="ticket-info-box full-width">
+                      <Globe size={18} />
+                      <span>{webinarDetails?.schedule_timezone || "—"}</span>
+                    </div>
+                  </div>
+
+                  <div className="ticket-actions-group">
+                    <button className="btn-get-ticket">
+                      <Ticket size={20} />
+                      Get ticket
+                    </button>
+
+                    <button className="btn-add-calendar">
+                      <CalendarPlus size={20} />
+                      Add to calendar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <section className="cl-agenda-section">
+                <h2 className="cl-section-title">Agenda</h2>
+                <div className="cl-agenda-container">
+                  {agendaItems.length ? (
+                    agendaItems.map((item, index) => (
+                      <div
+                        key={item?.id || index}
+                        className="cl-agenda-card"
+                      >
+                        <div className="cl-agenda-badge">
+                          {item?.time || "—"}
+                        </div>
+                        <h3 className="cl-agenda-title">
+                          {item?.topic || "Topic"}
+                        </h3>
+                        <p className="cl-agenda-desc">
+                          {item?.description || "No description added yet."}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="content-card">
+                      <p className="card-text">No agenda added yet.</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section style={{ width: "100%" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "164.404px",
+                      height: "60.002px",
+                      background: "#CEFF1B",
+                      borderRadius: "18px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "21px",
+                        fontWeight: "400",
+                        color: "#000",
+                      }}
+                    >
+                      Listings
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "16px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {["All", "Services", "Products", "Courses", "Webinars"].map((item) => (
+                      <button
+                        key={item}
+                        onClick={() => setFilter(item)}
+                        style={{
+                          padding: "12px 26px",
+                          borderRadius: "999px",
+                          border: filter === item ? "1px solid #ddd" : "none",
+                          cursor: "pointer",
+                          background:
+                            filter === item ? "#fff" : "linear-gradient(#f5f5f5,#e9e9e9)",
+                          boxShadow:
+                            "inset 0 1px 0 rgba(255,255,255,.9),0 2px 8px rgba(0,0,0,.06)",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          color: "#000",
+                        }}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="listings-grid">
+                  {filteredListings
+                    .slice(0, showMoreListings ? filteredListings.length : 6)
+                    .map((item, index) => (
+                      <div key={item.id || index} className="listing-card">
+                        <div className="listing-image">
+                          <img src={item.image} alt={item.title} />
+                        </div>
+
+                        <div className="listing-info">
+                          <div className="listing-title-row">
+                            <h4 className="listing-title">{item.title}</h4>
+                            <span className="listing-type">{item.type}</span>
+                          </div>
+
+                          <div className="listing-meta">
+                            <div className="listing-views">
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                              <span>{item.views} views</span>
+                            </div>
+                            <div className="listing-price">{item.price}</div>
+                          </div>
+                        </div>
+
+                        <div className="listing-actions">
+                          <button
+                            className="btn-view-listing"
+                            onClick={() =>
+                              navigate(`/${listingTypeToRouteSlug(item.listingType)}/${item.listingUsername}`)
+                            }
+                          >
+                            View Listing
+                          </button>
+                          <button
+                            className="btn-favorite"
+                            onClick={() => toggleFavorite(index)}
+                          >
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill={favorites.has(index) ? "#ef4444" : "none"}
+                              stroke={favorites.has(index) ? "#ef4444" : "currentColor"}
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </section>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "40px 0",
+                }}
+              >
+                <button
+                  onClick={() => setShowMoreListings(!showMoreListings)}
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    background: "#CEFF1B",
+                    borderRadius: "50%",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                    transition: "all 0.3s ease",
+                    transform: showMoreListings ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                >
+                  <ChevronDown size={20} color="#000" />
+                </button>
+              </div>
+
+              <DetailedTeamCard
+                teamName={creator?.full_name || creator?.name || "Creator"}
+                location={creator?.location || ""}
+                rating={0}
+                reviewCount={0}
+                description={creator?.bio || ""}
+                languages={creator?.languages || []}
+                karma={creator?.karma || "—"}
+                projectsCompleted={creator?.projects_completed || "—"}
+                responseSpeed={creator?.avg_response || "1 hour"}
+                memberSince={creator?.created_at || ""}
+                skills={creator?.skills || []}
+                avatarUrl={creator?.avatar_url || ""}
+                onViewProfile={() => {
+                  if (creator?.username) {
+                    navigate(`/public-user-profile/${creator.username}`);
+                  }
+                }}
+              />
+
+              <FAQAccordion faqData={faqData} theme={theme} />
+
+              <div className="cl-listing-container">
+                <h2 className="cl-sectionTitle">Recommended</h2>
+                <div className="cl-mp-grid" ref={recommendedGridRef}>
+                  {recommendedProducts.map((p, idx) => (
+                    <article className="cl-mp-card" key={p.id || idx}>
+                      <div className="cl-mp-imgWrap">
+                        <img className="cl-mp-img" src={p.image} alt={p.title} />
+                      </div>
+                      <div className="cl-mp-cardBody">
+                        <div className="cl-mp-topLine">
+                          <div className="cl-mp-user">
+                            <div className="cl-mp-avatar"></div>
+                            <span className="cl-mp-userName">
+                              {p.creatorUsername || p.listingUsername}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="cl-mp-desc">{p.title}</p>
+                        <div className="cl-mp-bottomRow">
+                          <div className="cl-mp-price">Price: {p.price}</div>
+                          <button
+                            className="cl-mp-cta"
+                            type="button"
+                            onClick={() =>
+                              navigate(`/${listingTypeToRouteSlug(p.listingType)}/${p.listingUsername}`)
+                            }
+                          >
+                            Know More
+                            <ChevronRight size={12} className="cl-mp-ctaIcon" />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <button
+                  className="cl-mp-floatArrow left"
+                  type="button"
+                  onClick={() => scrollGridRef(recommendedGridRef, "left")}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  className="cl-mp-floatArrow right"
+                  type="button"
+                  onClick={() => scrollGridRef(recommendedGridRef, "right")}
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+
+              <div className="cl-listing-container" style={{ marginTop: "40px" }}>
+                <h2 className="cl-sectionTitle">
+                  More from {creator?.full_name || creator?.name || username}
+                </h2>
+                <div className="cl-mp-grid" ref={moreFromCreatorGridRef}>
+                  {moreFromCreator.map((p, idx) => (
+                    <article className="cl-mp-card" key={p.id || idx}>
+                      <div className="cl-mp-imgWrap">
+                        <img className="cl-mp-img" src={p.image} alt={p.title} />
+                      </div>
+                      <div className="cl-mp-cardBody">
+                        <div className="cl-mp-topLine">
+                          <div className="cl-mp-user">
+                            <div className="cl-mp-avatar"></div>
+                            <span className="cl-mp-userName">
+                              {p.creatorUsername || p.listingUsername}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="cl-mp-desc">{p.title}</p>
+                        <div className="cl-mp-bottomRow">
+                          <div className="cl-mp-price">Price: {p.price}</div>
+                          <button
+                            className="cl-mp-cta"
+                            type="button"
+                            onClick={() =>
+                              navigate(`/${listingTypeToRouteSlug(p.listingType)}/${p.listingUsername}`)
+                            }
+                          >
+                            Know More
+                            <ChevronRight size={12} className="cl-mp-ctaIcon" />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <button
+                  className="cl-mp-floatArrow left"
+                  type="button"
+                  onClick={() => scrollGridRef(moreFromCreatorGridRef, "left")}
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  className="cl-mp-floatArrow right"
+                  type="button"
+                  onClick={() => scrollGridRef(moreFromCreatorGridRef, "right")}
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showImageModal &&
+        createPortal(
+          <div className="portfolio-modal-backdrop" onClick={() => setShowImageModal(false)}>
+            <div
+              className={`portfolio-modal-content ${theme}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="portfolio-modal-topbar">
+                <div className="portfolio-modal-brand">
+                  <div className="portfolio-brand-circle"></div>
+                  <span>{listing?.title}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="portfolio-modal-nav">
+                    <button
+                      className="nav-arrow left"
+                      onClick={() =>
+                        setModalImgIndex((prev) =>
+                          prev === 0 ? galleryImages.length - 1 : prev - 1,
+                        )
+                      }
+                    >
+                      ◀
+                    </button>
+                    <span className="portfolio-modal-counter">
+                      {modalImgIndex + 1} of {galleryImages.length}
+                    </span>
+                    <button
+                      className="nav-arrow right"
+                      onClick={() =>
+                        setModalImgIndex((prev) =>
+                          prev === galleryImages.length - 1 ? 0 : prev + 1,
+                        )
+                      }
+                    >
+                      ▶
+                    </button>
+                  </div>
+                  <button
+                    className="portfolio-modal-close"
+                    onClick={() => setShowImageModal(false)}
+                  >
+                    <X />
+                  </button>
+                </div>
+              </div>
+
+              <div className="portfolio-modal-image">
+                <img src={galleryImages[modalImgIndex]} alt={listing?.title} />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      <MobileBottomNav theme={theme} />
+    </div>
+  );
 };
 
 export default WebinarListing;

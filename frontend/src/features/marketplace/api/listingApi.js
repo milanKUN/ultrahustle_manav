@@ -329,3 +329,21 @@ export const updateListing = async (username, payload) => {
     throw new Error(extractErrorMessage(err));
   }
 };
+
+export const getPublicDigitalProductListing = async ({ username, listingId }) => {
+  try {
+    const res = await api.get(`/api/v1/digital-products/${username}/${listingId}`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
+export const getPublicUserListings = async (username) => {
+  try {
+    const res = await api.get(`/api/v1/public/users/${encodeURIComponent(username)}/listings`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
