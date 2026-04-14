@@ -1,0 +1,303 @@
+.campaign-analytics-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #f6f6f6;
+}
+
+.dark.campaign-analytics-layout {
+  background: #121212;
+}
+
+.campaign-analytics-body {
+  padding-top: 85px;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.campaign-analytics-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.campaign-analytics-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.campaign-analytics-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ca-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.ca-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.ca-subtitle {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: #444;
+}
+
+.campaign-analytics-layout.dark .ca-title {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-subtitle {
+  color: #b5b5b5;
+}
+
+.ca-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.ca-link {
+  font-size: 13px;
+  color: #444;
+}
+
+.ca-btn-new {
+  height: 34px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 4px;
+  background: #d4ff32;
+  color: #111;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campaign-analytics-layout.dark .ca-link {
+  color: #c7c7c7;
+}
+
+.ca-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ca-stats-grid.secondary {
+  margin-bottom: 20px;
+}
+
+.ca-stat-card {
+  border: 1px solid #d4ff32;
+  border-radius: 16px;
+  background: #efefef;
+  padding: 10px 12px;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ca-stat-label {
+  font-size: 11px;
+  color: #555;
+}
+
+.ca-stat-value {
+  font-size: 28px;
+  line-height: 1;
+  color: #333;
+  font-weight: 600;
+}
+
+.campaign-analytics-layout.dark .ca-stat-card {
+  background: #1d1d1d;
+  border-color: #3e4f12;
+}
+
+.campaign-analytics-layout.dark .ca-stat-label {
+  color: #a5a5a5;
+}
+
+.campaign-analytics-layout.dark .ca-stat-value {
+  color: #f1f1f1;
+}
+
+.ca-performance-card {
+  border: 1px solid #d4ff32;
+  border-radius: 16px;
+  background: #efefef;
+  padding: 18px 22px 14px;
+}
+
+.ca-performance-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  color: #333;
+}
+
+.ca-performance-subtitle {
+  margin: 7px 0 14px;
+  font-size: 16px;
+  color: #555;
+}
+
+.ca-chart-wrap {
+  width: 100%;
+}
+
+.ca-chart-area {
+  width: 100%;
+  height: 420px;
+  border-radius: 2px;
+  background: #e3e3e3;
+  padding: 8px 10px 4px 4px;
+  box-sizing: border-box;
+}
+
+.ca-chart-area .recharts-cartesian-axis-tick-value {
+  fill: #333;
+  font-size: 16px;
+}
+
+.ca-chart-area .recharts-wrapper:focus,
+.ca-chart-area .recharts-wrapper *:focus,
+.ca-chart-area .recharts-surface:focus {
+  outline: none;
+}
+
+.campaign-analytics-layout.dark .ca-performance-card {
+  background: #1d1d1d;
+  border-color: #3e4f12;
+}
+
+.campaign-analytics-layout.dark .ca-performance-title {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-performance-subtitle {
+  color: #b0b0b0;
+}
+
+.campaign-analytics-layout.dark .ca-chart-area {
+  background: #232323;
+}
+
+.campaign-analytics-layout.dark .ca-chart-area .recharts-cartesian-axis-tick-value {
+  fill: #d1d1d1;
+}
+
+@media (max-width: 1200px) {
+  .ca-title {
+    font-size: 36px;
+  }
+
+  .ca-subtitle {
+    font-size: 24px;
+  }
+
+  .ca-stat-value {
+    font-size: 32px;
+  }
+
+  .ca-performance-title {
+    font-size: 33px;
+  }
+
+  .ca-performance-subtitle {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 992px) {
+  .campaign-analytics-scroll {
+    padding: 20px;
+  }
+
+  .ca-header {
+    flex-direction: column;
+  }
+
+  .ca-header-actions {
+    margin-top: 0;
+  }
+
+  .ca-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ca-chart-area {
+    height: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  .campaign-analytics-scroll {
+    padding: 14px;
+  }
+
+  .ca-title {
+    font-size: 24px;
+  }
+
+  .ca-subtitle {
+    font-size: 16px;
+  }
+
+  .ca-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ca-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ca-stat-card {
+    min-height: 60px;
+  }
+
+  .ca-stat-value {
+    font-size: 24px;
+  }
+
+  .ca-performance-card {
+    padding: 14px 12px 12px;
+  }
+
+  .ca-performance-title {
+    font-size: 24px;
+  }
+
+  .ca-performance-subtitle {
+    font-size: 13px;
+  }
+
+  .ca-chart-wrap {
+    width: 100%;
+  }
+
+  .ca-chart-area {
+    height: 220px;
+  }
+}

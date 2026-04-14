@@ -76,6 +76,7 @@ import ViewAllWebinars from "./features/marketplace/pages/ViewAllWebinars";
 import GroupChat from "./features/marketplace/pages/GroupChat";
 import MyCampaign from "./features/marketplace/pages/MyCampaign";
 import BoostCampaign from "./features/marketplace/pages/BoostCampaign";
+import CampaignAnalytics from "./features/marketplace/pages/CampaignAnalytics";
 import FriendRequestPage from "./features/dashboard/pages/FriendRequestPage";
 
 export default function App() {
@@ -605,6 +606,12 @@ export default function App() {
                         path="/boost-campaign"
                         element={
                             <BoostCampaign theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/campaign-analytics"
+                        element={
+                            <CampaignAnalytics theme={theme} setTheme={setTheme} />
                         }
                     />
                 </Routes>
