@@ -911,7 +911,7 @@ class ListingController extends Controller
                 }
 
                 // DIGITAL PRODUCT PRICE = LOWEST PACKAGE PRICE
-                if ($row->listing_type === 'digital_product' && Schema::hasTable('digital_product_packages')) {
+                /* if ($row->listing_type === 'digital_product' && Schema::hasTable('digital_product_packages')) {
                     $minPrice = DB::table('digital_product_packages')
                         ->where('listing_id', $row->id)
                         ->whereNotNull('price')
@@ -921,7 +921,7 @@ class ListingController extends Controller
                         $price = (float) $minPrice;
                         $priceLabel = 'Starting at';
                     }
-                }
+                } */
 
                 // COURSE PRICE
                 // Adjust this only if your course table stores the field under a different column name.
@@ -1087,13 +1087,14 @@ class ListingController extends Controller
             'details.included.*' => 'nullable|string|max:255',
             'details.delivery_format' => 'nullable|string|max:255',
 
-            // 'details.packages' => 'nullable|array',
-            // 'details.packages.*.package_name' => 'required_with:details.packages|string|in:Basic,Standard,Premium',
-            // 'details.packages.*.price' => 'nullable',
-            // 'details.packages.*.included' => 'nullable|array',
-            // 'details.packages.*.included.*' => 'nullable|string|max:255',
-            // 'details.packages.*.deliveryFormats' => 'nullable|array',
-            // 'details.packages.*.deliveryFormats.*' => 'nullable|string|max:255',
+            'portfolio_projects' => 'nullable|array',
+            'portfolio_projects.*.title' => 'nullable|string|max:255',
+            'portfolio_projects.*.description' => 'nullable|string',
+            'portfolio_projects.*.cost' => 'nullable|string|max:100',
+            'portfolio_projects.*.sort_order' => 'nullable|integer|min:0',
+            'portfolio_projects.*.serverId' => 'nullable|integer',
+            'portfolio_projects.*.files' => 'nullable|array',
+            'portfolio_projects.*.files.*' => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,mkv,webm|max:20480',
             'details.course_level' => 'nullable|string|max:100',
 
             'details.learning_points' => 'nullable|array',
@@ -1236,7 +1237,7 @@ class ListingController extends Controller
             if (Schema::hasTable('digital_product_details')) {
                 DB::table('digital_product_details')->where('listing_id', $existing->id)->delete();
             }
-            if (Schema::hasTable('digital_product_packages')) {
+            /* if (Schema::hasTable('digital_product_packages')) {
                 $packageIds = DB::table('digital_product_packages')
                     ->where('listing_id', $existing->id)
                     ->pluck('id');
@@ -1246,7 +1247,7 @@ class ListingController extends Controller
                 }
 
                 DB::table('digital_product_packages')->where('listing_id', $existing->id)->delete();
-            }
+            } */
 
             if (Schema::hasTable('course_listing_details')) {
                 DB::table('course_listing_details')->where('listing_id', $existing->id)->delete();
@@ -1262,26 +1263,33 @@ class ListingController extends Controller
             }
 
             if (($validated['listing_type'] ?? '') === 'digital_product') {
-                $included = array_values(array_filter(array_map(
-                    fn ($v) => trim((string) $v),
-                    data_get($validated, 'details.included', [])
-                )));
 
-                if (Schema::hasTable('digital_product_details')) {
-                    DB::table('digital_product_details')
-                        ->where('listing_id', $existing->id)
-                        ->delete();
+                $includedRaw = data_get($validated, 'details.included', []);
 
-                    DB::table('digital_product_details')->insert([
-                        'listing_id' => $existing->id,
-                        'product_type' => data_get($validated, 'details.product_type'),
-                        'price' => data_get($validated, 'details.price'),
-                        'included_json' => !empty($included) ? json_encode($included) : null,
-                        'delivery_format' => data_get($validated, 'details.delivery_format'),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+                // DO NOT FILTER OUT EMPTY ARRAY COMPLETELY
+                $included = is_array($includedRaw)
+                    ? array_map(fn($v) => trim((string) $v), $includedRaw)
+                    : [];
+
+                // Remove only FULLY empty strings but keep structure
+                $included = array_values(array_filter($included, fn($v) => $v !== ''));
+
+                DB::table('digital_product_details')
+                    ->where('listing_id', $existing->id)
+                    ->delete();
+
+                DB::table('digital_product_details')->insert([
+                    'listing_id' => $existing->id,
+                    'product_type' => data_get($validated, 'details.product_type'),
+                    'price' => data_get($validated, 'details.price'),
+
+                    // 🔥 FIX: always save JSON, even empty array
+                    'included_json' => json_encode($included),
+
+                    'delivery_format' => data_get($validated, 'details.delivery_format'),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
             if (($validated['listing_type'] ?? '') === 'course') {
@@ -1416,6 +1424,119 @@ class ListingController extends Controller
                 }
             }
 
+            $portfolioProjects = $request->input('portfolio_projects', []);
+
+            if (Schema::hasTable('portfolios') && Schema::hasTable('portfolio_projects')) {
+                $existingPortfolio = DB::table('portfolios')
+                    ->where('owner_type', 'listing')
+                    ->where('owner_id', $existing->id)
+                    ->first();
+
+                // delete old media + old projects + old portfolio
+                if ($existingPortfolio) {
+                    $oldProjectIds = DB::table('portfolio_projects')
+                        ->where('portfolio_id', $existingPortfolio->id)
+                        ->pluck('id')
+                        ->all();
+
+                    if (!empty($oldProjectIds) && Schema::hasTable('portfolio_media')) {
+                        $oldMediaPaths = DB::table('portfolio_media')
+                            ->whereIn('project_id', $oldProjectIds)
+                            ->pluck('path')
+                            ->filter()
+                            ->values()
+                            ->all();
+
+                        foreach ($oldMediaPaths as $oldPath) {
+                            if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                                Storage::disk('public')->delete($oldPath);
+                            }
+                        }
+
+                        DB::table('portfolio_media')
+                            ->whereIn('project_id', $oldProjectIds)
+                            ->delete();
+                    }
+
+                    DB::table('portfolio_projects')
+                        ->where('portfolio_id', $existingPortfolio->id)
+                        ->delete();
+
+                    DB::table('portfolios')
+                        ->where('id', $existingPortfolio->id)
+                        ->delete();
+                }
+
+                $hasPortfolioData = false;
+
+                foreach ($portfolioProjects as $projectIndex => $projectInput) {
+                    $title = trim((string) ($projectInput['title'] ?? ''));
+                    $description = trim((string) ($projectInput['description'] ?? ''));
+                    $cost = trim((string) ($projectInput['cost'] ?? ''));
+                    $files = $request->file("portfolio_projects.$projectIndex.files", []);
+
+                    if ($title !== '' || $description !== '' || $cost !== '' || !empty($files)) {
+                        $hasPortfolioData = true;
+                        break;
+                    }
+                }
+
+                if ($hasPortfolioData) {
+                    $portfolioId = DB::table('portfolios')->insertGetId([
+                        'owner_type' => 'listing',
+                        'owner_id' => $existing->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    foreach ($portfolioProjects as $projectIndex => $projectInput) {
+                        $title = trim((string) ($projectInput['title'] ?? ''));
+                        $description = trim((string) ($projectInput['description'] ?? ''));
+                        $cost = trim((string) ($projectInput['cost'] ?? ''));
+                        $sortOrder = isset($projectInput['sort_order'])
+                            ? (int) $projectInput['sort_order']
+                            : $projectIndex;
+
+                        $files = $request->file("portfolio_projects.$projectIndex.files", []);
+
+                        if ($title === '' && $description === '' && $cost === '' && empty($files)) {
+                            continue;
+                        }
+
+                        $projectId = DB::table('portfolio_projects')->insertGetId([
+                            'portfolio_id' => $portfolioId,
+                            'title' => $title ?: null,
+                            'description' => $description ?: null,
+                            'cost_cents' => $cost !== '' ? (int) $cost : null,
+                            'sort_order' => $sortOrder,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+
+                        if (Schema::hasTable('portfolio_media') && !empty($files)) {
+                            foreach ($files as $mediaIndex => $mediaFile) {
+                                if (!$mediaFile) {
+                                    continue;
+                                }
+
+                                $mediaPath = $mediaFile->store('portfolio/media', 'public');
+                                $mime = $mediaFile->getMimeType();
+                                $type = str_starts_with((string) $mime, 'video/') ? 'video' : 'image';
+
+                                DB::table('portfolio_media')->insert([
+                                    'project_id' => $projectId,
+                                    'path' => $mediaPath,
+                                    'type' => $type,
+                                    'sort_order' => $mediaIndex,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
             return DB::table('listings')->where('id', $existing->id)->first();
         });
 
@@ -1512,138 +1633,138 @@ class ListingController extends Controller
     }
     
     public function getListingDropdowns(Request $request, string $listingTypeSlug): JsonResponse
-{
-    $type = trim((string) $request->query('type', ''));
-    $category = trim((string) $request->query('category', ''));
-    $subCategory = trim((string) $request->query('sub_category', ''));
+    {
+        $type = trim((string) $request->query('type', ''));
+        $category = trim((string) $request->query('category', ''));
+        $subCategory = trim((string) $request->query('sub_category', ''));
 
-    try {
-        $listingType = DB::table('listing_types')
-            ->where('slug', $listingTypeSlug)
-            ->where('is_active', 1)
-            ->first();
+        try {
+            $listingType = DB::table('listing_types')
+                ->where('slug', $listingTypeSlug)
+                ->where('is_active', 1)
+                ->first();
 
-        if (!$listingType) {
+            if (!$listingType) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Listing type not found.',
+                ], 404);
+            }
+
+            if ($type === 'categories') {
+                $categories = DB::table('listing_categories')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('is_active', 1)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->pluck('name')
+                    ->filter(fn ($item) => filled($item))
+                    ->values();
+
+                return response()->json([
+                    'success' => true,
+                    'categories' => $categories,
+                ]);
+            }
+
+            if ($type === 'sub_categories') {
+                if ($category === '') {
+                    return response()->json([
+                        'success' => true,
+                        'sub_categories' => [],
+                    ]);
+                }
+
+                $categoryRow = DB::table('listing_categories')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('name', $category)
+                    ->where('is_active', 1)
+                    ->first();
+
+                if (!$categoryRow) {
+                    return response()->json([
+                        'success' => true,
+                        'sub_categories' => [],
+                    ]);
+                }
+
+                $subCategories = DB::table('listing_sub_categories')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('listing_category_id', $categoryRow->id)
+                    ->where('is_active', 1)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->pluck('name')
+                    ->filter(fn ($item) => filled($item))
+                    ->values();
+
+                return response()->json([
+                    'success' => true,
+                    'sub_categories' => $subCategories,
+                ]);
+            }
+
+            if ($type === 'product_types') {
+                if ($category === '' || $subCategory === '') {
+                    return response()->json([
+                        'success' => true,
+                        'product_types' => [],
+                    ]);
+                }
+
+                $categoryRow = DB::table('listing_categories')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('name', $category)
+                    ->where('is_active', 1)
+                    ->first();
+
+                if (!$categoryRow) {
+                    return response()->json([
+                        'success' => true,
+                        'product_types' => [],
+                    ]);
+                }
+
+                $subCategoryRow = DB::table('listing_sub_categories')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('listing_category_id', $categoryRow->id)
+                    ->where('name', $subCategory)
+                    ->where('is_active', 1)
+                    ->first();
+
+                if (!$subCategoryRow) {
+                    return response()->json([
+                        'success' => true,
+                        'product_types' => [],
+                    ]);
+                }
+
+                $productTypes = DB::table('listing_product_types')
+                    ->where('listing_type_id', $listingType->id)
+                    ->where('listing_category_id', $categoryRow->id)
+                    ->where('listing_sub_category_id', $subCategoryRow->id)
+                    ->where('is_active', 1)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->pluck('name')
+                    ->filter(fn ($item) => filled($item))
+                    ->values();
+
+                return response()->json([
+                    'success' => true,
+                    'product_types' => $productTypes,
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Listing type not found.',
-            ], 404);
-        }
-
-        if ($type === 'categories') {
-            $categories = DB::table('listing_categories')
-                ->where('listing_type_id', $listingType->id)
-                ->where('is_active', 1)
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->pluck('name')
-                ->filter(fn ($item) => filled($item))
-                ->values();
-
+                'message' => 'Invalid dropdown type.',
+            ], 422);
+        } catch (\Throwable $e) {
             return response()->json([
-                'success' => true,
-                'categories' => $categories,
-            ]);
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
-
-        if ($type === 'sub_categories') {
-            if ($category === '') {
-                return response()->json([
-                    'success' => true,
-                    'sub_categories' => [],
-                ]);
-            }
-
-            $categoryRow = DB::table('listing_categories')
-                ->where('listing_type_id', $listingType->id)
-                ->where('name', $category)
-                ->where('is_active', 1)
-                ->first();
-
-            if (!$categoryRow) {
-                return response()->json([
-                    'success' => true,
-                    'sub_categories' => [],
-                ]);
-            }
-
-            $subCategories = DB::table('listing_sub_categories')
-                ->where('listing_type_id', $listingType->id)
-                ->where('listing_category_id', $categoryRow->id)
-                ->where('is_active', 1)
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->pluck('name')
-                ->filter(fn ($item) => filled($item))
-                ->values();
-
-            return response()->json([
-                'success' => true,
-                'sub_categories' => $subCategories,
-            ]);
-        }
-
-        if ($type === 'product_types') {
-            if ($category === '' || $subCategory === '') {
-                return response()->json([
-                    'success' => true,
-                    'product_types' => [],
-                ]);
-            }
-
-            $categoryRow = DB::table('listing_categories')
-                ->where('listing_type_id', $listingType->id)
-                ->where('name', $category)
-                ->where('is_active', 1)
-                ->first();
-
-            if (!$categoryRow) {
-                return response()->json([
-                    'success' => true,
-                    'product_types' => [],
-                ]);
-            }
-
-            $subCategoryRow = DB::table('listing_sub_categories')
-                ->where('listing_type_id', $listingType->id)
-                ->where('listing_category_id', $categoryRow->id)
-                ->where('name', $subCategory)
-                ->where('is_active', 1)
-                ->first();
-
-            if (!$subCategoryRow) {
-                return response()->json([
-                    'success' => true,
-                    'product_types' => [],
-                ]);
-            }
-
-            $productTypes = DB::table('listing_product_types')
-                ->where('listing_type_id', $listingType->id)
-                ->where('listing_category_id', $categoryRow->id)
-                ->where('listing_sub_category_id', $subCategoryRow->id)
-                ->where('is_active', 1)
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->pluck('name')
-                ->filter(fn ($item) => filled($item))
-                ->values();
-
-            return response()->json([
-                'success' => true,
-                'product_types' => $productTypes,
-            ]);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid dropdown type.',
-        ], 422);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage(),
-        ], 500);
     }
-}
 }

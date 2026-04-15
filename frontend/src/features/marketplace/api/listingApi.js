@@ -226,7 +226,7 @@ export const updateListing = async (username, payload) => {
     formData.append("short_description", payload.short_description || "");
     formData.append("about", payload.about || "");
     formData.append("ai_powered", payload.ai_powered ? "1" : "0");
-    
+
     if (payload.seller_mode) {
       formData.append("seller_mode", payload.seller_mode);
     }
@@ -261,10 +261,16 @@ export const updateListing = async (username, payload) => {
 
     const details = payload.details || {};
 
-    if (details.course_level) {
-      formData.append("details[course_level]", details.course_level);
+    // digital product
+    if (details.product_type) {
+      formData.append("details[product_type]", details.product_type);
     }
-    if (details.price !== undefined && details.price !== null && details.price !== "") {
+
+    if (
+      details.price !== undefined &&
+      details.price !== null &&
+      details.price !== ""
+    ) {
       formData.append("details[price]", details.price);
     }
 
@@ -276,6 +282,7 @@ export const updateListing = async (username, payload) => {
       formData.append("details[delivery_format]", details.delivery_format);
     }
 
+    // shared detail arrays
     (details.tools || []).forEach((tool, index) => {
       formData.append(`details[tools][${index}]`, tool);
     });
@@ -287,6 +294,11 @@ export const updateListing = async (username, payload) => {
     (details.languages || []).forEach((language, index) => {
       formData.append(`details[languages][${index}]`, language);
     });
+
+    // course
+    if (details.course_level) {
+      formData.append("details[course_level]", details.course_level);
+    }
 
     if (details.preview_video_file) {
       formData.append("details[preview_video_file]", details.preview_video_file);
@@ -294,59 +306,102 @@ export const updateListing = async (username, payload) => {
 
     (details.lessons || []).forEach((lesson, index) => {
       formData.append(`details[lessons][${index}][title]`, lesson.title || "");
-      formData.append(`details[lessons][${index}][description]`, lesson.description || "");
-      formData.append(`details[lessons][${index}][media_type]`, lesson.media_type || "");
+      formData.append(
+        `details[lessons][${index}][description]`,
+        lesson.description || ""
+      );
+      formData.append(
+        `details[lessons][${index}][media_type]`,
+        lesson.media_type || ""
+      );
 
       if (lesson.media_file) {
-        formData.append(`details[lessons][${index}][media_file]`, lesson.media_file);
+        formData.append(
+          `details[lessons][${index}][media_file]`,
+          lesson.media_file
+        );
       }
     });
-    
+
+    // webinar
     if (details.webinar_level) {
       formData.append("details[webinar_level]", details.webinar_level);
     }
-    if (details.ticket_price) {
+
+    if (
+      details.ticket_price !== undefined &&
+      details.ticket_price !== null &&
+      details.ticket_price !== ""
+    ) {
       formData.append("details[ticket_price]", details.ticket_price);
     }
+
     if (details.schedule_date) {
       formData.append("details[schedule_date]", details.schedule_date);
     }
+
     if (details.schedule_start_time) {
       formData.append("details[schedule_start_time]", details.schedule_start_time);
     }
+
     if (details.schedule_duration) {
       formData.append("details[schedule_duration]", details.schedule_duration);
     }
+
     if (details.schedule_timezone) {
       formData.append("details[schedule_timezone]", details.schedule_timezone);
     }
+
     if (details.webinar_link) {
       formData.append("details[webinar_link]", details.webinar_link);
     }
 
-    (details.tools || []).forEach((tool, index) => {
-      formData.append(`details[tools][${index}]`, tool);
-    });
-
-    (details.learning_points || []).forEach((point, index) => {
-      formData.append(`details[learning_points][${index}]`, point);
-    });
-
-    (details.languages || []).forEach((language, index) => {
-      formData.append(`details[languages][${index}]`, language);
-    });
-
     (details.agenda || []).forEach((item, index) => {
       formData.append(`details[agenda][${index}][time]`, item.time || "");
       formData.append(`details[agenda][${index}][topic]`, item.topic || "");
-      formData.append(`details[agenda][${index}][description]`, item.description || "");
+      formData.append(
+        `details[agenda][${index}][description]`,
+        item.description || ""
+      );
     });
 
-    const res = await api.post(`/api/v1/listings/${encodeURIComponent(username)}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    // portfolio for edit mode
+    (payload.portfolio_projects || []).forEach((project, index) => {
+      formData.append(`portfolio_projects[${index}][title]`, project.title || "");
+      formData.append(
+        `portfolio_projects[${index}][description]`,
+        project.description || ""
+      );
+      formData.append(`portfolio_projects[${index}][cost]`, project.cost || "");
+      formData.append(
+        `portfolio_projects[${index}][sort_order]`,
+        project.sort_order ?? index
+      );
+
+      if (project.serverId) {
+        formData.append(
+          `portfolio_projects[${index}][serverId]`,
+          project.serverId
+        );
+      }
+
+      (project.files || []).forEach((file, fileIndex) => {
+        formData.append(
+          `portfolio_projects[${index}][files][${fileIndex}]`,
+          file
+        );
+      });
     });
+
+    const res = await api.post(
+      `/api/v1/listings/${encodeURIComponent(username)}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     return unwrap(res);
   } catch (err) {

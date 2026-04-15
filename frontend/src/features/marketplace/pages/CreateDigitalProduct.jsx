@@ -1,33 +1,44 @@
 import React, { useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./CreateDigitalProduct.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import MyPortfolio from "../../dashboard/components/UserProfile/MyPortfolio";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
-import { createListing, getListingDropdowns   } from "../api/listingApi";
+import {
+  createListing,
+  updateListing,
+  getListingByUsername,
+  getListingDropdowns,
+} from "../api/listingApi";
 import Swal from "sweetalert2";
 
-export default function CreateDigitalProduct({ theme, setTheme }) {
-  
+export default function CreateDigitalProduct({
+  mode = "create",
+  theme,
+  setTheme,
+}) {
   const LISTING_TYPE_SLUG = "digital-product";
+  const TABS = ["Basic", "Standard", "Premium"];
 
   const navigate = useNavigate();
-  /* ================== CONSTANTS ================== */
+  const { username } = useParams();
+
+  const isEditMode = mode === "edit";
+
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [productTypes, setProductTypes] = useState([]);
   const [isMetaLoading, setIsMetaLoading] = useState(false);
+  const [isLoadingListing, setIsLoadingListing] = useState(false);
+  const [editingListingId, setEditingListingId] = useState(null);
 
   const deliveryFormats = useMemo(
     () => ["Google Drive Link", "Figma Link", "ZIP Download", "Notion Page"],
     [],
   );
 
-  const TABS = ["Basic", "Standard", "Premium"];
-
-  // ✅ Sidebar state (matching CreateTeam.jsx)
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeSetting, setActiveSetting] = useState("basic");
@@ -41,7 +52,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     setActiveSetting(id);
   };
 
-  /* ================== BASIC DETAILS STATE ================== */
   const [aiPowered, setAiPowered] = useState(false);
 
   const [form, setForm] = useState({
@@ -54,21 +64,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     price: "",
   });
 
-  // const subCategories = form.category
-  //   ? subCategoriesMap[form.category] || []
-  //   : [];
-
   const setFormField = (key, value) => setForm((p) => ({ ...p, [key]: value }));
-
-  const mapOptions = (items = []) =>
-    Array.isArray(items)
-      ? items
-          .map((item) => {
-            if (typeof item === "string") return item;
-            return item?.name || item?.title || item?.value || "";
-          })
-          .filter(Boolean)
-      : [];
 
   const loadCategories = async () => {
     try {
@@ -76,7 +72,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
         type: "categories",
       });
-      setCategories(res?.categories || []);
+      setCategories(Array.isArray(res?.categories) ? res.categories : []);
     } catch (error) {
       console.error("Failed to load categories", error);
       setCategories([]);
@@ -96,7 +92,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
         type: "sub_categories",
         category: categoryName,
       });
-      setSubCategories(res?.sub_categories || []);
+      setSubCategories(Array.isArray(res?.sub_categories) ? res.sub_categories : []);
     } catch (error) {
       console.error("Failed to load sub categories", error);
       setSubCategories([]);
@@ -115,13 +111,12 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
         category: categoryName,
         sub_category: subCategoryName,
       });
-      setProductTypes(res?.product_types || []);
+      setProductTypes(Array.isArray(res?.product_types) ? res.product_types : []);
     } catch (error) {
       console.error("Failed to load product types", error);
       setProductTypes([]);
     }
   };
-
 
   React.useEffect(() => {
     loadCategories();
@@ -135,7 +130,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     loadProductTypes(form.category, form.subCategory);
   }, [form.category, form.subCategory]);
 
-  /* ================== TAGS STATE ================== */
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -159,14 +153,8 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     }
   };
 
-  /* ================== SERVICE PROVIDER + PACKAGES STATE ================== */
-  // const [mode, setMode] = useState("Solo"); // Solo | Team
-  // const [teamName, setTeamName] = useState("");
   const [activeTab, setActiveTab] = useState("Basic");
-  // ✅ Upload modal state (MISSING)
-  const [uploadStep, setUploadStep] = useState(null); // null | "grid" | "success"
-
-  // ✅ Modal open when grid OR success (MISSING)
+  const [uploadStep, setUploadStep] = useState(null);
   const isModalOpen = uploadStep === "grid" || uploadStep === "success";
 
   const [pkg, setPkg] = useState({
@@ -236,25 +224,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     }));
   };
 
-  // React.useEffect(() => {
-  //   const loadTeams = async () => {
-  //     if (sellerMode !== "Team") return;
-
-  //     try {
-  //       setTeamsLoading(true);
-  //       const res = await getMyTeams();
-  //       const teams = Array.isArray(res?.teams) ? res.teams : [];
-  //       setTeamList(teams.map((item) => item.team_name).filter(Boolean));
-  //     } catch (e) {
-  //       setTeamList([]);
-  //     } finally {
-  //       setTeamsLoading(false);
-  //     }
-  //   };
-
-  //   loadTeams();
-  // }, [sellerMode]);
-
   const [includedInput, setIncludedInput] = useState("");
   const [howInput, setHowInput] = useState("");
   const [notInput, setNotInput] = useState("");
@@ -307,7 +276,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
 
   const removeTool = (idx) => removeFromList("toolsUsed", idx);
 
-  /* ================== ADD-ONS + MEDIA STATE ================== */
   const fileRef = useRef(null);
 
   const [addOn, setAddOn] = useState({
@@ -361,7 +329,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     reader.readAsDataURL(file);
   };
 
-  /* ================== FAQ STATE ================== */
   const [faqs, setFaqs] = useState([
     {
       q: "",
@@ -383,30 +350,100 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     setFaqs((p) => p.filter((_, i) => i !== idx));
   };
 
-  const normalizePackages = () => {
-    return Object.fromEntries(
-      TABS.map((tab) => {
-        const item = pkg[tab] || {};
+  const loadListingForEdit = async () => {
+    if (!isEditMode || !username) return;
 
-        return [
-          tab,
-          {
-            price: item.price || (tab === "Basic" ? form.price : ""),
-            deliveryDays: item.deliveryDays || "",
-            revisions: item.revisions || "",
-            scope: item.scope || "",
-            included: Array.isArray(item.included) ? item.included.filter(Boolean) : [],
-            howItWorks: Array.isArray(item.howItWorks) ? item.howItWorks.filter(Boolean) : [],
-            notIncluded: Array.isArray(item.notIncluded) ? item.notIncluded.filter(Boolean) : [],
-            toolsUsed: Array.isArray(item.toolsUsed) ? item.toolsUsed.filter(Boolean) : [],
-            deliveryFormat: item.deliveryFormat || "",
-          },
-        ];
-      }),
-    );
+    try {
+      setIsLoadingListing(true);
+
+      const res = await getListingByUsername(username);
+      const listing = res?.listing || res?.data || res;
+
+      if (!listing) return;
+
+      setEditingListingId(listing.id || null);
+
+      setForm({
+        title: listing.title || "",
+        category: listing.category || "",
+        subCategory: listing.sub_category || "",
+        shortDescription: listing.short_description || "",
+        about: listing.about || "",
+        productType: listing?.details?.product_type || "",
+        price:
+          listing?.details?.price !== undefined && listing?.details?.price !== null
+            ? String(listing.details.price)
+            : "",
+      });
+
+      setAiPowered(!!listing.ai_powered);
+      setTags(Array.isArray(listing.tags) ? listing.tags : []);
+
+      setFaqs(
+        Array.isArray(listing.faqs) && listing.faqs.length
+          ? listing.faqs.map((item) => ({
+              q: item.q || item.question || "",
+              a: item.a || item.answer || "",
+            }))
+          : [{ q: "", a: "" }],
+      );
+
+      setLinks(
+        Array.isArray(listing.links) && listing.links.length
+          ? listing.links
+          : [""],
+      );
+
+      setNotes(
+        Array.isArray(listing.deliverables) && listing.deliverables.length
+          ? listing.deliverables.map((item) => item.notes || "")
+          : [""],
+      );
+
+      setCover(listing.cover_media_url || null);
+
+      const tools = Array.isArray(listing?.tools)
+        ? listing.tools
+        : Array.isArray(listing?.details?.tools)
+          ? listing.details.tools
+          : [];
+
+      const included = Array.isArray(listing?.details?.included)
+        ? listing.details.included
+        : [];
+
+      const deliveryFormat = listing?.details?.delivery_format || "";
+
+      setPkg((prev) => ({
+        ...prev,
+        Basic: {
+          ...prev.Basic,
+          included,
+          deliveryFormat,
+          toolsUsed: tools,
+        },
+      }));
+
+      setPortfolioProjects(
+        Array.isArray(listing.portfolio_projects) ? listing.portfolio_projects : [],
+      );
+    } catch (error) {
+      console.error("Failed to load listing", error);
+      Swal.fire({
+        icon: "error",
+        title: "Load failed",
+        text: error?.message || "Failed to load listing details.",
+      });
+    } finally {
+      setIsLoadingListing(false);
+    }
   };
 
-  const buildPayload = () => {
+  React.useEffect(() => {
+    loadListingForEdit();
+  }, [isEditMode, username]);
+
+  const buildPayload = (status = "published") => {
     const activeData = pkg[activeTab] || {};
 
     const allTools = Array.from(
@@ -423,7 +460,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
 
     return {
       listing_type: "digital_product",
-      status: "published",
+      status,
       title: form.title.trim(),
       category: form.category || "",
       sub_category: form.subCategory || "",
@@ -454,48 +491,54 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     };
   };
 
- const handleSubmit = async () => {
-  if (!form.title.trim()) {
-    Swal.fire({
-      icon: "warning",
-      title: "Title is required",
-      text: "Please enter the product title.",
-    });
-    return;
-  }
+  const handleSubmit = async (status = "published") => {
+    if (!form.title.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Title is required",
+        text: "Please enter the product title.",
+      });
+      return;
+    }
 
-  try {
-    setIsSaving(true);
+    try {
+      setIsSaving(true);
 
-    const res = await createListing(buildPayload());
+      const payload = buildPayload(status);
 
-    Swal.fire({
-      icon: "success",
-      title: "Saved",
-      text: res?.message || "Listing saved successfully",
-      confirmButtonText: "OK",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigate("/my-listings");
-      }
-    });
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Save failed",
-      text: error?.message || "Something went wrong.",
-    });
-  } finally {
-    setIsSaving(false);
-  }
-};
+      const res = isEditMode
+        ? await updateListing(username, payload)
+        : await createListing(payload);
 
-  /* ================== RENDER ================== */
+      Swal.fire({
+        icon: "success",
+        title: isEditMode ? "Updated" : "Saved",
+        text:
+          res?.message ||
+          (isEditMode
+            ? "Listing updated successfully"
+            : "Listing saved successfully"),
+        confirmButtonText: "OK",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/my-listings");
+        }
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: isEditMode ? "Update failed" : "Save failed",
+        text: error?.message || "Something went wrong.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div
       className={`create-service-page user-page ${theme} min-h-screen relative overflow-hidden`}
     >
-      {/* ✅ NAVBAR */}
       <UserNavbar
         toggleSidebar={() => setSidebarOpen((p) => !p)}
         isSidebarOpen={sidebarOpen}
@@ -503,9 +546,10 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       />
 
       <div
-        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}
+        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${
+          isModalOpen ? "blur-sm pointer-events-none select-none" : ""
+        }`}
       >
-        {/* ✅ SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -517,20 +561,23 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
           setTheme={setTheme}
         />
 
-        {/* ✅ MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          {/* Scrollable Area */}
           <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
             <div className="create-service-container">
               <div className="csl-stack">
-                {/* ================= BASIC DETAILS CARD ================= */}
                 <div className="csl-card">
                   <div className="csl-header">
                     <div>
                       <h1 className="csl-title">
-                        Create Digital Products Listing
+                        {isEditMode
+                          ? "Edit Digital Product Listing"
+                          : "Create Digital Products Listing"}
                       </h1>
-                      <p className="csl-subtitle">Fill out each section</p>
+                      <p className="csl-subtitle">
+                        {isEditMode
+                          ? "Update your listing details"
+                          : "Fill out each section"}
+                      </p>
                     </div>
 
                     <div className="csl-ai">
@@ -557,6 +604,12 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                       </label>
                     </div>
                   </div>
+
+                  {isLoadingListing && (
+                    <div className="mb-4 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
+                      Loading listing details...
+                    </div>
+                  )}
 
                   <h2 className="csl-section">Basic Details</h2>
 
@@ -603,10 +656,13 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                             }))
                           }
                           options={categories}
-                          placeholder={isMetaLoading ? "Loading categories..." : "Select category"}
+                          placeholder={
+                            isMetaLoading ? "Loading categories..." : "Select category"
+                          }
                         />
                       </div>
                     </div>
+
                     <div className="csl-field">
                       <label className="csl-label csl-titleLabel">
                         Sub Category
@@ -622,12 +678,17 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                             }))
                           }
                           options={subCategories}
-                          placeholder={!form.category ? "Select category first" : "Select sub category"}
+                          placeholder={
+                            !form.category
+                              ? "Select category first"
+                              : "Select sub category"
+                          }
                           disabled={!form.category}
                         />
                       </div>
                     </div>
                   </div>
+
                   <div className="csl-grid2">
                     <div className="csl-field">
                       <label className="csl-label csl-titleLabel">
@@ -638,7 +699,11 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                           value={form.productType}
                           onChange={(val) => setFormField("productType", val)}
                           options={productTypes}
-                          placeholder={!form.subCategory ? "Select sub category first" : "Select product type"}
+                          placeholder={
+                            !form.subCategory
+                              ? "Select sub category first"
+                              : "Select product type"
+                          }
                           disabled={!form.subCategory}
                         />
                       </div>
@@ -815,12 +880,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                         <CustomSelect
                           value={current.deliveryFormat}
                           onChange={(val) => setPkgField("deliveryFormat", val)}
-                          options={[
-                            "Googel drive link",
-                            "figma link ",
-                            "zip download",
-                            "notion page",
-                          ]}
+                          options={deliveryFormats}
                           placeholder="Select format"
                         />
                       </div>
@@ -828,7 +888,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                   </div>
                 </div>
 
-                {/* ================= ADD-ONS + MEDIA ================= */}
                 <div className="am-card">
                   <h3 className="am-title" style={{ marginTop: 0 }}>
                     Cover Page
@@ -866,35 +925,31 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                   </div>
                 </div>
 
-                {/* Portfolio Section */}
                 <div className="csl-portfolio-wrap">
                   <MyPortfolio
                     mode="listing"
                     listingType="digital_product"
-                    listingId={null}
+                    listingId={isEditMode ? editingListingId : null}
                     onChange={setPortfolioProjects}
                   />
                 </div>
 
-                {/* ================= MAIN DELIVERABLES Section ================= */}
                 <div className="border !border-[#CEFF1B] rounded-xl p-4 bg-white">
-                  {/* HEADER */}
                   <h3 className="text-lg font-semibold mb-3 text-gray-700">
                     Upload main deliverables
                   </h3>
 
-                  {/* UPLOAD BOX */}
                   <div className="p-4 mb-4">
                     <label
                       htmlFor="main-deliverables"
                       className="
-                      flex flex-col items-center justify-center text-center cursor-pointer                      py-10 rounded-lg
-                      border border-dashed border-gray-300
-                      bg-[#EBEBEB]
-                      dark:bg-[#FEFEFE40]
-                      transition
-                      hover:border-[#CEFF1B] hover:bg-gray-50
-                      dark:hover:border-transparent dark:hover:bg-[#FEFEFE40]
+                        flex flex-col items-center justify-center text-center cursor-pointer py-10 rounded-lg
+                        border border-dashed border-gray-300
+                        bg-[#EBEBEB]
+                        dark:bg-[#FEFEFE40]
+                        transition
+                        hover:border-[#CEFF1B] hover:bg-gray-50
+                        dark:hover:border-transparent dark:hover:bg-[#FEFEFE40]
                       "
                     >
                       <span className="text-blue-600 text-sm font-medium">
@@ -931,32 +986,24 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                     )}
                   </div>
 
-                  {/* NOTES SECTION */}
-
-                  <div
-                    className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden 
-  bg-white dark:bg-slate-800 mb-4 m-4"
-                  >
-                    {/* HEADER */}
+                  <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-slate-800 mb-4 m-4">
                     <div className="px-4 py-2 text-sm font-medium text-black dark:text-gray-200 bg-white dark:bg-slate-700">
                       Add Notes
                     </div>
 
-                    {/* DIVIDER */}
                     <div className="border-t border-gray-300 dark:border-gray-600" />
 
-                    {/* TEXTAREA */}
                     <textarea
                       placeholder="Type here"
                       value={notes[0] || ""}
                       onChange={(e) => updateNoteField(0, e.target.value)}
                       className="
-      w-full px-4 py-3 text-sm
-      bg-white dark:bg-slate-800
-      text-gray-900 dark:text-gray-100
-      placeholder-gray-400 dark:placeholder-gray-500
-      resize-none border-none outline-none focus:ring-0
-    "
+                        w-full px-4 py-3 text-sm
+                        bg-white dark:bg-slate-800
+                        text-gray-900 dark:text-gray-100
+                        placeholder-gray-400 dark:placeholder-gray-500
+                        resize-none border-none outline-none focus:ring-0
+                      "
                       rows={4}
                     />
                   </div>
@@ -971,7 +1018,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                     </button>
                   </div>
 
-                  {/* LINK SECTION */}
                   <div>
                     <label className="text-sm font-medium text-black dark:text-gray-200 mx-4">
                       Link
@@ -1001,7 +1047,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                   </div>
                 </div>
 
-                {/* ================= FAQ ================= */}
                 <div className="faq-wrap">
                   <h3 className="faq-title">FAQs</h3>
 
@@ -1066,14 +1111,24 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                     </div>
                   ))}
                 </div>
-                {/* ================= ACTIONS ================= */}
+
                 <div className="faq-actions">
-                  <button type="button" className="faq-draft" onClick={() => handleSubmit("draft")} disabled={isSaving}>
+                  <button
+                    type="button"
+                    className="faq-draft"
+                    onClick={() => handleSubmit("draft")}
+                    disabled={isSaving}
+                  >
                     {isSaving ? "Saving..." : "Save as Draft"}
                   </button>
 
-                  <button type="button" className="faq-save" onClick={() => handleSubmit("published")} disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Save"}
+                  <button
+                    type="button"
+                    className="faq-save"
+                    onClick={() => handleSubmit("published")}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : isEditMode ? "Update" : "Save"}
                   </button>
                 </div>
               </div>
@@ -1082,7 +1137,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
         </div>
       </div>
 
-      {/* ================= UPLOAD MODALS ================= */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-[900] bg-black/30 backdrop-blur-sm"
@@ -1113,8 +1167,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
   );
 }
 
-/* ================= REUSABLE CUSTOM SELECT ================= */
-
 function CustomSelect({
   value,
   onChange,
@@ -1135,7 +1187,9 @@ function CustomSelect({
 
   return (
     <div
-      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${
+        disabled ? "opacity-50 pointer-events-none" : ""
+      }`}
       ref={ref}
     >
       <div
@@ -1170,8 +1224,6 @@ function CustomSelect({
   );
 }
 
-/* ================= UPLOAD GRID ================= */
-
 function UploadGrid({ onSelect, onBack, blurred }) {
   const fileRef = React.useRef(null);
   const [files, setFiles] = React.useState([]);
@@ -1201,7 +1253,6 @@ function UploadGrid({ onSelect, onBack, blurred }) {
             : ""
         }`}
       >
-        {/* HEADER */}
         <div className="upload-header flex items-center gap-3 mb-3 shrink-0">
           <button
             type="button"
@@ -1222,7 +1273,6 @@ function UploadGrid({ onSelect, onBack, blurred }) {
           </button>
         </div>
 
-        {/* GRID */}
         <div className="grid grid-cols-3 gap-4 flex-1 overflow-y-auto pr-2 custom-scroll">
           {Array.from({ length: visibleSlots }).map((_, i) => {
             const file = files[i];
@@ -1306,8 +1356,6 @@ function UploadGrid({ onSelect, onBack, blurred }) {
     </div>
   );
 }
-
-/* ================= UPLOAD SUCCESS ================= */
 
 function UploadSuccess({ onBack }) {
   return (
