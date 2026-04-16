@@ -348,9 +348,8 @@ class TeamController extends Controller
         ]);
     }
 
-    public function manageTeams(Request $request): JsonResponse
+    public function manageTeams(Request $request)
     {
-        /** @var User $user */
         $user = $request->user();
 
         $teams = Team::query()
@@ -358,29 +357,39 @@ class TeamController extends Controller
                 $query->where('owner_user_id', $user->id)
                     ->orWhereHas('memberships', function ($q) use ($user) {
                         $q->where('user_id', $user->id)
-                            ->whereNull('left_at');
+                        ->whereNull('left_at'); // only active joined teams
                     });
             })
             ->withCount([
                 'memberships as members_count' => function ($q) {
-                    $q->whereNull('left_at');
-                },
+                    $q->whereNull('left_at'); // count only active members
+                }
             ])
             ->orderByDesc('id')
             ->get()
-            ->map(function (Team $team) use ($user) {
+            ->map(function ($team) use ($user) {
+                // Team portfolio
                 $portfolio = Portfolio::where('owner_type', 'team')
                     ->where('owner_id', $team->id)
                     ->first();
 
                 $projectsCount = 0;
+
                 if ($portfolio) {
                     $projectsCount = PortfolioProject::where('portfolio_id', $portfolio->id)->count();
                 }
 
+                // If you have listings/services/gigs table later, replace this
                 $listingsCount = 0;
 
+                // Check if current user is owner
                 $isOwner = (int) $team->owner_user_id === (int) $user->id;
+
+                // Current user's membership row (if joined)
+                $membership = $team->memberships()
+                    ->where('user_id', $user->id)
+                    ->whereNull('left_at')
+                    ->first();
 
                 return [
                     'id' => $team->id,
@@ -395,16 +404,18 @@ class TeamController extends Controller
                     'listings' => (int) $listingsCount,
                     'projects' => (int) $projectsCount,
                     'isActive' => (bool) $team->is_active,
-                    'isOwner' => $isOwner,
+
+                    // extra useful fields
+                    'is_owner' => $isOwner,
+                    'joined_as' => $membership?->role,
+                    'member_title' => $membership?->member_title,
                 ];
-            })
-            ->values();
+            });
 
         return response()->json([
             'teams' => $teams,
         ]);
     }
-
 
     public function toggleStatus(Request $request, Team $team): JsonResponse
     {
