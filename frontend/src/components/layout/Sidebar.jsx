@@ -4,20 +4,22 @@ import { useLocation, useNavigate } from "react-router-dom";
 import MobileBottomNav from "./MobileBottomNav";
 
 import {
-  ChevronLeft,
-  X,
-  FilePlus,
-  Folder,
-  HeartIcon,
-  LayoutGrid,
-  Maximize2,
-  MessageCircle,
-  Settings,
-  ShoppingBag,
-  ShoppingCart,
-  Store,
-  Users,
-  Rocket
+    ChevronLeft,
+    X,
+    FilePlus,
+    Folder,
+    HeartIcon,
+    LayoutGrid,
+    Maximize2,
+    MessageCircle,
+    Settings,
+    ShoppingBag,
+    ShoppingCart,
+    Store,
+    Users,
+    Rocket,
+    NotebookTabs,
+    ChartArea,
 } from "lucide-react";
 import { CiSaveDown1 } from "react-icons/ci";
 import { LuTrendingUp } from "react-icons/lu";
@@ -57,9 +59,19 @@ const CREATOR_ITEMS = [
         icon: Rocket,
         children: [
             {
-                label: "Campaign Listings",
+                label: "Boost Campaign",
                 icon: Rocket,
+                path: "/campaign",
+            },
+            {
+                label: "Campaign Listing",
+                icon: NotebookTabs,
                 path: "/campaign-listing",
+            },
+            {
+                label: "Campaign Analytics",
+                icon: ChartArea,
+                path: "/campaign-analytics",
             },
         ],
     },

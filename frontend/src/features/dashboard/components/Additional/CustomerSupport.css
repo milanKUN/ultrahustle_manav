@@ -1,0 +1,172 @@
+/* ================= CONTAINER ================= */
+.chat-box {
+    width: 100%;
+    max-width: 425px;
+    height: 540px;
+    border-radius: 14px;
+    padding: 16px;
+    border: 2px solid #c6ff00;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+/* ================= LIGHT MODE ================= */
+.chat-box.light {
+    background: #f3f3f3;
+    color: #222;
+}
+
+/* ================= DARK MODE ================= */
+.chat-box.dark {
+    background: #1a1a1a;
+    color: #eee;
+}
+
+/* ================= HEADER ================= */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+/* Divider */
+.chat-box.light .chat-header {
+    border-bottom: 1px solid #444;
+}
+
+.chat-box.dark .chat-header {
+    border-bottom: 1px solid #555;
+}
+
+.chat-header h3 {
+    font-size: 18px;
+    margin: 0;
+}
+
+/* ================= BODY ================= */
+.chat-body {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom scrollbar - WebKit */
+.chat-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.chat-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Firefox scrollbar */
+.chat-body {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
+
+/* Push messages to bottom */
+.chat-spacer {
+    flex: 1;
+}
+
+/* ================= MESSAGES ================= */
+.chat-message {
+    max-width: 95%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-top: 10px;
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+/* SUPPORT (YOU → LEFT) */
+.chat-box.light .chat-message.support {
+    background: #dcdcdc;
+    color: #000;
+}
+
+.chat-box.dark .chat-message.support {
+    background: #2a2a2a;
+    color: #eee;
+}
+
+.chat-message.support {
+    align-self: flex-start;
+}
+
+/* CLIENT (RIGHT → YELLOW stays same) */
+.chat-message.client {
+    background: #c6ff00;
+    color: #000;
+    align-self: flex-end;
+}
+
+/* ================= INPUT ================= */
+.chat-input {
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding: 6px 10px;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+/* Light */
+.chat-box.light .chat-input {
+    border: 1px solid #888;
+    background: #fff;
+}
+
+/* Dark */
+.chat-box.dark .chat-input {
+    border: 1px solid #444;
+    background: #222;
+}
+
+/* Input field */
+.chat-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    font-size: 14px;
+    color: inherit;
+}
+
+/* Placeholder */
+.chat-input input::placeholder {
+    color: #888;
+}
+
+/* ================= ICONS ================= */
+.chat-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-actions svg {
+    cursor: pointer;
+    opacity: 0.8;
+    transition: 0.2s;
+}
+
+.chat-actions svg:hover {
+    opacity: 1;
+}

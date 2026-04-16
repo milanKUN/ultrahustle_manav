@@ -75,9 +75,14 @@ import ViewAllCourses from "./features/marketplace/pages/ViewAllCourses";
 import ViewAllWebinars from "./features/marketplace/pages/ViewAllWebinars";
 import GroupChat from "./features/marketplace/pages/GroupChat";
 import MyCampaign from "./features/marketplace/pages/MyCampaign";
+import CampaignListing from "./features/marketplace/pages/CampaignListing";
 import BoostCampaign from "./features/marketplace/pages/BoostCampaign";
 import CampaignAnalytics from "./features/marketplace/pages/CampaignAnalytics";
 import FriendRequestPage from "./features/dashboard/pages/FriendRequestPage";
+import AdminDashboard from "./features/dashboard/pages/uh-admin-complete";
+import Components from "./features/dashboard/pages/Components";
+
+
 
 export default function App() {
     const THEME_KEY = "user-theme";
@@ -429,7 +434,7 @@ export default function App() {
                             <CourseListing theme={theme} setTheme={setTheme} />
                         }
                     />
-                   {/*  <Route
+                    {/*  <Route
                         path="/digital-product/:username"
                         element={<ProductDeliverables />}
                     />
@@ -449,12 +454,30 @@ export default function App() {
                         path="/edit-webinar/:username"
                         element={<EditWebinar />}
                     />
-                    <Route path="/edit-digital-product/:username" element={<EditDigitalProduct />} />
-                    <Route path="/digital-product/:username" element={<DigitalProductListing />} />
-                    <Route path="/course/:username" element={<CourseListing />} />
-                    <Route path="/edit-course/:username" element={<EditCourse />} />
-                    <Route path="/webinar/:username" element={<WebinarListing />} />
-                    <Route path="/edit-webinar/:username" element={<EditWebinar />} />
+                    <Route
+                        path="/edit-digital-product/:username"
+                        element={<EditDigitalProduct />}
+                    />
+                    <Route
+                        path="/digital-product/:username"
+                        element={<DigitalProductListing />}
+                    />
+                    <Route
+                        path="/course/:username"
+                        element={<CourseListing />}
+                    />
+                    <Route
+                        path="/edit-course/:username"
+                        element={<EditCourse />}
+                    />
+                    <Route
+                        path="/webinar/:username"
+                        element={<WebinarListing />}
+                    />
+                    <Route
+                        path="/edit-webinar/:username"
+                        element={<EditWebinar />}
+                    />
                     <Route
                         path="/product-deliverables"
                         element={
@@ -549,6 +572,18 @@ export default function App() {
                         }
                     />
                     <Route
+                        path="/admin-dashboard"
+                        element={
+                            <AdminDashboard theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
+                        path="/components"
+                        element={
+                            <Components theme={theme} setTheme={setTheme} />
+                        }
+                    />
+                    <Route
                         path="/all-listings"
                         element={
                             <AllListingPages
@@ -597,7 +632,7 @@ export default function App() {
                         }
                     />
                     <Route
-                        path="/campaign-listing"
+                        path="/campaign"
                         element={
                             <MyCampaign theme={theme} setTheme={setTheme} />
                         }
@@ -609,9 +644,21 @@ export default function App() {
                         }
                     />
                     <Route
+                        path="/campaign-listing"
+                        element={
+                            <CampaignListing
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
+                        }
+                    />
+                    <Route
                         path="/campaign-analytics"
                         element={
-                            <CampaignAnalytics theme={theme} setTheme={setTheme} />
+                            <CampaignAnalytics
+                                theme={theme}
+                                setTheme={setTheme}
+                            />
                         }
                     />
                 </Routes>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     ChevronDown,
@@ -117,6 +118,8 @@ export default function MyListingPage({ theme, setTheme }) {
     const [openActionMenu, setOpenActionMenu] = useState(null);
     const statusDropdownRef = useRef(null);
     const actionMenuRef = useRef(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setSidebarOpen(false);
@@ -411,7 +414,12 @@ export default function MyListingPage({ theme, setTheme }) {
                                                     </span>
                                                     <button
                                                         type="button"
-                                                        className="my-listings-boost-btn"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                "/boost-campaign",
+                                                            )
+                                                        }
+                                                        className="my-listings-boost-btn border rounded-md"
                                                         aria-label="Boost listing"
                                                     >
                                                         Boost

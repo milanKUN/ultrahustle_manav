@@ -1,0 +1,122 @@
+/* Container */
+.fs-box {
+    width: 480px;
+    max-width: 95%;
+    height: 425px;
+    margin: 40px auto;
+    padding: 16px;
+    border-radius: 14px;
+    border: 2px solid #c6ff00;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* LIGHT */
+.fs-box.light {
+    background: #f3f3f3;
+    color: #222;
+}
+
+/* DARK */
+.fs-box.dark {
+    background: #1a1a1a;
+    color: #eee;
+}
+
+/* Title */
+.fs-title {
+    font-size: 26px;
+    text-align: center;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Tabs */
+.fs-tabs {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    border-bottom: 1px solid #666;
+    padding-bottom: 6px;
+}
+
+.fs-tabs span {
+    opacity: 0.7;
+}
+
+.fs-tabs .active {
+    opacity: 1;
+    border-bottom: 2px solid #c6ff00;
+    padding-bottom: 2px;
+}
+
+/* List */
+.fs-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Item */
+.fs-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px;
+}
+
+/* Left */
+.fs-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Avatar */
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    background: #ccc;
+}
+
+/* Actions */
+.fs-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Follow button */
+.follow-btn {
+    background: #c6ff00;
+    color: #000;
+    font-weight: 500;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* Dark adjustments */
+.fs-box.dark .avatar {
+    background: #444;
+}
+
+
+
+
+/* Empty state */
+.empty {
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.6;
+    padding: 20px 0;
+}
+
+/* Clickable tabs */
+.fs-tabs span {
+    cursor: pointer;
+}

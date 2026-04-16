@@ -336,8 +336,9 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                         <h1>Momentum is building</h1>
                                         <p>
                                             CTR at 12.38% with strongest volume
-                                            from Feed. Focus on high-intent opens
-                                            -> messages to lift conversions
+                                            from Feed. Focus on high-intent
+                                            opens -&gt; messages to lift
+                                            conversions
                                         </p>
                                     </header>
 
@@ -346,27 +347,32 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                         role="tablist"
                                         aria-label="Analytics channels"
                                     >
-                                        {CHANNELS.map(({ label, icon: Icon }) => (
-                                            <button
-                                                key={label}
-                                                type="button"
-                                                role="tab"
-                                                aria-selected={
-                                                    activeChannel === label
-                                                }
-                                                className={`analytics-tab ${
-                                                    activeChannel === label
-                                                        ? "is-active"
-                                                        : ""
-                                                }`}
-                                                onClick={() =>
-                                                    setActiveChannel(label)
-                                                }
-                                            >
-                                                <Icon size={11} strokeWidth={2} />
-                                                <span>{label}</span>
-                                            </button>
-                                        ))}
+                                        {CHANNELS.map(
+                                            ({ label, icon: Icon }) => (
+                                                <button
+                                                    key={label}
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-selected={
+                                                        activeChannel === label
+                                                    }
+                                                    className={`analytics-tab ${
+                                                        activeChannel === label
+                                                            ? "is-active"
+                                                            : ""
+                                                    }`}
+                                                    onClick={() =>
+                                                        setActiveChannel(label)
+                                                    }
+                                                >
+                                                    <Icon
+                                                        size={11}
+                                                        strokeWidth={2}
+                                                    />
+                                                    <span>{label}</span>
+                                                </button>
+                                            ),
+                                        )}
                                     </div>
 
                                     <div className="analytics-metrics-grid">
@@ -428,7 +434,9 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                             </strong>
                                                             <p>{item.note}</p>
                                                         </div>
-                                                        <span>{item.value}</span>
+                                                        <span>
+                                                            {item.value}
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -446,7 +454,10 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                 <div className="analytics-performance-layout">
                                     <div className="analytics-chart-panel">
                                         <div className="analytics-chart-wrap">
-                                            <ResponsiveContainer width="100%" height="100%">
+                                            <ResponsiveContainer
+                                                width="100%"
+                                                height="100%"
+                                            >
                                                 <AreaChart
                                                     data={PERFORMANCE_DATA}
                                                     margin={{
@@ -467,12 +478,16 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                             <stop
                                                                 offset="0%"
                                                                 stopColor="#ceff1b"
-                                                                stopOpacity={0.35}
+                                                                stopOpacity={
+                                                                    0.35
+                                                                }
                                                             />
                                                             <stop
                                                                 offset="100%"
                                                                 stopColor="#ceff1b"
-                                                                stopOpacity={0.02}
+                                                                stopOpacity={
+                                                                    0.02
+                                                                }
                                                             />
                                                         </linearGradient>
                                                     </defs>
@@ -490,7 +505,10 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                             right: 6,
                                                         }}
                                                         tick={{
-                                                            fill: theme === "dark" ? "#f0f0f0" : "#323232",
+                                                            fill:
+                                                                theme === "dark"
+                                                                    ? "#f0f0f0"
+                                                                    : "#323232",
                                                             fontSize: 12,
                                                         }}
                                                         interval={1}
@@ -500,22 +518,27 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                         tickLine={false}
                                                         domain={[0, 60000]}
                                                         ticks={[
-                                                            0, 15000, 30000, 45000,
-                                                            60000,
+                                                            0, 15000, 30000,
+                                                            45000, 60000,
                                                         ]}
                                                         allowDecimals={false}
-                                                        tickFormatter={(value) =>
+                                                        tickFormatter={(
+                                                            value,
+                                                        ) =>
                                                             value === 0
                                                                 ? "0"
                                                                 : `${(
                                                                       value /
                                                                       1000
                                                                   ).toFixed(
-                                                                      1
+                                                                      1,
                                                                   )}K`
                                                         }
                                                         tick={{
-                                                            fill: theme === "dark" ? "#f0f0f0" : "#323232",
+                                                            fill:
+                                                                theme === "dark"
+                                                                    ? "#f0f0f0"
+                                                                    : "#323232",
                                                             fontSize: 12,
                                                         }}
                                                         tickMargin={10}
@@ -530,10 +553,20 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                             "Trend",
                                                         ]}
                                                         contentStyle={{
-                                                            borderRadius: "10px",
-                                                            border: theme === "dark" ? "1px solid #444" : "1px solid #d6d6cf",
-                                                            background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-                                                            color: theme === "dark" ? "#f0f0f0" : "#2f2f2f",
+                                                            borderRadius:
+                                                                "10px",
+                                                            border:
+                                                                theme === "dark"
+                                                                    ? "1px solid #444"
+                                                                    : "1px solid #d6d6cf",
+                                                            background:
+                                                                theme === "dark"
+                                                                    ? "#1e1e1e"
+                                                                    : "#ffffff",
+                                                            color:
+                                                                theme === "dark"
+                                                                    ? "#f0f0f0"
+                                                                    : "#2f2f2f",
                                                             fontSize: "12px",
                                                         }}
                                                     />
@@ -575,7 +608,9 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                             </strong>
                                                             <p>{item.note}</p>
                                                         </div>
-                                                        <span>{item.value}</span>
+                                                        <span>
+                                                            {item.value}
+                                                        </span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -588,7 +623,9 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                                     className="analytics-mini-snapshot"
                                                 >
                                                     <span>{item.label}</span>
-                                                    <strong>{item.value}</strong>
+                                                    <strong>
+                                                        {item.value}
+                                                    </strong>
                                                     <p>{item.note}</p>
                                                 </article>
                                             ))}
@@ -599,176 +636,236 @@ export default function AnalyticsPage({ theme, setTheme }) {
 
                             <section className="analytics-source-duo">
                                 <section className="analytics-surface analytics-source-surface analytics-source-panel">
-                                        <header className="analytics-heading analytics-source-heading">
-                                            <h2>Source mix</h2>
-                                            <p>Where impressions are coming from</p>
-                                        </header>
+                                    <header className="analytics-heading analytics-source-heading">
+                                        <h2>Source mix</h2>
+                                        <p>Where impressions are coming from</p>
+                                    </header>
 
-                                        <div className="analytics-source-content">
-                                            <div className="analytics-source-pie">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <PieChart>
-                                                        <Tooltip
-                                                            formatter={(value) => [`${value}%`, "Value"]}
-                                                            contentStyle={{
-                                                                borderRadius: "10px",
-                                                                border: theme === "dark" ? "1px solid #444" : "1px solid #d6d6cf",
-                                                                background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-                                                                color: theme === "dark" ? "#f0f0f0" : "#2f2f2f",
-                                                                fontSize: "12px",
-                                                            }}
-                                                        />
-                                                        <Pie
-                                                            data={SOURCE_MIX_DATA}
-                                                            dataKey="value"
-                                                            nameKey="name"
-                                                            cx="50%"
-                                                            cy="50%"
-                                                            outerRadius={78}
-                                                            innerRadius={0}
-                                                            paddingAngle={1}
-                                                            stroke="none"
-                                                        >
-                                                            {SOURCE_MIX_DATA.map((entry) => (
-                                                                <Cell
-                                                                    key={entry.name}
-                                                                    fill={entry.color}
-                                                                />
-                                                            ))}
-                                                        </Pie>
-                                                    </PieChart>
-                                                </ResponsiveContainer>
-                                            </div>
-
-                                            <div className="analytics-source-list">
-                                                {SOURCE_MIX_DATA.map((item) => (
-                                                    <div
-                                                        key={item.name}
-                                                        className="analytics-source-row"
-                                                    >
-                                                        <div className="analytics-source-name">
-                                                            <span
-                                                                className="analytics-source-dot"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        item.color,
-                                                                }}
-                                                            />
-                                                            <span>{item.name}</span>
-                                                        </div>
-                                                        <strong>{item.value}%</strong>
-                                                    </div>
-                                                ))}
-
-                                                <div className="analytics-source-tip">
-                                                    <span>Tip</span>
-                                                    <p>
-                                                        Boost tends to amplify what already works.
-                                                        Watch CTR & conversion before scaling spend.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                </section>
-
-                                <section className="analytics-surface analytics-source-surface analytics-source-panel analytics-source-panel-right">
-                                        <div className="analytics-source-bars">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart
-                                                    data={SOURCE_BAR_DATA}
-                                                    margin={{
-                                                        top: 10,
-                                                        right: 14,
-                                                        left: 0,
-                                                        bottom: 6,
-                                                    }}
-                                                >
-                                                    <XAxis
-                                                        dataKey="label"
-                                                        axisLine={false}
-                                                        tickLine={false}
-                                                        tick={{
-                                                            fill: theme === "dark" ? "#f0f0f0" : "#323232",
-                                                            fontSize: 9,
-                                                        }}
-                                                        interval={0}
-                                                        tickMargin={8}
-                                                    />
-                                                    <YAxis
-                                                        axisLine={false}
-                                                        tickLine={false}
-                                                        domain={[0, 12]}
-                                                        ticks={[0, 3, 6, 9, 12]}
-                                                        tickFormatter={(value) => value === 0 ? "0" : `${value.toFixed(1)}L`}
-                                                        tick={{
-                                                            fill: theme === "dark" ? "#f0f0f0" : "#323232",
-                                                            fontSize: 9,
-                                                        }}
-                                                        width={36}
-                                                        tickMargin={4}
-                                                    />
+                                    <div className="analytics-source-content">
+                                        <div className="analytics-source-pie">
+                                            <ResponsiveContainer
+                                                width="100%"
+                                                height="100%"
+                                            >
+                                                <PieChart>
                                                     <Tooltip
-                                                        formatter={(value) => [`${value}L`, "Value"]}
+                                                        formatter={(value) => [
+                                                            `${value}%`,
+                                                            "Value",
+                                                        ]}
                                                         contentStyle={{
-                                                            borderRadius: "10px",
-                                                            border: theme === "dark" ? "1px solid #444" : "1px solid #d6d6cf",
-                                                            background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-                                                            color: theme === "dark" ? "#f0f0f0" : "#2f2f2f",
+                                                            borderRadius:
+                                                                "10px",
+                                                            border:
+                                                                theme === "dark"
+                                                                    ? "1px solid #444"
+                                                                    : "1px solid #d6d6cf",
+                                                            background:
+                                                                theme === "dark"
+                                                                    ? "#1e1e1e"
+                                                                    : "#ffffff",
+                                                            color:
+                                                                theme === "dark"
+                                                                    ? "#f0f0f0"
+                                                                    : "#2f2f2f",
                                                             fontSize: "12px",
                                                         }}
-                                                        cursor={{ fill: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(206, 255, 27, 0.15)' }}
                                                     />
-                                                    <Bar
+                                                    <Pie
+                                                        data={SOURCE_MIX_DATA}
                                                         dataKey="value"
-                                                        radius={[4, 4, 0, 0]}
-                                                        fill="#c7ff00"
-                                                        barSize={20}
-                                                    />
-                                                </BarChart>
+                                                        nameKey="name"
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        outerRadius={78}
+                                                        innerRadius={0}
+                                                        paddingAngle={1}
+                                                        stroke="none"
+                                                    >
+                                                        {SOURCE_MIX_DATA.map(
+                                                            (entry) => (
+                                                                <Cell
+                                                                    key={
+                                                                        entry.name
+                                                                    }
+                                                                    fill={
+                                                                        entry.color
+                                                                    }
+                                                                />
+                                                            ),
+                                                        )}
+                                                    </Pie>
+                                                </PieChart>
                                             </ResponsiveContainer>
                                         </div>
 
-                                        <div className="analytics-source-cards">
-                                            <div className="analytics-rates-card">
-                                                <h3>Key rates</h3>
-                                                <div className="analytics-rates-list">
-                                                    {KEY_RATE_ROWS.map((item) => (
-                                                        <div
-                                                            key={item.label}
-                                                            className="analytics-rates-row"
-                                                        >
-                                                            <div>
-                                                                <strong>
-                                                                    {item.label}
-                                                                </strong>
-                                                                <p>{item.note}</p>
-                                                            </div>
-                                                            <span>{item.value}</span>
-                                                        </div>
-                                                    ))}
+                                        <div className="analytics-source-list">
+                                            {SOURCE_MIX_DATA.map((item) => (
+                                                <div
+                                                    key={item.name}
+                                                    className="analytics-source-row"
+                                                >
+                                                    <div className="analytics-source-name">
+                                                        <span
+                                                            className="analytics-source-dot"
+                                                            style={{
+                                                                backgroundColor:
+                                                                    item.color,
+                                                            }}
+                                                        />
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                    <strong>
+                                                        {item.value}%
+                                                    </strong>
                                                 </div>
-                                            </div>
+                                            ))}
 
-                                            <div className="analytics-next-card">
-                                                <h3>Next action</h3>
+                                            <div className="analytics-source-tip">
+                                                <span>Tip</span>
                                                 <p>
-                                                    Improve the biggest drop first. Most creators see
-                                                    the steepest drop between Opens -&gt; Messages.
+                                                    Boost tends to amplify what
+                                                    already works. Watch CTR &
+                                                    conversion before scaling
+                                                    spend.
                                                 </p>
-
-                                                <div className="analytics-next-actions">
-                                                    {NEXT_ACTIONS.map((action) => (
-                                                        <button
-                                                            key={action}
-                                                            type="button"
-                                                            className="analytics-next-button"
-                                                        >
-                                                            {action}
-                                                        </button>
-                                                    ))}
-                                                </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </section>
+
+                                <section className="analytics-surface analytics-source-surface analytics-source-panel analytics-source-panel-right">
+                                    <div className="analytics-source-bars">
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height="100%"
+                                        >
+                                            <BarChart
+                                                data={SOURCE_BAR_DATA}
+                                                margin={{
+                                                    top: 10,
+                                                    right: 14,
+                                                    left: 0,
+                                                    bottom: 6,
+                                                }}
+                                            >
+                                                <XAxis
+                                                    dataKey="label"
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    tick={{
+                                                        fill:
+                                                            theme === "dark"
+                                                                ? "#f0f0f0"
+                                                                : "#323232",
+                                                        fontSize: 9,
+                                                    }}
+                                                    interval={0}
+                                                    tickMargin={8}
+                                                />
+                                                <YAxis
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                    domain={[0, 12]}
+                                                    ticks={[0, 3, 6, 9, 12]}
+                                                    tickFormatter={(value) =>
+                                                        value === 0
+                                                            ? "0"
+                                                            : `${value.toFixed(1)}L`
+                                                    }
+                                                    tick={{
+                                                        fill:
+                                                            theme === "dark"
+                                                                ? "#f0f0f0"
+                                                                : "#323232",
+                                                        fontSize: 9,
+                                                    }}
+                                                    width={36}
+                                                    tickMargin={4}
+                                                />
+                                                <Tooltip
+                                                    formatter={(value) => [
+                                                        `${value}L`,
+                                                        "Value",
+                                                    ]}
+                                                    contentStyle={{
+                                                        borderRadius: "10px",
+                                                        border:
+                                                            theme === "dark"
+                                                                ? "1px solid #444"
+                                                                : "1px solid #d6d6cf",
+                                                        background:
+                                                            theme === "dark"
+                                                                ? "#1e1e1e"
+                                                                : "#ffffff",
+                                                        color:
+                                                            theme === "dark"
+                                                                ? "#f0f0f0"
+                                                                : "#2f2f2f",
+                                                        fontSize: "12px",
+                                                    }}
+                                                    cursor={{
+                                                        fill:
+                                                            theme === "dark"
+                                                                ? "rgba(255,255,255,0.08)"
+                                                                : "rgba(206, 255, 27, 0.15)",
+                                                    }}
+                                                />
+                                                <Bar
+                                                    dataKey="value"
+                                                    radius={[4, 4, 0, 0]}
+                                                    fill="#c7ff00"
+                                                    barSize={20}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+
+                                    <div className="analytics-source-cards">
+                                        <div className="analytics-rates-card">
+                                            <h3>Key rates</h3>
+                                            <div className="analytics-rates-list">
+                                                {KEY_RATE_ROWS.map((item) => (
+                                                    <div
+                                                        key={item.label}
+                                                        className="analytics-rates-row"
+                                                    >
+                                                        <div>
+                                                            <strong>
+                                                                {item.label}
+                                                            </strong>
+                                                            <p>{item.note}</p>
+                                                        </div>
+                                                        <span>
+                                                            {item.value}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="analytics-next-card">
+                                            <h3>Next action</h3>
+                                            <p>
+                                                Improve the biggest drop first.
+                                                Most creators see the steepest
+                                                drop between Opens -&gt;
+                                                Messages.
+                                            </p>
+
+                                            <div className="analytics-next-actions">
+                                                {NEXT_ACTIONS.map((action) => (
+                                                    <button
+                                                        key={action}
+                                                        type="button"
+                                                        className="analytics-next-button"
+                                                    >
+                                                        {action}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </section>
                             </section>
 
@@ -782,14 +879,27 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                     {INSIGHTS_DATA.map((item) => {
                                         const Icon = item.icon;
                                         return (
-                                            <div key={item.title} className="analytics-insight-card">
+                                            <div
+                                                key={item.title}
+                                                className="analytics-insight-card"
+                                            >
                                                 <div className="analytics-insight-icon">
-                                                    <Icon size={20} strokeWidth={2} color="#2f2f2f" />
+                                                    <Icon
+                                                        size={20}
+                                                        strokeWidth={2}
+                                                        color="#2f2f2f"
+                                                    />
                                                 </div>
                                                 <div className="analytics-insight-info">
-                                                    <span className="analytics-insight-title">{item.title}</span>
-                                                    <strong className="analytics-insight-value">{item.value}</strong>
-                                                    <p className="analytics-insight-note">{item.note}</p>
+                                                    <span className="analytics-insight-title">
+                                                        {item.title}
+                                                    </span>
+                                                    <strong className="analytics-insight-value">
+                                                        {item.value}
+                                                    </strong>
+                                                    <p className="analytics-insight-note">
+                                                        {item.note}
+                                                    </p>
                                                 </div>
                                             </div>
                                         );
@@ -801,9 +911,14 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                         <h3>Earnings breakdown</h3>
                                         <div className="analytics-breakdown-list">
                                             {EARNINGS_BREAKDOWN.map((item) => (
-                                                <div key={item.label} className="analytics-rates-row">
+                                                <div
+                                                    key={item.label}
+                                                    className="analytics-rates-row"
+                                                >
                                                     <div>
-                                                        <strong>{item.label}</strong>
+                                                        <strong>
+                                                            {item.label}
+                                                        </strong>
                                                         <p>{item.note}</p>
                                                     </div>
                                                     <span>{item.value}</span>
@@ -816,9 +931,14 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                         <h3>Ops health</h3>
                                         <div className="analytics-ops-list">
                                             {OPS_HEALTH_DATA.map((item) => (
-                                                <div key={item.label} className="analytics-rates-row">
+                                                <div
+                                                    key={item.label}
+                                                    className="analytics-rates-row"
+                                                >
                                                     <div>
-                                                        <strong>{item.label}</strong>
+                                                        <strong>
+                                                            {item.label}
+                                                        </strong>
                                                         <p>{item.note}</p>
                                                     </div>
                                                     <span>{item.value}</span>
@@ -839,14 +959,27 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                     {BOOST_METRICS.map((item) => {
                                         const Icon = item.icon;
                                         return (
-                                            <div key={item.title} className="analytics-insight-card">
+                                            <div
+                                                key={item.title}
+                                                className="analytics-insight-card"
+                                            >
                                                 <div className="analytics-insight-icon">
-                                                    <Icon size={18} strokeWidth={2} color="#2f2f2f" />
+                                                    <Icon
+                                                        size={18}
+                                                        strokeWidth={2}
+                                                        color="#2f2f2f"
+                                                    />
                                                 </div>
                                                 <div className="analytics-insight-info">
-                                                    <span className="analytics-insight-title">{item.title}</span>
-                                                    <strong className="analytics-insight-value">{item.value}</strong>
-                                                    <p className="analytics-insight-note">{item.note}</p>
+                                                    <span className="analytics-insight-title">
+                                                        {item.title}
+                                                    </span>
+                                                    <strong className="analytics-insight-value">
+                                                        {item.value}
+                                                    </strong>
+                                                    <p className="analytics-insight-note">
+                                                        {item.note}
+                                                    </p>
                                                 </div>
                                             </div>
                                         );
@@ -861,16 +994,37 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                         </header>
                                         <div className="analytics-checklist-list">
                                             {SCALING_CHECKLIST.map((item) => (
-                                                <div key={item.label} className="analytics-checklist-row">
+                                                <div
+                                                    key={item.label}
+                                                    className="analytics-checklist-row"
+                                                >
                                                     <div>
-                                                        <strong>{item.label}</strong>
+                                                        <strong>
+                                                            {item.label}
+                                                        </strong>
                                                         <p>{item.note}</p>
                                                     </div>
-                                                    <div className={`analytics-status-icon is-${item.status}`}>
-                                                        {item.status === "success" ? (
-                                                            <Check size={16} strokeWidth={4} color="#ffffff" />
+                                                    <div
+                                                        className={`analytics-status-icon is-${item.status}`}
+                                                    >
+                                                        {item.status ===
+                                                        "success" ? (
+                                                            <Check
+                                                                size={16}
+                                                                strokeWidth={4}
+                                                                color="#ffffff"
+                                                            />
                                                         ) : (
-                                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="#ffe100" stroke="#262626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                            <svg
+                                                                width="22"
+                                                                height="22"
+                                                                viewBox="0 0 24 24"
+                                                                fill="#ffe100"
+                                                                stroke="#262626"
+                                                                strokeWidth="1.5"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                            >
                                                                 <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                                                                 <path d="M12 9v4" />
                                                                 <path d="M12 17h.01" />
@@ -890,14 +1044,19 @@ export default function AnalyticsPage({ theme, setTheme }) {
 
                                         <div className="analytics-tactics-chips">
                                             {BOOST_TACTICS.map((tactic) => (
-                                                <button key={tactic} type="button" className="analytics-next-button">
+                                                <button
+                                                    key={tactic}
+                                                    type="button"
+                                                    className="analytics-next-button"
+                                                >
                                                     {tactic}
                                                 </button>
                                             ))}
                                         </div>
 
                                         <p className="analytics-boost-tip">
-                                            Start with high-intent sources (Search/Profile) before broad reach.
+                                            Start with high-intent sources
+                                            (Search/Profile) before broad reach.
                                         </p>
                                     </div>
                                 </div>
@@ -911,19 +1070,31 @@ export default function AnalyticsPage({ theme, setTheme }) {
 
                                 <div className="analytics-audience-grid">
                                     {AUDIENCE_DATA.map((card) => (
-                                        <div key={card.title} className="analytics-audience-card">
+                                        <div
+                                            key={card.title}
+                                            className="analytics-audience-card"
+                                        >
                                             <h3>{card.title}</h3>
                                             <div className="analytics-audience-list">
                                                 {card.rows.map((row) => (
-                                                    <div key={row.label} className="analytics-audience-row">
+                                                    <div
+                                                        key={row.label}
+                                                        className="analytics-audience-row"
+                                                    >
                                                         <div className="analytics-audience-row-header">
-                                                            <span>{row.label}</span>
-                                                            <strong>{row.value}%</strong>
+                                                            <span>
+                                                                {row.label}
+                                                            </span>
+                                                            <strong>
+                                                                {row.value}%
+                                                            </strong>
                                                         </div>
                                                         <div className="analytics-audience-progress">
                                                             <div
                                                                 className="analytics-audience-progress-bar"
-                                                                style={{ width: `${row.value}%` }}
+                                                                style={{
+                                                                    width: `${row.value}%`,
+                                                                }}
                                                             />
                                                         </div>
                                                     </div>
@@ -951,15 +1122,17 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {TOP_LISTINGS_DATA.map((item, idx) => (
-                                                <tr key={idx}>
-                                                    <td>{item.title}</td>
-                                                    <td>{item.ctr}</td>
-                                                    <td>{item.conv}</td>
-                                                    <td>{item.value}</td>
-                                                    <td>{item.leads}</td>
-                                                </tr>
-                                            ))}
+                                            {TOP_LISTINGS_DATA.map(
+                                                (item, idx) => (
+                                                    <tr key={idx}>
+                                                        <td>{item.title}</td>
+                                                        <td>{item.ctr}</td>
+                                                        <td>{item.conv}</td>
+                                                        <td>{item.value}</td>
+                                                        <td>{item.leads}</td>
+                                                    </tr>
+                                                ),
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -968,22 +1141,35 @@ export default function AnalyticsPage({ theme, setTheme }) {
                             <section className="analytics-surface analytics-definitions-surface mt-8 mb-8">
                                 <header className="analytics-heading analytics-definitions-heading">
                                     <h2>Definitions</h2>
-                                    <p>Quick reference for common Ultra Hustle metrics.</p>
+                                    <p>
+                                        Quick reference for common Ultra Hustle
+                                        metrics.
+                                    </p>
                                 </header>
 
                                 <div className="analytics-definitions-grid">
                                     {DEFINITIONS_DATA.map((card) => (
-                                        <div key={card.title} className="analytics-definition-card">
+                                        <div
+                                            key={card.title}
+                                            className="analytics-definition-card"
+                                        >
                                             <h3>{card.title}</h3>
                                             <div className="analytics-definition-list">
                                                 {card.items.map((item) => (
-                                                    <div key={item.label} className="analytics-definition-row">
+                                                    <div
+                                                        key={item.label}
+                                                        className="analytics-definition-row"
+                                                    >
                                                         <div className="analytics-definition-info">
-                                                            <strong>{item.label}</strong>
+                                                            <strong>
+                                                                {item.label}
+                                                            </strong>
                                                             <p>{item.note}</p>
                                                         </div>
                                                         <div className="analytics-definition-value">
-                                                            <strong>{item.value}</strong>
+                                                            <strong>
+                                                                {item.value}
+                                                            </strong>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -992,7 +1178,6 @@ export default function AnalyticsPage({ theme, setTheme }) {
                                     ))}
                                 </div>
                             </section>
-
                         </div>
                     </div>
                 </div>

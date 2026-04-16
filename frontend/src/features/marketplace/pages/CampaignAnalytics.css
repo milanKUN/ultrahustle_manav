@@ -33,7 +33,7 @@
 }
 
 .campaign-analytics-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -207,6 +207,508 @@
   fill: #d1d1d1;
 }
 
+/* Dashboard: goal, placements, audience, sidebar */
+.ca-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 22px;
+}
+
+.ca-dashboard-main,
+.ca-dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.ca-surface-card {
+  border: 1px solid rgba(212, 255, 50, 0.65);
+  border-radius: 16px;
+  background: #fff;
+  padding: 18px 20px 16px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.ca-surface-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.2;
+}
+
+.ca-surface-subtitle {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: #666;
+}
+
+.ca-goal-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ca-goal-metric-cell {
+  border: 1px solid rgba(212, 255, 50, 0.55);
+  border-radius: 12px;
+  background: #f7f7f7;
+  padding: 10px 12px;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ca-goal-metric-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.ca-goal-metric-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111;
+}
+
+.ca-bar-chart-wrap {
+  width: 100%;
+  height: 280px;
+  margin-bottom: -12px;
+}
+
+.ca-bar-chart-wrap .recharts-cartesian-axis-tick-value {
+  fill: #444;
+}
+
+.ca-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.ca-data-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ca-data-table th,
+.ca-data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.ca-data-table th {
+  font-weight: 600;
+  color: #555;
+  background: #f3f3f3;
+  white-space: nowrap;
+}
+
+.ca-data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ca-data-table td {
+  color: #222;
+}
+
+.ca-audience-table-wrap .ca-data-table {
+  min-width: 720px;
+}
+
+.ca-audience-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ca-audience-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fafafa;
+}
+
+.ca-audience-card-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ca-audience-card-row:last-child {
+  border-bottom: none;
+}
+
+.ca-audience-card-row span {
+  color: #666;
+}
+
+.ca-ai-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ca-ai-bubble {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #f7f7f7;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #333;
+}
+
+.ca-action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ca-action-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.ca-action-btn-primary {
+  background: #d4ff32;
+  color: #111;
+}
+
+.ca-action-btn-primary:hover {
+  filter: brightness(0.97);
+}
+
+.ca-action-btn-muted {
+  background: #fff;
+  color: #222;
+  border: 1px solid #ccc;
+}
+
+.ca-action-btn-muted:hover {
+  background: #f5f5f5;
+}
+
+.ca-boost-link {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: center;
+  font-size: 13px;
+  color: #444;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ca-export-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.ca-boost-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.ca-boost-left-section,
+.ca-boost-right-section {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.ca-boost-left-section {
+  background: #fafafa;
+}
+
+.ca-boost-right-section {
+  background: #fafafa;
+  height: 70%;
+  padding: 25px;
+}
+
+.ca-boost-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.ca-boost-row + .ca-boost-row {
+  margin-top: 12px;
+}
+
+.ca-boost-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ca-boost-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+}
+
+.ca-boost-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+}
+
+.ca-boost-progress {
+  width: 100%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ca-boost-progress-fill {
+  height: 100%;
+  background: #d4ff32;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.ca-boost-heading {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #222;
+  text-align: left;
+  line-height: 1;
+}
+
+.ca-boost-text {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  color: #555;
+}
+
+.ca-boost-tags {
+  display: flex;
+  gap: 0px 18px;
+  margin-top: 20px;
+}
+
+.ca-boost-tag {
+  display: inline-block;
+  background: #d4ff32;
+  color: #111;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+}
+
+.campaign-analytics-layout.dark .ca-boost-left-section,
+.campaign-analytics-layout.dark .ca-boost-right-section {
+  background: #232323;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.campaign-analytics-layout.dark .ca-boost-label {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-boost-value {
+  color: #b0b0b0;
+}
+
+.campaign-analytics-layout.dark .ca-boost-progress {
+  background: #3a3a3a;
+}
+
+.campaign-analytics-layout.dark .ca-boost-heading {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-boost-text {
+  color: #c7c7c7;
+}
+
+.ca-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ca-compare-panel {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  background: #f3f3f3;
+  padding: 15px;
+}
+
+.ca-compare-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.ca-compare-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ca-compare-metric {
+  border: 1px solid rgba(212, 255, 50, 0.9);
+  border-radius: 10px;
+  background: #f7f7f7;
+  padding: 10px;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ca-compare-metric span {
+  font-size: 12px;
+  color: #666;
+}
+
+.ca-compare-metric strong {
+  font-size: 28px;
+  line-height: 1;
+  color: #333;
+  font-weight: 500;
+}
+
+.campaign-analytics-layout.dark .ca-surface-card {
+  background: #1d1d1d;
+  border-color: #3e4f12;
+}
+
+.campaign-analytics-layout.dark .ca-surface-title {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-surface-subtitle {
+  color: #b0b0b0;
+}
+
+.campaign-analytics-layout.dark .ca-goal-metric-cell {
+  background: #232323;
+  border-color: #3e4f12;
+}
+
+.campaign-analytics-layout.dark .ca-goal-metric-label {
+  color: #a5a5a5;
+}
+
+.campaign-analytics-layout.dark .ca-goal-metric-value {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-table-scroll {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.campaign-analytics-layout.dark .ca-data-table th {
+  background: #2a2a2a;
+  color: #c7c7c7;
+}
+
+.campaign-analytics-layout.dark .ca-data-table th,
+.campaign-analytics-layout.dark .ca-data-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.campaign-analytics-layout.dark .ca-data-table td {
+  color: #eaeaea;
+}
+
+.campaign-analytics-layout.dark .ca-bar-chart-wrap .recharts-cartesian-axis-tick-value {
+  fill: #c7c7c7;
+}
+
+.campaign-analytics-layout.dark .ca-ai-bubble {
+  background: #232323;
+  border-color: #3a3a3a;
+  color: #e0e0e0;
+}
+
+.campaign-analytics-layout.dark .ca-audience-card {
+  background: #232323;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.campaign-analytics-layout.dark .ca-audience-card-row span {
+  color: #a5a5a5;
+}
+
+.campaign-analytics-layout.dark .ca-action-btn-muted {
+  background: #1d1d1d;
+  border-color: #555;
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-boost-link {
+  color: #c7c7c7;
+}
+
+.campaign-analytics-layout.dark .ca-export-note {
+  color: #b0b0b0;
+}
+
+.campaign-analytics-layout.dark .ca-compare-panel {
+  background: #222;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.campaign-analytics-layout.dark .ca-compare-title {
+  color: #d0d0d0;
+}
+
+.campaign-analytics-layout.dark .ca-compare-metric strong {
+  color: #f1f1f1;
+}
+
+.campaign-analytics-layout.dark .ca-compare-metric span {
+  color: #b0b0b0;
+}
+
+.campaign-analytics-layout.dark .ca-compare-metric {
+  background: #1e1e1e;
+  border-color: #3e4f12;
+}
+
 @media (max-width: 1200px) {
   .ca-title {
     font-size: 36px;
@@ -248,6 +750,22 @@
 
   .ca-chart-area {
     height: 280px;
+  }
+
+  .ca-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ca-goal-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ca-bar-chart-wrap {
+    height: 260px;
+  }
+
+  .ca-boost-grid-container {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -300,4 +818,51 @@
   .ca-chart-area {
     height: 220px;
   }
+
+  .ca-dashboard-grid {
+    margin-top: 16px;
+    gap: 14px;
+  }
+
+  .ca-surface-card {
+    padding: 14px 12px 12px;
+  }
+
+  .ca-surface-title {
+    font-size: 18px;
+  }
+
+  .ca-goal-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .ca-goal-metric-value {
+    font-size: 17px;
+  }
+
+  .ca-bar-chart-wrap {
+    height: 220px;
+  }
+
+  .ca-compare-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ca-mini-heading {
+    font-size: 20px;
+  }
+
+  .ca-boost-heading {
+    font-size: 14px;
+  }
+
+  .ca-compare-metric strong {
+    font-size: 28px;
+  }
+}
+
+/* Keep audience as table on mobile/tablet (scrolls horizontally). */
+.ca-audience-cards {
+  display: none;
 }
