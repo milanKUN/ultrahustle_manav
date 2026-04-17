@@ -2,8 +2,8 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
-import heroImg from "../../../assets/marketplacehero.png";
-import heroImgDark from "../../../assets/marketplacedark.png";
+import heroImg from "../../../assets/marketplace-bg-light.jpeg";
+import heroImgDark from "../../../assets/marketplace-bg-dark.jpeg";
 import filterIcon from "../../../assets/filtericon.svg";
 import "./Marketplace.css";
 
