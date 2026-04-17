@@ -41,7 +41,7 @@ export default function CreatorOnboarding() {
 
           {/* ✅ iPad/Tablet pe image ko thoda “contain” feel dena, taaki top crop kam ho */}
           <img
-            src="/onboarding-character.png"
+            src="/onboarding-image.png"
             alt="Ultra Hustle Character"
             className="
               relative z-10 w-full h-full

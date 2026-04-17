@@ -1,5 +1,4 @@
-/* Suggestion Box Component */
-
+/* ================= CONTAINER ================= */
 .suggestion-box-container {
   width: 100%;
   background: #fafafa;
@@ -7,6 +6,7 @@
   border-radius: 16px;
   padding: 1.5rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
 }
 
 .suggestion-box-container.dark {
@@ -14,7 +14,7 @@
   border-color: #9acc22;
 }
 
-/* Title */
+/* ================= TITLE ================= */
 .suggestion-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -26,32 +26,66 @@
   color: #ffffff;
 }
 
-/* Cards Grid */
-.suggestion-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+/* ================= WRAPPER ================= */
+.suggestion-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* overflow: hidden; */
 }
 
-/* Card */
+/* ================= HORIZONTAL SCROLL ================= */
+.suggestion-cards {
+  display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 60px;
+  
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar */
+.suggestion-cards::-webkit-scrollbar {
+  display: none;
+}
+
+/* Snap scroll (optional but smooth UX) */
+.suggestion-cards {
+  scroll-snap-type: x mandatory;
+}
+
+/* ================= CARD ================= */
 .suggestion-card {
   position: relative;
+  min-width: 200px;
+  max-width: 200px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+
   background: #e8e8e8;
   border-radius: 12px;
   padding: 1.5rem 1rem;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  min-height: 280px;
+
+  min-height: 260px;
   justify-content: center;
+
+  flex: 0 0 calc((100% - 3rem) / 3);
+  max-width: calc((100% - 3rem) / 3);
 }
 
 .suggestion-box-container.dark .suggestion-card {
   background: #3a3a3a;
 }
 
-/* Close Button */
+/* ================= CLOSE BUTTON ================= */
 .suggestion-close-btn {
   position: absolute;
   top: 0.5rem;
@@ -62,9 +96,11 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   color: #000;
   transition: all 0.2s ease;
 }
@@ -82,24 +118,12 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
-.suggestion-close-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* Avatar Section */
+/* ================= AVATAR ================= */
 .suggestion-avatar {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   overflow: hidden;
-  flex-shrink: 0;
-}
-
-.suggestion-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .avatar-placeholder {
@@ -109,13 +133,9 @@
   border-radius: 50%;
 }
 
-/* Content */
+/* ================= CONTENT ================= */
 .suggestion-content {
   text-align: center;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .suggestion-name {
@@ -139,7 +159,7 @@
   color: #999;
 }
 
-/* Follow Button */
+/* ================= FOLLOW BUTTON ================= */
 .suggestion-follow-btn {
   width: 100%;
   padding: 0.5rem 1rem;
@@ -162,135 +182,80 @@
   transform: scale(0.98);
 }
 
-/* Responsive Design */
+/* ================= NAV BUTTONS ================= */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #bfff00;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
 
-/* Tablet (641px - 1024px) */
-@media (min-width: 641px) and (max-width: 1024px) {
-  .suggestion-box-container {
-    padding: 1.25rem;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  .suggestion-title {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .suggestion-cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.875rem;
-  }
-
-  .suggestion-card {
-    padding: 1.25rem 0.875rem;
-    gap: 0.625rem;
-    min-height: 240px;
-  }
-
-  .suggestion-avatar {
-    width: 90px;
-    height: 90px;
-  }
-
-  .suggestion-name {
-    font-size: 0.875rem;
-  }
-
-  .suggestion-username {
-    font-size: 0.75rem;
-  }
-
-  .suggestion-follow-btn {
-    font-size: 0.75rem;
-    padding: 0.4rem 0.875rem;
-  }
+  z-index: 1000 !important;
 }
 
-/* Mobile (max 640px) */
+.nav-btn:hover {
+  background: #a8e600;
+}
+
+/* Position */
+.nav-btn.left {
+  left: -18px;
+  /* half outside */
+}
+
+.nav-btn.right {
+  right: -18px;
+}
+
+/* Dark mode */
+.suggestion-box-container.dark .nav-btn {
+  background: #bfff00;
+  color: #000;
+}
+
+.suggestion-cards::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================= MOBILE ================= */
 @media (max-width: 640px) {
-  .suggestion-box-container {
-    padding: 1rem;
-    border: 2.5px solid #bfff00;
-    border-radius: 12px;
-  }
-
-  .suggestion-box-container.dark {
-    border-color: #9acc22;
-  }
-
-  .suggestion-title {
-    font-size: 0.95rem;
-    margin-bottom: 0.875rem;
-  }
-
-  .suggestion-cards {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
   .suggestion-card {
-    flex-direction: row;
-    padding: 0.875rem;
-    gap: 0.75rem;
-    align-items: flex-start;
-    min-height: auto;
+    min-width: 160px;
+    padding: 1rem;
+    min-height: 220px;
   }
 
   .suggestion-avatar {
-    width: 75px;
-    height: 75px;
-    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
   }
 
-  .suggestion-close-btn {
-    top: 0.375rem;
-    right: 0.375rem;
-    width: 24px;
-    height: 24px;
-  }
-
-  .suggestion-close-btn svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .suggestion-content {
-    text-align: left;
-    flex: 1;
-  }
-
-  .suggestion-name {
-    font-size: 0.8125rem;
-  }
-
-  .suggestion-username {
-    font-size: 0.7rem;
-    margin-top: 0.125rem;
-  }
-
-  .suggestion-follow-btn {
-    font-size: 0.7rem;
-    padding: 0.375rem 0.75rem;
-    width: auto;
-    white-space: nowrap;
+  .nav-btn {
+    width: 28px;
+    height: 28px;
   }
 }
 
-/* Accessibility */
+/* ================= ACCESSIBILITY ================= */
 .suggestion-close-btn:focus-visible,
 .suggestion-follow-btn:focus-visible {
   outline: 2px solid #bfff00;
   outline-offset: 2px;
 }
 
-.suggestion-box-container.dark .suggestion-close-btn:focus-visible,
-.suggestion-box-container.dark .suggestion-follow-btn:focus-visible {
-  outline-color: #9acc22;
-}
-
-/* Reduced Motion */
+/* ================= REDUCED MOTION ================= */
 @media (prefers-reduced-motion: reduce) {
-  .suggestion-close-btn,
-  .suggestion-follow-btn {
+
+  .suggestion-follow-btn,
+  .nav-btn {
     transition: none;
   }
 }

@@ -16,6 +16,12 @@
   border-color: #9acc22;
 }
 
+.logo-img {
+  height: 32px;
+  /* adjust based on your design */
+  object-fit: contain;
+}
+
 /* Header */
 .review-header {
   display: flex;

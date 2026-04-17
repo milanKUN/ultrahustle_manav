@@ -32,8 +32,11 @@ const Review = ({ theme = "light" }) => {
             {/* Header */}
             <div className="review-header">
                 <div className="review-logo">
-                    <span className="logo-ultra">ULTRA</span>
-                    <span className="logo-hustle">HUSTLE</span>
+                    <img
+                        src="/logo.png"
+                        alt="UltraHustle"
+                        className="logo-img"
+                    />
                 </div>
                 <div className="review-divider"></div>
             </div>
