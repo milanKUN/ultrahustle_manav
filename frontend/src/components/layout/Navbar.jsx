@@ -1,23 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Navbar() {
+export default function Navbar({ className = "" }) {
   return (
     <nav
-      className="
+      className={`
   fixed top-0 left-0 right-0 z-50
   border-b border-[#CEFF1B]
   shadow-[0_2px_12px_3px_rgba(206,255,27,0.35)]
   backdrop-blur-xl
   bg-gradient-to-r from-[#D9D9D9] via-[#CFCFCF] to-[#C6C6C6]
-"
+  ${className}
+`}
 
     >
       {/* MAIN BAR */}
       <div
         className="
           flex items-center justify-between
-          px-4 sm:px-6
+          px-4 pr-6 sm:px-6 sm:pr-8
           py-3 sm:py-4
           max-w-7xl mx-auto
         "

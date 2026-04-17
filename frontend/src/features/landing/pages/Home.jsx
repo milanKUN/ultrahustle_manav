@@ -124,9 +124,9 @@ export default function Home({ theme = "light" }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-cover bg-center bg-no-repeat bg-fixed bg-gradient-to-br from-[#cfd3d6] via-[#d9dcde] to-[#e6e8e9]">
-      <div className="relative z-30">
+      <div className="relative z-30 pt-[80px]">
         <Navbar />
-        <div className="h-32 bg-gradient-to-r from-[#D5D5D6] via-[#BBBCBC] to-[#A4A5A4]" />
+        <div className="h-12 bg-gradient-to-r from-[#D5D5D6] via-[#BBBCBC] to-[#A4A5A4]" />
         <Hero />
         <ProblemSolution />
         <NewWayToWork />
