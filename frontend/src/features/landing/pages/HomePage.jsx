@@ -6,8 +6,9 @@ import {
     useSpring,
     useTransform,
 } from "framer-motion";
-import { Search, Lock, ShieldCheck, FileText } from "lucide-react";
+import { Search, Lock, ShieldCheck, FileText, Check, Star, Plus, X } from "lucide-react";
 import Navbar from "../../../components/layout/Navbar";
+import Footer from "../components/Footer";
 import "./HomePage.css";
 
 const slides = [
@@ -22,6 +23,21 @@ const slides = [
     {
         text: "grow.",
         bg: "/Grow.jpeg",
+    },
+];
+
+const slidesSecond = [
+    {
+        text: "Work Smart",
+        bg: "/work-smart.png",
+    },
+    {
+        text: "Work Hard",
+        bg: "/work-hard.png",
+    },
+    {
+        text: "Work Ultra",
+        bg: "/work-ultra.png",
     },
 ];
 
@@ -106,34 +122,273 @@ const bringTogetherPanels = [
     },
 ];
 
+const communityPanels = [
+    {
+        eyebrow: "CREATORS & FREELANCERS",
+        title: "Your skills have always been worth more. The marketplace proves it.",
+        description:
+            "When clients browse Ultra Hustle, they see your listings ranked by real reputation and real reviews — not by who paid to be featured. Your work speaks for itself.",
+        bullets: [
+            "Start earning from day one, no setup fees, no waiting periods.",
+            "Sell services, products, courses and teams from one profile",
+            "Your listings on the marketplace reach clients who are already browsing and ready to buy",
+            "Get paid the same day work is approved",
+        ],
+        cta: "Join as a creator",
+        tone: "light",
+    },
+    {
+        eyebrow: "STARTUP FOUNDERS . MARKETERS . BUSINESSES",
+        title: "The best global talent is on the marketplace. Ready for your project.",
+        description:
+            "Browse verified creators across services, digital products, courses, webinars, and teams. Real profiles, real reviews, real results.",
+        bullets: [
+            "Browse the marketplace and connect directly to the verified creator you need",
+            "Pay only when milestones are delivered and approved",
+            "KYC-verified talent with real, earned reputation scores",
+            "Designers, developers, marketers, writers — all in one place",
+        ],
+        cta: "Browse creators",
+        tone: "lime",
+    },
+];
+
+const platformFeatures = [
+    {
+        tag: "CREATOR",
+        icon: "📊",
+        title: "Creator Dashboard",
+        desc: "Revenue, active orders, listing performance, and reputation — all live in one place.",
+    },
+    {
+        tag: "CLIENT",
+        icon: "🏪",
+        title: "Marketplace",
+        desc: "Browse thousands of verified creators by category, skill, and reputation. Filter by delivery time, rating, and price — find the right fit fast.",
+    },
+    {
+        tag: "CREATOR",
+        icon: "💳",
+        title: "Payout Wallet",
+        desc: "Instant withdrawals via UPI, bank transfer, and international wire. Track every transaction.",
+    },
+    {
+        tag: "BOTH",
+        icon: "🏆",
+        title: "Reputation System",
+        desc: "XP, Karma, Pro badges — built from real completed work, never gamed or purchased.",
+    },
+    {
+        tag: "BOTH",
+        icon: "📋",
+        title: "Milestones & Escrow",
+        desc: "Break any project into funded milestones. Creators know what to deliver. Clients control every release.",
+    },
+    {
+        tag: "CREATOR",
+        icon: "🚀",
+        title: "Analytics & Boost",
+        desc: "See which listings perform, which fall flat, and amplify the ones that work.",
+    },
+];
+
+const testimonials = [
+    {
+        id: 1,
+        type: "CREATOR",
+        category: "UI/UX DESIGNER",
+        quote: "Finally a platform where the listing tools actually help me look professional. Landed 3 clients in my first week without a single cold message.",
+        user: {
+            name: "Priya R.",
+            role: "UI/UX Designer",
+            location: "Chennai",
+            avatar: "PR"
+        },
+        tone: "light"
+    },
+    {
+        id: 2,
+        type: "CLIENT",
+        category: "STARTUP FOUNDER",
+        quote: "Found the right product designer on the marketplace in minutes. Escrow meant I didn't have to worry about getting burned on a large project.",
+        user: {
+            name: "Rahul V.",
+            role: "Founder, SaaS startup",
+            location: "Bangalore",
+            avatar: "RV"
+        },
+        tone: "dark"
+    },
+    {
+        id: 3,
+        type: "CREATOR",
+        category: "BRAND DESIGNER",
+        quote: "Uploaded my Figma template pack and forgot about it. Three weeks later I'd made ₹40,000 in passive income. This platform actually delivers.",
+        user: {
+            name: "Sneha M.",
+            role: "Brand Designer",
+            location: "Mumbai",
+            avatar: "SM"
+        },
+        tone: "light"
+    },
+    {
+        id: 4,
+        type: "CLIENT",
+        category: "MARKETING MANAGER",
+        quote: "Brief to first draft in 48 hours. Milestone escrow made my finance team happy. No more chasing invoices or managing freelancer spreadsheets.",
+        user: {
+            name: "Ananya K.",
+            role: "Marketing Lead",
+            location: "D2C Brand",
+            avatar: "AK"
+        },
+        tone: "dark"
+    },
+    {
+        id: 5,
+        type: "CREATOR",
+        category: "FULLSTACK DEV",
+        quote: "The escrow system gave me the confidence to take on international clients for the first time. Payment secured before I write a line of code.",
+        user: {
+            name: "Aditya K.",
+            role: "Fullstack Developer",
+            location: "Bangalore",
+            avatar: "AK"
+        },
+        tone: "light"
+    },
+    {
+        id: 6,
+        type: "CLIENT",
+        category: "BUSINESS OWNER",
+        quote: "I've used three other platforms. Ultra Hustle is the first one where I felt the process was designed for me — not just to extract my money.",
+        user: {
+            name: "Mihir K.",
+            role: "Business Owner",
+            location: "Ahmedabad",
+            avatar: "MK"
+        },
+        tone: "dark"
+    }
+];
+
 const howItWorksSteps = {
     creator: {
         bg: "/Creator.png",
         steps: [
-            { num: "01", tag: "BUILD", title: "Set up your profile", desc: "Create your profile and list your services, products, or courses. Go from signup to live in under an hour." },
-            { num: "02", tag: "LIST", title: "Publish everything you offer", desc: "Services, digital products, courses, webinars, or teams — all on one profile, one dashboard." },
-            { num: "03", tag: "MATCH", title: "Clients come to you", desc: "Gig Matcher puts your listings in front of buyers who are ready. Stop cold pitching. Start receiving." },
-            { num: "04", tag: "EARN", title: "Deliver. Get paid. Same day.", desc: "Escrow releases the moment your work is approved. Payout hits your wallet automatically." },
+            {
+                num: "01",
+                tag: "BUILD",
+                title: "Set up your profile",
+                desc: "Create your profile and list your services, products, or courses. Go from signup to live in under an hour.",
+            },
+            {
+                num: "02",
+                tag: "LIST",
+                title: "Publish everything you offer",
+                desc: "Services, digital products, courses, webinars, or teams — all on one profile, one dashboard.",
+            },
+            {
+                num: "03",
+                tag: "DISCOVER",
+                title: "Clients discover you",
+                desc: "Your listings go live on the marketplace. Clients browsing your category find you, review your profile, and reach out when they're ready to hire..",
+            },
+            {
+                num: "04",
+                tag: "EARN",
+                title: "Deliver. Get paid. Same day.",
+                desc: "Escrow releases the moment your work is approved. Payout hits your wallet automatically.",
+            },
         ],
     },
     client: {
         bg: "/Client.png",
         steps: [
-            { num: "01", tag: "BRIEF", title: "Describe your project", desc: "Post what you need, your timeline, and your budget. Gig Matcher does the rest." },
-            { num: "02", tag: "MATCH", title: "Meet your top creators", desc: "Verified creators ranked by fit, reputation score, and delivery history. No scrolling through hundreds." },
-            { num: "03", tag: "PROJECT", title: "Fund escrow. Work begins.", desc: "Your payment is held until you approve each milestone. You stay in control from first message to final delivery." },
-            { num: "04", tag: "DONE", title: "Approve. Pay. Repeat.", desc: "Review the work, approve, funds release. No invoices. No wire transfers. No friction." },
+            {
+                num: "01",
+                tag: "BROWSE",
+                title: "Search the marketplace",
+                desc: "Browse thousands of verified creators by category, skill, and budget. Filter by rating, delivery time, and reputation level.",
+            },
+            {
+                num: "02",
+                tag: "SHORTLIST",
+                title: "Find your perfect creator",
+                desc: "Review real profiles, real ratings, and real delivery history. Every creator is KYC-verified. No fake reviews, no paid placement.",
+            },
+            {
+                num: "03",
+                tag: "PROTECT",
+                title: "Fund escrow. Work begins.",
+                desc: "Your payment is held until you approve each milestone. You stay in control from first message to final delivery.",
+            },
+            {
+                num: "04",
+                tag: "DONE",
+                title: "Approve. Pay. Repeat.",
+                desc: "Review the work, approve, funds release. No invoices. No wire transfers. No friction.",
+            },
         ],
     },
 };
 
-function TrustSection() {
+const homepageFaqs = {
+    creator: [
+        {
+            question: "Is it free to join and list my services?",
+            answer: "Yes — joining is completely free. Founding creators also lock in 0% commission permanently. This offer closes at launch.",
+        },
+        {
+            question: "How does escrow work for me as a creator?",
+            answer: "Clients fund the project into escrow before you begin any work. Complete each milestone, mark it done, and funds release instantly to your payout wallet. You never start work without the money already secured.",
+        },
+        {
+            question: "Can I sell services and digital products on the same profile?",
+            answer: "Absolutely — and courses, webinars, and team packages too. Your entire income streams live on one profile.",
+        },
+        {
+            question: "How do clients find me on Ultra Hustle?",
+            answer: "Once your listing is live on the marketplace, clients browsing your category can discover your profile, review your work, and reach out to hire you. The better your profile and reputation score, the higher your visibility.",
+        },
+        {
+            question: "When and how do I receive my payout?",
+            answer: "Payouts land in your wallet the same day a milestone is approved. Withdraw instantly via UPI, bank transfer, or international wire.",
+        },
+    ],
+    client: [
+        {
+            question: "Is it free to post a project?",
+            answer: "Yes. Posting a project and browsing creators is completely free. You only pay when you hire and fund a milestone.",
+        },
+        {
+            question: "How do I know the creator is actually good?",
+            answer: "Every creator has a reputation score built from real completed projects — XP, Karma, completion rate, and verified client reviews. No fake ratings, no paid placement.",
+        },
+        {
+            question: "What if the work isn't what I expected?",
+            answer: "Your money stays in escrow until you approve each milestone. If there's a dispute, our team steps in within 2 hours. You never lose money to work you didn't approve.",
+        },
+        {
+            question: "How quickly can I find and hire someone?",
+            answer: "Browse the marketplace, filter by category and budget, and start a conversation with your shortlisted creators straight away. Most clients are talking to the right talent within the hour.",
+        },
+        {
+            question: "Can I hire a full team, not just one person?",
+            answer: "Yes. Through the Teams module, you can hire a complete squad — designer, developer, and copywriter as one package — without the agency overhead.",
+        },
+    ],
+};
+
+
+function TrustSection({ containerRef }) {
     return (
         <motion.section
             className="trust-section"
             initial={{ opacity: 0, y: 56 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.15 }}
+            viewport={{ once: false, amount: 0.15, root: containerRef }}
             transition={{
                 duration: 1.6,
                 delay: 0.3,
@@ -142,7 +397,6 @@ function TrustSection() {
         >
             <div className="trust-shell">
                 <div className="trust-content">
-                    <span className="trust-eyebrow">TRUST & SECURITY</span>
                     <h2 className="clash trust-headline">
                         Built on trust. <br />
                         Backed by structure.
@@ -223,22 +477,223 @@ function TrustSection() {
     );
 }
 
-function HowItWorksSection() {
-    const [activeTab, setActiveTab] = useState("creator");
-    const { bg, steps } = howItWorksSteps[activeTab];
-
+function CommunitySplitSection({ containerRef }) {
     return (
         <motion.section
-            className="hiw-section"
+            className="community-split-section"
             initial={{ opacity: 0, y: 56 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.15 }}
+            viewport={{ once: false, amount: 0.15, root: containerRef }}
             transition={{
                 duration: 1.6,
                 delay: 0.3,
                 ease: [0.16, 1, 0.3, 1],
             }}
         >
+            <div className="community-split-shell">
+                {communityPanels.map((panel) => (
+                    <article
+                        key={panel.eyebrow}
+                        className={`community-split-panel community-split-panel--${panel.tone}`}
+                    >
+
+                        <h2 className="clash community-split-title">
+                            {panel.title}
+                        </h2>
+
+                        <p className="community-split-description">
+                            {panel.description}
+                        </p>
+
+                        <ul className="community-split-list">
+                            {panel.bullets.map((item) => (
+                                <li
+                                    key={item}
+                                    className="community-split-list-item"
+                                >
+                                    <Check size={18} className="community-split-check" />
+                                    <span>{item}</span>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <button
+                            type="button"
+                            className="community-split-cta"
+                        >
+                            <span>{panel.cta}</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </article>
+                ))}
+            </div>
+        </motion.section>
+    );
+}
+
+function PlatformFeaturesSection({ containerRef }) {
+    const sectionRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start start", "end end"],
+        container: containerRef,
+    });
+
+    // Translate the row further to ensure the last card is fully revealed.
+    // Using -65% instead of -50% to account for gaps and container padding.
+    const xTranslate = useTransform(scrollYProgress, [0.1, 0.85], ["0%", "-55%"]);
+
+    return (
+        <section className="pf-sticky-wrapper" ref={sectionRef}>
+            <div className="pf-sticky-container">
+                <div className="pf-shell">
+                    <motion.div
+                        className="pf-header"
+                        initial={{ opacity: 0, y: 56 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.3, root: containerRef }}
+                        transition={{
+                            duration: 1.4,
+                            delay: 0.2,
+                            ease: [0.16, 1, 0.3, 1],
+                        }}
+                    >
+                        <h2 className="clash pf-headline">
+                            Every feature you need. <br />
+                            For both sides.
+                        </h2>
+                    </motion.div>
+
+                    <div className="pf-horizontal-row-container">
+                        <motion.div
+                            className="pf-single-row"
+                            style={{ x: xTranslate }}
+                        >
+                            {platformFeatures.map((feature, i) => (
+                                <div key={feature.title} className="pf-card">
+                                    <span className={`pf-card-tag pf-card-tag--${feature.tag.toLowerCase()}`}>
+                                        {feature.tag}
+                                    </span>
+                                    <div className="pf-card-icon">{feature.icon}</div>
+                                    <h3 className="pf-card-title">{feature.title}</h3>
+                                    <p className="pf-card-desc font-light">{feature.desc}</p>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function TestimonialCard({ t }) {
+    return (
+        <div className={`testimonial-card testimonial-card--${t.tone}`}>
+            <div className="testimonial-card-header">
+                <span className="testimonial-card-tag">
+                    <span className="testimonial-card-dot" />
+                    {t.type} • {t.category}
+                </span>
+            </div>
+            <p className="testimonial-card-quote">&ldquo;{t.quote}&rdquo;</p>
+            <div className="testimonial-card-footer">
+                <div className="testimonial-card-user">
+                    <div className="testimonial-card-avatar">{t.user.avatar}</div>
+                    <div className="testimonial-card-info">
+                        <span className="testimonial-card-name">{t.user.name}</span>
+                        <span className="testimonial-card-role">
+                            {t.user.role} • {t.user.location}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function TestimonialsSection({ containerRef }) {
+    // Split testimonials for two rows
+    const row1 = [...testimonials, ...testimonials]; // Duplicate for infinite scroll
+    const row2 = [...testimonials.slice().reverse(), ...testimonials.slice().reverse()];
+
+    return (
+        <section className="testimonials-section">
+            <div className="testimonials-shell">
+                <motion.div
+                    className="testimonials-header"
+                    initial={{ opacity: 0, y: 56 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.3, root: containerRef }}
+                    transition={{
+                        duration: 1.4,
+                        delay: 0.2,
+                        ease: [0.16, 1, 0.3, 1],
+                    }}
+                >
+                    <div className="testimonials-header-left">
+                        {/* <span className="testimonials-eyebrow">TESTIMONIALS</span> */}
+                        <h2 className="clash testimonials-headline">Real stories from real people</h2>
+                    </div>
+                    <div className="testimonials-rating">
+                        <div className="testimonials-stars">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={16} fill="#0b0b0b" color="#0b0b0b" />
+                            ))}
+                        </div>
+                        <span className="testimonials-rating-text">4.9 • Early access members</span>
+                    </div>
+                </motion.div>
+
+                <div className="testimonials-marquee-container">
+                    {/* Row 1: Right to Left */}
+                    <div className="testimonials-marquee-row">
+                        <motion.div
+                            className="testimonials-marquee-inner"
+                            animate={{ x: ["0%", "-50%"] }}
+                            transition={{
+                                duration: 30,
+                                ease: "linear",
+                                repeat: Infinity,
+                            }}
+                        >
+                            {row1.map((t, i) => (
+                                <TestimonialCard key={`row1-${i}`} t={t} />
+                            ))}
+                        </motion.div>
+                    </div>
+
+                    {/* Row 2: Left to Right */}
+                    <div className="testimonials-marquee-row">
+                        <motion.div
+                            className="testimonials-marquee-inner"
+                            animate={{ x: ["-50%", "0%"] }}
+                            transition={{
+                                duration: 35,
+                                ease: "linear",
+                                repeat: Infinity,
+                            }}
+                        >
+                            {row2.map((t, i) => (
+                                <TestimonialCard key={`row2-${i}`} t={t} />
+                            ))}
+                        </motion.div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+
+
+function HowItWorksSection({ containerRef }) {
+    const [activeTab, setActiveTab] = useState("creator");
+    const { bg, steps } = howItWorksSteps[activeTab];
+
+    return (
+        <div
+            className="hiw-section">
             {/* Background images — one per tab, cross-faded via opacity */}
             <div className="hiw-bg-layer">
                 <div
@@ -254,8 +709,17 @@ function HowItWorksSection() {
 
             <div className="hiw-shell">
                 {/* Header */}
-                <div className="hiw-header">
-                    <span className="hiw-eyebrow">HOW IT WORKS</span>
+                <motion.div
+                    className="hiw-header"
+                    initial={{ opacity: 0, y: 56 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.15, root: containerRef }}
+                    transition={{
+                        duration: 1.6,
+                        delay: 0.3,
+                        ease: [0.16, 1, 0.3, 1],
+                    }}
+                >
                     <h2 className="clash hiw-headline">Your journey starts here</h2>
 
                     {/* Tab toggle */}
@@ -275,7 +739,7 @@ function HowItWorksSection() {
                             I&apos;m a Client
                         </button>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Step cards */}
                 <div className="hiw-cards">
@@ -295,11 +759,11 @@ function HowItWorksSection() {
                     ))}
                 </div>
             </div>
-        </motion.section>
+        </div>
     );
 }
 
-const SCROLL_HEIGHT = `${slides.length * 120}vh`;
+const SCROLL_HEIGHT = `${slides.length * 180}vh`;
 
 function ScrollSlide({ slide, index, total, progress, reduceMotion }) {
     const segment = 1 / total;
@@ -372,13 +836,180 @@ function ScrollSlide({ slide, index, total, progress, reduceMotion }) {
     );
 }
 
+function ScrollSlideSecond({ slideSecond, index, total, progress, reduceMotion }) {
+    const segment = 1 / total;
+    const start = index * segment;
+    const end = start + segment;
+    const isLast = index === total - 1;
+
+    // Internal timing phases - Start zoom earlier for a "slower" feel
+    const readEnd = start + segment * 0.5; 
+    const zoomEnd = start + segment * 0.98;
+
+    const layerOpacity = useTransform(
+        progress,
+        [start, start + segment * 0.05, zoomEnd, end],
+        isLast ? [0, 1, 1, 1] : [0, 1, 1, 0]
+    );
+
+    const imageScale = useTransform(progress, [start, zoomEnd], [1.15, 1]);
+    const imageY = useTransform(progress, [start, zoomEnd], [20, 0]);
+
+    const copyOpacity = useTransform(
+        progress,
+        [start, start + segment * 0.05, readEnd, zoomEnd],
+        [0, 1, 1, 0]
+    );
+
+    const copyY = useTransform(
+        progress,
+        [start, readEnd, zoomEnd],
+        [20, 0, -40]
+    );
+
+    const copyScale = useTransform(
+        progress,
+        [start, readEnd, zoomEnd],
+        [0.98, 1, 15] // Reduced final scale and earlier start for slower growth
+    );
+
+    return (
+        <motion.div
+            className="absolute inset-0"
+            style={{ opacity: layerOpacity, zIndex: total - index }}
+        >
+            <motion.div
+                className="absolute inset-0"
+                style={
+                    reduceMotion
+                        ? undefined
+                        : {
+                              scale: imageScale,
+                              y: imageY,
+                          }
+                }
+            >
+                <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${slideSecond.bg})` }}
+                />
+            </motion.div>
+
+            <div className="scroll-story-overlay absolute inset-0" />
+
+            <motion.div
+                className="relative z-10 flex h-full items-center justify-center px-6 text-center"
+                style={
+                    reduceMotion
+                        ? { opacity: 1 }
+                        : {
+                              opacity: copyOpacity,
+                              y: copyY,
+                              scale: copyScale,
+                          }
+                }
+            >
+                <div className="mx-auto max-w-6xl">
+                    <h2 className="clash scroll-story-title text-[#CEFF1B] font-extrabold tracking-[-0.07em] flex items-center justify-center">
+                        {slideSecond.text}
+                    </h2>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+}
+
+function HomepageFAQSection({ containerRef }) {
+    const [activeTab, setActiveTab] = useState("creator");
+    const [expandedIndex, setExpandedIndex] = useState(-1);
+
+    const faqs = homepageFaqs[activeTab];
+
+    const toggleAccordion = (index) => {
+        setExpandedIndex(expandedIndex === index ? -1 : index);
+    };
+
+    return (
+        <section className="homepage-faq-section">
+            <div className="homepage-faq-shell">
+                <motion.div
+                    className="homepage-faq-header"
+                    initial={{ opacity: 0, y: 56 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.3, root: containerRef }}
+                    transition={{
+                        duration: 1.4,
+                        delay: 0.2,
+                        ease: [0.16, 1, 0.3, 1],
+                    }}
+                >
+                    <h2 className="clash homepage-faq-headline">
+                        Clear answers for <br /> both sides
+                    </h2>
+                    <div className="homepage-faq-tabs">
+                        <button
+                            type="button"
+                            className={`homepage-faq-tab ${activeTab === "creator" ? "active" : ""}`}
+                            onClick={() => {
+                                setActiveTab("creator");
+                                setExpandedIndex(-1);
+                            }}
+                        >
+                            For Creators
+                        </button>
+                        <button
+                            type="button"
+                            className={`homepage-faq-tab ${activeTab === "client" ? "active" : ""}`}
+                            onClick={() => {
+                                setActiveTab("client");
+                                setExpandedIndex(-1);
+                            }}
+                        >
+                            For Clients
+                        </button>
+                    </div>
+                </motion.div>
+
+                <div className="homepage-faq-accordion">
+                    {faqs.map((faq, index) => (
+                        <div
+                            key={`${activeTab}-${index}`}
+                            className={`homepage-faq-item ${expandedIndex === index ? "expanded" : ""}`}
+                        >
+                            <button
+                                type="button"
+                                className="homepage-faq-question"
+                                onClick={() => toggleAccordion(index)}
+                            >
+                                <span>{faq.question}</span>
+                                {expandedIndex === index ? (
+                                    <X size={20} strokeWidth={3} />
+                                ) : (
+                                    <Plus size={20} strokeWidth={3} />
+                                )}
+                            </button>
+                            <div className="homepage-faq-answer-wrapper">
+                                <div className="homepage-faq-answer">
+                                    <p>{faq.answer}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
+
 
 export default function HomePage() {
+    const containerRef = useRef(null);
     const buildSectionRef = useRef(null);
 
     const { scrollYProgress: buildProgress } = useScroll({
         target: buildSectionRef,
         offset: ["start end", "start start"],
+        container: containerRef,
     });
 
     const buildScale = useTransform(buildProgress, [0, 1], [0.85, 1]);
@@ -386,24 +1017,39 @@ export default function HomePage() {
     const buildOpacity = useTransform(buildProgress, [0, 0.3, 1], [0, 1, 1]);
 
     const sectionRef = useRef(null);
+    const sectionRefSecond = useRef(null);
     const [showNavbar, setShowNavbar] = useState(true);
     const reduceMotion = useReducedMotion();
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start start", "end end"],
+        container: containerRef,
     });
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 110,
         damping: 26,
         mass: 0.2,
     });
+    const { scrollYProgress: scrollYProgressSecond } = useScroll({
+        target: sectionRefSecond,
+        offset: ["start start", "end end"],
+        container: containerRef,
+    });
+    const smoothProgressSecond = useSpring(scrollYProgressSecond, {
+        stiffness: 40, // Lower stiffness for slower response
+        damping: 30,   // Higher damping to prevent bounce
+        mass: 1,
+    });
     const progressWidth = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
 
     useEffect(() => {
-        let lastScrollY = window.scrollY;
+        const container = containerRef.current;
+        if (!container) return;
+
+        let lastScrollY = container.scrollTop;
 
         const handleScroll = () => {
-            const currentScrollY = window.scrollY;
+            const currentScrollY = container.scrollTop;
 
             if (currentScrollY <= 16) {
                 setShowNavbar(true);
@@ -417,15 +1063,15 @@ export default function HomePage() {
         };
 
         handleScroll();
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        container.addEventListener("scroll", handleScroll, { passive: true });
 
         return () => {
-            window.removeEventListener("scroll", handleScroll);
+            container.removeEventListener("scroll", handleScroll);
         };
     }, []);
 
     return (
-        <div className="relative z-30">
+        <div className="h-screen overflow-hidden">
             <Navbar
                 className={`transition-all duration-300 ${
                     showNavbar
@@ -433,8 +1079,12 @@ export default function HomePage() {
                         : "-translate-y-full opacity-0 pointer-events-none"
                 }`}
             />
+            <div
+                ref={containerRef}
+                className="h-full overflow-y-auto custom-scroll"
+            >
             <section
-                className="homepage-hero relative flex min-h-screen items-start justify-start px-8 pt-24 sm:px-6 md:px-10 lg:px-20"
+                className="homepage-hero relative flex min-h-screen items-start justify-start px-8 pt-36 sm:px-6 md:px-10 lg:px-20"
                 style={{
                     backgroundImage: "url('/homepage-hero2.png')",
                     backgroundSize: "130%",
@@ -528,7 +1178,7 @@ export default function HomePage() {
                         className="build-domain-header"
                         initial={{ opacity: 0, y: 48 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: false, amount: 0.3 }}
+                        viewport={{ once: false, amount: 0.3, root: containerRef }}
                         transition={{
                             duration: 0.75,
                             ease: [0.22, 1, 0.36, 1],
@@ -574,6 +1224,7 @@ export default function HomePage() {
                                             viewport={{
                                                 once: false,
                                                 amount: 0.2,
+                                                root: containerRef
                                             }}
                                             transition={{
                                                 duration: 0.8,
@@ -635,7 +1286,7 @@ export default function HomePage() {
                 className="bring-together-section"
                 initial={{ opacity: 0, y: 56 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
+                viewport={{ once: false, amount: 0.2, root: containerRef }}
                 transition={{
                     duration: 1.6,
                     delay: 0.3,
@@ -648,9 +1299,6 @@ export default function HomePage() {
                             key={panel.eyebrow}
                             className={`bring-together-panel bring-together-panel-${panel.tone}`}
                         >
-                            <span className="bring-together-eyebrow">
-                                {panel.eyebrow}
-                            </span>
 
                             <h2 className="clash bring-together-title">
                                 {panel.title}
@@ -683,31 +1331,60 @@ export default function HomePage() {
                 </div>
             </motion.section>
 
-            <motion.section
-                className="tagline-section"
-                initial={{ opacity: 0, y: 56 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{
-                    duration: 1.6,
-                    delay: 0.3,
-                    ease: [0.16, 1, 0.3, 1],
-                }}
-            >
-
-                <div className="tagline-shell">
+            <section className="tagline-section">
+                <motion.div
+                    className="tagline-shell"
+                    initial={{ opacity: 0, y: 56 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.3, root: containerRef }}
+                    transition={{
+                        duration: 1.4,
+                        delay: 0.2,
+                        ease: [0.16, 1, 0.3, 1],
+                    }}
+                >
                     <h2 className="clash tagline-headline tracking-[-0.07em] font-extrabold">
                         Great work <br /> happens when <br /> great talent <br />meets great <br />clients.
                     </h2>
                     <p className="tagline-sub">
                         Ultra Hustle is the place where both sides of that equation finally get what they came for — in one marketplace built for both.
                     </p>
+                </motion.div>
+            </section>
+
+            <HowItWorksSection containerRef={containerRef} />
+
+            <TrustSection containerRef={containerRef} />
+
+            <CommunitySplitSection containerRef={containerRef} />
+
+            <PlatformFeaturesSection containerRef={containerRef} />
+            <TestimonialsSection containerRef={containerRef} />
+            <HomepageFAQSection containerRef={containerRef} />
+
+            <section
+                ref={sectionRefSecond}
+                className="relative overflow-clip bg-[#040404]"
+                style={{ height: SCROLL_HEIGHT }}
+            >
+                <div className="sticky top-0 h-screen overflow-hidden">
+                    <div className="absolute inset-0 bg-white" />
+
+                    {slidesSecond.map((slide, index) => (
+                        <ScrollSlideSecond
+                            key={`${slide.text}-${index}`}
+                            slideSecond={slide}
+                            index={index}
+                            total={slidesSecond.length}
+                            progress={smoothProgressSecond}
+                            reduceMotion={reduceMotion}
+                        />
+                    ))}
                 </div>
-            </motion.section>
+            </section>
 
-            <HowItWorksSection />
-
-            <TrustSection />
+            <Footer containerRef={containerRef} />
+            </div>
         </div>
     );
 }

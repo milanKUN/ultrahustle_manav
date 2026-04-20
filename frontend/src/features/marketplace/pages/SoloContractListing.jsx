@@ -272,7 +272,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
               theme={theme}
           />
 
-          <div className="pt-[85px] flex relative z-10 w-full h-full cnc-pageLayout">
+          <div className="pt-[72px] flex relative z-10 w-full h-full cnc-pageLayout">
               {/* ---------- SIDEBAR ---------- */}
               <Sidebar
                   expanded={sidebarOpen}
@@ -288,7 +288,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
               {/* Main Content Wrapper */}
               <div className="relative flex-1 min-w-5 overflow-hidden cnc-pageContent">
                   {/* Scrollable Area */}
-                  <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] p-4 cnc-pageScroll">
+                  <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)] p-4 cnc-pageScroll">
                       <div className={`cnc-readonlyWrap ${readOnly ? "is-readonly" : ""}`}>
                           {readOnly && <div className="cnc-readonlyOverlay" aria-hidden="true" />}
                       <main className="cnc-main w-full">

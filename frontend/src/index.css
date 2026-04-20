@@ -11,13 +11,12 @@
   outline: 1px solid red;
 } */
 
+html,
 body {
+  height: 100%;
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  overflow: hidden;
   width: 100%;
-  display: block;
-  overflow-x: hidden;
 }
 
 /* ===== Global Custom Scrollbar ===== */
@@ -40,10 +39,29 @@ body {
   background-color: #b9e600;
 }
 
-/* Firefox support */
-* {
+/* Custom Scroll Class for internal containers */
+.custom-scroll {
   scrollbar-width: thin;
   scrollbar-color: #ceff1b #f2f2f2;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f2f2f2;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #ceff1b;
+  border-radius: 10px;
+  border: 2px solid #f2f2f2;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #b9e600;
 }
 
 /* Dark Mode Scrollbar Styling */
@@ -62,14 +80,14 @@ body {
   background-color: #666;
 }
 
-.user-page.dark * {
+.user-page.dark body {
   scrollbar-color: #ceff1b #1a1a1a;
 }
 
 /* rest of your CSS below */
 html {
   scroll-behavior: smooth;
-  scrollbar-gutter: stable;
+  overflow: hidden;
 }
 
 @layer base {

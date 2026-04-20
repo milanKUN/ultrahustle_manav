@@ -70,7 +70,7 @@ export default function MyCartPage({ theme, setTheme }) {
         onDropdownChange={setIsDropdownOpen}
       />
 
-      <div className="pt-[85px] flex relative w-full">
+      <div className="pt-[72px] flex relative w-full">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -83,7 +83,7 @@ export default function MyCartPage({ theme, setTheme }) {
         />
 
         <div className="relative flex-1 min-w-0 overflow-hidden w-full">
-          <div className="relative overflow-y-auto h-[calc(100vh-85px)] w-full">
+          <div className="relative overflow-y-auto h-[calc(100vh-72px)] w-full">
             <main className={`my-cart-main ${isDropdownOpen ? "blurred" : ""}`}>
               <section className="my-cart-shell">
                 <header className="my-cart-head">

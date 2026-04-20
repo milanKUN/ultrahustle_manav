@@ -26,7 +26,7 @@ export default function Navbar({ className = "" }) {
         {/* LEFT : Logo */}
         <Link to="/" className="flex items-center">
           <img
-            src="/logo.png"
+            src="/UHlogo.png"
             alt="UltraHustle Logo"
             className="h-8 sm:h-9 object-contain"
           />

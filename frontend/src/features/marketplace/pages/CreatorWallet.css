@@ -11,7 +11,7 @@
 }
 
 .creator-wallet-main {
-  min-height: calc(100vh - 85px);
+  min-height: calc(100vh - 72px);
   background:
     radial-gradient(circle at top left, rgba(214, 255, 31, 0.13), transparent 28%),
     linear-gradient(180deg, #f7f7f3 0%, #f2f2ee 100%);

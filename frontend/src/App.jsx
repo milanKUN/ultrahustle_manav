@@ -4,6 +4,7 @@ import ProtectedRoute from "../src/components/ProtectedRoute.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./features/landing/pages/Home";
 import HomePage from "./features/landing/pages/HomePage";
+import Test from "./features/landing/pages/Test";
 import User from "./features/dashboard/pages/User";
 import DesktopLogin from "./features/auth/pages/DesktopLogin";
 import DesktopSignup from "./features/auth/pages/DesktopSignup";
@@ -113,6 +114,7 @@ export default function App() {
             <div className="app">
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/test" element={<Test />} />
                     <Route path="/homepage" element={<HomePage />} />
                     <Route
                         path="/setting"

@@ -179,7 +179,7 @@ export default function MyListings({ theme = "light", setTheme }) {
                 theme={theme}
             />
 
-            <div className="pt-[85px] flex relative z-10 w-full h-full">
+            <div className="pt-[72px] flex relative z-10 w-full h-full">
                 {/* ---------- SIDEBAR ---------- */}
                 <Sidebar
                     expanded={sidebarOpen}
@@ -194,7 +194,7 @@ export default function MyListings({ theme = "light", setTheme }) {
 
                 {/* ---------- MAIN CONTENT ---------- */}
                 <div className="relative flex-1 min-w-5 overflow-hidden">
-                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
                         <main className="mylis-main w-full">
 
                             {/* Header */}

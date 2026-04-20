@@ -8,7 +8,7 @@
 .resolution-center-layout {
   display: flex;
   width: 100%;
-  padding-top: 85px;
+  padding-top: 72px;
 }
 
 .resolution-center-contentWrap {
@@ -21,7 +21,7 @@
 .resolution-center-scroll {
   position: relative;
   width: 100%;
-  height: calc(100vh - 85px);
+  height: calc(100vh - 72px);
   overflow-y: auto;
 }
 

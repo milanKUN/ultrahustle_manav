@@ -318,9 +318,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
           isSidebarOpen={sidebarOpen}
           theme={theme}
         />
-        <div className="pt-[85px] flex relative z-10">
+        <div className="pt-[72px] flex relative z-10">
           <div className="relative flex-1 min-w-0 overflow-hidden">
-            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+            <div className="overflow-y-auto h-[calc(100vh-72px)]">
               <div className="tsl-page">
                 <div className="content-card">
                   <p className="card-text">Loading digital product listing...</p>
@@ -342,9 +342,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
           isSidebarOpen={sidebarOpen}
           theme={theme}
         />
-        <div className="pt-[85px] flex relative z-10">
+        <div className="pt-[72px] flex relative z-10">
           <div className="relative flex-1 min-w-0 overflow-hidden">
-            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+            <div className="overflow-y-auto h-[calc(100vh-72px)]">
               <div className="tsl-page">
                 <div className="content-card">
                   <p className="card-text text-red-600">
@@ -368,9 +368,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
         theme={theme}
       />
 
-      <div className="pt-[85px] flex relative z-10 transition-all duration-300">
+      <div className="pt-[72px] flex relative z-10 transition-all duration-300">
         <div className="relative flex-1 min-w-0 overflow-hidden">
-          <div className="overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="overflow-y-auto h-[calc(100vh-72px)]">
             <div className={`tsl-page ${theme}`}>
               <div className="tsl-header">
                 <h1 className="tsl-title">{listing?.title || "Digital Product"}</h1>

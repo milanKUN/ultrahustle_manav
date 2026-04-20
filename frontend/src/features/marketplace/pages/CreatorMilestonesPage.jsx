@@ -188,7 +188,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
         setTheme={setTheme}
       />
 
-      <div className="pt-[85px] flex relative z-10">
+      <div className="pt-[72px] flex relative z-10">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -201,7 +201,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
         />
 
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <div className={`ms-wrap ${isUploadModalOpen ? "ms-wrap--blurred" : ""}`}>
               {/* Top tabs */}
               <div className="ms-topbar">

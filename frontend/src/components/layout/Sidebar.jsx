@@ -237,7 +237,7 @@ export default function Sidebar({
       <div className="flex">
         {!isMobile && !expanded && (
           <aside
-            className="sidebar w-14 flex flex-col items-center py-4 sticky top-[85px] h-[calc(100vh-85px)] overflow-y-auto scrollbar-hide"
+            className="sidebar w-14 flex flex-col items-center py-4 sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto scrollbar-hide"
             style={{
               backgroundColor: "var(--card)",
               msOverflowStyle: "none",
@@ -304,8 +304,8 @@ export default function Sidebar({
             className={`
               ${
                 isMobile
-                  ? "fixed top-0 left-0 h-screen w-[289px] z-[9999] pt-[85px]"
-                  : "sticky top-[85px] w-[289px] min-w-[289px] h-[calc(100vh-85px)]"
+                  ? "fixed top-0 left-0 h-screen w-[289px] z-[9999] pt-[72px]"
+                  : "sticky top-[72px] w-[289px] min-w-[289px] h-[calc(100vh-72px)]"
               }
               px-6 py-6 flex flex-col
               overflow-y-auto scrollbar-hide
@@ -519,7 +519,7 @@ export default function Sidebar({
 
         {showSettings && !isMobile && (
           <aside
-            className="w-[238px] border-l sticky top-[85px] h-[calc(100vh-85px)] overflow-y-auto scrollbar-hide"
+            className="w-[238px] border-l sticky top-[72px] h-[calc(100vh-72px)] overflow-y-auto scrollbar-hide"
             style={{
               backgroundColor: "var(--card)",
               borderColor: "var(--border)",

@@ -47,16 +47,11 @@
   flex-shrink: 0;
 }
 
-.logo {
-  height: 34px;
-  width: auto;
-  margin-left: 0;
-}
 
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 56px;
+  gap: 46px;
 }
 
 .nav-link {
@@ -659,7 +654,7 @@
   color: #1a1a1a;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(206, 255, 27, 0.45),
-              0 1px 3px rgba(0, 0, 0, 0.12);
+    0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 /* ---- Dark mode variants ---- */
@@ -1850,6 +1845,7 @@ USER DROPDOWN – DARK MODE FIX
 
 /* --- Tablet: 551px – 950px --- */
 @media (min-width: 551px) and (max-width: 950px) {
+
   /* Dropdown fixed below navbar, pinned to right edge */
   .user-dropdown {
     position: fixed !important;
@@ -1880,6 +1876,7 @@ USER DROPDOWN – DARK MODE FIX
 
 /* --- Mobile: ≤550px --- */
 @media (max-width: 550px) {
+
   /* Dropdown fixed, pinned to right edge */
   .user-dropdown {
     position: fixed !important;

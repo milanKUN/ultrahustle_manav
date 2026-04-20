@@ -220,7 +220,7 @@ const ManageTeam = (props) => {
         />
 
         <div className="relative flex-1 min-w-0 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <main
               className={`manage-team-main p-4 md:p-6 lg:p-10 ${
                 isDropdownOpen ? "blurred" : ""

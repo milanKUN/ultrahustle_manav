@@ -204,7 +204,7 @@ export default function MessageBox({ theme, setTheme }) {
                 theme={theme}
             />
 
-            <div className="pt-[85px] flex relative w-full">
+            <div className="pt-[72px] flex relative w-full">
                 <Sidebar
                     expanded={sidebarOpen}
                     setExpanded={setSidebarOpen}

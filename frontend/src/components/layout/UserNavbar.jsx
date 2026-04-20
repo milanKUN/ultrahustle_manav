@@ -285,7 +285,7 @@ const NavbarLight = ({ onDropdownChange, theme = "light", setTheme, toggleSideba
           )}
 
           <Link to="/">
-            <img src="/logo.png" alt="UltraHustle" className="logo" />
+            <img src="/UHlogo.png" alt="UltraHustle" className="logo h-8 sm:h-9 object-contain" />
           </Link>
 
           <nav className="nav-menu">

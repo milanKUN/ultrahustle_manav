@@ -484,10 +484,10 @@ const TeamServiceListing = ({ theme, setTheme }) => {
                 theme={theme}
             />
 
-            <div className="pt-[85px] flex relative z-10 transition-all duration-300">
+            <div className="pt-[72px] flex relative z-10 transition-all duration-300">
                 {/* MAIN CONTENT */}
                 <div className="relative flex-1 min-w-0 overflow-hidden">
-                    <div className="overflow-y-auto h-[calc(100vh-85px)]">
+                    <div className="overflow-y-auto h-[calc(100vh-72px)]">
                         <div className={`tsl-page ${theme}`}>
                             <div className="tsl-header">
                                 <h1 className="tsl-title">

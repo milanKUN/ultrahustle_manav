@@ -8,7 +8,7 @@
 }
 
 .alp-layout-body {
-  padding-top: 85px;  /* Match UserNavbar */
+  padding-top: 72px;  /* Match UserNavbar */
   display: flex;
   position: relative;
   z-index: 10;
@@ -28,7 +28,7 @@
   position: relative;
   z-index: 10;
   overflow-y: auto;
-  height: calc(100vh - 85px);
+  height: calc(100vh - 72px);
   width: 100%;
 }
 
