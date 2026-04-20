@@ -326,11 +326,26 @@ export default function CreateServiceListing({
         }
 
         if (Array.isArray(item.deliverables) && item.deliverables.length) {
-          setMainDeliverables(item.deliverables);
+          setMainDeliverables(
+            item.deliverables.map((d) => ({
+              file: null,
+              notes: d.notes || "",
+              existing_file_name: d.file_name || "",
+              existing_file_url: d.file_url || "",
+              name: d.file_name,
+              size: d.file_size,
+            }))
+          );
           setNotes(item.deliverables.map(d => d.notes || ""));
         } else {
           setMainDeliverables([]);
           setNotes([]);
+        }
+
+        if (Array.isArray(item.portfolio_projects)) {
+          setPortfolioProjects(item.portfolio_projects);
+        } else {
+          setPortfolioProjects([]);
         }
 
         const gallery = Array.isArray(item.gallery) ? item.gallery : [];
@@ -521,9 +536,10 @@ export default function CreateServiceListing({
       tags,
       faqs: faqs.filter((f) => String(f.q || "").trim() || String(f.a || "").trim()),
       links: links.filter(Boolean),
-      deliverables: mainDeliverables.map((file, index) => ({
-        file,
-        notes: notes[index] || "",
+      deliverables: mainDeliverables.map((d, index) => ({
+        file: d instanceof File ? d : (d.file instanceof File ? d.file : null),
+        notes: notes[index] || (typeof d === 'object' ? d.notes : "") || "",
+        existing_file_url: d.existing_file_url || d.file_url || ""
       })),
       portfolio_projects: Array.isArray(portfolioProjects) ? portfolioProjects : [],
 
@@ -1218,11 +1234,11 @@ export default function CreateServiceListing({
 
                 <div className="csl-card">
                   <DeliverablesSection
-                    deliverables={mainDeliverables.map((file, idx) => ({
-                      file: file instanceof File ? file : null,
-                      file_name: file.file_name || file.name,
-                      file_size: file.file_size || file.size,
-                      notes: notes[idx] || "",
+                    deliverables={mainDeliverables.map((d, idx) => ({
+                      file: d instanceof File ? d : (d.file instanceof File ? d.file : null),
+                      name: d.file_name || d.name,
+                      size: d.file_size || d.size,
+                      notes: notes[idx] || (typeof d === 'object' ? d.notes : "") || "",
                     }))}
                     onAddDeliverable={(file) => {
                       setMainDeliverables((p) => [...p, file]);

@@ -1292,7 +1292,11 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'cover_media_path',
                 'created_at',
                 'updated_at',
-            ]);
+            ])
+            ->map(function ($l) {
+                $l->cover_media_url = $l->cover_media_path ? Storage::disk('public')->url($l->cover_media_path) : null;
+                return $l;
+            });
 
         return response()->json([
             'success' => true,

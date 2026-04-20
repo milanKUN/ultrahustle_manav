@@ -4,6 +4,7 @@ import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "./MyListings.css";
 import "../../../Darkuser.css";
+import { getMyListings } from "../api/listingApi";
 
 // SVG Icons for tabs and cards
 const PackageIcon = () => (
@@ -104,9 +105,27 @@ export default function MyListings({ theme = "light", setTheme }) {
     const [statusFilter, setStatusFilter] = useState("All Statuses");
     const [openStatusDropdown, setOpenStatusDropdown] = useState(false);
 
+    const [listings, setListings] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
     }, [sidebarOpen]);
+
+    useEffect(() => {
+        const fetchListings = async () => {
+            try {
+                setIsLoading(true);
+                const res = await getMyListings();
+                setListings(res?.listings || []);
+            } catch (error) {
+                console.error("Failed to fetch listings", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchListings();
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = () => {
@@ -134,33 +153,23 @@ export default function MyListings({ theme = "light", setTheme }) {
         { name: "Teams", icon: <UsersIcon /> },
     ];
 
-    // Dummy data matching the screenshot
-    const listings = [
-        {
-            id: 1,
-            title: "Notion Content Calendar",
-            price: "$29",
-            updated: "Feb 26, 2026",
-            status: "Active",
-            img: "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        },
-        {
-            id: 2,
-            title: "Notion Content Calendar",
-            price: "$29",
-            updated: "Feb 26, 2026",
-            status: "Paused",
-            img: "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        },
-        {
-            id: 3,
-            title: "Notion Content Calendar",
-            price: "$29",
-            updated: "Feb 26, 2026",
-            status: "Draft",
-            img: "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        },
-    ];
+    const typeMap = {
+        'digital_product': 'Products',
+        'service': 'Services',
+        'course': 'Courses',
+        'webinar': 'Webinar'
+    };
+
+    const filteredListings = listings.filter(l => {
+        const tabName = typeMap[l.listing_type] || 'Other';
+        if (activeTab === 'Teams') return false; 
+        
+        const matchesTab = tabName === activeTab;
+        const matchesStatus = statusFilter === "All Statuses" || 
+                           (l.status && l.status.toLowerCase() === statusFilter.toLowerCase());
+                           
+        return matchesTab && matchesStatus;
+    });
 
     return (
         <div className={`user-page ${theme} min-h-screen relative overflow-hidden mylis-shell`}>
@@ -264,7 +273,11 @@ export default function MyListings({ theme = "light", setTheme }) {
 
                             {/* Grid */}
                             <div className="mylis-grid">
-                                {listings.map((item) => {
+                                {isLoading ? (
+                                    <div className="py-20 text-center w-full opacity-50">Loading listings...</div>
+                                ) : filteredListings.length === 0 ? (
+                                    <div className="py-20 text-center w-full opacity-50">No listings found in this category.</div>
+                                ) : filteredListings.map((item) => {
                                     const getRoute = () => {
                                         switch (activeTab) {
                                             case "Products": return "/digital-product-listing";
@@ -283,7 +296,11 @@ export default function MyListings({ theme = "light", setTheme }) {
                                             onClick={() => navigate(getRoute())}
                                         >
                                         <div className="mylis-card-img-wrap">
-                                            <img src={item.img} alt={item.title} className="mylis-card-img" />
+                                            <img 
+                                                src={item.cover_media_url || item.img || "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"} 
+                                                alt={item.title} 
+                                                className="mylis-card-img" 
+                                            />
                                         </div>
                                         <div className="mylis-card-body">
                                             <div className="mylis-card-top">
@@ -293,7 +310,9 @@ export default function MyListings({ theme = "light", setTheme }) {
                                                     </div>
                                                     <div className="mylis-card-info">
                                                         <h3>{item.title}</h3>
-                                                        <p>{item.price} • Updated {item.updated}</p>
+                                                        <p>
+                                                            {item.price ? `$${item.price}` : "Price TBD"} • Updated {item.updated_at ? new Date(item.updated_at).toLocaleDateString() : "Recently"}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div className="mylis-dropdown-wrap">
@@ -307,7 +326,18 @@ export default function MyListings({ theme = "light", setTheme }) {
                                                     {openDropdown === item.id && (
                                                         <div className="mylis-dropdown-menu" onClick={(e) => e.stopPropagation()}>
                                                             <div className="mylis-dropdown-header">Actions</div>
-                                                            <button className="mylis-dropdown-item">
+                                                            <button 
+                                                                className="mylis-dropdown-item"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const type = item.listing_type;
+                                                                    const slug = item.username || item.id;
+                                                                    if (type === 'digital_product') navigate(`/edit-digital-product/${slug}`);
+                                                                    else if (type === 'service') navigate(`/edit-service/${slug}`);
+                                                                    else if (type === 'course') navigate(`/edit-course/${slug}`);
+                                                                    else if (type === 'webinar') navigate(`/edit-webinar/${slug}`);
+                                                                }}
+                                                            >
                                                                 <EditIcon /> Edit
                                                             </button>
                                                             <button className="mylis-dropdown-item">
