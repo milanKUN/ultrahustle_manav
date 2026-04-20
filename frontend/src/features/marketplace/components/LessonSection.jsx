@@ -19,11 +19,19 @@ const LessonSection = ({ lessons, onAddLesson, onRemoveLesson, onUpdateLesson, o
                         <div className={`lesson-media-box ${lesson.media ? 'has-media' : ''}`}>
                             {lesson.media ? (
                                 <>
-                                    <img
-                                        src={lesson.media?.preview || lesson.media}
-                                        alt={`Lesson ${index + 1}`}
-                                        className="lesson-media-preview"
+                                    {lesson.media?.type === 'video' ? (
+                                        <video
+                                            src={lesson.media?.preview || (lesson.media?.url || (typeof lesson.media === 'string' ? lesson.media : ''))}
+                                            className="lesson-media-preview"
+                                            controls
                                         />
+                                    ) : (
+                                        <img
+                                            src={lesson.media?.preview || (lesson.media?.url || (typeof lesson.media === 'string' ? lesson.media : ''))}
+                                            alt={`Lesson ${index + 1}`}
+                                            className="lesson-media-preview"
+                                        />
+                                    )}
                                     <div className="lesson-media-overlay">
                                         <button 
                                             className="lesson-remove-btn" 

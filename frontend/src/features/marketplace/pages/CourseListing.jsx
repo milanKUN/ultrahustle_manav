@@ -12,6 +12,7 @@ import {
   Clock,
   X,
   Play,
+  CheckCircle2 
 } from "lucide-react";
 import "./CourseListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
@@ -198,16 +199,21 @@ const CourseListing = ({ theme, setTheme }) => {
       .map((item) => toMediaUrl(String(item || "")))
       .filter(Boolean);
 
-    if (normalizedGallery.length) return normalizedGallery;
-
     const cover =
       listing?.cover_media_url ||
       listing?.cover_media_path ||
       listing?.cover ||
       "";
+    const coverUrl = cover ? toMediaUrl(cover) : "";
 
-    return cover ? [toMediaUrl(cover)] : [];
-  }, [listing]);
+    const portfolioImages = (Array.isArray(portfolioProjects) ? portfolioProjects : [])
+      .map((p) => getPortfolioImage(p))
+      .filter(Boolean);
+
+    const combined = [...new Set([coverUrl, ...normalizedGallery, ...portfolioImages].filter(Boolean))];
+
+    return combined.length ? combined : [];
+  }, [listing, portfolioProjects]);
 
   const courseDetails = useMemo(() => listing?.details || {}, [listing]);
 
@@ -283,8 +289,8 @@ const CourseListing = ({ theme, setTheme }) => {
     ? courseDetails.learning_points
     : [];
 
-  const prerequisites = Array.isArray(courseDetails?.prerequisites)
-    ? courseDetails.prerequisites
+  const courseIncludes = Array.isArray(courseDetails?.included)
+    ? courseDetails.included
     : [];
 
   const languages = Array.isArray(courseDetails?.languages)
@@ -502,15 +508,7 @@ const CourseListing = ({ theme, setTheme }) => {
 
                   <div className="cl-section">
                     <h2>Prerequisites</h2>
-                    {prerequisites.length ? (
-                      <ul className="cl-bullet-list">
-                        {prerequisites.map((point, index) => (
-                          <li key={`${point}-${index}`}>{point}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No prerequisites added yet.</p>
-                    )}
+                      <p>{listing?.about || listing?.about || "No Prerequisites added yet."}</p>
                   </div>
 
                   <div className="cl-section">
@@ -555,18 +553,39 @@ const CourseListing = ({ theme, setTheme }) => {
                   <div className="cl-pricing-content">
                     <div className="cl-price-row">
                       <div className="cl-price-info">
-                        <span className="cl-price-label">Level</span>
+                        <span className="cl-price-label">Price</span>
                         <span className="cl-price">
-                          {courseDetails?.course_level || "—"}
+                          ${listing?.price || "—"}
                         </span>
                       </div>
                     </div>
 
                     <div className="cl-divider"></div>
 
+                    <div className="cl-section">
+                      <h2>Course Includes</h2>
+
+                      {/* {courseIncludes.map((item, index) => (
+                        <div className="cl-include-item" key={`${item}-${index}`}>
+                          <CheckCircle2 size={18} />
+                          <span>{item}</span>
+                        </div>
+                      ))} */}
+                      
+                      {courseIncludes.length ? (
+                        <ul className="cl-bullet-list">
+                          {courseIncludes.map((point, index) => (
+                            <li key={`${point}-${index}`}>{point}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No learning points added yet.</p>
+                      )}
+                    </div>
+                    
                     <div className="cl-pricing-actions">
-                      <button className="cl-btn-primary">Enroll now</button>
-                      <button className="cl-btn-outline">Chat first</button>
+                      <button className="cl-btn-primary">Buy now</button>
+                      <button className="cl-btn-outline">Add to Cart</button>
                     </div>
                   </div>
                 </div>

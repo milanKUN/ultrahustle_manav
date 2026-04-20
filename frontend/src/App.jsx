@@ -46,6 +46,7 @@ import SoloMilestonesPage from "./features/marketplace/pages/SoloMilestonesPage"
 import CreatorWallet from "./features/marketplace/pages/CreatorWallet";
 import ClientWallet from "./features/marketplace/pages/ClientWallet";
 import CreateServiceListing from "./features/marketplace/pages/CreateServiceListing";
+import EditServiceListing from "./features/marketplace/pages/EditServiceListing";
 import CreateDigitalProduct from "./features/marketplace/pages/CreateDigitalProduct";
 import EditDigitalProduct from "./features/marketplace/pages/EditDigitalProduct";
 import Marketplace from "./features/marketplace/pages/Marketplace";
@@ -449,6 +450,16 @@ export default function App() {
                     <Route
                         path="/edit-course/:username"
                         element={<EditCourse />}
+                    />
+                    <Route
+                        path="/edit-service/:username"
+                        element={<EditServiceListing />}
+                    />
+                    <Route
+                        path="/service/:username"
+                        element={
+                            <ServiceListing theme={theme} setTheme={setTheme} />
+                        }
                     />
                     {/* <Route
                         path="/webinar/:username"

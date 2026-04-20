@@ -83,6 +83,7 @@ const createPreviewFile = (file) => ({
 
 export default function MyPortfolio({
   onSuccess,
+  onChange,
   mode = "user",
   teamId = null,
   listingId = null,
@@ -129,7 +130,7 @@ export default function MyPortfolio({
   );
 
   const canUsePortfolio =
-    mode === "team" ? !!teamId : mode === "listing" ? !!listingId : true;
+  mode === "team" ? !!teamId : true;
 
   const showToast = (title, message = "", type = "success") => {
     setToast({ open: true, title, message, type });
@@ -146,6 +147,12 @@ export default function MyPortfolio({
   };
 
   const refreshPortfolio = async () => {
+    if (mode === "listing" && !listingId) {
+      setMainProject(emptyProject("main"));
+      setProjects([emptyProject(1), emptyProject(2), emptyProject(3)]);
+      setError("");
+      return;
+    }
     if (!canUsePortfolio) {
       setMainProject(emptyProject("main"));
       setProjects([emptyProject(1), emptyProject(2), emptyProject(3)]);
@@ -323,6 +330,27 @@ export default function MyPortfolio({
     }));
   };
 
+  const buildProjectsForParent = () => {
+    const combined = [
+      { ...mainProject, _sort: 0 },
+      ...projects.map((p, idx) => ({ ...p, _sort: idx + 1 })),
+    ];
+
+    return combined.map((p) => ({
+      title: p.title || "",
+      description: p.desc || "",
+      cost: p.cost || "",
+      sort_order: p._sort,
+      files: (p.files || []).map((f) => f.file),
+    }));
+  };
+
+  useEffect(() => {
+    if (typeof onChange === "function") {
+      onChange(buildProjectsForParent());
+    }
+  }, [mainProject, projects, onChange]);
+
   const handleSaveChanges = async () => {
     if (!canUsePortfolio) {
       setError(
@@ -431,13 +459,7 @@ export default function MyPortfolio({
               Create the team first, then you can add its portfolio here.
             </p>
           </div>
-        ) : mode === "listing" && !listingId ? (
-          <div className="border border-dashed border-[#CEFF1B] rounded-2xl p-8 bg-white/70">
-            <p className="text-sm text-gray-700">
-              Save the listing first, then you can add its portfolio here.
-            </p>
-          </div>
-        ) : (
+        )  : (
           <>
             <PortfolioCard
               isMain
@@ -511,24 +533,26 @@ export default function MyPortfolio({
               </button>
             </div>
 
-            <div className="flex justify-end gap-4 mt-10">
-              <button
-                type="button"
-                onClick={handleDiscard}
-                disabled={isSaving || isLoading}
-                className="px-4 py-2 border-[0.6px] border-black rounded"
-              >
-                Discard
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveChanges}
-                disabled={isSaving || isLoading}
-                className="bg-[#CEFF1B] border-[0.6px] border-black px-4 py-2 rounded"
-              >
-                {isSaving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
+            {mode !== "listing" && (
+              <div className="flex justify-end gap-4 mt-10">
+                <button
+                  type="button"
+                  onClick={handleDiscard}
+                  disabled={isSaving || isLoading}
+                  className="px-4 py-2 border-[0.6px] border-black rounded"
+                >
+                  Discard
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveChanges}
+                  disabled={isSaving || isLoading}
+                  className="bg-[#CEFF1B] border-[0.6px] border-black px-4 py-2 rounded"
+                >
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            )}
           </>
         )}
 

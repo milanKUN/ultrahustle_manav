@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Maximize2,
   Check,
-  Star,
   ChevronDown,
   Clock,
   X,
@@ -44,6 +43,21 @@ const getPortfolioImage = (project) => {
   return "";
 };
 
+const getPortfolioMedia = (project) => {
+  const media = Array.isArray(project?.media) ? project.media : [];
+  if (media.length) {
+    return media
+      .map((item) => ({
+        url: item?.url || toMediaUrl(item?.path || ""),
+        type: item?.type || "image",
+      }))
+      .filter((item) => item.url);
+  }
+
+  const fallback = getPortfolioImage(project);
+  return fallback ? [{ url: fallback, type: "image" }] : [];
+};
+
 const currencyText = (value) => {
   if (value === null || value === undefined || value === "") return "—";
   const numeric = Number(value);
@@ -60,11 +74,25 @@ const normalizeFaqs = (faqs = []) =>
     }))
     .filter((faq) => faq.question || faq.answer);
 
+const listingTypeToRouteSlug = (type = "") => {
+  switch (type) {
+    case "digital_product":
+      return "digital-product";
+    case "service":
+      return "service";
+    case "course":
+      return "course";
+    case "webinar":
+      return "webinar";
+    default:
+      return type || "listing";
+  }
+};
+
 const DigitalProductListing = ({ theme, setTheme }) => {
   const navigate = useNavigate();
   const { username } = useParams();
 
-  const [activeTab, setActiveTab] = useState("");
   const [activeImg, setActiveImg] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showMoreListings, setShowMoreListings] = useState(false);
@@ -72,8 +100,10 @@ const DigitalProductListing = ({ theme, setTheme }) => {
   const [modalImgIndex, setModalImgIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
-  const [activeItem, setActiveItem] = useState(null);
-  const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [activePortfolioProject, setActivePortfolioProject] = useState(null);
+  const [activePortfolioProjectIndex, setActivePortfolioProjectIndex] = useState(0);
+  const [activePortfolioMediaIndex, setActivePortfolioMediaIndex] = useState(0);
+
   const [favorites, setFavorites] = useState(new Set());
   const [filter, setFilter] = useState("All");
 
@@ -87,24 +117,8 @@ const DigitalProductListing = ({ theme, setTheme }) => {
   const [creator, setCreator] = useState(null);
   const [portfolioProjects, setPortfolioProjects] = useState([]);
   const [faqData, setFaqData] = useState([]);
-  const [listingPackages, setListingPackages] = useState([]);
   const [recommendedListings, setRecommendedListings] = useState([]);
   const [moreFromUserListings, setMoreFromUserListings] = useState([]);
-
-  const listingTypeToRouteSlug = (type = "") => {
-    switch (type) {
-      case "digital_product":
-        return "digital-product";
-      case "service":
-        return "service";
-      case "course":
-        return "course";
-      case "webinar":
-        return "webinar";
-      default:
-        return type || "listing";
-    }
-  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -114,21 +128,14 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
         const res = await getListingByUsername(username);
 
-        const listingData =
-          res?.listing ||
-          res?.data?.listing ||
-          res?.data ||
-          null;
+        const listingData = res?.listing || res?.data?.listing || res?.data || null;
 
         if (!listingData) {
           throw new Error("Digital product listing not found.");
         }
 
         const creatorData =
-          res?.creator ||
-          res?.data?.creator ||
-          listingData?.creator ||
-          null;
+          res?.creator || res?.data?.creator || listingData?.creator || null;
 
         const portfolio =
           res?.portfolio_projects ||
@@ -137,16 +144,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
           [];
 
         const faqs =
-          res?.faqs ||
-          res?.data?.faqs ||
-          listingData?.faqs ||
-          [];
-
-        const packages =
-          res?.packages ||
-          res?.data?.packages ||
-          listingData?.packages ||
-          [];
+          res?.faqs || res?.data?.faqs || listingData?.faqs || [];
 
         const recommended =
           res?.recommended_listings ||
@@ -164,7 +162,6 @@ const DigitalProductListing = ({ theme, setTheme }) => {
         setCreator(creatorData);
         setPortfolioProjects(Array.isArray(portfolio) ? portfolio : []);
         setFaqData(normalizeFaqs(faqs));
-        setListingPackages(Array.isArray(packages) ? packages : []);
         setRecommendedListings(Array.isArray(recommended) ? recommended : []);
         setMoreFromUserListings(Array.isArray(moreFromUser) ? moreFromUser : []);
       } catch (err) {
@@ -208,53 +205,39 @@ const DigitalProductListing = ({ theme, setTheme }) => {
       .map((item) => toMediaUrl(String(item || "")))
       .filter(Boolean);
 
-    if (normalizedGallery.length) return normalizedGallery;
-
     const cover =
       listing?.cover_media_url ||
       listing?.cover_media_path ||
       listing?.cover ||
       "";
+    const coverUrl = cover ? toMediaUrl(cover) : "";
 
-    return cover ? [toMediaUrl(cover)] : [];
-  }, [listing]);
+    const portfolioImages = (Array.isArray(portfolioProjects) ? portfolioProjects : [])
+      .map((p) => getPortfolioImage(p))
+      .filter(Boolean);
 
-  const packageTabs = useMemo(() => {
-    const raw = Array.isArray(listingPackages) ? listingPackages : [];
-    if (!raw.length) return {};
+    const combined = [...new Set([coverUrl, ...normalizedGallery, ...portfolioImages].filter(Boolean))];
 
-    return raw.reduce((acc, item) => {
-      const name = item?.package_name || item?.name || "Package";
-      acc[name] = {
-        package_name: name,
-        price: item?.price ?? "",
-        desc: item?.description || "",
-        inclusions: Array.isArray(item?.included) ? item.included : [],
-        deliveryFormats: Array.isArray(item?.delivery_formats)
-          ? item.delivery_formats
-          : Array.isArray(item?.deliveryFormats)
-            ? item.deliveryFormats
-            : [],
-      };
-      return acc;
-    }, {});
-  }, [listingPackages]);
+    return combined.length ? combined : [];
+  }, [listing, portfolioProjects]);
 
-  const packageNames = useMemo(() => Object.keys(packageTabs), [packageTabs]);
-
-  useEffect(() => {
-    if (packageNames.length && !packageTabs[activeTab]) {
-      setActiveTab(packageNames[0]);
-    }
-  }, [packageNames, packageTabs, activeTab]);
-
-  const currentPackage = packageTabs[activeTab] || null;
+  const details = listing?.details || {};
+  const detailIncluded = Array.isArray(details?.included) ? details.included : [];
+  const detailTools = Array.isArray(listing?.tools)
+    ? listing.tools
+    : Array.isArray(details?.tools)
+      ? details.tools
+      : [];
+  const deliveryFormats = details?.delivery_format
+    ? [details.delivery_format]
+    : [];
 
   const portfolioData = useMemo(() => {
     const items = (Array.isArray(portfolioProjects) ? portfolioProjects : []).map(
       (project) => ({
         id: project?.id,
         image: getPortfolioImage(project),
+        media: getPortfolioMedia(project),
         title: project?.title || "Untitled Project",
         description: project?.description || "",
         cost: currencyText(project?.cost_cents ?? project?.cost),
@@ -264,8 +247,17 @@ const DigitalProductListing = ({ theme, setTheme }) => {
     return {
       featured: items[0] || null,
       items: items.slice(1),
+      all: items,
     };
   }, [portfolioProjects]);
+
+  const openPortfolioModal = (index) => {
+    const items = portfolioData.all || [];
+    if (!items[index]) return;
+    setActivePortfolioProjectIndex(index);
+    setActivePortfolioProject(items[index]);
+    setActivePortfolioMediaIndex(0);
+  };
 
   const mapListingCard = (item) => ({
     id: item?.id,
@@ -472,7 +464,20 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                   <div className="tsl-profile-mini-card">
                     <div className="tsl-pmc-left">
                       <div className="tsl-pmc-avatar-wrap">
-                        <div className="tsl-pmc-avatar-bg"></div>
+                        <div className="tsl-pmc-avatar-bg">
+                          {creator?.avatar_url ? (
+                            <img
+                              src={creator.avatar_url}
+                              alt={creator?.full_name || "user"}
+                              className="tsl-avatar-img"
+                            />
+                          ) : (
+                            <span className="tsl-avatar-fallback">
+                              {(creator?.full_name || "U")[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+
                         <div className="tsl-pmc-status-dot"></div>
                       </div>
                       <div className="tsl-pmc-info">
@@ -513,26 +518,13 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                     <h2>Description</h2>
                     <p>{listing?.short_description || listing?.about || "No description added yet."}</p>
 
-                    <div className="tsl-tech-section">
-                      <h4 className="tsl-detail-title">Tags</h4>
-                      <div className="tsl-tech-tags">
-                        {(Array.isArray(listing?.tags) ? listing.tags : []).length ? (
-                          listing.tags.map((tag) => (
-                            <span key={tag} className="tsl-tech-tag">
-                              {tag}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="tsl-tech-tag">No tags added</span>
-                        )}
-                      </div>
-                    </div>
+                    
 
                     <div className="tsl-tech-section">
                       <h4 className="tsl-detail-title">Tools & Technologies</h4>
                       <div className="tsl-tech-tags">
-                        {(Array.isArray(listing?.tools) ? listing.tools : []).length ? (
-                          listing.tools.map((tool) => (
+                        {detailTools.length ? (
+                          detailTools.map((tool) => (
                             <span key={tool} className="tsl-tech-tag">
                               {tool}
                             </span>
@@ -546,8 +538,8 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                     <div className="tsl-delivery-section">
                       <h4 className="tsl-detail-title">Delivery Format</h4>
                       <div className="tsl-delivery-tags">
-                        {(Array.isArray(listing?.delivery_formats) ? listing.delivery_formats : []).length ? (
-                          listing.delivery_formats.map((fmt) => (
+                        {deliveryFormats.length ? (
+                          deliveryFormats.map((fmt) => (
                             <span key={fmt} className="tsl-delivery-tag">
                               {fmt}
                             </span>
@@ -562,45 +554,21 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
                 <div className="tsl-pricing-card">
                   <div className="tsl-pricing-content">
-                    {!!packageNames.length && (
-                      <div className="flex gap-2 mb-4 flex-wrap">
-                        {packageNames.map((name) => (
-                          <button
-                            key={name}
-                            type="button"
-                            onClick={() => setActiveTab(name)}
-                            className={`px-4 py-2 rounded-full border text-sm ${
-                              activeTab === name ? "bg-[#CEFF1B] text-black" : ""
-                            }`}
-                          >
-                            {name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
                     <div className="tsl-price-row">
                       <div className="tsl-price-info">
                         <span className="tsl-price-label">Price</span>
                         <span className="tsl-price">
-                          {currentPackage ? currencyText(currentPackage.price) : "—"}
+                          {currencyText(details?.price)}
                         </span>
                       </div>
                     </div>
-
-                    {!!currentPackage?.desc && (
-                      <>
-                        <div className="tsl-divider"></div>
-                        <p className="text-sm">{currentPackage.desc}</p>
-                      </>
-                    )}
 
                     <div className="tsl-divider"></div>
 
                     <h4 className="tsl-inclusions-title">What's included</h4>
                     <div className="tsl-inclusions-list">
-                      {(currentPackage?.inclusions || []).length ? (
-                        currentPackage.inclusions.map((item, idx) => (
+                      {detailIncluded.length ? (
+                        detailIncluded.map((item, idx) => (
                           <div key={idx} className="tsl-inclusion-item">
                             <div className="tsl-check-circle">
                               <Check size={12} strokeWidth={3} />
@@ -610,27 +578,12 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                         ))
                       ) : (
                         <div className="tsl-inclusion-item">
-                          <span>No package inclusions added yet.</span>
+                          <span>No inclusions added yet.</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="tsl-divider"></div>
-
-                    <h4 className="tsl-inclusions-title">Delivery format</h4>
-                    <div className="tsl-delivery-tags">
-                      {(currentPackage?.deliveryFormats || []).length ? (
-                        currentPackage.deliveryFormats.map((fmt) => (
-                          <span key={fmt} className="tsl-delivery-tag">
-                            {fmt}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="tsl-delivery-tag">No delivery format added</span>
-                      )}
-                    </div>
-
-                    <div className="tsl-divider"></div>
+                    
 
                     <div className="tsl-pricing-actions">
                       <button className="tsl-btn-primary">Buy now</button>
@@ -653,11 +606,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                         <img
                           src={portfolioData.featured.image}
                           alt={portfolioData.featured.title}
-                          onClick={() => {
-                            const allItems = [portfolioData.featured, ...portfolioData.items];
-                            setActiveItemIndex(0);
-                            setActiveItem(allItems[0]);
-                          }}
+                          onClick={() => openPortfolioModal(0)}
                           style={{ cursor: "pointer" }}
                         />
                       </div>
@@ -676,11 +625,11 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                       </div>
                     </div>
 
-                    {activeItem &&
+                    {activePortfolioProject &&
                       createPortal(
                         <div
                           className="portfolio-modal-backdrop"
-                          onClick={() => setActiveItem(null)}
+                          onClick={() => setActivePortfolioProject(null)}
                         >
                           <div
                             className={`portfolio-modal-content ${theme}`}
@@ -698,30 +647,32 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                     <button
                                       className="nav-arrow left"
                                       onClick={() => {
-                                        const allItems = [portfolioData.featured, ...portfolioData.items];
+                                        const allItems = portfolioData.all || [];
                                         const prevIndex =
-                                          activeItemIndex > 0
-                                            ? activeItemIndex - 1
+                                          activePortfolioProjectIndex > 0
+                                            ? activePortfolioProjectIndex - 1
                                             : allItems.length - 1;
-                                        setActiveItemIndex(prevIndex);
-                                        setActiveItem(allItems[prevIndex]);
+                                        setActivePortfolioProjectIndex(prevIndex);
+                                        setActivePortfolioProject(allItems[prevIndex]);
+                                        setActivePortfolioMediaIndex(0);
                                       }}
                                     >
                                       ◀
                                     </button>
                                     <span className="portfolio-modal-counter">
-                                      {activeItemIndex + 1} of {[portfolioData.featured, ...portfolioData.items].length}
+                                      {activePortfolioProjectIndex + 1} of {portfolioData.all.length}
                                     </span>
                                     <button
                                       className="nav-arrow right"
                                       onClick={() => {
-                                        const allItems = [portfolioData.featured, ...portfolioData.items];
+                                        const allItems = portfolioData.all || [];
                                         const nextIndex =
-                                          activeItemIndex < allItems.length - 1
-                                            ? activeItemIndex + 1
+                                          activePortfolioProjectIndex < allItems.length - 1
+                                            ? activePortfolioProjectIndex + 1
                                             : 0;
-                                        setActiveItemIndex(nextIndex);
-                                        setActiveItem(allItems[nextIndex]);
+                                        setActivePortfolioProjectIndex(nextIndex);
+                                        setActivePortfolioProject(allItems[nextIndex]);
+                                        setActivePortfolioMediaIndex(0);
                                       }}
                                     >
                                       ▶
@@ -730,7 +681,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
                                   <button
                                     className="portfolio-modal-close"
-                                    onClick={() => setActiveItem(null)}
+                                    onClick={() => setActivePortfolioProject(null)}
                                   >
                                     ✕
                                   </button>
@@ -739,19 +690,39 @@ const DigitalProductListing = ({ theme, setTheme }) => {
 
                               <div className="portfolio-modal-info">
                                 <div className="portfolio-info-header">
-                                  <h3>{activeItem.title}</h3>
+                                  <h3>{activePortfolioProject.title}</h3>
                                 </div>
-                                <p>{activeItem.description}</p>
+                                <p>{activePortfolioProject.description}</p>
 
                                 <div className="portfolio-modal-cost">
                                   <span className="cost-label">Project cost</span>
-                                  <span className="cost-value">{activeItem.cost}</span>
+                                  <span className="cost-value">{activePortfolioProject.cost}</span>
                                 </div>
                               </div>
 
                               <div className="portfolio-modal-image">
-                                <img src={activeItem.image} alt={activeItem.title} />
+                                <img
+                                  src={
+                                    activePortfolioProject.media?.[activePortfolioMediaIndex]?.url ||
+                                    activePortfolioProject.image
+                                  }
+                                  alt={activePortfolioProject.title}
+                                />
                               </div>
+
+                              {(activePortfolioProject.media || []).length > 1 && (
+                                <div className="tsl-thumbs" style={{ marginTop: "16px" }}>
+                                  {activePortfolioProject.media.map((item, idx) => (
+                                    <img
+                                      key={idx}
+                                      src={item.url}
+                                      alt={`${activePortfolioProject.title}-${idx}`}
+                                      className={`tsl-thumb ${activePortfolioMediaIndex === idx ? "active" : ""}`}
+                                      onClick={() => setActivePortfolioMediaIndex(idx)}
+                                    />
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>,
@@ -767,11 +738,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                                 <img
                                   src={item.image}
                                   alt={item.title}
-                                  onClick={() => {
-                                    const allItems = [portfolioData.featured, ...portfolioData.items];
-                                    setActiveItemIndex(index + 1);
-                                    setActiveItem(allItems[index + 1]);
-                                  }}
+                                  onClick={() => openPortfolioModal(index + 1)}
                                   style={{ cursor: "pointer" }}
                                 />
                               </div>
@@ -903,7 +870,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                           <button
                             className="btn-view-listing"
                             onClick={() =>
-                              navigate(`/${listingTypeToRouteSlug(item.listingType)}/${item.listingUsername}`)
+                              navigate(
+                                `/${listingTypeToRouteSlug(item.listingType)}/${item.listingUsername}`,
+                              )
                             }
                           >
                             View Listing
@@ -964,13 +933,13 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                 location={creator?.location || ""}
                 rating={0}
                 reviewCount={0}
-                description={creator?.bio || ""}
-                languages={creator?.languages || []}
+                description={creator?.about || creator?.bio || ""}
+                languages={Array.isArray(creator?.languages) ? creator.languages : []}
                 karma={creator?.karma || "—"}
                 projectsCompleted={creator?.projects_completed || "—"}
                 responseSpeed={creator?.avg_response || "1 hour"}
-                memberSince={creator?.created_at || ""}
-                skills={creator?.skills || []}
+                memberSince={creator?.member_since || creator?.created_at || ""}
+                skills={Array.isArray(creator?.skills) ? creator.skills : []}
                 avatarUrl={creator?.avatar_url || ""}
                 onViewProfile={() => {
                   if (creator?.username) {
@@ -992,8 +961,22 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                       <div className="tsl-mp-cardBody">
                         <div className="tsl-mp-topLine">
                           <div className="tsl-mp-user">
-                            <div className="tsl-mp-avatar"></div>
-                            <span className="tsl-mp-userName">{p.username}</span>
+                            <div className="tsl-mp-avatar">
+                              {creator?.avatar_url ? (
+                                <img
+                                  src={creator.avatar_url}
+                                  alt={creator?.full_name || "user"}
+                                  className="tsl-avatar-img"
+                                />
+                              ) : (
+                                <span className="tsl-avatar-fallback">
+                                  {(creator?.full_name || "U")[0].toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                            <span className="tsl-mp-userName">
+                              {p.creatorUsername || creator?.username || ""}
+                            </span>
                           </div>
                         </div>
                         <p className="tsl-mp-desc">{p.title}</p>
@@ -1002,7 +985,11 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                           <button
                             className="tsl-mp-cta"
                             type="button"
-                            onClick={() => navigate(`/${p.listingType}/${p.username}`)}
+                            onClick={() =>
+                              navigate(
+                                `/${listingTypeToRouteSlug(p.listingType)}/${p.listingUsername}`,
+                              )
+                            }
                           >
                             Know More
                             <ChevronRight size={12} className="tsl-mp-ctaIcon" />
@@ -1041,8 +1028,22 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                       <div className="tsl-mp-cardBody">
                         <div className="tsl-mp-topLine">
                           <div className="tsl-mp-user">
-                            <div className="tsl-mp-avatar"></div>
-                            <span className="tsl-mp-userName">{p.username}</span>
+                            <div className="tsl-mp-avatar">
+                              {creator?.avatar_url ? (
+                                <img
+                                  src={creator.avatar_url}
+                                  alt={creator?.full_name || "user"}
+                                  className="tsl-avatar-img"
+                                />
+                              ) : (
+                                <span className="tsl-avatar-fallback">
+                                  {(creator?.full_name || "U")[0].toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                            <span className="tsl-mp-userName">
+                              {p.creatorUsername || creator?.username || ""}
+                            </span>
                           </div>
                         </div>
                         <p className="tsl-mp-desc">{p.title}</p>
@@ -1051,7 +1052,11 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                           <button
                             className="tsl-mp-cta"
                             type="button"
-                            onClick={() => navigate(`/${p.listingType}/${p.username}`)}
+                            onClick={() =>
+                              navigate(
+                                `/${listingTypeToRouteSlug(p.listingType)}/${p.listingUsername}`,
+                              )
+                            }
                           >
                             Know More
                             <ChevronRight size={12} className="tsl-mp-ctaIcon" />

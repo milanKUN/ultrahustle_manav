@@ -201,16 +201,21 @@ const WebinarListing = ({ theme, setTheme }) => {
       .map((item) => toMediaUrl(String(item || "")))
       .filter(Boolean);
 
-    if (normalizedGallery.length) return normalizedGallery;
-
     const cover =
       listing?.cover_media_url ||
       listing?.cover_media_path ||
       listing?.cover ||
       "";
+    const coverUrl = cover ? toMediaUrl(cover) : "";
 
-    return cover ? [toMediaUrl(cover)] : [];
-  }, [listing]);
+    const portfolioImages = (Array.isArray(portfolioProjects) ? portfolioProjects : [])
+      .map((p) => getPortfolioImage(p))
+      .filter(Boolean);
+
+    const combined = [...new Set([coverUrl, ...normalizedGallery, ...portfolioImages].filter(Boolean))];
+
+    return combined.length ? combined : [];
+  }, [listing, portfolioProjects]);
 
   const webinarDetails = useMemo(() => listing?.details || {}, [listing]);
 
@@ -288,6 +293,10 @@ const WebinarListing = ({ theme, setTheme }) => {
 
   const languages = Array.isArray(webinarDetails?.languages)
     ? webinarDetails.languages
+    : [];
+
+  const key_outcomes = Array.isArray(webinarDetails?.key_outcomes)
+    ? webinarDetails.key_outcomes
     : [];
 
   const agendaItems = Array.isArray(webinarDetails?.agenda)
@@ -498,6 +507,17 @@ const WebinarListing = ({ theme, setTheme }) => {
                     ) : (
                       <p>No learning points added yet.</p>
                     )}
+                  </div>
+                  
+                  <div className="cl-section">
+                    <h2>Key Outcomes</h2>
+                    <div className="cl-tools-list">
+                      {key_outcomes.length ? (
+                        key_outcomes.map((key_outcome) => <strong key={key_outcome}>{key_outcome}</strong>)
+                      ) : (
+                        <strong>Not specified</strong>
+                      )}
+                    </div>
                   </div>
 
                   <div className="cl-section">

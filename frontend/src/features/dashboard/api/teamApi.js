@@ -1,9 +1,6 @@
 import axios from "axios";
 import { getAuthToken } from "../../auth/api/authApi";
 
-// Base URL for axios.
-// - Set VITE_API_BASE_URL to call your backend directly (e.g. http://159.89.193.253/).
-// - Leave empty to use same-origin requests (useful with Vite proxy in dev).
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const api = axios.create({
@@ -170,7 +167,6 @@ export const acceptTeamInvite = async (token) => {
   }
 };
 
-// Public endpoint (token-only) according to your routes.
 export const declineTeamInvite = async (token) => {
   try {
     const res = await publicApi.post(`${V1}/team-invites/${token}/decline`);
@@ -188,10 +184,6 @@ export const getTeamByUsername = async (username) => {
     throw new Error(extractErrorMessage(err));
   }
 };
-
-// =========================
-// Manage Teams
-// =========================
 
 export const getMyTeams = async () => {
   try {
@@ -211,7 +203,6 @@ export const toggleTeamStatus = async (teamId) => {
   }
 };
 
-//check team username availability
 export const checkTeamUsernameAvailability = async (username, teamId = null) => {
   try {
     const res = await api.get(`${V1}/teams/check-username`, {

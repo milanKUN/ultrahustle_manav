@@ -51,17 +51,56 @@ const ManageTeam = (props) => {
     }, 2500);
   };
 
+  const normalizeTeam = (team) => {
+    const teamName =
+      team?.name ||
+      team?.team_name ||
+      team?.title ||
+      "Untitled Team";
+
+    return {
+      id: team?.id ?? null,
+      owner_user_id: team?.owner_user_id ?? null,
+      name: teamName,
+      username: String(team?.username || team?.team_username || "").trim(),
+      title: team?.title || "",
+      bio: team?.bio || "",
+      avatar:
+        team?.avatar ||
+        team?.avatar_url ||
+        "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent(teamName) +
+          "&background=111827&color=fff&size=200",
+      members: Number(team?.members ?? team?.members_count ?? 0),
+      listings: Number(team?.listings ?? team?.listings_count ?? 0),
+      projects: Number(team?.projects ?? team?.projects_count ?? 0),
+      isActive: Boolean(team?.isActive ?? team?.is_active ?? false),
+      isOwner: Boolean(team?.isOwner ?? team?.is_owner ?? false),
+    };
+  };
+
   const fetchTeams = async () => {
     try {
       setLoading(true);
       setPageError("");
 
       const res = await getMyTeams();
-      setTeams(res?.teams || []);
+      console.log("getMyTeams response:", res);
+
+      const rawTeams = Array.isArray(res?.teams)
+        ? res.teams
+        : Array.isArray(res?.data?.teams)
+        ? res.data.teams
+        : [];
+
+      const normalizedTeams = rawTeams.map(normalizeTeam);
+      setTeams(normalizedTeams);
     } catch (err) {
       console.error("Failed to fetch teams", err);
       setPageError(
-        err?.response?.data?.message || "Failed to load teams."
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load teams."
       );
     } finally {
       setLoading(false);
@@ -73,6 +112,7 @@ const ManageTeam = (props) => {
   }, []);
 
   const openDeactivateModal = (team) => {
+    if (!team?.isOwner) return;
     setSelectedTeam(team);
     setConfirmOpen(true);
   };
@@ -84,27 +124,36 @@ const ManageTeam = (props) => {
   };
 
   const confirmToggleActive = async () => {
-    if (!selectedTeam) return;
+    if (!selectedTeam || !selectedTeam.isOwner) return;
 
     try {
       setActionLoading(true);
 
       const res = await toggleTeamStatus(selectedTeam.id);
 
+      const updatedIsActive =
+        res?.team?.isActive ??
+        res?.data?.team?.isActive ??
+        !selectedTeam.isActive;
+
       setTeams((prev) =>
         prev.map((t) =>
           t.id === selectedTeam.id
-            ? { ...t, isActive: res?.team?.isActive }
+            ? { ...t, isActive: updatedIsActive }
             : t
         )
       );
 
-      showToast(res?.message || "Team status updated successfully.");
+      showToast(
+        res?.message || res?.data?.message || "Team status updated successfully."
+      );
       closeDeactivateModal();
     } catch (err) {
       console.error("Failed to toggle team status", err);
       showToast(
-        err?.response?.data?.message || "Failed to update team status.",
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to update team status.",
         "error"
       );
     } finally {
@@ -128,13 +177,28 @@ const ManageTeam = (props) => {
     };
   }, [confirmOpen, actionLoading]);
 
+  const handleViewTeam = (team) => {
+    if (!team?.isActive) return;
+
+    if (!team?.username) {
+      showToast("Team username is missing.", "error");
+      return;
+    }
+
+    if (team.isOwner) {
+      navigate(`/team-profile/${team.username}`);
+      return;
+    }
+
+    navigate(`/public-team-profile/${team.username}`);
+  };
+
   return (
     <div
       className={`manage-team-page user-page ${
         theme || "light"
       } min-h-screen relative overflow-hidden`}
     >
-      {/* NAVBAR */}
       <NavbarLight
         className="create-team-navbar"
         toggleSidebar={() => setSidebarOpen((p) => !p)}
@@ -143,8 +207,7 @@ const ManageTeam = (props) => {
         onDropdownChange={handleDropdownChange}
       />
 
-      <div className="pt-[72px] flex relative z-10">
-        {/* SIDEBAR */}
+      <div className="pt-[85px] flex relative z-10">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -156,7 +219,6 @@ const ManageTeam = (props) => {
           setTheme={setTheme}
         />
 
-        {/* MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-0 overflow-hidden">
           <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <main
@@ -217,15 +279,9 @@ const ManageTeam = (props) => {
                         !team.isActive ? "manage-team-card-inactive" : ""
                       }`}
                     >
-                      {/* Avatar */}
                       <div className="flex-shrink-0">
                         <img
-                          src={
-                            team.avatar ||
-                            "https://ui-avatars.com/api/?name=" +
-                              encodeURIComponent(team.name) +
-                              "&background=111827&color=fff&size=200"
-                          }
+                          src={team.avatar}
                           alt={team.name}
                           className={`w-14 h-14 md:w-[60px] md:h-[60px] rounded-full object-cover ${
                             !team.isActive
@@ -235,7 +291,6 @@ const ManageTeam = (props) => {
                         />
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 flex flex-col min-w-0">
                         <h3 className="manage-team-title font-medium text-[15px] md:text-base mb-3 max-sm:mb-4 flex flex-col items-start sm:flex-row sm:items-center gap-1.5 sm:gap-2">
                           <span className="truncate w-full">{team.name}</span>
@@ -246,7 +301,6 @@ const ManageTeam = (props) => {
                           )}
                         </h3>
 
-                        {/* Stats */}
                         <div
                           className={`flex items-center gap-2 md:gap-3 mb-4 ${
                             !team.isActive
@@ -282,7 +336,6 @@ const ManageTeam = (props) => {
                           </div>
                         </div>
 
-                        {/* Actions */}
                         <div
                           className={`flex flex-col gap-2 md:gap-2.5 ${
                             !team.isActive
@@ -301,30 +354,31 @@ const ManageTeam = (props) => {
                                 <ExternalLink className="w-3.5 h-3.5" /> Edit Team
                               </button>
                             )}
+
                             {team.isOwner && (
-                            <button
-                              onClick={() => openDeactivateModal(team)}
-                              className="manage-team-action-btn flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] transition-colors border"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                              {team.isActive
-                                ? "Deactivate Team"
-                                : "Activate Team"}
-                            </button>
+                              <button
+                                onClick={() => openDeactivateModal(team)}
+                                className="manage-team-action-btn flex-1 flex items-center justify-center gap-1 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] transition-colors border"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                {team.isActive
+                                  ? "Deactivate Team"
+                                  : "Activate Team"}
+                              </button>
                             )}
                           </div>
 
                           <button
-                            onClick={() =>
-                              navigate(
-                                team.isOwner
-                                  ? `/team-profile/${team.username}`
-                                  : `/public-team-profile/${team.username}`
-                              )
-                            }
-                            disabled={!team.isActive}
+                            onClick={() => handleViewTeam(team)}
+                            disabled={!team.isActive || !team.username}
                             className="manage-team-view-btn w-full flex items-center justify-center border-1 border-black gap-2 py-2 rounded-[10px] sm:rounded-[7px] text-[10px] font-medium transition-colors"
-                            title={!team.isActive ? "Activate team to view" : ""}
+                            title={
+                              !team.username
+                                ? "Username missing for this team"
+                                : !team.isActive
+                                ? "Activate team to view"
+                                : ""
+                            }
                           >
                             <Eye className="w-3.5 h-3.5" /> View Team
                           </button>
@@ -339,7 +393,6 @@ const ManageTeam = (props) => {
         </div>
       </div>
 
-      {/* Confirm Modal */}
       {confirmOpen && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center px-4 backdrop-blur-sm transition-all duration-300"
@@ -396,7 +449,6 @@ const ManageTeam = (props) => {
         </div>
       )}
 
-      {/* Success/Error Toast */}
       {toast.open && (
         <div className="fixed bottom-6 right-6 z-[99999]">
           <div

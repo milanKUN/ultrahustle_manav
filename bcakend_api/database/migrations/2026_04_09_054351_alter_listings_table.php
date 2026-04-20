@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('listings', function (Blueprint $table) {
-            $table->json('tags_json')->nullable()->after('team_name');
-            $table->json('tools_json')->nullable()->after('tags_json');
-        });
+        // Already added in 2026_04_07_085117_alter_listings_table.php
     }
 
     /**

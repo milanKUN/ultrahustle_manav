@@ -1,51 +1,43 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "./CreateDigitalProduct.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import MyPortfolio from "../../dashboard/components/UserProfile/MyPortfolio";
 import "../../../Darkuser.css";
 import "../../onboarding/components/OnboardingSelect.css";
+import {
+  createListing,
+  updateListing,
+  getListingByUsername,
+  getListingDropdowns,
+} from "../api/listingApi";
+import DeliverablesSection from "../components/DeliverablesSection";
+import Swal from "sweetalert2";
 
-export default function CreateDigitalProduct({ theme, setTheme }) {
-  /* ================== CONSTANTS ================== */
-  const categories = useMemo(
-    () => ["Design", "Development", "Marketing", "Writing"],
-    [],
-  );
-
-  const subCategoriesMap = useMemo(
-    () => ({
-      Design: ["Logo Design", "UI/UX", "Branding"],
-      Development: ["Full Stack", "Frontend", "Backend"],
-      Marketing: ["SEO", "Social Media", "Ads"],
-      Writing: ["Copywriting", "Blog Writing", "Script Writing"],
-    }),
-    [],
-  );
-
-  const productTypes = useMemo(
-    () => [
-      "Digital Service",
-      "Consultation",
-      "One-time Project",
-      "Monthly Retainer",
-    ],
-    [],
-  );
-
-  const teamList = useMemo(
-    () => ["Ultra Hustle Studio", "Design Squad", "Dev Crew"],
-    [],
-  );
-
-  const deliveryFormats = useMemo(
-    () => ["Google Drive Link", "Figma Link", "ZIP Download", "Notion Page"],
-    [],
-  );
-
+export default function CreateDigitalProduct({
+  mode = "create",
+  theme,
+  setTheme,
+}) {
+  const LISTING_TYPE_SLUG = "digital-product";
   const TABS = ["Basic", "Standard", "Premium"];
 
-  // ✅ Sidebar state (matching CreateTeam.jsx)
+  const navigate = useNavigate();
+  const { username } = useParams();
+
+  const isEditMode = mode === "edit";
+
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [isMetaLoading, setIsMetaLoading] = useState(false);
+  const [isLoadingListing, setIsLoadingListing] = useState(false);
+  const [editingListingId, setEditingListingId] = useState(null);
+
+  const [deliveryFormatInput, setDeliveryFormatInput] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeSetting, setActiveSetting] = useState("basic");
@@ -59,7 +51,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     setActiveSetting(id);
   };
 
-  /* ================== BASIC DETAILS STATE ================== */
   const [aiPowered, setAiPowered] = useState(false);
 
   const [form, setForm] = useState({
@@ -72,13 +63,72 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     price: "",
   });
 
-  const subCategories = form.category
-    ? subCategoriesMap[form.category] || []
-    : [];
-
   const setFormField = (key, value) => setForm((p) => ({ ...p, [key]: value }));
 
-  /* ================== TAGS STATE ================== */
+  const loadCategories = async () => {
+    try {
+      setIsMetaLoading(true);
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "categories",
+      });
+      setCategories(Array.isArray(res?.categories) ? res.categories : []);
+    } catch (error) {
+      console.error("Failed to load categories", error);
+      setCategories([]);
+    } finally {
+      setIsMetaLoading(false);
+    }
+  };
+
+  const loadSubCategories = async (categoryName) => {
+    if (!categoryName) {
+      setSubCategories([]);
+      return;
+    }
+
+    try {
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "sub_categories",
+        category: categoryName,
+      });
+      setSubCategories(Array.isArray(res?.sub_categories) ? res.sub_categories : []);
+    } catch (error) {
+      console.error("Failed to load sub categories", error);
+      setSubCategories([]);
+    }
+  };
+
+  const loadProductTypes = async (categoryName, subCategoryName) => {
+    if (!categoryName || !subCategoryName) {
+      setProductTypes([]);
+      return;
+    }
+
+    try {
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "product_types",
+        category: categoryName,
+        sub_category: subCategoryName,
+      });
+      setProductTypes(Array.isArray(res?.product_types) ? res.product_types : []);
+    } catch (error) {
+      console.error("Failed to load product types", error);
+      setProductTypes([]);
+    }
+  };
+
+  React.useEffect(() => {
+    loadCategories();
+  }, []);
+
+  React.useEffect(() => {
+    loadSubCategories(form.category);
+  }, [form.category]);
+
+  React.useEffect(() => {
+    loadProductTypes(form.category, form.subCategory);
+  }, [form.category, form.subCategory]);
+
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -102,14 +152,8 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     }
   };
 
-  /* ================== SERVICE PROVIDER + PACKAGES STATE ================== */
-  const [mode, setMode] = useState("Solo"); // Solo | Team
-  const [teamName, setTeamName] = useState("");
   const [activeTab, setActiveTab] = useState("Basic");
-  // ✅ Upload modal state (MISSING)
-  const [uploadStep, setUploadStep] = useState(null); // null | "grid" | "success"
-
-  // ✅ Modal open when grid OR success (MISSING)
+  const [uploadStep, setUploadStep] = useState(null);
   const isModalOpen = uploadStep === "grid" || uploadStep === "success";
 
   const [pkg, setPkg] = useState({
@@ -123,7 +167,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       howItWorks: [],
       notIncluded: [],
       toolsUsed: [],
-      deliveryFormat: "",
+      deliveryFormat: [],
     },
     Standard: {
       packageName: "",
@@ -135,7 +179,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       howItWorks: [],
       notIncluded: [],
       toolsUsed: [],
-      deliveryFormat: "",
+      deliveryFormat: [],
     },
     Premium: {
       packageName: "",
@@ -147,7 +191,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       howItWorks: [],
       notIncluded: [],
       toolsUsed: [],
-      deliveryFormat: "",
+      deliveryFormat: [],
     },
   });
 
@@ -178,25 +222,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       },
     }));
   };
-
-  // React.useEffect(() => {
-  //   const loadTeams = async () => {
-  //     if (sellerMode !== "Team") return;
-
-  //     try {
-  //       setTeamsLoading(true);
-  //       const res = await getMyTeams();
-  //       const teams = Array.isArray(res?.teams) ? res.teams : [];
-  //       setTeamList(teams.map((item) => item.team_name).filter(Boolean));
-  //     } catch (e) {
-  //       setTeamList([]);
-  //     } finally {
-  //       setTeamsLoading(false);
-  //     }
-  //   };
-
-  //   loadTeams();
-  // }, [sellerMode]);
 
   const [includedInput, setIncludedInput] = useState("");
   const [howInput, setHowInput] = useState("");
@@ -250,8 +275,8 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
 
   const removeTool = (idx) => removeFromList("toolsUsed", idx);
 
-  /* ================== ADD-ONS + MEDIA STATE ================== */
   const fileRef = useRef(null);
+  const deliverableFileRef = useRef(null);
 
   const [addOn, setAddOn] = useState({
     name: "",
@@ -260,7 +285,11 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
   });
 
   const [addOns, setAddOns] = useState([]);
-  const [cover, setCover] = useState(null);
+  const [coverImages, setCoverImages] = useState([]);
+  const [coverFiles, setCoverFiles] = useState([]);
+  const [coverSlideIdx, setCoverSlideIdx] = useState(0);
+  const [savingStatus, setSavingStatus] = useState(null); // null | "draft" | "published"
+  const [portfolioProjects, setPortfolioProjects] = useState([]);
 
   const [mainDeliverables, setMainDeliverables] = useState([]);
   const [notes, setNotes] = useState([""]);
@@ -270,7 +299,20 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
     setMainDeliverables((prev) => [...prev, ...files]);
+    setNotes((prev) => {
+      const updated = [...prev];
+      while (updated.length < mainDeliverables.length + files.length) updated.push("");
+      return updated;
+    });
+    if (e.target) e.target.value = "";
   };
+
+  const removeDeliverable = (idx) => {
+    setMainDeliverables((prev) => prev.filter((_, i) => i !== idx));
+    setNotes((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const addMoreDeliverables = () => deliverableFileRef.current?.click();
 
   const addNoteField = () => setNotes((p) => [...p, ""]);
   const updateNoteField = (idx, value) =>
@@ -279,6 +321,51 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
   const addLinkField = () => setLinks((p) => [...p, ""]);
   const updateLinkField = (idx, value) =>
     setLinks((p) => p.map((item, i) => (i === idx ? value : item)));
+
+  // Delivery Format as tag list (per product protocol)
+  const addDeliveryFormat = () => {
+    const v = deliveryFormatInput.trim();
+    if (!v) return;
+    const current_df = pkg[activeTab].deliveryFormat || [];
+    if (current_df.some((t) => t.toLowerCase() === v.toLowerCase())) {
+      setDeliveryFormatInput("");
+      return;
+    }
+    setPkg((p) => ({
+      ...p,
+      [activeTab]: {
+        ...p[activeTab],
+        deliveryFormat: [...current_df, v],
+      },
+    }));
+    setDeliveryFormatInput("");
+  };
+
+  const removeDeliveryFormat = (idx) => {
+    setPkg((p) => ({
+      ...p,
+      [activeTab]: {
+        ...p[activeTab],
+        deliveryFormat: (p[activeTab].deliveryFormat || []).filter((_, i) => i !== idx),
+      },
+    }));
+  };
+
+  // Drag-and-drop handlers for main deliverables
+  const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = () => setIsDragging(false);
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) return;
+    setMainDeliverables((prev) => [...prev, ...files]);
+    setNotes((prev) => {
+      const updated = [...prev];
+      while (updated.length < mainDeliverables.length + files.length) updated.push("");
+      return updated;
+    });
+  };
 
   const addNewAddOn = () => {
     if (!addOn.name) return;
@@ -290,15 +377,29 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     setAddOns((p) => p.filter((_, i) => i !== idx));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCover(reader.result);
-    reader.readAsDataURL(file);
+  const applyCoverFiles = (files) => {
+    if (!files || !files.length) return;
+    setCoverFiles(files);
+    const readers = files.map(
+      (file) =>
+        new Promise((resolve) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.readAsDataURL(file);
+        }),
+    );
+    Promise.all(readers).then((urls) => {
+      setCoverImages(urls);
+      setCoverSlideIdx(0);
+    });
   };
 
-  /* ================== FAQ STATE ================== */
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    applyCoverFiles(files);
+  };
+
   const [faqs, setFaqs] = useState([
     {
       q: "",
@@ -320,12 +421,243 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     setFaqs((p) => p.filter((_, i) => i !== idx));
   };
 
-  /* ================== RENDER ================== */
+  const loadListingForEdit = async () => {
+    if (!isEditMode || !username) return;
+
+    try {
+      setIsLoadingListing(true);
+
+      const res = await getListingByUsername(username);
+      const listing = res?.listing || res?.data || res;
+
+      if (!listing) return;
+
+      setEditingListingId(listing.id || null);
+
+      setForm({
+        title: listing.title || "",
+        category: listing.category || "",
+        subCategory: listing.sub_category || "",
+        shortDescription: listing.short_description || "",
+        about: listing.about || "",
+        productType: listing?.details?.product_type || "",
+        price:
+          listing?.details?.price !== undefined && listing?.details?.price !== null
+            ? String(listing.details.price)
+            : "",
+      });
+
+      setAiPowered(!!listing.ai_powered);
+      setTags(Array.isArray(listing.tags) ? listing.tags : []);
+
+      setFaqs(
+        Array.isArray(listing.faqs) && listing.faqs.length
+          ? listing.faqs.map((item) => ({
+              q: item.q || item.question || "",
+              a: item.a || item.answer || "",
+            }))
+          : [{ q: "", a: "" }],
+      );
+
+      setLinks(
+        Array.isArray(listing.links) && listing.links.length
+          ? listing.links
+          : [""],
+      );
+
+      if (Array.isArray(listing.deliverables) && listing.deliverables.length) {
+        setMainDeliverables(
+          listing.deliverables.map((d) => ({
+            file: null,
+            notes: d.notes || "",
+            existing_file_name: d.file_name || "",
+            existing_file_url: d.file_url || "",
+            name: d.file_name,
+            size: d.file_size,
+          }))
+        );
+        setNotes(listing.deliverables.map((item) => item.notes || ""));
+      } else {
+        setMainDeliverables([]);
+        setNotes([]);
+      }
+
+      const gallery = Array.isArray(listing.gallery) ? listing.gallery : [];
+      if (gallery.length > 0) {
+        setCoverImages(gallery);
+        setCoverFiles([]);
+        setCoverSlideIdx(0);
+      } else if (listing.cover_media_url || listing.cover_media_path) {
+        const coverUrl = listing.cover_media_url || listing.cover_media_path;
+        setCoverImages([coverUrl]);
+        setCoverFiles([]);
+        setCoverSlideIdx(0);
+      }
+
+      const tools = Array.isArray(listing?.tools)
+        ? listing.tools
+        : Array.isArray(listing?.details?.tools)
+          ? listing.details.tools
+          : [];
+
+      const included = Array.isArray(listing?.details?.included)
+        ? listing.details.included
+        : [];
+
+      const deliveryFormat = listing?.details?.delivery_format
+        ? String(listing.details.delivery_format).split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+
+      setPkg((prev) => ({
+        ...prev,
+        Basic: {
+          ...prev.Basic,
+          included,
+          deliveryFormat,
+          toolsUsed: tools,
+        },
+      }));
+
+      setPortfolioProjects(
+        Array.isArray(listing.portfolio_projects) ? listing.portfolio_projects : [],
+      );
+    } catch (error) {
+      console.error("Failed to load listing", error);
+      Swal.fire({
+        icon: "error",
+        title: "Load failed",
+        text: error?.message || "Failed to load listing details.",
+        background: "#0b0b0b",
+        color: "#ffffff",
+        iconColor: "#CEFF1B",
+        confirmButtonColor: "#CEFF1B",
+        confirmButtonText: "<span style='color:#000;font-weight:700'>OK</span>",
+      });
+    } finally {
+      setIsLoadingListing(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadListingForEdit();
+  }, [isEditMode, username]);
+
+  const buildPayload = (status = "published") => {
+    const activeData = pkg[activeTab] || {};
+
+    const allTools = Array.from(
+      new Set(
+        [
+          ...(pkg.Basic?.toolsUsed || []),
+          ...(pkg.Standard?.toolsUsed || []),
+          ...(pkg.Premium?.toolsUsed || []),
+        ]
+          .map((item) => String(item).trim())
+          .filter(Boolean),
+      ),
+    );
+
+    return {
+      listing_type: "digital_product",
+      status,
+      title: form.title.trim(),
+      category: form.category || "",
+      sub_category: form.subCategory || "",
+      short_description: form.shortDescription || "",
+      about: form.about || "",
+      ai_powered: aiPowered,
+      cover_files: coverFiles.length ? coverFiles : null,
+      tags: tags.filter(Boolean),
+      faqs: faqs
+        .map((item) => ({
+          q: item.q?.trim() || "",
+          a: item.a?.trim() || "",
+        }))
+        .filter((item) => item.q || item.a),
+      links: links.map((item) => item.trim()).filter(Boolean),
+      deliverables: mainDeliverables.map((d, index) => ({
+        file: d instanceof File ? d : (d.file instanceof File ? d.file : null),
+        notes: notes[index] || (typeof d === 'object' ? d.notes : "") || "",
+        existing_file_url: d.existing_file_url || d.file_url || ""
+      })),
+      details: {
+        product_type: form.productType || "",
+        price: form.price || "",
+        included: (activeData.included || []).filter(Boolean),
+        delivery_format: (activeData.deliveryFormat || []).join(", "),
+        tools: allTools,
+      },
+      portfolio_projects: portfolioProjects,
+    };
+  };
+
+  const handleSubmit = async (status = "published") => {
+    if (!form.title.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Title is required",
+        text: "Please enter the product title.",
+        background: "#0b0b0b",
+        color: "#ffffff",
+        iconColor: "#CEFF1B",
+        confirmButtonColor: "#CEFF1B",
+        confirmButtonText: "<span style='color:#000;font-weight:700'>OK</span>",
+      });
+      return;
+    }
+
+    try {
+      setSavingStatus(status);
+
+      const payload = buildPayload(status);
+
+      const res = isEditMode
+        ? await updateListing(username, payload)
+        : await createListing(payload);
+
+      Swal.fire({
+        icon: "success",
+        title: isEditMode ? "Updated!" : "Saved!",
+        text:
+          res?.message ||
+          (isEditMode
+            ? "Listing updated successfully"
+            : "Listing saved successfully"),
+        background: "#0b0b0b",
+        color: "#ffffff",
+        iconColor: "#CEFF1B",
+        confirmButtonColor: "#CEFF1B",
+        confirmButtonText: "<span style='color:#000;font-weight:700'>Go to My Listings</span>",
+        customClass: {
+          popup: "swal-brand-popup",
+          title: "swal-brand-title",
+          confirmButton: "swal-brand-confirm",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/my-listings");
+        }
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: isEditMode ? "Update failed" : "Save failed",
+        text: error?.message || "Something went wrong.",
+        background: "#0b0b0b",
+        color: "#ffffff",
+        iconColor: "#ff4444",
+        confirmButtonColor: "#CEFF1B",
+        confirmButtonText: "<span style='color:#000;font-weight:700'>Try Again</span>",
+      });
+    } finally {
+      setSavingStatus(null);
+    }
+  };
+
   return (
     <div
       className={`create-service-page user-page ${theme} min-h-screen relative overflow-hidden`}
     >
-      {/* ✅ NAVBAR */}
       <UserNavbar
         toggleSidebar={() => setSidebarOpen((p) => !p)}
         isSidebarOpen={sidebarOpen}
@@ -333,9 +665,10 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
       />
 
       <div
-        className={`pt-[72px] flex relative z-10 transition-all duration-300 ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}
+        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${
+          isModalOpen ? "blur-sm pointer-events-none select-none" : ""
+        }`}
       >
-        {/* ✅ SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -347,20 +680,23 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
           setTheme={setTheme}
         />
 
-        {/* ✅ MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          {/* Scrollable Area */}
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
             <div className="create-service-container">
               <div className="csl-stack">
-                {/* ================= BASIC DETAILS CARD ================= */}
                 <div className="csl-card">
                   <div className="csl-header">
                     <div>
                       <h1 className="csl-title">
-                        Create Digital Products Listing
+                        {isEditMode
+                          ? "Edit Digital Product Listing"
+                          : "Create Digital Products Listing"}
                       </h1>
-                      <p className="csl-subtitle">Fill out each section</p>
+                      <p className="csl-subtitle">
+                        {isEditMode
+                          ? "Update your listing details"
+                          : "Fill out each section"}
+                      </p>
                     </div>
 
                     <div className="csl-ai">
@@ -387,6 +723,12 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                       </label>
                     </div>
                   </div>
+
+                  {isLoadingListing && (
+                    <div className="mb-4 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
+                      Loading listing details...
+                    </div>
+                  )}
 
                   <h2 className="csl-section">Basic Details</h2>
 
@@ -433,10 +775,13 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                             }))
                           }
                           options={categories}
-                          placeholder="Select category"
+                          placeholder={
+                            isMetaLoading ? "Loading categories..." : "Select category"
+                          }
                         />
                       </div>
                     </div>
+
                     <div className="csl-field">
                       <label className="csl-label csl-titleLabel">
                         Sub Category
@@ -452,12 +797,17 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                             }))
                           }
                           options={subCategories}
-                          placeholder="Select sub category"
+                          placeholder={
+                            !form.category
+                              ? "Select category first"
+                              : "Select sub category"
+                          }
                           disabled={!form.category}
                         />
                       </div>
                     </div>
                   </div>
+
                   <div className="csl-grid2">
                     <div className="csl-field">
                       <label className="csl-label csl-titleLabel">
@@ -468,7 +818,11 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                           value={form.productType}
                           onChange={(val) => setFormField("productType", val)}
                           options={productTypes}
-                          placeholder="eg., Digital Service"
+                          placeholder={
+                            !form.subCategory
+                              ? "Select sub category first"
+                              : "Select product type"
+                          }
                           disabled={!form.subCategory}
                         />
                       </div>
@@ -587,36 +941,73 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                     )}
 
                     <div className="sp-field mt-4">
-                      <label className="sp-label">What's not included</label>
-                      <input
-                        className="sp-input"
-                        value={notInput}
-                        onChange={(e) => setNotInput(e.target.value)}
-                        onKeyDown={(e) => onEnterAdd(e, addNot)}
-                        placeholder="eg., Printing"
-                      />
-                      <button
-                        type="button"
-                        className="sp-addMini"
-                        onClick={addNot}
-                      >
-                        + <span>Add</span>
-                      </button>
-
-                      {!!current.notIncluded?.length && (
-                        <div
-                          className="sp-chipRow"
-                          style={{ position: "relative" }}
+                      <label className="sp-label">What's included</label>
+                      <div className="sp-toolsRow">
+                        <input
+                          className="sp-input"
+                          value={includedInput}
+                          onChange={(e) => setIncludedInput(e.target.value)}
+                          onKeyDown={(e) => onEnterAdd(e, addIncluded)}
+                          placeholder="eg., Source file, Commercial License"
+                        />
+                        <button
+                          type="button"
+                          className="sp-addBtnRight"
+                          onClick={addIncluded}
                         >
-                          {current.notIncluded.map((x, idx) => (
+                          + Add
+                        </button>
+                      </div>
+
+                      {!!current.included?.length && (
+                        <ul className="included-bullet-list">
+                          {current.included.map((x, idx) => (
+                            <li key={`${x}-${idx}`} className="included-bullet-item">
+                              <span className="included-bullet-dot">•</span>
+                              <span className="included-bullet-text">{x}</span>
+                              <button
+                                type="button"
+                                className="included-bullet-del"
+                                onClick={() => removeFromList("included", idx)}
+                                aria-label="Remove"
+                              >
+                                ×
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
+                    <div className="sp-field mt-4">
+                      <label className="sp-label">Delivery format</label>
+                      <div className="sp-toolsRow">
+                        <input
+                          className="sp-input"
+                          value={deliveryFormatInput}
+                          onChange={(e) => setDeliveryFormatInput(e.target.value)}
+                          onKeyDown={(e) => onEnterAdd(e, addDeliveryFormat)}
+                          placeholder="eg., PDF, Figma, ZIP Download"
+                        />
+                        <button
+                          type="button"
+                          className="sp-addBtnRight"
+                          onClick={addDeliveryFormat}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                      <div className="sp-hint">Tag the format buyers will receive</div>
+
+                      {!!(current.deliveryFormat || []).length && (
+                        <div className="sp-chipRow" style={{ position: "relative" }}>
+                          {(current.deliveryFormat || []).map((x, idx) => (
                             <div className="sp-chip" key={`${x}-${idx}`}>
                               {x}
                               <button
                                 className="sp-chipX"
                                 type="button"
-                                onClick={() =>
-                                  removeFromList("notIncluded", idx)
-                                }
+                                onClick={() => removeDeliveryFormat(idx)}
                               >
                                 ×
                               </button>
@@ -627,10 +1018,7 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                             onClick={() =>
                               setPkg((p) => ({
                                 ...p,
-                                [activeTab]: {
-                                  ...p[activeTab],
-                                  notIncluded: [],
-                                },
+                                [activeTab]: { ...p[activeTab], deliveryFormat: [] },
                               }))
                             }
                             title="Clear all"
@@ -640,34 +1028,77 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                         </div>
                       )}
                     </div>
-
-                    <div className="sp-field mt-4">
-                      <label className="sp-label">Delivery format</label>
-                      <div className="sp-selectWrap">
-                        <CustomSelect
-                          value={current.deliveryFormat}
-                          onChange={(val) => setPkgField("deliveryFormat", val)}
-                          options={[
-                            "Googel drive link",
-                            "figma link ",
-                            "zip download",
-                            "notion page",
-                          ]}
-                          placeholder="Select format"
-                        />
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                {/* ================= ADD-ONS + MEDIA ================= */}
                 <div className="am-card">
                   <h3 className="am-title" style={{ marginTop: 0 }}>
-                    Cover Page
+                    Cover Pages
                   </h3>
+                  <p className="csl-label" style={{marginBottom:'8px',opacity:.7}}>Upload up to 9 images — first image is the primary cover.</p>
                   <div className="am-uploadBox">
-                    {cover ? (
-                      <img src={cover} alt="cover" className="am-preview" />
+                    {coverImages.length > 0 ? (
+                      <>
+                        {/* Slider Preview */}
+                        <div className="am-cover-slider" style={{position:'relative',width:'100%'}}>
+                          <img
+                            src={coverImages[coverSlideIdx]}
+                            alt={`cover ${coverSlideIdx + 1}`}
+                            className="am-preview"
+                            style={{display:'block'}}
+                          />
+                          {coverImages.length > 1 && (
+                            <>
+                              <button
+                                type="button"
+                                className="am-slide-btn left"
+                                onClick={() => setCoverSlideIdx((p) => (p - 1 + coverImages.length) % coverImages.length)}
+                              >&#8249;</button>
+                              <button
+                                type="button"
+                                className="am-slide-btn right"
+                                onClick={() => setCoverSlideIdx((p) => (p + 1) % coverImages.length)}
+                              >&#8250;</button>
+                              <div className="am-slide-dots">
+                                {coverImages.map((_, i) => (
+                                  <span
+                                    key={i}
+                                    className={`am-dot ${i === coverSlideIdx ? 'active' : ''}`}
+                                    onClick={() => setCoverSlideIdx(i)}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                          <div className="am-slide-count">{coverSlideIdx + 1} / {coverImages.length}</div>
+                        </div>
+                        {/* Thumbnail strip */}
+                        {coverImages.length > 1 && (
+                          <div className="am-thumb-strip">
+                            {coverImages.map((img, i) => (
+                              <img
+                                key={i}
+                                src={img}
+                                alt={`thumb ${i + 1}`}
+                                className={`am-thumb ${i === coverSlideIdx ? 'active' : ''}`}
+                                onClick={() => setCoverSlideIdx(i)}
+                              />
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          className="am-changeBtn"
+                          onClick={() => setUploadStep("grid")}
+                          title="Change cover images"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                          </svg>
+                          Change
+                        </button>
+                      </>
                     ) : (
                       <div className="am-placeholder">
                         <button
@@ -678,154 +1109,45 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                         </button>
                       </div>
                     )}
-                    <button
-                      className="am-removeImg"
-                      onClick={() => setCover(null)}
-                    >
-                      ×
-                    </button>
-
-                    <input
-                      type="file"
-                      ref={fileRef}
-                      hidden
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
                   </div>
                 </div>
 
-                {/* Portfolio Section */}
                 <div className="csl-portfolio-wrap">
-                  <MyPortfolio />
+                  <MyPortfolio
+                    mode="listing"
+                    listingType="digital_product"
+                    listingId={isEditMode ? editingListingId : null}
+                    onChange={setPortfolioProjects}
+                  />
                 </div>
 
-                {/* ================= MAIN DELIVERABLES Section ================= */}
-                <div className="border !border-[#CEFF1B] rounded-xl p-4 bg-white">
-                  {/* HEADER */}
-                  <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                    Upload main deliverables
-                  </h3>
+                <DeliverablesSection
+                  deliverables={mainDeliverables.map((d, idx) => ({
+                    file: d instanceof File ? d : (d.file instanceof File ? d.file : null),
+                    name: d.file_name || d.name,
+                    size: d.file_size || d.size,
+                    notes: notes[idx] || (typeof d === 'object' ? d.notes : "") || "",
+                  }))}
+                  onAddDeliverable={(file) => {
+                    setMainDeliverables((p) => [...p, file]);
+                    setNotes((p) => [...p, ""]);
+                  }}
+                  onRemoveDeliverable={(idx) => {
+                    setMainDeliverables((p) => p.filter((_, i) => i !== idx));
+                    setNotes((p) => p.filter((_, i) => i !== idx));
+                  }}
+                  onUpdateDeliverableNotes={(idx, val) => {
+                    setNotes((p) => p.map((n, i) => (i === idx ? val : n)));
+                  }}
+                  onUpdateDeliverableFile={(idx, file) => {
+                    setMainDeliverables((p) => p.map((f, i) => (i === idx ? file : f)));
+                  }}
+                  links={links}
+                  onAddLink={() => setLinks((p) => [...p, ""])}
+                  onRemoveLink={(idx) => setLinks((p) => p.filter((_, i) => i !== idx))}
+                  onUpdateLink={(idx, val) => setLinks((p) => p.map((l, i) => (i === idx ? val : l)))}
+                />
 
-                  {/* UPLOAD BOX */}
-                  <div className="p-4 mb-4">
-                    <label
-                      htmlFor="main-deliverables"
-                      className="
-                      flex flex-col items-center justify-center text-center cursor-pointer                      py-10 rounded-lg
-                      border border-dashed border-gray-300
-                      bg-[#EBEBEB]
-                      dark:bg-[#FEFEFE40]
-                      transition
-                      hover:border-[#CEFF1B] hover:bg-gray-50
-                      dark:hover:border-transparent dark:hover:bg-[#FEFEFE40]
-                      "
-                    >
-                      <span className="text-blue-600 text-sm font-medium">
-                        Click to upload
-                        <span className="text-gray-500">
-                          {" "}
-                          or Drag or drop file
-                        </span>
-                      </span>
-
-                      <span className="text-xs text-gray-400 mt-2">
-                        PDF, JPG, JPEG, PNG less than 10MB
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        Ensure your document are in good condition and readable
-                      </span>
-
-                      <input
-                        id="main-deliverables"
-                        type="file"
-                        multiple
-                        accept="application/pdf,image/jpeg,image/png"
-                        className="hidden"
-                        onChange={handleMainDeliverablesChange}
-                      />
-                    </label>
-
-                    {mainDeliverables.length > 0 && (
-                      <ul className="mt-3 text-sm text-gray-600 list-disc list-inside">
-                        {mainDeliverables.map((file, idx) => (
-                          <li key={`${file.name}-${idx}`}>{file.name}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  {/* NOTES SECTION */}
-
-                  <div
-                    className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden 
-  bg-white dark:bg-slate-800 mb-4 m-4"
-                  >
-                    {/* HEADER */}
-                    <div className="px-4 py-2 text-sm font-medium text-black dark:text-gray-200 bg-white dark:bg-slate-700">
-                      Add Notes
-                    </div>
-
-                    {/* DIVIDER */}
-                    <div className="border-t border-gray-300 dark:border-gray-600" />
-
-                    {/* TEXTAREA */}
-                    <textarea
-                      placeholder="Type here"
-                      value={notes[0] || ""}
-                      onChange={(e) => updateNoteField(0, e.target.value)}
-                      className="
-      w-full px-4 py-3 text-sm
-      bg-white dark:bg-slate-800
-      text-gray-900 dark:text-gray-100
-      placeholder-gray-400 dark:placeholder-gray-500
-      resize-none border-none outline-none focus:ring-0
-    "
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="flex justify-end mt-2 m-4">
-                    <button
-                      type="button"
-                      onClick={addLinkField}
-                      className="bg-[#CEFF1B] text-black text-sm font-semibold px-3 py-2 rounded-md hover:opacity-90"
-                    >
-                      + Add more
-                    </button>
-                  </div>
-
-                  {/* LINK SECTION */}
-                  <div>
-                    <label className="text-sm font-medium text-black dark:text-gray-200 mx-4">
-                      Link
-                    </label>
-
-                    <div className="mt-2 space-y-2 m-4">
-                      {links.map((link, idx) => (
-                        <input
-                          key={idx}
-                          placeholder="Paste here"
-                          value={link}
-                          onChange={(e) => updateLinkField(idx, e.target.value)}
-                          className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:border-[#CEFF1B]"
-                        />
-                      ))}
-                    </div>
-
-                    <div className="flex justify-end mt-2 m-4">
-                      <button
-                        type="button"
-                        onClick={addLinkField}
-                        className="bg-[#CEFF1B] text-black text-sm font-semibold px-3 py-2 rounded-md hover:opacity-90"
-                      >
-                        + Add more
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ================= FAQ ================= */}
                 <div className="faq-wrap">
                   <h3 className="faq-title">FAQs</h3>
 
@@ -890,13 +1212,38 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
                     </div>
                   ))}
                 </div>
-                {/* ================= ACTIONS ================= */}
+
                 <div className="faq-actions">
-                  <button type="button" className="faq-draft">
-                    Save as Draft
+                  <button
+                    type="button"
+                    className={`faq-draft${savingStatus === "draft" ? " saving" : ""}`}
+                    onClick={() => handleSubmit("draft")}
+                    disabled={savingStatus !== null}
+                  >
+                    {savingStatus === "draft" ? (
+                      <span className="saving-indicator">
+                        <span className="saving-dot" />
+                        Saving...
+                      </span>
+                    ) : (
+                      "Save as Draft"
+                    )}
                   </button>
-                  <button type="button" className="faq-save">
-                    Save
+
+                  <button
+                    type="button"
+                    className={`faq-save${savingStatus === "published" ? " saving" : ""}`}
+                    onClick={() => handleSubmit("published")}
+                    disabled={savingStatus !== null}
+                  >
+                    {savingStatus === "published" ? (
+                      <span className="saving-indicator">
+                        <span className="saving-dot" />
+                        Saving...
+                      </span>
+                    ) : (
+                      isEditMode ? "Update" : "Save"
+                    )}
                   </button>
                 </div>
               </div>
@@ -905,7 +1252,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
         </div>
       </div>
 
-      {/* ================= UPLOAD MODALS ================= */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-[900] bg-black/30 backdrop-blur-sm"
@@ -915,16 +1261,18 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
 
       {(uploadStep === "grid" || uploadStep === "success") && (
         <UploadGrid
-          blurred={uploadStep === "success"}
-          onBack={() => setUploadStep(null)}
+          initialFiles={coverFiles}
           onSelect={(files) => {
-            if (files && files[0]) {
-              const reader = new FileReader();
-              reader.onload = () => setCover(reader.result);
-              reader.readAsDataURL(files[0]);
-            }
+            const validFiles = files.filter(Boolean);
+            if (!validFiles.length) return;
+            setCoverFiles(validFiles);
+            const urls = validFiles.map(file => URL.createObjectURL(file));
+            setCoverImages(urls);
+            setCoverSlideIdx(0);
             setUploadStep("success");
           }}
+          onBack={() => setUploadStep(null)}
+          blurred={uploadStep === "success"}
         />
       )}
 
@@ -934,8 +1282,6 @@ export default function CreateDigitalProduct({ theme, setTheme }) {
     </div>
   );
 }
-
-/* ================= REUSABLE CUSTOM SELECT ================= */
 
 function CustomSelect({
   value,
@@ -957,7 +1303,9 @@ function CustomSelect({
 
   return (
     <div
-      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${
+        disabled ? "opacity-50 pointer-events-none" : ""
+      }`}
       ref={ref}
     >
       <div
@@ -992,144 +1340,95 @@ function CustomSelect({
   );
 }
 
-/* ================= UPLOAD GRID ================= */
-
-function UploadGrid({ onSelect, onBack, blurred }) {
-  const fileRef = React.useRef(null);
-  const [files, setFiles] = React.useState([]);
-  const [visibleSlots] = React.useState(9);
-  const [activeIndex, setActiveIndex] = React.useState(null);
-
-  const openPicker = () => fileRef.current?.click();
+function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
+  const fileRef = useRef(null);
+  const [files, setFiles] = useState(initialFiles);
+  const activeIndexRef = useRef(null);
 
   const handleFiles = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (activeIndex === null || selected.length === 0) return;
-    setFiles((prev) => {
-      const updated = [...prev];
-      updated[activeIndex] = selected[0];
-      return updated;
-    });
-    setActiveIndex(null);
+    const newFiles = Array.from(e.target.files);
+    if (!newFiles.length) return;
+
+    if (activeIndexRef.current !== null) {
+      const next = [...files];
+      next[activeIndexRef.current] = newFiles[0];
+      setFiles(next);
+      activeIndexRef.current = null;
+    } else {
+      const combined = [...files, ...newFiles].slice(0, 9);
+      setFiles(combined);
+    }
     e.target.value = "";
   };
 
+  const removeFile = (idx, e) => {
+    e.stopPropagation();
+    setFiles(files.filter((_, i) => i !== idx));
+  };
+
   return (
-    <div className="fixed inset-0 z-[950] flex items-center justify-center pointer-events-auto">
-      <div
-        className={`upload-card rounded-2xl p-4 w-[95%] max-w-[820px] h-auto max-h-[90vh] flex flex-col bg-white shadow-[0_0_20px_#CEFF1B] transition-all duration-200${
-          blurred
-            ? " blur-sm scale-[0.98] pointer-events-none select-none opacity-95"
-            : ""
-        }`}
-      >
-        {/* HEADER */}
-        <div className="upload-header flex items-center gap-3 mb-3 shrink-0">
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100"
-            title="Back"
-          >
-            <img src="/backarrow.svg" alt="back" />
+    <div className={`am-modal-overlay ${blurred ? "blurred" : ""}`}>
+      <div className="am-modal-content">
+        <div className="am-modal-header">
+          <button className="am-back-btn" onClick={onBack}>
+            ← Back
           </button>
-          <h4 className="text-sm font-medium">Select and upload your file</h4>
+          <h2 className="am-modal-title">Upload Cover Photo</h2>
           <button
-            type="button"
-            onClick={onBack}
-            className="ml-auto w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#CEFF1B]"
-            title="Close"
+            className="am-done-btn"
+            onClick={() => onSelect(files)}
+            disabled={!files.length}
           >
-            ✕
+            Done
           </button>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-3 gap-4 flex-1 overflow-y-auto pr-2 custom-scroll">
-          {Array.from({ length: visibleSlots }).map((_, i) => {
+        <div className="am-upload-grid">
+          {[...Array(9)].map((_, i) => {
             const file = files[i];
+            const url = file ? URL.createObjectURL(file) : null;
+
             return (
               <div
                 key={i}
+                className={`am-grid-slot ${file ? "has-file" : ""}`}
                 onClick={() => {
-                  setActiveIndex(i);
-                  openPicker();
+                  activeIndexRef.current = i;
+                  fileRef.current?.click();
                 }}
-                className="upload-slot relative h-[110px] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden bg-gray-100"
               >
-                {i === 0 && (
-                  <span className="absolute inset-0 z-10 flex items-center justify-center px-2">
-                    <span className="bg-[#CEFF1B] text-black font-medium text-[10px] sm:text-xs px-2 py-[3px] rounded max-w-[90%] text-center whitespace-normal leading-tight">
-                      Upload Cover Image
-                    </span>
-                  </span>
-                )}
-                {file ? (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+                {url ? (
                   <>
-                    {i !== 0 && (
-                      <div className="relative">
-                        <img
-                          src="/video2.svg"
-                          className="w-10 mr-8 mt-2 opacity-60"
-                          alt=""
-                        />
-                        <img
-                          src="/video1.svg"
-                          className="w-12 absolute -right-2 -top-3 opacity-60"
-                          alt=""
-                        />
-                        <div className="absolute bottom-4 right-5 w-6 h-6 rounded-full bg-[#CEFF1B] flex items-center justify-center">
-                          +
-                        </div>
-                      </div>
-                    )}
+                    <img src={url} alt="" className="am-slot-img" />
+                    <button
+                      className="am-remove-slot"
+                      onClick={(e) => removeFile(i, e)}
+                    >
+                      ×
+                    </button>
                   </>
+                ) : (
+                  <div className="am-slot-add">+</div>
                 )}
               </div>
             );
           })}
         </div>
-
-        <div className="flex justify-end items-center mt-3 shrink-0">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="upload-btn-cancel px-4 py-2 rounded-lg text-sm border border-black"
-            >
-              Cancel
-            </button>
-            {files.filter(Boolean).length > 0 && (
-              <button
-                type="button"
-                onClick={() => onSelect(files.filter(Boolean))}
-                className="upload-btn-confirm px-5 py-2 rounded-lg text-sm font-medium bg-[#CEFF1B] border border-black"
-              >
-                Upload
-              </button>
-            )}
-          </div>
-        </div>
-
         <input
-          ref={fileRef}
           type="file"
-          accept="image/*,video/*"
-          onChange={handleFiles}
+          ref={fileRef}
           className="hidden"
+          multiple
+          accept="image/*"
+          onChange={handleFiles}
         />
+        <p className="am-modal-hint">
+          Upload up to 9 images. The first image will be your main cover.
+        </p>
       </div>
     </div>
   );
 }
-
-/* ================= UPLOAD SUCCESS ================= */
 
 function UploadSuccess({ onBack }) {
   return (

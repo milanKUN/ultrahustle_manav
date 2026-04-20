@@ -40,14 +40,14 @@ class MePortfolioTest extends TestCase
 					'title' => 'Project A',
 					'description' => 'Desc A',
 					'cost_cents' => 2500,
-					'currency' => 'INR',
+					'currency' => 'USD',
 					'sort_order' => 0,
 				],
 				[
 					'title' => 'Project B',
 					'description' => 'Desc B',
 					'cost_cents' => null,
-					'currency' => 'INR',
+					'currency' => 'USD',
 					'sort_order' => 1,
 				],
 			],
@@ -72,7 +72,7 @@ class MePortfolioTest extends TestCase
 					'title' => 'Project A (Updated)',
 					'description' => 'Desc A2',
 					'cost_cents' => 999,
-					'currency' => 'INR',
+					'currency' => 'USD',
 					'sort_order' => 0,
 				],
 			],
@@ -99,7 +99,7 @@ class MePortfolioTest extends TestCase
 			'title' => 'Project',
 			'description' => null,
 			'cost_cents' => null,
-			'currency' => 'INR',
+			'currency' => 'USD',
 			'sort_order' => 0,
 		]);
 
@@ -143,7 +143,7 @@ class MePortfolioTest extends TestCase
 			'title' => 'Owners Project',
 			'description' => null,
 			'cost_cents' => null,
-			'currency' => 'INR',
+			'currency' => 'USD',
 			'sort_order' => 0,
 		]);
 

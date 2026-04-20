@@ -74,7 +74,7 @@ class MePortfolioController extends Controller
 					'title' => (string) ($item['title'] ?? ''),
 					'description' => array_key_exists('description', $item) ? ($item['description'] === null ? null : (string) $item['description']) : null,
 					'cost_cents' => array_key_exists('cost_cents', $item) ? ($item['cost_cents'] === null ? null : (int) $item['cost_cents']) : null,
-					'currency' => array_key_exists('currency', $item) && $item['currency'] ? strtoupper((string) $item['currency']) : 'INR',
+					'currency' => array_key_exists('currency', $item) && $item['currency'] ? strtoupper((string) $item['currency']) : 'USD',
 					'sort_order' => array_key_exists('sort_order', $item) && $item['sort_order'] !== null ? (int) $item['sort_order'] : 0,
 				];
 

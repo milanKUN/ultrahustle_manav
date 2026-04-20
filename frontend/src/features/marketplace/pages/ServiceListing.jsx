@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getListingByUsername, getPublicUserListings } from "../api/listingApi";
 import { createPortal } from "react-dom";
 import {
     Share2,
@@ -47,6 +48,48 @@ const ServiceListing = ({ theme, setTheme }) => {
     const moreFromSarahGridRef = useRef(null);
 
     const navigate = useNavigate();
+    const { username } = useParams();
+    const [listing, setListing] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(null);
+
+    const getRoutePrefix = (type) => {
+        if (!type) return "service";
+        const t = type.toLowerCase();
+        if (t === "course") return "course";
+        if (t === "webinar") return "webinar";
+        if (t === "digital_product" || t === "digital-product") return "digital-product";
+        return "service";
+    };
+
+    useEffect(() => {
+        if (!username) { setIsLoading(false); return; }
+        setIsLoading(true);
+        getListingByUsername(username)
+            .then((res) => setListing(res?.listing || res?.data || res || null))
+            .catch((e) => setFetchError(e?.message || "Failed to load listing."))
+            .finally(() => setIsLoading(false));
+    }, [username]);
+
+    // Sync activeTab to first real package once listing loads
+    useEffect(() => {
+        if (listing?.details?.packages?.length) {
+            setActiveTab(listing.details.packages[0].package_name || "Basic");
+        }
+    }, [listing]);
+
+    // Fetch the creator's public listings for the "Listings" section
+    // (listing.more_from_user is limited to 8 and excludes current — use public endpoint for full grid)
+    const [creatorListings, setCreatorListings] = useState([]);
+    useEffect(() => {
+        const creatorUser = listing?.creator_username || listing?.creator?.username;
+        if (!creatorUser) return;
+        getPublicUserListings(creatorUser)
+            .then((res) => setCreatorListings(
+                Array.isArray(res?.listings) ? res.listings : []
+            ))
+            .catch(() => {});
+    }, [listing]);
 
     useEffect(() => {
         const shouldLockScroll = Boolean(activeItem || showImageModal);
@@ -84,35 +127,7 @@ const ServiceListing = ({ theme, setTheme }) => {
         });
     };
 
-    const portfolioData = {
-        featured: {
-            image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            title: "SalonSync - Revolutionary AI-Powered Salon App UI/UX",
-            description:
-                "This project involves designing a next-generation salon mobile application with AI-powered recommendations.",
-            cost: "$600-$800",
-        },
-        items: [
-            {
-                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                title: "Title",
-                description: "Description",
-                cost: "$",
-            },
-            {
-                image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                title: "E-commerce Dashboard Redesign",
-                description: "This project involves designing more...",
-                cost: "$600-$800",
-            },
-            {
-                image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-                title: "E-commerce Dashboard Redesign",
-                description: "This project involves designing more...",
-                cost: "$600-$800",
-            },
-        ],
-    };
+
 
     const listingsData = [
         {
@@ -324,164 +339,99 @@ const ServiceListing = ({ theme, setTheme }) => {
         },
     ];
 
-    const images = [
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=2070&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1588&auto=format&fit=crop",
+    // ── API-derived data ─────────────────────────────────────────────────
+    const details = listing?.details || {};
+    const rawPkgs = Array.isArray(details.packages) ? details.packages : [];
+    const addOns  = Array.isArray(details.add_ons)  ? details.add_ons  : [];
+    const coverUrl = listing?.cover_media_url || "";
+    const portfolio_api = Array.isArray(listing?.portfolio_projects) ? listing.portfolio_projects : [];
+
+    const portfolioImages = portfolio_api.flatMap((p) =>
+        Array.isArray(p.files) ? p.files.map((f) => f.url || f) : (p.image_url ? [p.image_url] : [])
+    );
+    const galleryImages = Array.isArray(listing?.gallery) ? listing.gallery : [];
+    
+    const combinedImages = [...new Set([coverUrl, ...galleryImages, ...portfolioImages].filter(Boolean))];
+
+    const images = combinedImages.length
+        ? combinedImages
+        : [
+            "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1964&auto=format&fit=crop",
+          ];
+
+    // Build keyed packages from API
+    const PKG_TABS = rawPkgs.length ? rawPkgs.map((p) => p.package_name || "Basic") : ["Basic", "Standard", "Premium"];
+    const packages = PKG_TABS.reduce((acc, tab) => {
+        const p = rawPkgs.find((r) => (r.package_name || "Basic") === tab) || {};
+        acc[tab] = {
+            price: p.price ?? "",
+            delivery: p.delivery_days ? `${p.delivery_days} day${p.delivery_days != 1 ? "s" : ""}` : "—",
+            revisions: p.revisions ?? "—",
+            desc: p.scope || "",
+            inclusions: Array.isArray(p.included) ? p.included : [],
+            howItWorks: Array.isArray(p.how_it_works) ? p.how_it_works : [],
+            notIncluded: Array.isArray(p.not_included) ? p.not_included : [],
+            toolsUsed: Array.isArray(p.tools_used) ? p.tools_used : [],
+            deliveryFormat: p.delivery_format || "",
+        };
+        return acc;
+    }, {});
+
+    // Comparison table — dynamic columns from PKG_TABS
+    const comparisonData = [
+        { feature: "Price",                ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].price ? `$${packages[t].price}` : "—"])) },
+        { feature: "Delivery time (days)", ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].delivery])) },
+        { feature: "Number of revisions",  ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), String(packages[t].revisions)])) },
+        { feature: "Scope of work",        ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].desc])) },
+        { feature: "What's Included",      ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].inclusions])) },
+        { feature: "How it works",         ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].howItWorks])) },
+        { feature: "What's not included",  ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].notIncluded])) },
+        { feature: "Tools used",           ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), (packages[t].toolsUsed || []).join(", ")])) },
+        { feature: "Delivery format",      ...Object.fromEntries(PKG_TABS.map((t) => [t.toLowerCase(), packages[t].deliveryFormat])) },
     ];
 
-    const packages = {
-        Basic: {
-            price: 399,
-            delivery: "5 days",
-            revisions: 4,
-            desc: "Most Popular for medium projects",
-            inclusions: [
-                "Up to 12 screens",
-                "Advanced wireframing & prototyping",
-                "Custom color scheme & typography",
-                "Mobile & tablet responsive",
-                "Interactive prototype",
-                "Source files included",
-                "Commercial use",
-            ],
-        },
-        Standard: {
-            price: 599,
-            delivery: "7 days",
-            revisions: 6,
-            desc: "Recommended for large scale startups",
-            inclusions: [
-                "Up to 24 screens",
-                "Advanced wireframing & prototyping",
-                "Brand Identity guidelines",
-                "Mobile & tablet responsive",
-                "Interactive prototype",
-                "Source files included",
-                "Commercial use",
-            ],
-        },
-        Premium: {
-            price: 999,
-            delivery: "10 days",
-            revisions: "Unlimited",
-            desc: "Enterprise grade design solution",
-            inclusions: [
-                "Unlimited screens",
-                "Full brand design system",
-                "High fidelity animation",
-                "Mobile & tablet responsive",
-                "Usability testing",
-                "Source files included",
-                "Commercial use",
-            ],
-        },
+    // FAQ data from API
+    const faqData = (Array.isArray(listing?.faqs) ? listing.faqs : []).map((f) => ({
+        question: f.q || f.question || "",
+        answer:   f.a || f.answer   || "",
+    }));
+
+    // Portfolio data from API
+    const FALLBACK_IMG = "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+    const portfolioData = {
+        featured: portfolio_api[0]
+            ? { image: portfolio_api[0].files?.[0]?.url || portfolio_api[0].image_url || coverUrl || FALLBACK_IMG, title: portfolio_api[0].title || "Portfolio", description: portfolio_api[0].description || "", cost: portfolio_api[0].cost || "" }
+            : { image: FALLBACK_IMG, title: "Portfolio", description: "", cost: "" },
+        items: portfolio_api.slice(1).map((p) => ({
+            image: p.files?.[0]?.url || p.image_url || coverUrl || FALLBACK_IMG,
+            title: p.title || "",
+            description: p.description || "",
+            cost: p.cost || "",
+        })),
     };
 
-    const comparisonData = [
-        {
-            feature: "Price",
-            basic: "$49",
-            standard: "$399",
-            premium: "$799",
-        },
-        {
-            feature: "Delivery time (days)",
-            basic: "3",
-            standard: "5 days delivery",
-            premium: "3 days delivery",
-        },
-        {
-            feature: "Number of revisions",
-            basic: "1",
-            standard: "6 screens",
-            premium: "8 screens",
-        },
-        {
-            feature: "Scope of work",
-            basic: "Design of 1 core screen or section with clean layout, spacing, and basic interaction logic.",
-            standard:
-                "UI/UX design for up to 3 screens with consistent layout, components, and basic user flow.",
-            premium:
-                "End-to-end UI/UX for a small product flow including multiple screens, components, and UX logic.",
-        },
-        {
-            feature: "What's Included",
-            basic: [
-                "1 UI screen",
-                "Figma file access",
-                "Clean layout and spacing",
-            ],
-            standard: [
-                "Up to 3 UI screens",
-                "Component consistency",
-                "Figma source file",
-            ],
-            premium: [
-                "Up to 6 screens",
-                "Reusable components",
-                "UX flow logic",
-                "Developer-ready structure",
-            ],
-        },
-        {
-            feature: "How it works",
-            basic: [
-                "Client shares requirements",
-                "I design and deliver the UI",
-                "One revision included",
-            ],
-            standard: [
-                "Requirement discussion",
-                "Design + review cycles",
-                "Final delivery",
-            ],
-            premium: [
-                "Strategy discussion",
-                "Structured design execution",
-                "Review and final polish",
-            ],
-        },
-        {
-            feature: "What's not included",
-            basic: ["Full design systems", "Prototyping", "Developer handoff"],
-            standard: ["Full design system", "Advanced animations"],
-            premium: ["Frontend development", "Copywriting"],
-        },
-        {
-            feature: "Tools used",
-            basic: "Figma, AI Design Assistants",
-            standard: "Figma, Notion, AI Design Tools",
-            premium: "Figma, Notion, AI UX Tools",
-        },
-        {
-            feature: "Delivery format",
-            basic: "Figma File",
-            standard: "Figma File",
-            premium: "Figma File",
-        },
-    ];
-
-    const faqData = [
-        {
-            question: "What information do you need to get started?",
-            answer: "I'll need your app concept, target audience details, any brand guidelines you have, competitor examples, and specific features you want included. The more details you provide, the better I can tailor the design to your needs.",
-        },
-        {
-            question: "Do you provide the source files?",
-            answer: "Yes, all packages include the source Figma files with well-organized layers and components ready for development.",
-        },
-        {
-            question: "How many revisions are included?",
-            answer: "The number of revisions varies by package: Basic includes 1, Standard includes 6 screens, and Premium offers unlimited revisions until you are completely satisfied.",
-        },
-    ];
+    // Safe current package — falls back to first tab if activeTab isn't in packages yet
+    const currentPkg = packages[activeTab] || packages[PKG_TABS[0]] || {
+        price: "", delivery: "—", revisions: "—", desc: "",
+        inclusions: [], howItWorks: [], notIncluded: [], toolsUsed: [], deliveryFormat: "",
+    };
 
     return (
         <div className={`user-page ${theme} min-h-screen`}>
-            {/* NAVBAR */}
+
+            {isLoading && (
+                <div className="pt-[85px] flex items-center justify-center h-screen">
+                    <p className="text-lg opacity-60">Loading service listing...</p>
+                </div>
+            )}
+            {fetchError && (
+                <div className="pt-[85px] flex items-center justify-center h-screen">
+                    <p className="text-red-500">{fetchError}</p>
+                </div>
+            )}
+            {!isLoading && !fetchError && (
+            <>
             <UserNavbar
                 toggleSidebar={() => setSidebarOpen((p) => !p)}
                 isSidebarOpen={sidebarOpen}
@@ -495,8 +445,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                         <div className={`tsl-page ${theme}`}>
                             <div className="tsl-header">
                                 <h1 className="tsl-title">
-                                    I will design online course cover and
-                                    digital product mockup bundle
+                                    {listing?.title || "Service Listing"}
                                 </h1>
                                 <div className="tsl-header-actions">
                                     <button className="tsl-icon-btn">
@@ -585,13 +534,22 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     <div className="tsl-profile-mini-card">
                                         <div className="tsl-pmc-left">
                                             <div className="tsl-pmc-avatar-wrap">
-                                                <div className="tsl-pmc-avatar-bg"></div>
+                                                {listing?.creator?.avatar_url ? (
+                                                    <img 
+                                                        src={listing.creator.avatar_url} 
+                                                        alt="Avatar" 
+                                                        className="tsl-pmc-avatar-img"
+                                                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div className="tsl-pmc-avatar-bg"></div>
+                                                )}
                                                 <div className="tsl-pmc-status-dot"></div>
                                             </div>
                                             <div className="tsl-pmc-info">
                                                 <div className="tsl-pmc-name-row">
                                                     <span className="tsl-pmc-name">
-                                                        Sarah Anderson
+                                                        {listing?.creator?.full_name || listing?.creator?.username || "Profile"}
                                                     </span>
                                                     <div className="tsl-pmc-online-badge">
                                                         <div className="tsl-pmc-online-dot"></div>
@@ -601,12 +559,12 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                 <div className="tsl-pmc-meta">
                                                     <Clock size={14} />
                                                     <span>
-                                                        Avg response: 1 hour
+                                                        Avg response: {listing?.creator?.avg_response || "—"}
                                                     </span>
                                                 </div>
                                                 <div className="tsl-pmc-role-row">
                                                     <span className="tsl-pmc-role">
-                                                        Full Stack Developer
+                                                        {listing?.creator?.role || "Creator"}
                                                     </span>
                                                     <div className="tsl-pmc-rating">
                                                         <Star
@@ -615,7 +573,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                             color="#CEFF1B"
                                                         />
                                                         <span>
-                                                            4.9(247 reviews)
+                                                            {listing?.creator?.rating || 0} ({listing?.creator?.review_count || 0} reviews)
                                                         </span>
                                                     </div>
                                                 </div>
@@ -630,51 +588,27 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     {/* Description */}
                                     <div className="tsl-section">
                                         <h2>Description</h2>
-                                        <p>
-                                            He is the best in the game. Always
-                                            have time to explain to me and made
-                                            sure I was satisfied at every stage.
-                                            Don't skip him if you want the best.
-                                            He's great
-                                        </p>
+                                        <p>{listing?.short_description || ""}</p>
                                     </div>
 
                                     <div className="tsl-section">
                                         <h2>About This Service</h2>
-                                        <p>
-                                            Welcome! I'm a senior UI/UX designer
-                                            with 8+ years of experience crafting
-                                            beautiful, user-centered mobile
-                                            applications. I specialize in
-                                            creating intuitive interfaces that
-                                            not only look stunning but are
-                                            backed by thorough user research and
-                                            industry best practices.
-                                        </p>
-                                        <p>
-                                            Whether you're launching a startup
-                                            MVP, redesigning an existing app, or
-                                            building a complex enterprise
-                                            solution, I'll help bring your
-                                            vision to life with modern design
-                                            principles and pixel-perfect
-                                            execution.
-                                        </p>
+                                        {(listing?.about || "").split("\n\n").filter(Boolean).map((para, i) => (
+                                            <p key={i}>{para}</p>
+                                        ))}
                                     </div>
                                 </div>
 
                                 {/* Right Column (Sticky Pricing) */}
                                 <div className="tsl-pricing-card">
                                     <div className="tsl-pricing-tabs">
-                                        {Object.keys(packages).map((pkg) => (
+                                        {PKG_TABS.map((tab) => (
                                             <button
-                                                key={pkg}
-                                                className={`tsl-tab ${activeTab === pkg ? "active" : ""}`}
-                                                onClick={() =>
-                                                    setActiveTab(pkg)
-                                                }
+                                                key={tab}
+                                                className={`tsl-tab ${activeTab === tab ? "active" : ""}`}
+                                                onClick={() => setActiveTab(tab)}
                                             >
-                                                {pkg}
+                                                {tab}
                                             </button>
                                         ))}
                                     </div>
@@ -686,7 +620,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                     Price
                                                 </span>
                                                 <span className="tsl-price">
-                                                    ${packages[activeTab].price}
+                                                    ${currentPkg.price}
                                                 </span>
                                             </div>
                                             <div className="tsl-delivery-info">
@@ -694,20 +628,17 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                     Delivery
                                                 </span>
                                                 <span className="tsl-delivery-value">
-                                                    {
-                                                        packages[activeTab]
-                                                            .delivery
-                                                    }
+                                                    {currentPkg.delivery}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <p className="tsl-pkg-desc">
-                                            {packages[activeTab].desc}
+                                            {currentPkg.desc}
                                         </p>
 
                                         <p className="tsl-revs">
-                                            {packages[activeTab].revisions}{" "}
+                                            {currentPkg.revisions}{" "}
                                             Revisions
                                         </p>
 
@@ -715,7 +646,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                             What's included
                                         </h4>
                                         <div className="tsl-inclusions-list">
-                                            {packages[activeTab].inclusions.map(
+                                            {(currentPkg.inclusions || []).map(
                                                 (item, idx) => (
                                                     <div
                                                         key={idx}
@@ -739,58 +670,20 @@ const ServiceListing = ({ theme, setTheme }) => {
                                             Add-ons
                                         </h4>
                                         <div className="tsl-addons-list">
-                                            <div className="tsl-addon-item">
-                                                <div className="tsl-addon-left">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="tsl-addon-checkbox"
-                                                    />
-                                                    <span className="tsl-addon-name">
-                                                        Extra revision
-                                                    </span>
-                                                </div>
-                                                <span className="tsl-addon-price">
-                                                    +$25
-                                                </span>
-                                            </div>
-                                            <div className="tsl-addon-item">
-                                                <div className="tsl-addon-left">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="tsl-addon-checkbox"
-                                                    />
-                                                    <div className="tsl-addon-info">
-                                                        <span className="tsl-addon-name">
-                                                            Superfast delivery
-                                                        </span>
-                                                        <span className="tsl-addon-sub">
-                                                            -2days
-                                                        </span>
+                                            {addOns.length > 0 ? addOns.map((ao, i) => (
+                                                <div key={i} className="tsl-addon-item">
+                                                    <div className="tsl-addon-left">
+                                                        <input type="checkbox" className="tsl-addon-checkbox" />
+                                                        <div className="tsl-addon-info">
+                                                            <span className="tsl-addon-name">{ao.name}</span>
+                                                            {ao.days ? <span className="tsl-addon-sub">+{ao.days} day(s)</span> : null}
+                                                        </div>
                                                     </div>
+                                                    <span className="tsl-addon-price">+${ao.price}</span>
                                                 </div>
-                                                <span className="tsl-addon-price">
-                                                    +$75
-                                                </span>
-                                            </div>
-                                            <div className="tsl-addon-item">
-                                                <div className="tsl-addon-left">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="tsl-addon-checkbox"
-                                                    />
-                                                    <div className="tsl-addon-info">
-                                                        <span className="tsl-addon-name">
-                                                            Additional 5 screens
-                                                        </span>
-                                                        <span className="tsl-addon-sub">
-                                                            +2days
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <span className="tsl-addon-price">
-                                                    +$120
-                                                </span>
-                                            </div>
+                                            )) : (
+                                                <p className="text-sm opacity-50 py-2">No add-ons available.</p>
+                                            )}
                                         </div>
 
                                         <div className="tsl-pricing-actions">
@@ -1096,95 +989,25 @@ const ServiceListing = ({ theme, setTheme }) => {
                                         <thead>
                                             <tr>
                                                 <th>Package Features</th>
-                                                <th>Basic</th>
-                                                <th>Standard</th>
-                                                <th>Premium</th>
+                                                {PKG_TABS.map((t) => <th key={t}>{t}</th>)}
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {comparisonData.map((row, idx) => (
                                                 <tr key={idx}>
-                                                    <td className="feature-name">
-                                                        {row.feature}
-                                                    </td>
-                                                    <td>
-                                                        {Array.isArray(
-                                                            row.basic,
-                                                        ) ? (
-                                                            <ul className="compare-list">
-                                                                {row.basic.map(
-                                                                    (
-                                                                        item,
-                                                                        i,
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                item
-                                                                            }
-                                                                        </li>
-                                                                    ),
-                                                                )}
-                                                            </ul>
-                                                        ) : (
-                                                            row.basic
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {Array.isArray(
-                                                            row.standard,
-                                                        ) ? (
-                                                            <ul className="compare-list">
-                                                                {row.standard.map(
-                                                                    (
-                                                                        item,
-                                                                        i,
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                item
-                                                                            }
-                                                                        </li>
-                                                                    ),
-                                                                )}
-                                                            </ul>
-                                                        ) : (
-                                                            row.standard
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {Array.isArray(
-                                                            row.premium,
-                                                        ) ? (
-                                                            <ul className="compare-list">
-                                                                {row.premium.map(
-                                                                    (
-                                                                        item,
-                                                                        i,
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                item
-                                                                            }
-                                                                        </li>
-                                                                    ),
-                                                                )}
-                                                            </ul>
-                                                        ) : (
-                                                            row.premium
-                                                        )}
-                                                    </td>
+                                                    <td className="feature-name">{row.feature}</td>
+                                                    {PKG_TABS.map((tab) => {
+                                                        const val = row[tab.toLowerCase()];
+                                                        return (
+                                                            <td key={tab}>
+                                                                {Array.isArray(val) ? (
+                                                                    <ul className="compare-list">
+                                                                        {val.map((item, i) => <li key={i}>{item}</li>)}
+                                                                    </ul>
+                                                                ) : (val || "—")}
+                                                            </td>
+                                                        );
+                                                    })}
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -1273,140 +1096,44 @@ const ServiceListing = ({ theme, setTheme }) => {
                                 {/* ================= CONTENT ================= */}
 
                                 <div className="listings-grid">
-                                    {listingsData
+                                    {(creatorListings.length ? creatorListings : [])
                                         .filter((l) => {
                                             if (filter === "All") return true;
-                                            return (
-                                                l.type === filter.slice(0, -1)
-                                            );
+                                            return (l.listing_type || l.type || "").toLowerCase() === filter.slice(0, -1).toLowerCase();
                                         })
-                                        .slice(
-                                            0,
-                                            showMoreListings
-                                                ? listingsData.length
-                                                : 6,
-                                        )
-                                        .map((listing, index) => (
-                                            <div
-                                                key={index}
-                                                className="listing-card"
-                                            >
+                                        .slice(0, showMoreListings ? creatorListings.length : 6)
+                                        .map((l, index) => (
+                                            <div key={l.id || index} className="listing-card">
                                                 <div className="listing-image">
                                                     <img
-                                                        src={listing.image}
-                                                        alt={listing.title}
+                                                        src={l.cover_media_url || l.image || "https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"}
+                                                        alt={l.title}
                                                     />
-
-                                                    <button className="listing-nav-btn left">
-                                                        <svg
-                                                            width="18"
-                                                            height="18"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            strokeWidth="2.5"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        >
-                                                            <path d="m15 18-6-6 6-6" />
-                                                        </svg>
-                                                    </button>
-                                                    <button className="listing-nav-btn right">
-                                                        <svg
-                                                            width="18"
-                                                            height="18"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            strokeWidth="2.5"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        >
-                                                            <path d="m9 18 6-6-6-6" />
-                                                        </svg>
-                                                    </button>
                                                 </div>
-
                                                 <div className="listing-info">
                                                     <div className="listing-title-row">
-                                                        <h4 className="listing-title">
-                                                            {listing.title}
-                                                        </h4>
-                                                        <span className="listing-type">
-                                                            {listing.type}
-                                                        </span>
+                                                        <h4 className="listing-title">{l.title}</h4>
+                                                        <span className="listing-type">{l.listing_type || l.type || "Service"}</span>
                                                     </div>
-
                                                     <div className="listing-meta">
-                                                        <div className="listing-views">
-                                                            <svg
-                                                                width="14"
-                                                                height="14"
-                                                                viewBox="0 0 24 24"
-                                                                fill="none"
-                                                                stroke="currentColor"
-                                                                strokeWidth="2"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                            >
-                                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                                <circle
-                                                                    cx="12"
-                                                                    cy="12"
-                                                                    r="3"
-                                                                />
-                                                            </svg>
-                                                            <span>
-                                                                {listing.views}{" "}
-                                                                views
-                                                            </span>
-                                                        </div>
                                                         <div className="listing-price">
-                                                            {listing.price}
+                                                            {l.details?.price ? `$${l.details.price}` : (l.price ? `$${l.price}` : "—")}
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div className="listing-actions">
-                                                    <button className="btn-view-listing">
-                                                        View Listing
-                                                    </button>
                                                     <button
-                                                        className="btn-favorite"
-                                                        onClick={() =>
-                                                            toggleFavorite(
-                                                                index,
-                                                            )
-                                                        }
+                                                        className="btn-view-listing"
+                                                        onClick={() => navigate(`/${getRoutePrefix(l.listing_type || l.type)}/${l.username || l.slug || ""}`)}
                                                     >
-                                                        <svg
-                                                            width="20"
-                                                            height="20"
-                                                            viewBox="0 0 24 24"
-                                                            fill={
-                                                                favorites.has(
-                                                                    index,
-                                                                )
-                                                                    ? "#ef4444"
-                                                                    : "none"
-                                                            }
-                                                            stroke={
-                                                                favorites.has(
-                                                                    index,
-                                                                )
-                                                                    ? "#ef4444"
-                                                                    : "currentColor"
-                                                            }
-                                                            strokeWidth="2"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        >
-                                                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                                                        </svg>
+                                                        View Listing
                                                     </button>
                                                 </div>
                                             </div>
                                         ))}
+                                    {!creatorListings.length && (
+                                        <p className="opacity-50 text-sm py-4">No listings found.</p>
+                                    )}
                                 </div>
                             </section>
 
@@ -1444,7 +1171,22 @@ const ServiceListing = ({ theme, setTheme }) => {
                             </div>
 
                             {/* Detailed Team Card */}
-                            <DetailedTeamCard />
+                            <DetailedTeamCard
+                                teamName={listing?.creator?.full_name || listing?.creator?.username || ""}
+                                avatarUrl={listing?.creator?.avatar_url || ""}
+                                location={listing?.creator?.location || ""}
+                                rating={listing?.creator?.rating || 0}
+                                reviewCount={listing?.creator?.review_count || 0}
+                                description={listing?.creator?.bio || listing?.creator?.about || ""}
+                                languages={listing?.creator?.languages || []}
+                                skills={listing?.creator?.skills || listing?.tags || []}
+                                memberSince={listing?.creator?.created_at || listing?.creator?.member_since || ""}
+                                karma={listing?.creator?.karma || "—"}
+                                projectsCompleted={listing?.creator?.projects_completed || "—"}
+                                responseSpeed={listing?.creator?.avg_response || listing?.creator?.response_speed || "—"}
+                                buttonText="View Profile"
+                                onViewProfile={() => navigate(`/public-user-profile/${listing?.creator?.username || listing?.creator_username || username}`)}
+                            />
 
                             {/* FAQ Section */}
                             <section className="faq-section">
@@ -1665,97 +1407,39 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     className="tsl-mp-grid"
                                     ref={recommendedGridRef}
                                 >
-                                    {recommendedProducts.map((p) => (
-                                        <article
-                                            className="tsl-mp-card"
-                                            key={p.id}
-                                        >
+                                    {(listing?.recommended_listings?.length > 0
+                                        ? listing.recommended_listings
+                                        : []
+                                    ).map((p, i) => (
+                                        <article className="tsl-mp-card" key={p.id || i}>
                                             <div className="tsl-mp-imgWrap">
                                                 <img
                                                     className="tsl-mp-img"
-                                                    src={p.image}
-                                                    alt=""
+                                                    src={p.cover_media_url || "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop"}
+                                                    alt={p.title || ""}
                                                 />
                                             </div>
                                             <div className="tsl-mp-cardBody">
-                                                <div className="tsl-mp-topLine">
-                                                    <div className="tsl-mp-user">
-                                                        <div className="tsl-mp-avatar"></div>
-                                                        <span className="tsl-mp-userName">
-                                                            {p.name}
-                                                        </span>
-                                                        {p.verified && (
-                                                            <svg
-                                                                className="tsl-mp-verifyIcon"
-                                                                width="16"
-                                                                height="16"
-                                                                viewBox="0 0 24 24"
-                                                                fill="none"
-                                                            >
-                                                                <path
-                                                                    fill="#1DA1F2"
-                                                                    d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
-                                                                />
-                                                                <path
-                                                                    stroke="#FFF"
-                                                                    strokeWidth="3"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M8 12.5l3 3 5-5"
-                                                                />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    {p.ai && (
-                                                        <span className="tsl-mp-aiBadge">
-                                                            <svg
-                                                                width="16"
-                                                                height="16"
-                                                                viewBox="0 0 24 24"
-                                                                fill="currentColor"
-                                                            >
-                                                                <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
-                                                            </svg>
-                                                            Ai Powered
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="tsl-mp-desc">
-                                                    {p.title}
-                                                </p>
-                                                <div className="tsl-mp-metaRow">
-                                                    <div className="tsl-mp-rating">
-                                                        <span className="tsl-mp-star">
-                                                            ★
-                                                        </span>
-                                                        <span>
-                                                            {p.rating.toFixed(
-                                                                1,
-                                                            )}
-                                                        </span>
-                                                        <span className="tsl-mp-rev">
-                                                            ({p.reviews})
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                                <p className="tsl-mp-desc">{p.title}</p>
                                                 <div className="tsl-mp-bottomRow">
                                                     <div className="tsl-mp-price">
-                                                        {p.priceLabel}
+                                                        {p.price != null ? `From $${p.price}` : ""}
                                                     </div>
                                                     <button
                                                         className="tsl-mp-cta"
                                                         type="button"
+                                                        onClick={() => navigate(`/${getRoutePrefix(p.listing_type)}/${p.listing_username || ""}`)}
                                                     >
-                                                        {p.cta}
-                                                        <ChevronRight
-                                                            size={12}
-                                                            className="tsl-mp-ctaIcon"
-                                                        />
+                                                        Know More
+                                                        <ChevronRight size={12} className="tsl-mp-ctaIcon" />
                                                     </button>
                                                 </div>
                                             </div>
                                         </article>
                                     ))}
+                                    {!listing?.recommended_listings?.length && (
+                                        <p style={{opacity: 0.5, fontSize: 14, padding: "16px 0"}}>No recommendations yet.</p>
+                                    )}
                                 </div>
                                 <button
                                     className="tsl-mp-floatArrow left"
@@ -1789,103 +1473,45 @@ const ServiceListing = ({ theme, setTheme }) => {
                                 style={{ marginTop: "40px" }}
                             >
                                 <h2 className="tsl-sectionTitle">
-                                    More from Sarah Anderson
+                                    More from {listing?.creator?.full_name || listing?.creator?.username || "this creator"}
                                 </h2>
                                 <div
                                     className="tsl-mp-grid"
                                     ref={moreFromSarahGridRef}
                                 >
-                                    {moreFromSarah.map((p) => (
-                                        <article
-                                            className="tsl-mp-card"
-                                            key={p.id}
-                                        >
+                                    {(listing?.more_from_user?.length > 0
+                                        ? listing.more_from_user
+                                        : []
+                                    ).map((p, i) => (
+                                        <article className="tsl-mp-card" key={p.id || i}>
                                             <div className="tsl-mp-imgWrap">
                                                 <img
                                                     className="tsl-mp-img"
-                                                    src={p.image}
-                                                    alt=""
+                                                    src={p.cover_media_url || "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1400&auto=format&fit=crop"}
+                                                    alt={p.title || ""}
                                                 />
                                             </div>
                                             <div className="tsl-mp-cardBody">
-                                                <div className="tsl-mp-topLine">
-                                                    <div className="tsl-mp-user">
-                                                        <div className="tsl-mp-avatar"></div>
-                                                        <span className="tsl-mp-userName">
-                                                            {p.name}
-                                                        </span>
-                                                        {p.verified && (
-                                                            <svg
-                                                                className="tsl-mp-verifyIcon"
-                                                                width="16"
-                                                                height="16"
-                                                                viewBox="0 0 24 24"
-                                                                fill="none"
-                                                            >
-                                                                <path
-                                                                    fill="#1DA1F2"
-                                                                    d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.7.54-1.51.26-3.23-.97-4.46-1.23-1.23-2.95-1.51-4.46-.97C14.13 2.08 12.76 1.2 11.18 1.2c-1.58 0-2.95.88-3.7 2.18-1.51-.54-3.23-.26-4.46.97-1.23 1.23-1.51 2.95-.97 4.46C.88 9.55 0 10.92 0 12.5c0 1.58.88 2.95 2.18 3.7-.54 1.51-.26 3.23.97 4.46 1.23 1.23 2.95 1.51 4.46.97 0.74 1.3 2.11 2.18 3.69 2.18 1.58 0 2.95-.88 3.7-2.18 1.51.54 3.23.26 4.46-.97 1.23-1.23 1.51-2.95.97-4.46 1.3-.75 2.18-2.12 2.18-3.7z"
-                                                                />
-                                                                <path
-                                                                    stroke="#FFF"
-                                                                    strokeWidth="3"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    d="M8 12.5l3 3 5-5"
-                                                                />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    {p.ai && (
-                                                        <span className="tsl-mp-aiBadge">
-                                                            <svg
-                                                                width="16"
-                                                                height="16"
-                                                                viewBox="0 0 24 24"
-                                                                fill="currentColor"
-                                                            >
-                                                                <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
-                                                            </svg>
-                                                            Ai Powered
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="tsl-mp-desc">
-                                                    {p.title}
-                                                </p>
-                                                <div className="tsl-mp-metaRow">
-                                                    <div className="tsl-mp-rating">
-                                                        <span className="tsl-mp-star">
-                                                            ★
-                                                        </span>
-                                                        <span>
-                                                            {p.rating.toFixed(
-                                                                1,
-                                                            )}
-                                                        </span>
-                                                        <span className="tsl-mp-rev">
-                                                            ({p.reviews})
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                                <p className="tsl-mp-desc">{p.title}</p>
                                                 <div className="tsl-mp-bottomRow">
                                                     <div className="tsl-mp-price">
-                                                        {p.priceLabel}
+                                                        {p.price != null ? `From $${p.price}` : ""}
                                                     </div>
                                                     <button
                                                         className="tsl-mp-cta"
                                                         type="button"
+                                                        onClick={() => navigate(`/${getRoutePrefix(p.listing_type)}/${p.listing_username || ""}`)}
                                                     >
-                                                        {p.cta}
-                                                        <ChevronRight
-                                                            size={12}
-                                                            className="tsl-mp-ctaIcon"
-                                                        />
+                                                        View
+                                                        <ChevronRight size={12} className="tsl-mp-ctaIcon" />
                                                     </button>
                                                 </div>
                                             </div>
                                         </article>
                                     ))}
+                                    {!listing?.more_from_user?.length && (
+                                        <p style={{opacity: 0.5, fontSize: 14, padding: "16px 0"}}>No other listings yet.</p>
+                                    )}
                                 </div>
                                 <button
                                     className="tsl-mp-floatArrow left"
@@ -1916,6 +1542,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                     </div>
                 </div>
             </div>
+            </> )} {/* end !isLoading && !fetchError */}
             <MobileBottomNav theme={theme} />
         </div>
     );

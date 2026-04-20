@@ -1,9 +1,11 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import "./CreateCourse.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
-import FAQSection from "../components/FAQSection";
+import "../../../Darkuser.css";
+import "../../onboarding/components/OnboardingSelect.css";
+// import FAQSection from "../components/FAQSection";
 import PreviewVideo from "../components/PreviewVideo";
 import CoverSection from "../components/CoverSection";
 import DeliverablesSection from "../components/DeliverablesSection";
@@ -12,47 +14,28 @@ import {
   createListing,
   getListingByUsername,
   updateListing,
-  getMyTeams,
+  getListingDropdowns,
+  getLanguages,
 } from "../api/listingApi";
-import "../../../Darkuser.css";
-import "../../onboarding/components/OnboardingSelect.css";
 import { useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const LISTING_TYPE = "course";
+const LISTING_TYPE_SLUG = "course";
 
 export default function CreateCourse({
   theme,
   setTheme,
   mode = "create",
 }) {
-  const categories = useMemo(
-    () => ["Design", "Development", "Marketing", "Writing", "Education", "Business"],
-    [],
-  );
-
   const navigate = useNavigate();
   const { username } = useParams();
   const isEditMode = mode === "edit";
 
-  const subCategoriesMap = useMemo(
-    () => ({
-      Design: ["Logo Design", "UI/UX", "Branding"],
-      Development: ["Full Stack", "Frontend", "Backend"],
-      Marketing: ["SEO", "Social Media", "Ads"],
-      Writing: ["Copywriting", "Blog Writing", "Script Writing"],
-      Education: ["Mathematics", "Science", "Languages"],
-      Business: ["Entrepreneurship", "Management", "Finance"],
-    }),
-    [],
-  );
-
-  const courseLevels = useMemo(
-    () => ["Beginner", "Intermediate", "Advanced", "Expert"],
-    [],
-  );
-
-  const [teamList, setTeamList] = useState([]);
-  const [teamsLoading, setTeamsLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
+  const [languageOptions, setLanguageOptions] = useState([]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -62,25 +45,48 @@ export default function CreateCourse({
   const isModalOpen = uploadStep === "grid" || uploadStep === "success";
 
   const [initialLoading, setInitialLoading] = useState(isEditMode);
+  const [isMetaLoading, setIsMetaLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  React.useEffect(() => {
-    const loadTeams = async () => {
-      if (sellerMode !== "Team") return;
+  const [form, setForm] = useState({
+    title: "",
+    category: "",
+    subCategory: "",
+    productType: "",
+    price: "",
+    shortDescription: "",
+    prerequisites: "",
+  });
 
-      try {
-        setTeamsLoading(true);
-        const res = await getMyTeams();
-        const teams = Array.isArray(res?.teams) ? res.teams : [];
-        setTeamList(teams.map((item) => item.team_name).filter(Boolean));
-      } catch (e) {
-        setTeamList([]);
-      } finally {
-        setTeamsLoading(false);
-      }
-    };
+  const [toolsInput, setToolsInput] = useState("");
+  const [tools, setTools] = useState([]);
 
-    loadTeams();
-  }, [sellerMode]);
+  const [includedInput, setIncludedInput] = useState("");
+  const [courseIncluded, setCourseIncluded] = useState([]);
+
+  const [learningInput, setLearningInput] = useState("");
+  const [learningPoints, setLearningPoints] = useState([]);
+
+  const [languages, setLanguages] = useState([]);
+
+  const [previewVideo, setPreviewVideo] = useState(null);
+  const [previewVideoFile, setPreviewVideoFile] = useState(null);
+  const [existingPreviewVideoUrl, setExistingPreviewVideoUrl] = useState("");
+
+  const [lessons, setLessons] = useState([
+    { title: "", description: "", media: null },
+    { title: "", description: "", media: null },
+    { title: "", description: "", media: null },
+  ]);
+  const [coverImages, setCoverImages] = useState([]);
+  const [coverFiles, setCoverFiles] = useState([]);
+  const [coverSlideIdx, setCoverSlideIdx] = useState(0);
+  const [activePreviewImg, setActivePreviewImg] = useState(0);
+
+  const [faqs, setFaqs] = useState([{ q: "", a: "" }]);
+
+  const [resources, setResources] = useState([{ file: null, notes: "" }]);
+  const [links, setLinks] = useState([""]);
 
   React.useEffect(() => {
     if (isModalOpen) document.body.style.overflow = "hidden";
@@ -107,53 +113,96 @@ export default function CreateCourse({
     setActiveSetting(id);
   };
 
-  const [successPopup, setSuccessPopup] = useState({
-    open: false,
-    title: "",
-    message: "",
-    shouldRedirect: false,
-  });
-
-  const showSuccess = (title, message, shouldRedirect = false) => {
-    setSuccessPopup({
-      open: true,
-      title,
-      message,
-      shouldRedirect,
-    });
+  const setFormField = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const [aiPowered, setAiPowered] = useState(false);
+  const loadCategories = async () => {
+    try {
+      setIsMetaLoading(true);
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "categories",
+      });
+      setCategories(Array.isArray(res?.categories) ? res.categories : []);
+    } catch (e) {
+      setCategories([]);
+    } finally {
+      setIsMetaLoading(false);
+    }
+  };
 
-  const [form, setForm] = useState({
-    title: "",
-    category: "",
-    subCategory: "",
-    shortDescription: "",
-    prerequisites: "",
-    level: "",
-  });
+  const loadSubCategories = async (categoryName) => {
+    if (!categoryName) {
+      setSubCategories([]);
+      return;
+    }
 
-  const subCategories = form.category ? subCategoriesMap[form.category] || [] : [];
-  const setFormField = (key, value) => setForm((p) => ({ ...p, [key]: value }));
+    try {
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "sub_categories",
+        category: categoryName,
+      });
+      setSubCategories(Array.isArray(res?.sub_categories) ? res.sub_categories : []);
+    } catch (e) {
+      setSubCategories([]);
+    }
+  };
 
-  const [toolsInput, setToolsInput] = useState("");
-  const [tools, setTools] = useState([]);
+  const loadProductTypes = async (categoryName, subCategoryName) => {
+    if (!categoryName || !subCategoryName) {
+      setProductTypes([]);
+      return;
+    }
 
-  const [learningInput, setLearningInput] = useState("");
-  const [learningPoints, setLearningPoints] = useState([]);
+    try {
+      const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+        type: "product_types",
+        category: categoryName,
+        sub_category: subCategoryName,
+      });
+      setProductTypes(Array.isArray(res?.product_types) ? res.product_types : []);
+    } catch (e) {
+      setProductTypes([]);
+    }
+  };
 
-  const languageOptions = ["English", "Hindi", "Spanish", "French", "German"];
-  const [languages, setLanguages] = useState([]);
+  const loadLanguages = async () => {
+    try {
+      const res = await getLanguages();
+      const items = Array.isArray(res?.languages) ? res.languages : [];
+      setLanguageOptions(items.map((item) => item.value).filter(Boolean));
+    } catch (e) {
+      setLanguageOptions([]);
+    }
+  };
 
-  const [previewVideo, setPreviewVideo] = useState(null);
-  const [previewVideoFile, setPreviewVideoFile] = useState(null);
+  React.useEffect(() => {
+    loadCategories();
+    loadLanguages();
+  }, []);
 
-  const [lessons, setLessons] = useState([
-    { title: "", description: "", media: null },
-    { title: "", description: "", media: null },
-    { title: "", description: "", media: null },
-  ]);
+  React.useEffect(() => {
+    loadSubCategories(form.category);
+  }, [form.category]);
+
+  React.useEffect(() => {
+    loadProductTypes(form.category, form.subCategory);
+  }, [form.category, form.subCategory]);
+
+  const addSimpleItem = (input, setInput, list, setList) => {
+    const v = String(input || "").trim();
+    if (!v) return;
+    if (list.some((x) => String(x).toLowerCase() === v.toLowerCase())) {
+      setInput("");
+      return;
+    }
+    setList([...list, v]);
+    setInput("");
+  };
+
+  const removeSimpleItem = (idx, list, setList) => {
+    setList(list.filter((_, i) => i !== idx));
+  };
 
   const addLesson = () =>
     setLessons([...lessons, { title: "", description: "", media: null }]);
@@ -178,6 +227,8 @@ export default function CreateCourse({
       reader.onload = () => {
         updateLesson(idx, "media", {
           preview: reader.result,
+          existing_url: "",
+          existing_path: "",
           file,
           type: file.type?.startsWith("video/") ? "video" : "image",
         });
@@ -188,45 +239,14 @@ export default function CreateCourse({
     input.click();
   };
 
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState([]);
 
-  const addTag = () => {
-    const clean = tagInput.trim();
-    if (!clean) return;
-    if (tags.some((t) => t.toLowerCase() === clean.toLowerCase())) {
-      setTagInput("");
-      return;
-    }
-    setTags((p) => [...p, clean]);
-    setTagInput("");
+  const applyCoverFiles = (files) => {
+    setCoverFiles(files);
+    const newUrls = files.map((f) => URL.createObjectURL(f));
+    setCoverImages(newUrls);
+    setCoverSlideIdx(0);
+    setActivePreviewImg(0);
   };
-
-  const removeTag = (idx) => setTags((p) => p.filter((_, i) => i !== idx));
-
-  const onTagKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
-    }
-  };
-
-  const [sellerMode, setSellerMode] = useState("Solo");
-  const [teamName, setTeamName] = useState("");
-
-  const [cover, setCover] = useState(null);
-  const [coverFile, setCoverFile] = useState(null);
-
-  const handleCoverFileSelect = (file) => {
-    if (!file) return;
-    setCoverFile(file);
-
-    const reader = new FileReader();
-    reader.onload = () => setCover(reader.result);
-    reader.readAsDataURL(file);
-  };
-
-  const [faqs, setFaqs] = useState([{ q: "", a: "" }]);
 
   const addFaq = () => setFaqs([...faqs, { q: "", a: "" }]);
 
@@ -239,44 +259,20 @@ export default function CreateCourse({
     setFaqs(faqs.filter((_, i) => i !== idx));
   };
 
-  const [deliverables, setDeliverables] = useState([{ file: null, notes: "" }]);
-  const [links, setLinks] = useState([""]);
+  const addResource = () => setResources([...resources, { file: null, notes: "" }]);
 
-  const addDeliverable = () =>
-    setDeliverables([...deliverables, { file: null, notes: "" }]);
+  const updateResourceNotes = (idx, notes) =>
+    setResources(resources.map((d, i) => (i === idx ? { ...d, notes } : d)));
 
-  const updateDeliverableNotes = (idx, notes) =>
-    setDeliverables(deliverables.map((d, i) => (i === idx ? { ...d, notes } : d)));
+  const updateResourceFile = (idx, file) =>
+    setResources(resources.map((d, i) => (i === idx ? { ...d, file } : d)));
 
-  const updateDeliverableFile = (idx, file) =>
-    setDeliverables(deliverables.map((d, i) => (i === idx ? { ...d, file } : d)));
-
-  const removeDeliverable = (idx) =>
-    setDeliverables(deliverables.filter((_, i) => i !== idx));
+  const removeResource = (idx) =>
+    setResources(resources.filter((_, i) => i !== idx));
 
   const addLink = () => setLinks([...links, ""]);
   const updateLink = (idx, value) => setLinks(links.map((l, i) => (i === idx ? value : l)));
   const removeLink = (idx) => setLinks(links.filter((_, i) => i !== idx));
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [saveError, setSaveError] = useState("");
-  const [saveSuccess, setSaveSuccess] = useState("");
-  const [listingId, setListingId] = useState(null);
-
-  const addSimpleItem = (input, setInput, list, setList) => {
-    const v = String(input || "").trim();
-    if (!v) return;
-    if (list.some((x) => String(x).toLowerCase() === v.toLowerCase())) {
-      setInput("");
-      return;
-    }
-    setList([...list, v]);
-    setInput("");
-  };
-
-  const removeSimpleItem = (idx, list, setList) => {
-    setList(list.filter((_, i) => i !== idx));
-  };
 
   React.useEffect(() => {
     const loadListing = async () => {
@@ -287,67 +283,73 @@ export default function CreateCourse({
 
       try {
         setInitialLoading(true);
-        setSaveError("");
 
         const res = await getListingByUsername(username);
         const item = res?.listing || null;
 
         if (!item) {
-          setSaveError("Listing not found.");
+          Swal.fire({ icon: "error", title: "Not found", text: "Listing not found." });
           return;
         }
 
         if (item.listing_type !== LISTING_TYPE) {
-          setSaveError("This listing is not a course.");
+          Swal.fire({ icon: "error", title: "Invalid listing", text: "This listing is not a course." });
           return;
         }
-
-        setListingId(item.id || null);
-        setAiPowered(Boolean(item.ai_powered));
 
         setForm({
           title: item.title || "",
           category: item.category || "",
           subCategory: item.sub_category || "",
+          productType: item?.details?.product_type || "",
+          price:
+            item?.price !== undefined && item?.price !== null
+              ? String(item.price)
+              : item?.details?.price !== undefined && item?.details?.price !== null
+                ? String(item.details.price)
+                : "",
           shortDescription: item.short_description || "",
-          prerequisites: item.about || "",
-          level: item?.details?.course_level || "",
+          prerequisites: item.about || item?.details?.prerequisites || "",
         });
 
-        setSellerMode(item.seller_mode || "Solo");
-        setTeamName(item.team_name || "");
-        setTags(Array.isArray(item.tags) ? item.tags : []);
-        setTools(Array.isArray(item?.details?.tools) ? item.details.tools : []);
+        setTools(Array.isArray(item?.tools) ? item.tools : []);
+        setCourseIncluded(
+          Array.isArray(item?.details?.included) ? item.details.included : []
+        );
         setLearningPoints(
-          Array.isArray(item?.details?.learning_points) ? item.details.learning_points : [],
+          Array.isArray(item?.details?.learning_points) ? item.details.learning_points : []
         );
         setLanguages(
-          Array.isArray(item?.details?.languages) ? item.details.languages : [],
+          Array.isArray(item?.details?.languages) ? item.details.languages : []
         );
 
         setFaqs(
           Array.isArray(item.faqs) && item.faqs.length
             ? item.faqs.map((faq) => ({
-                q: faq.q || "",
-                a: faq.a || "",
+                q: faq.q || faq.question || "",
+                a: faq.a || faq.answer || "",
               }))
-            : [{ q: "", a: "" }],
+            : [{ q: "", a: "" }]
         );
 
         setLinks(
-          Array.isArray(item.links) && item.links.length ? item.links : [""],
+          Array.isArray(item.links) && item.links.length ? item.links : [""]
         );
 
-        setDeliverables(
-          Array.isArray(item.deliverables) && item.deliverables.length
-            ? item.deliverables.map((d) => ({
-                file: null,
-                notes: d.notes || "",
-                existing_file_name: d.file_name || "",
-                existing_file_url: d.file_url || "",
-              }))
-            : [{ file: null, notes: "" }],
-        );
+        if (Array.isArray(item.deliverables) && item.deliverables.length) {
+          setResources(
+            item.deliverables.map((d) => ({
+              file: null,
+              notes: d.notes || "",
+              existing_file_name: d.file_name || "",
+              existing_file_url: d.file_url || "",
+              name: d.file_name,
+              size: d.file_size,
+            }))
+          );
+        } else {
+          setResources([]);
+        }
 
         setLessons(
           Array.isArray(item?.details?.lessons) && item.details.lessons.length
@@ -357,23 +359,48 @@ export default function CreateCourse({
                 media: lesson.media_url
                   ? {
                       preview: lesson.media_url,
+                      existing_url: lesson.media_url,
+                      existing_path: lesson.media_path || "",
                       file: null,
                       type: lesson.media_type || null,
                     }
                   : null,
               }))
-            : [{ title: "", description: "", media: null }],
+            : [
+                { title: "", description: "", media: null },
+                { title: "", description: "", media: null },
+                { title: "", description: "", media: null },
+              ]
         );
 
-        if (item.cover_media_url || item.cover_media_path) {
-          setCover(item.cover_media_url || item.cover_media_path);
+        if (item.gallery_json) {
+          try {
+            const gallery = JSON.parse(item.gallery_json);
+            if (Array.isArray(gallery)) {
+              const urls = gallery.map((path) =>
+                path.startsWith("http") ? path : `/storage/${path}`
+              );
+              setCoverImages(urls);
+              setCoverFiles([]); // Existing files are strings, not File objects
+            }
+          } catch (e) {
+            console.error("Failed to parse gallery_json", e);
+          }
+        } else if (item.cover_media_url || item.cover_media_path) {
+          const coverUrl = item.cover_media_url || item.cover_media_path;
+          setCoverImages([coverUrl]);
         }
 
         if (item?.details?.preview_video_url) {
+          setExistingPreviewVideoUrl(item.details.preview_video_url);
           setPreviewVideo(item.details.preview_video_url);
         }
       } catch (e) {
-        setSaveError(e?.message || "Failed to load course.");
+        Swal.fire({
+          icon: "error",
+          title: "Load failed",
+          text: e?.message || "Failed to load course.",
+        });
       } finally {
         setInitialLoading(false);
       }
@@ -386,105 +413,109 @@ export default function CreateCourse({
     if (!String(form.title || "").trim()) return "Course title is required.";
     if (!String(form.category || "").trim()) return "Category is required.";
     if (!String(form.subCategory || "").trim()) return "Sub category is required.";
-    if (!String(form.level || "").trim()) return "Course level is required.";
+    if (!String(form.productType || "").trim()) return "Product type is required.";
+    if (!String(form.price || "").trim()) return "Price is required.";
+    if (!String(form.shortDescription || "").trim()) return "Short description is required.";
     return "";
   };
 
-  const buildPayload = (status) => ({
-    listing_type: LISTING_TYPE,
-    status,
-    title: form.title,
-    category: form.category,
-    sub_category: form.subCategory,
-    short_description: form.shortDescription,
-    about: form.prerequisites,
-    ai_powered: aiPowered,
-    seller_mode: sellerMode,
-    team_name: sellerMode === "Team" ? teamName : "",
-    cover_file: coverFile,
-    tags,
-    faqs: faqs.filter((f) => String(f.q || "").trim() || String(f.a || "").trim()),
-    links: links.map((l) => String(l || "").trim()).filter(Boolean),
-    deliverables: deliverables.filter(
-      (d) =>
-        d.file ||
-        String(d.notes || "").trim() ||
-        String(d.existing_file_url || "").trim(),
-    ),
-    details: {
-      course_level: form.level,
-      preview_video_file: previewVideoFile,
-      tools,
-      learning_points: learningPoints,
-      languages,
-      lessons: lessons
-        .filter(
-          (lesson) =>
-            String(lesson.title || "").trim() ||
-            String(lesson.description || "").trim() ||
-            lesson.media?.file ||
-            lesson.media?.preview,
-        )
-        .map((lesson) => ({
-          title: lesson.title,
-          description: lesson.description,
-          media_file: lesson.media?.file || null,
-          media_type: lesson.media?.type || null,
-        })),
-    },
-  });
+  const buildPayload = () => ({
+  listing_type: LISTING_TYPE,
+  status: "published",
+  title: form.title,
+  category: form.category,
+  sub_category: form.subCategory,
+  short_description: form.shortDescription,
+  about: form.prerequisites,
 
-  const handleSaveListing = async (status = "published") => {
+  cover_files: coverFiles,
+  existing_cover_urls: coverImages.filter(url => !url.startsWith('blob:')),
+
+  links: links.map((l) => String(l || "").trim()).filter(Boolean),
+
+  faqs: faqs.filter(
+    (f) => String(f.q || "").trim() || String(f.a || "").trim()
+  ),
+
+  deliverables: resources.map(d => ({
+    file: d.file,
+    notes: d.notes || "",
+    existing_file_url: d.existing_file_url || ""
+  })),
+
+  details: {
+    product_type: form.productType,
+    price: form.price,
+    tools,
+    included: courseIncluded,
+    learning_points: learningPoints,
+    languages,
+
+    preview_video_file: previewVideoFile || null,
+    existing_preview_video_url: !previewVideoFile ? existingPreviewVideoUrl || "" : "",
+
+    lessons: lessons
+      .filter(
+        (lesson) =>
+          String(lesson.title || "").trim() ||
+          String(lesson.description || "").trim() ||
+          lesson.media?.file ||
+          lesson.media?.existing_url ||
+          lesson.media?.preview
+      )
+      .map((lesson) => ({
+        title: lesson.title,
+        description: lesson.description,
+
+        media_file: lesson.media?.file || null,
+        media_type: lesson.media?.type || null,
+
+        existing_media_path:
+          !lesson.media?.file && lesson.media?.existing_path
+            ? lesson.media.existing_path.replace("/storage/", "")
+            : "",
+      })),
+  },
+});
+
+  const handleSaveListing = async () => {
     const validationError = validateBeforeSave();
     if (validationError) {
-      setSaveError(validationError);
-      setSaveSuccess("");
+      Swal.fire({
+        icon: "warning",
+        title: "Validation error",
+        text: validationError,
+      });
       return;
     }
 
     try {
       setIsSubmitting(true);
-      setSaveError("");
-      setSaveSuccess("");
 
       const res = isEditMode
-        ? await updateListing(username, buildPayload(status))
-        : await createListing(buildPayload(status));
+        ? await updateListing(username, buildPayload())
+        : await createListing(buildPayload());
 
-      const newListingId =
-        res?.listing_id ||
-        res?.data?.listing_id ||
-        res?.listing?.id ||
-        listingId ||
-        null;
-
-      if (newListingId) {
-        setListingId(newListingId);
-      }
-
-      const message = isEditMode
-        ? status === "draft"
-          ? "Your course draft has been updated successfully."
-          : "Your course has been updated successfully."
-        : status === "draft"
-          ? "Your course draft has been saved successfully."
-          : "Your course has been created successfully.";
-
-      setSaveSuccess(message);
-      showSuccess(
-        isEditMode
-          ? status === "draft"
-            ? "Draft Updated!"
-            : "Course Updated!"
-          : status === "draft"
-            ? "Draft Saved!"
-            : "Course Created!",
-        message,
-        status !== "draft",
-      );
+      Swal.fire({
+        icon: "success",
+        title: isEditMode ? "Course Updated" : "Course Created",
+        text:
+          res?.message ||
+          (isEditMode
+            ? "Your course has been updated successfully."
+            : "Your course has been created successfully."),
+        confirmButtonText: "OK",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/my-listings");
+        }
+      });
     } catch (e) {
-      setSaveError(e?.message || `Failed to ${isEditMode ? "update" : "save"} course.`);
-      setSaveSuccess("");
+      Swal.fire({
+        icon: "error",
+        title: isEditMode ? "Update failed" : "Save failed",
+        text: e?.message || `Failed to ${isEditMode ? "update" : "save"} course.`,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -553,37 +584,19 @@ export default function CreateCourse({
                           {isEditMode ? "Edit Course Listing" : "Create Course Listing"}
                         </h1>
                         <p className="csl-subtitle">
-                          {isEditMode ? "Update each section" : "Fill out each section"}
+                          {isEditMode ? "Update course details" : "Fill out each section"}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center mb-6">
-                      <h2 className="csl-section m-0">Course Details</h2>
-                      <div className="csl-ai">
-                        <span className={`csl-ai-pill ${aiPowered ? "active" : ""}`}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 2L9 6.81l4.89 2L9 10.81 7 15.62l-2-4.81-4.81-2 4.81-2L7 2zM17.5 15l1.25 3.01 3 1.25-3 1.25-1.25 3-1.25-3-3-1.25 3-1.25L17.5 15z" />
-                          </svg>
-                          Ai Powered
-                        </span>
-                        <label className="csl-switch">
-                          <input
-                            type="checkbox"
-                            checked={aiPowered}
-                            onChange={(e) => setAiPowered(e.target.checked)}
-                          />
-                          <span className="csl-slider" />
-                        </label>
-                      </div>
-                    </div>
+                    <h2 className="csl-section m-0">Course Details</h2>
 
                     <div className="csl-group-box">
                       <div className="csl-field">
                         <label className="csl-label">Course title</label>
                         <input
                           className="csl-input"
-                          placeholder="eg., Professional Logo Design"
+                          placeholder="Course title"
                           value={form.title}
                           onChange={(e) => setFormField("title", e.target.value)}
                         />
@@ -601,11 +614,11 @@ export default function CreateCourse({
                                 ...prev,
                                 category: val,
                                 subCategory: "",
-                                level: "",
+                                productType: "",
                               }))
                             }
                             options={categories}
-                            placeholder="Select category"
+                            placeholder={isMetaLoading ? "Loading categories..." : "Select category"}
                           />
                         </div>
 
@@ -617,7 +630,7 @@ export default function CreateCourse({
                               setForm((prev) => ({
                                 ...prev,
                                 subCategory: val,
-                                level: "",
+                                productType: "",
                               }))
                             }
                             options={subCategories}
@@ -631,53 +644,25 @@ export default function CreateCourse({
                     <div className="csl-group-box">
                       <div className="csl-grid2">
                         <div className="csl-field">
-                          <label className="csl-label">Course level</label>
+                          <label className="csl-label">Product type</label>
                           <CustomSelect
-                            value={form.level}
-                            onChange={(val) => setFormField("level", val)}
-                            options={courseLevels}
-                            placeholder="Select course level"
+                            value={form.productType}
+                            onChange={(val) => setFormField("productType", val)}
+                            options={productTypes}
+                            placeholder="Select product type"
                             disabled={!form.subCategory}
                           />
                         </div>
 
                         <div className="csl-field">
-                          <label className="csl-label">Seller Type</label>
-                          <CustomSelect
-                            value={sellerMode}
-                            onChange={(val) => {
-                              setSellerMode(val);
-                              if (val !== "Team") {
-                                setTeamName("");
-                              }
-                            }}
-                            options={["Solo", "Team"]}
-                            placeholder="Select mode"
+                          <label className="csl-label">Price</label>
+                          <input
+                            className="csl-input"
+                            placeholder="Price"
+                            value={form.price}
+                            onChange={(e) => setFormField("price", e.target.value)}
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="csl-group-box">
-                      <div className="csl-field">
-                        <label className={`csl-label ${sellerMode !== "Team" ? "opacity-50" : ""}`}>
-                          Team Name
-                        </label>
-                        <CustomSelect
-                          value={teamName}
-                          onChange={(val) => setTeamName(val)}
-                          options={teamList}
-                          placeholder={
-                            sellerMode !== "Team"
-                              ? "Select team name"
-                              : teamsLoading
-                                ? "Loading teams..."
-                                : teamList.length
-                                  ? "Select team name"
-                                  : "No team found"
-                          }
-                          disabled={sellerMode !== "Team" || teamsLoading || teamList.length === 0}
-                        />
                       </div>
                     </div>
 
@@ -690,54 +675,6 @@ export default function CreateCourse({
                           value={form.shortDescription}
                           onChange={(e) => setFormField("shortDescription", e.target.value)}
                         />
-                      </div>
-                    </div>
-
-                    <div className="csl-group-box">
-                      <div className="csl-field">
-                        <label className="csl-label">Prerequisites</label>
-                        <textarea
-                          className="csl-textarea h-28"
-                          placeholder="No prior design experience required; basic computer skills recommended."
-                          value={form.prerequisites}
-                          onChange={(e) => setFormField("prerequisites", e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="csl-group-box">
-                      <div className="csl-field">
-                        <label className="csl-label">Tags</label>
-                        <div className="csl-input-group">
-                          <input
-                            className="csl-input"
-                            placeholder="eg., Design, Branding"
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onKeyDown={onTagKeyDown}
-                          />
-                          <button type="button" className="csl-add-btn-lime" onClick={addTag}>
-                            Add
-                          </button>
-                        </div>
-
-                        {tags.length > 0 && (
-                          <div className="csl-chips-container mt-4">
-                            {tags.map((t, i) => (
-                              <div className="csl-tag-chip" key={i}>
-                                {t} <button type="button" onClick={() => removeTag(i)}>×</button>
-                              </div>
-                            ))}
-                            <button
-                              type="button"
-                              className="csl-clear-all"
-                              onClick={() => setTags([])}
-                              title="Clear all"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -765,8 +702,6 @@ export default function CreateCourse({
                           </button>
                         </div>
 
-                        <p className="csl-hint mt-2">You can add up to 10 tools</p>
-
                         {tools.length > 0 && (
                           <div className="csl-chips-container mt-4">
                             {tools.map((t, i) => (
@@ -784,6 +719,82 @@ export default function CreateCourse({
                               type="button"
                               className="csl-clear-all"
                               onClick={() => setTools([])}
+                              title="Clear all"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="csl-group-box">
+                      <div className="csl-field">
+                        <label className="csl-label">Prerequisites</label>
+                        <textarea
+                          className="csl-textarea h-28"
+                          placeholder="Prerequisites"
+                          value={form.prerequisites}
+                          onChange={(e) => setFormField("prerequisites", e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="csl-group-box">
+                      <div className="csl-field">
+                        <label className="csl-label">Course included</label>
+                        <div className="csl-input-group">
+                          <input
+                            className="csl-input"
+                            placeholder="Course included"
+                            value={includedInput}
+                            onChange={(e) => setIncludedInput(e.target.value)}
+                            onKeyDown={(e) =>
+                              e.key === "Enter" &&
+                              (e.preventDefault(),
+                              addSimpleItem(
+                                includedInput,
+                                setIncludedInput,
+                                courseIncluded,
+                                setCourseIncluded,
+                              ))
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="csl-add-btn-lime"
+                            onClick={() =>
+                              addSimpleItem(
+                                includedInput,
+                                setIncludedInput,
+                                courseIncluded,
+                                setCourseIncluded,
+                              )
+                            }
+                          >
+                            Add
+                          </button>
+                        </div>
+
+                        {courseIncluded.length > 0 && (
+                          <div className="csl-chips-container mt-4">
+                            {courseIncluded.map((item, i) => (
+                              <div className="csl-tag-chip" key={i}>
+                                {item}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeSimpleItem(i, courseIncluded, setCourseIncluded)
+                                  }
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              className="csl-clear-all"
+                              onClick={() => setCourseIncluded([])}
                               title="Clear all"
                             >
                               ✕
@@ -859,6 +870,90 @@ export default function CreateCourse({
 
                     <div className="csl-group-box">
                       <div className="csl-field">
+                        <label className="csl-label">Cover Images</label>
+                        <div className="am-uploader-container">
+                          {coverImages.length > 0 ? (
+                            <>
+                              <div className="am-main-preview">
+                                <img
+                                  src={coverImages[activePreviewImg]}
+                                  className="am-preview-img"
+                                  alt=""
+                                />
+                                {coverImages.length > 1 && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="am-nav-btn prev"
+                                      onClick={() =>
+                                        setActivePreviewImg((p) =>
+                                          p === 0 ? coverImages.length - 1 : p - 1
+                                        )
+                                      }
+                                    >
+                                      ‹
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="am-nav-btn next"
+                                      onClick={() =>
+                                        setActivePreviewImg((p) =>
+                                          p === coverImages.length - 1 ? 0 : p + 1
+                                        )
+                                      }
+                                    >
+                                      ›
+                                    </button>
+                                  </>
+                                )}
+                                <div className="am-dot-strip">
+                                  {coverImages.map((_, i) => (
+                                    <span
+                                      key={i}
+                                      className={`am-dot ${
+                                        i === activePreviewImg ? "active" : ""
+                                      }`}
+                                      onClick={() => setActivePreviewImg(i)}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="am-thumb-strip">
+                                {coverImages.map((url, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={url}
+                                    className={`am-thumb ${
+                                      activePreviewImg === idx ? "active" : ""
+                                    }`}
+                                    onClick={() => setActivePreviewImg(idx)}
+                                    alt=""
+                                  />
+                                ))}
+                              </div>
+                              <button
+                                type="button"
+                                className="am-change-btn"
+                                onClick={() => setUploadStep("grid")}
+                              >
+                                Change Images
+                              </button>
+                            </>
+                          ) : (
+                            <div
+                              className="am-placeholder"
+                              onClick={() => setUploadStep("grid")}
+                            >
+                              <div className="am-upload-icon">+</div>
+                              <div className="am-upload-text">Upload Cover Images</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="csl-group-box">
+                      <div className="csl-field">
                         <label className="csl-label">Languages</label>
                         <CustomSelect
                           value=""
@@ -872,8 +967,6 @@ export default function CreateCourse({
                           options={languageOptions}
                           placeholder="Select language"
                         />
-
-                        <p className="csl-hint mt-2">You can add up to 10 languages</p>
 
                         {languages.length > 0 && (
                           <div className="csl-chips-container mt-4">
@@ -902,17 +995,7 @@ export default function CreateCourse({
                     </div>
                   </div>
 
-                  <CoverSection
-                    mode="listing"
-                    listingType={LISTING_TYPE}
-                    cover={cover}
-                    coverFileName={coverFile?.name || ""}
-                    onUploadClick={() => setUploadStep("grid")}
-                    onRemoveCover={() => {
-                      setCover(null);
-                      setCoverFile(null);
-                    }}
-                  />
+
 
                   <LessonSection
                     lessons={lessons}
@@ -923,13 +1006,16 @@ export default function CreateCourse({
                   />
 
                   <DeliverablesSection
-                    mode="listing"
-                    listingType={LISTING_TYPE}
-                    deliverables={deliverables}
-                    onAddDeliverable={addDeliverable}
-                    onRemoveDeliverable={removeDeliverable}
-                    onUpdateDeliverableNotes={updateDeliverableNotes}
-                    onUpdateDeliverableFile={updateDeliverableFile}
+                    deliverables={resources.map(d => ({
+                      file: d.file,
+                      notes: d.notes,
+                      name: d.file?.name || d.existing_file_name || d.name,
+                      size: d.file?.size || d.size
+                    }))}
+                    onAddDeliverable={(file) => setResources([...resources, { file, notes: "" }])}
+                    onRemoveDeliverable={removeResource}
+                    onUpdateDeliverableNotes={updateResourceNotes}
+                    onUpdateDeliverableFile={updateResourceFile}
                     links={links}
                     onAddLink={addLink}
                     onRemoveLink={removeLink}
@@ -956,33 +1042,79 @@ export default function CreateCourse({
                       onClose={() => {
                         setPreviewVideo(null);
                         setPreviewVideoFile(null);
+                        setExistingPreviewVideoUrl("");
                       }}
                     />
                   </div>
 
-                  {saveError ? <p className="text-red-600 text-sm">{saveError}</p> : null}
-                  {saveSuccess ? <p className="text-green-600 text-sm">{saveSuccess}</p> : null}
+                  <div className="faq-wrap">
+                    <h3 className="faq-title">FAQs</h3>
 
-                  <FAQSection
-                    mode="listing"
-                    listingType={LISTING_TYPE}
-                    faqs={faqs}
-                    onAddFaq={addFaq}
-                    onUpdateFaq={updateFaq}
-                    onRemoveFaq={removeFaq}
-                    showFooter={true}
-                    isSaving={isSubmitting}
-                    submitMode={isEditMode ? "edit" : "create"}
-                    onSave={() => handleSaveListing("published")}
-                    onSaveDraft={() => handleSaveListing("draft")}
-                  />
+                    {faqs.map((item, idx) => (
+                      <div className="faq-card" key={idx}>
+                        <div className="faq-card-top">
+                          <div className="faq-number">FAQ #{idx + 1}</div>
+
+                          <button
+                            type="button"
+                            className="faq-trash"
+                            onClick={() => removeFaq(idx)}
+                            aria-label="Delete FAQ"
+                            title="Delete"
+                          >
+                            ×
+                          </button>
+                        </div>
+
+                        <div className="faq-field">
+                          <label className="faq-label">Question</label>
+                          <input
+                            className="faq-input"
+                            placeholder="Type your question"
+                            value={item.q}
+                            onChange={(e) => updateFaq(idx, "q", e.target.value)}
+                          />
+                        </div>
+
+                        <div className="faq-field">
+                          <label className="faq-label">Answer</label>
+                          <input
+                            className="faq-input"
+                            placeholder="Type the answer"
+                            value={item.a}
+                            onChange={(e) => updateFaq(idx, "a", e.target.value)}
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          className="faq-add"
+                          onClick={addFaq}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="faq-actions">
+                    <button
+                      type="button"
+                      className="faq-save"
+                      onClick={handleSaveListing}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Save"}
+                    </button>
+                  </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {isModalOpen &&
+        {uploadStep &&
           createPortal(
             <div className={`user-page ${theme || "light"}`}>
               <div
@@ -992,42 +1124,47 @@ export default function CreateCourse({
 
               {(uploadStep === "grid" || uploadStep === "success") && (
                 <UploadGrid
-                  blurred={uploadStep === "success"}
-                  onBack={() => setUploadStep(null)}
+                  initialFiles={coverFiles}
                   onSelect={(files) => {
-                    if (files?.[0]) {
-                      handleCoverFileSelect(files[0]);
-                    }
+                    if (files?.length) applyCoverFiles(files);
                     setUploadStep("success");
                   }}
+                  onBack={() => setUploadStep(null)}
+                  blurred={uploadStep === "success"}
                 />
               )}
 
               {uploadStep === "success" && <UploadSuccess onBack={() => setUploadStep(null)} />}
             </div>,
-            document.body,
+            document.body
           )}
-      </div>
-
-      <SuccessPopup
-        open={successPopup.open}
-        title={successPopup.title}
-        message={successPopup.message}
-        onClose={() => setSuccessPopup({ open: false, title: "", message: "" })}
-        onClick={() => {
-          setSuccessPopup({
-            open: false,
-            title: "",
-            message: "",
-            shouldRedirect: false,
-          });
-
-          if (successPopup.shouldRedirect) {
-            navigate("/my-listings");
-          }
-        }}
-      />
     </>
+  );
+}
+
+function UploadSuccess({ onBack }) {
+  return (
+    <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-auto p-4">
+      <div className="upload-success-card rounded-2xl w-[90%] max-w-[600px] h-auto min-h-[300px] md:h-[400px] py-10 flex flex-col items-center justify-center shadow-[0_0_20px_#CEFF1B] bg-white dark:bg-[#2B2B2B]">
+        <div className="w-24 h-24 bg-[#CEFF1B] rounded-full flex items-center justify-center mb-6">
+          <img src="/right.svg" alt="success" />
+        </div>
+
+        <h3 className="text-2xl font-semibold mb-8 text-black dark:text-white text-center px-4">
+          You have successfully uploaded!
+        </h3>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={onBack}
+            className="upload-btn-confirm px-12 py-3 rounded-lg bg-[#CEFF1B] border border-black font-semibold text-black transition-transform hover:scale-105"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1057,9 +1194,9 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
 
       {open && (
         <ul className="onboarding-options-list dark:bg-[#1E1E1E]">
-          {options.map((opt) => (
+          {options.map((opt, index) => (
             <li
-              key={opt.id}
+              key={`${opt}-${index}`}
               className={value === opt ? "active" : ""}
               onClick={() => {
                 onChange(opt);
@@ -1075,177 +1212,91 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
   );
 }
 
-function UploadGrid({ onSelect, onBack, blurred }) {
+function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
   const fileRef = useRef(null);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(initialFiles);
   const activeIndexRef = useRef(null);
 
   const handleFiles = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (activeIndexRef.current === null || selected.length === 0) return;
+    const newFiles = Array.from(e.target.files);
+    if (!newFiles.length) return;
 
-    setFiles((prev) => {
-      const updated = [...prev];
-      updated[activeIndexRef.current] = selected[0];
-      return updated;
-    });
-
-    activeIndexRef.current = null;
+    if (activeIndexRef.current !== null) {
+      const next = [...files];
+      next[activeIndexRef.current] = newFiles[0];
+      setFiles(next);
+      activeIndexRef.current = null;
+    } else {
+      const combined = [...files, ...newFiles].slice(0, 9);
+      setFiles(combined);
+    }
     e.target.value = "";
   };
 
+  const removeFile = (idx, e) => {
+    e.stopPropagation();
+    setFiles(files.filter((_, i) => i !== idx));
+  };
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
-      <div
-        className={`upload-card rounded-2xl p-4 w-[95%] max-w-[820px] h-auto max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1A] shadow-[0_0_20px_#CEFF1B] transition-all duration-200 ${
-          blurred ? "blur-sm scale-[0.98] pointer-events-none select-none opacity-95" : ""
-        }`}
-      >
-        <div className="upload-header flex items-center gap-3 mb-3 shrink-0">
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 shrink-0"
-            title="Back"
-          >
-            <img src="/backarrow.svg" alt="back" />
+    <div className={`am-modal-overlay ${blurred ? "blurred" : ""}`}>
+      <div className="am-modal-content">
+        <div className="am-modal-header">
+          <button className="am-back-btn" onClick={onBack}>
+            ← Back
           </button>
-
-          <h4 className="text-sm font-medium text-black dark:text-black">
-            Select and upload your file
-          </h4>
-
+          <h2 className="am-modal-title">Upload Cover Photo</h2>
           <button
-            type="button"
-            onClick={onBack}
-            className="ml-auto w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#CEFF1B]"
-            title="Close"
+            className="am-done-btn"
+            onClick={() => onSelect(files)}
+            disabled={!files.length}
           >
-            ✕
+            Done
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 flex-1 overflow-y-auto pr-2 custom-scroll">
-          {Array.from({ length: 9 }).map((_, i) => {
+        <div className="am-upload-grid">
+          {[...Array(9)].map((_, i) => {
             const file = files[i];
+            const url = file ? URL.createObjectURL(file) : null;
+
             return (
               <div
                 key={i}
+                className={`am-grid-slot ${file ? "has-file" : ""}`}
                 onClick={() => {
                   activeIndexRef.current = i;
                   fileRef.current?.click();
                 }}
-                className="upload-slot relative h-[110px] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800"
               >
-                {i === 0 && (
-                  <span className="absolute inset-0 z-10 flex items-center justify-center px-2 pointer-events-none">
-                    <span className="bg-[#CEFF1B] text-black font-medium text-[10px] sm:text-xs px-2 py-[3px] rounded max-w-[90%] text-center whitespace-normal leading-tight">
-                      Upload Cover Image
-                    </span>
-                  </span>
-                )}
-
-                {file ? (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                {url ? (
+                  <>
+                    <img src={url} alt="" className="am-slot-img" />
+                    <button
+                      className="am-remove-slot"
+                      onClick={(e) => removeFile(i, e)}
+                    >
+                      ×
+                    </button>
+                  </>
                 ) : (
-                  i !== 0 && (
-                    <div className="relative pointer-events-none">
-                      <img src="/video2.svg" className="w-10 mr-8 mt-2 opacity-60" alt="" />
-                      <img src="/video1.svg" className="w-12 absolute -right-2 -top-3 opacity-60" alt="" />
-                      <div className="absolute bottom-4 right-6 w-6 h-6 rounded-full bg-[#CEFF1B] flex items-center justify-center text-black font-bold">
-                        +
-                      </div>
-                    </div>
-                  )
+                  <div className="am-slot-add">+</div>
                 )}
               </div>
             );
           })}
         </div>
-
-        <div className="flex justify-end items-center mt-3 shrink-0">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="upload-btn-cancel px-4 py-2 rounded-lg text-sm border border-black dark:border-white/20 dark:text-white"
-            >
-              Cancel
-            </button>
-            {files.filter(Boolean).length > 0 && (
-              <button
-                type="button"
-                onClick={() => onSelect(files.filter(Boolean))}
-                className="upload-btn-confirm px-5 py-2 rounded-lg text-sm font-medium bg-[#CEFF1B] border border-black"
-              >
-                Upload
-              </button>
-            )}
-          </div>
-        </div>
-
         <input
-          ref={fileRef}
           type="file"
-          accept="image/*,video/*"
-          onChange={handleFiles}
+          ref={fileRef}
           className="hidden"
+          multiple
+          accept="image/*"
+          onChange={handleFiles}
         />
-      </div>
-    </div>
-  );
-}
-
-function SuccessPopup({ open, title, message, onClose, onClick }) {
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[99999] bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#1f1f1f] rounded-3xl shadow-[0_0_30px_rgba(206,255,27,0.4)] border border-[#CEFF1B] px-8 py-10 w-full max-w-[420px] text-center animate-[fadeIn_.25s_ease]">
-        <div className="w-20 h-20 rounded-full bg-[#CEFF1B] mx-auto flex items-center justify-center mb-6 shadow-lg">
-          <img src="/right.svg" alt="success" className="w-10 h-10" />
-        </div>
-
-        <h3 className="text-2xl font-bold text-black dark:text-white mb-3">{title}</h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-8">{message}</p>
-
-        <button
-          onClick={onClick}
-          className="bg-[#CEFF1B] text-black font-semibold px-6 py-3 rounded-xl border border-black hover:scale-[1.02] transition"
-        >
-          Continue
-        </button>
-      </div>
-    </div>,
-    document.body
-  );
-}
-
-function UploadSuccess({ onBack }) {
-  return (
-    <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-auto p-4">
-      <div className="upload-success-card rounded-2xl w-[90%] max-w-[600px] h-auto min-h-[300px] md:h-[400px] py-10 flex flex-col items-center justify-center shadow-[0_0_20px_#CEFF1B] bg-white dark:bg-[#2B2B2B]">
-        <div className="w-24 h-24 bg-[#CEFF1B] rounded-full flex items-center justify-center mb-6">
-          <img src="/right.svg" alt="success" />
-        </div>
-
-        <h3 className="text-2xl font-semibold mb-8 text-black dark:text-white text-center px-4">
-          You have successfully uploaded!
-        </h3>
-
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={onBack}
-            className="upload-btn-confirm px-12 py-3 rounded-lg bg-[#CEFF1B] border border-black font-semibold text-black transition-transform hover:scale-105"
-          >
-            Back
-          </button>
-        </div>
+        <p className="am-modal-hint">
+          Upload up to 9 images. The first image will be your main cover.
+        </p>
       </div>
     </div>
   );
