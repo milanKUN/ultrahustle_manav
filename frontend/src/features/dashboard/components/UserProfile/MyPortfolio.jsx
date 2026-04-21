@@ -1057,7 +1057,10 @@ function Input({ label, value, onChange, placeholder, numericOnly = false }) {
         placeholder={placeholder}
         onChange={(e) => {
           let val = e.target.value;
-          if (numericOnly) val = val.replace(/[^\d]/g, "");
+          if (numericOnly) {
+            // Allow digits, $, -, and . for price ranges/currencies
+            val = val.replace(/[^\d$.-]/g, "");
+          }
           onChange(val);
         }}
       />
@@ -1080,7 +1083,7 @@ function Textarea({ label, value, onChange, placeholder, limit = 150 }) {
         onChange={(e) => onChange(e.target.value)}
       />
       <div className="text-xs text-[#9AA0AD] mt-2">
-        {value.length}/{limit}
+        {(value || "").length}/{limit}
       </div>
     </div>
   );

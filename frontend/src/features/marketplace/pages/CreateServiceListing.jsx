@@ -282,7 +282,7 @@ export default function CreateServiceListing({
               ? packageItem.not_included
               : [],
             toolsUsed: Array.isArray(packageItem?.tools_used) ? packageItem.tools_used : [],
-            deliveryFormat: packageItem?.delivery_format || "",
+            deliveryFormat: packageItem?.delivery_format ? packageItem.delivery_format.split(",").map(s => s.trim()) : [],
           };
         });
 
@@ -492,7 +492,7 @@ export default function CreateServiceListing({
       how_it_works: Array.isArray(pkg[tab]?.howItWorks) ? pkg[tab].howItWorks : [],
       not_included: Array.isArray(pkg[tab]?.notIncluded) ? pkg[tab].notIncluded : [],
       tools_used: Array.isArray(pkg[tab]?.toolsUsed) ? pkg[tab].toolsUsed : [],
-      delivery_format: pkg[tab]?.deliveryFormat || "",
+      delivery_format: Array.isArray(pkg[tab]?.deliveryFormat) ? pkg[tab].deliveryFormat.join(", ") : (pkg[tab]?.deliveryFormat || ""),
     })).filter((pkg) =>
       pkg.price ||
       pkg.delivery_days ||
@@ -596,22 +596,26 @@ export default function CreateServiceListing({
         ? await updateListing(username, buildPayload(status))
         : await createListing(buildPayload(status));
 
+      const isDraft = status === "draft";
+
       Swal.fire({
         icon: "success",
-        title: isEditMode ? "Service Updated" : "Service Created",
+        title: isDraft 
+          ? (isEditMode ? "Draft Updated" : "Draft Saved")
+          : (isEditMode ? "Service Updated" : "Service Created"),
         text:
           res?.message ||
-          (isEditMode
-            ? "Your service has been updated successfully."
-            : "Your service has been created successfully."),
+          (isDraft
+            ? `Your draft has been ${isEditMode ? "updated" : "saved"} successfully.`
+            : `Your service has been ${isEditMode ? "updated" : "created"} successfully.`),
         background: "#0b0b0b",
         color: "#ffffff",
         iconColor: "#CEFF1B",
         confirmButtonColor: "#CEFF1B",
-        confirmButtonText: "<span style='color:#000;font-weight:700'>Go to My Listings</span>",
+        confirmButtonText: isDraft ? "<span style='color:#000;font-weight:700'>OK</span>" : "<span style='color:#000;font-weight:700'>Go to My Listings</span>",
         customClass: { popup: "swal-brand-popup", confirmButton: "swal-brand-confirm" },
       }).then((result) => {
-        if (result.isConfirmed) navigate("/my-listings");
+        if (!isDraft && result.isConfirmed) navigate("/my-listings");
       });
     } catch (e) {
       setSaveError(e?.message || "Failed to save service listing.");
@@ -1061,12 +1065,34 @@ export default function CreateServiceListing({
 
                   <div className="csl-field mt-4">
                     <label className="csl-label">Delivery format</label>
-                    <input
-                      className="csl-input"
-                      value={current.deliveryFormat}
-                      onChange={(e) => setPkgField("deliveryFormat", e.target.value)}
-                      placeholder="Delivery format"
-                    />
+                    <div className="csl-input-with-btn">
+                      <input
+                        className="csl-input"
+                        value={current.deliveryFormatInput || ""}
+                        onChange={(e) => setPkgField("deliveryFormatInput", e.target.value)}
+                        onKeyDown={(e) => onEnterAdd(e, () => addToList("deliveryFormat", current.deliveryFormatInput, (v) => setPkgField("deliveryFormatInput", v)))}
+                        placeholder="e.g. PDF, Figma, MP4"
+                      />
+                      <button
+                        type="button"
+                        className="csl-add-btn-inline"
+                        onClick={() => addToList("deliveryFormat", current.deliveryFormatInput, (v) => setPkgField("deliveryFormatInput", v))}
+                      >
+                        +
+                      </button>
+                    </div>
+                    {Array.isArray(current.deliveryFormat) && current.deliveryFormat.length > 0 && (
+                      <div className="csl-chips-container mt-2">
+                        {current.deliveryFormat.map((item, i) => (
+                          <div className="csl-tag-chip" key={i}>
+                            {item}
+                            <button type="button" onClick={() => removeFromList("deliveryFormat", i)}>
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1307,7 +1333,7 @@ export default function CreateServiceListing({
                 <div className="flex justify-end gap-4 pb-12">
                   <button
                     type="button"
-                    className="px-6 py-3 rounded-xl border border-black dark:border-white/20 dark:text-white"
+                    className={`px-6 py-3 rounded-xl border border-black dark:border-white/20 dark:text-white transition-opacity ${savingStatus !== null ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-gray-100 dark:hover:bg-white/5'}`}
                     onClick={() => handleSaveListing("draft")}
                     disabled={savingStatus !== null}
                   >
@@ -1342,11 +1368,21 @@ export default function CreateServiceListing({
 
             {(uploadStep === "grid" || uploadStep === "success") && (
               <UploadGrid
-                blurred={uploadStep === "success"}
+                blurred={false} // Removed success blur to allow continued editing
                 initialFiles={coverFiles}
                 onSelect={(files) => {
                   if (files?.length) applyCoverFiles(files);
-                  setUploadStep("success");
+                  setUploadStep(null); // Close modal after selection instead of success step
+                  Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Images selected',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    background: '#0b0b0b',
+                    color: '#fff'
+                  });
                 }}
                 onBack={() => setUploadStep(null)}
               />

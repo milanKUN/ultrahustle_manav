@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getListingByUsername, getPublicUserListings } from "../api/listingApi";
 import { createPortal } from "react-dom";
+import Swal from "sweetalert2";
 import {
     Share2,
     Flag,
@@ -17,6 +18,7 @@ import {
     CheckCircle2,
     User,
     X,
+    Zap,
 } from "lucide-react";
 import "./TeamServiceListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
@@ -399,15 +401,62 @@ const ServiceListing = ({ theme, setTheme }) => {
 
     // Portfolio data from API
     const FALLBACK_IMG = "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+
+    // Helper: get the best image for a portfolio project
+    const getProjectImage = (p) => {
+        // Try cover_media first
+        if (p?.cover_media?.url) return p.cover_media.url;
+        if (p?.cover_media?.path) return `/storage/${p.cover_media.path}`;
+        // Then try media array
+        const media = Array.isArray(p?.media) ? p.media : [];
+        if (media[0]?.url) return media[0].url;
+        if (media[0]?.path) return `/storage/${media[0].path}`;
+        // Then legacy files array
+        const files = Array.isArray(p?.files) ? p.files : [];
+        if (files[0]?.url) return files[0].url;
+        // Legacy single image_url
+        if (p?.image_url) return p.image_url;
+        return FALLBACK_IMG;
+    };
+
+    // Helper: get all media for a portfolio project (for modal thumbnails)
+    const getProjectAllMedia = (p) => {
+        const media = Array.isArray(p?.media) ? p.media : [];
+        const urls = media.map(m => m?.url || (m?.path ? `/storage/${m.path}` : null)).filter(Boolean);
+        if (urls.length) return urls;
+        const files = Array.isArray(p?.files) ? p.files : [];
+        const fileUrls = files.map(f => f?.url || null).filter(Boolean);
+        if (fileUrls.length) return fileUrls;
+        if (p?.image_url) return [p.image_url];
+        return [FALLBACK_IMG];
+    };
+
+    // Helper: format cost from cost_cents or cost string
+    const formatCost = (p) => {
+        let raw = "";
+        if (p?.cost && String(p.cost).trim()) raw = String(p.cost).trim();
+        else if (p?.cost_cents !== undefined && p?.cost_cents !== null && p?.cost_cents !== "") raw = String(p.cost_cents).trim();
+        if (!raw) return "";
+        // Add $ prefix if not already present
+        return raw.startsWith("$") ? raw : `$${raw}`;
+    };
+
     const portfolioData = {
         featured: portfolio_api[0]
-            ? { image: portfolio_api[0].files?.[0]?.url || portfolio_api[0].image_url || coverUrl || FALLBACK_IMG, title: portfolio_api[0].title || "Portfolio", description: portfolio_api[0].description || "", cost: portfolio_api[0].cost || "" }
-            : { image: FALLBACK_IMG, title: "Portfolio", description: "", cost: "" },
+            ? {
+                image: getProjectImage(portfolio_api[0]),
+                allMedia: getProjectAllMedia(portfolio_api[0]),
+                title: portfolio_api[0].title || "Portfolio",
+                description: portfolio_api[0].description || "",
+                cost: formatCost(portfolio_api[0]),
+              }
+            : { image: FALLBACK_IMG, allMedia: [FALLBACK_IMG], title: "Portfolio", description: "", cost: "" },
         items: portfolio_api.slice(1).map((p) => ({
-            image: p.files?.[0]?.url || p.image_url || coverUrl || FALLBACK_IMG,
+            image: getProjectImage(p),
+            allMedia: getProjectAllMedia(p),
             title: p.title || "",
             description: p.description || "",
-            cost: p.cost || "",
+            cost: formatCost(p),
         })),
     };
 
@@ -444,14 +493,52 @@ const ServiceListing = ({ theme, setTheme }) => {
                     <div className="overflow-y-auto h-[calc(100vh-85px)]">
                         <div className={`tsl-page ${theme}`}>
                             <div className="tsl-header">
-                                <h1 className="tsl-title">
-                                    {listing?.title || "Service Listing"}
-                                </h1>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                    <h1 className="tsl-title">
+                                        {listing?.title || "Service Listing"}
+                                    </h1>
+                                    {listing?.ai_powered && (
+                                        <span style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                            background: 'linear-gradient(135deg, #CEFF1B 0%, #a8e600 100%)',
+                                            color: '#000', fontSize: '12px', fontWeight: 600,
+                                            padding: '4px 10px', borderRadius: '6px', whiteSpace: 'nowrap',
+                                        }}>
+                                            <Zap size={12} fill="#000" /> AI Powered
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="tsl-header-actions">
-                                    <button className="tsl-icon-btn">
+                                    <button className="tsl-icon-btn" title="Share" onClick={() => {
+                                        const url = window.location.href;
+                                        if (navigator.share) {
+                                            navigator.share({ title: listing?.title || 'Service', url }).catch(() => {});
+                                        } else {
+                                            navigator.clipboard.writeText(url).then(() => {
+                                                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Link copied to clipboard!', showConfirmButton: false, timer: 1500, background: '#0b0b0b', color: '#fff' });
+                                            });
+                                        }
+                                    }}>
                                         <Share2 size={20} />
                                     </button>
-                                    <button className="tsl-icon-btn">
+                                    <button className="tsl-icon-btn" title="Report" onClick={() => {
+                                        Swal.fire({
+                                            title: 'Report this listing?',
+                                            text: 'If this listing violates our terms, we will review and take action.',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#CEFF1B',
+                                            cancelButtonColor: '#333',
+                                            confirmButtonText: "<span style='color:#000;font-weight:700'>Yes, Report</span>",
+                                            cancelButtonText: 'Cancel',
+                                            background: '#0b0b0b',
+                                            color: '#ffffff',
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Report submitted. We will review this listing.', showConfirmButton: false, timer: 2500, background: '#0b0b0b', color: '#fff' });
+                                            }
+                                        });
+                                    }}>
                                         <Flag size={20} />
                                     </button>
                                     <button
@@ -579,7 +666,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button className="tsl-pmc-view-btn">
+                                        <button className="tsl-pmc-view-btn" onClick={() => navigate(`/public-user-profile/${listing?.creator?.username || listing?.creator_username || username}`)}>
                                             View profile
                                             <ChevronRight size={18} />
                                         </button>
@@ -691,7 +778,9 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                 className="tsl-btn-primary">
                                                 Create Contract
                                             </button>
-                                            <button className="tsl-btn-outline">
+                                            <button className="tsl-btn-outline" onClick={() => {
+                                                Swal.fire({ toast: true, position: 'top-end', icon: 'info', title: 'Messaging coming soon!', showConfirmButton: false, timer: 2000, background: '#0b0b0b', color: '#fff' });
+                                            }}>
                                                 Chat first
                                             </button>
                                         </div>
@@ -891,14 +980,7 @@ const ServiceListing = ({ theme, setTheme }) => {
 
                                                     {/* 🧩 Thumbnails */}
                                                     <div className="portfolio-modal-thumbs">
-                                                        {[
-                                                            activeItem.image,
-                                                            activeItem.image,
-                                                            activeItem.image,
-                                                            activeItem.image,
-                                                            activeItem.image,
-                                                            activeItem.image,
-                                                        ].map((img, i) => (
+                                                        {(activeItem.allMedia || [activeItem.image]).map((img, i) => (
                                                             <img
                                                                 key={i}
                                                                 src={img}
@@ -1543,6 +1625,78 @@ const ServiceListing = ({ theme, setTheme }) => {
                 </div>
             </div>
             </> )} {/* end !isLoading && !fetchError */}
+
+            {/* Fullscreen Image Lightbox */}
+            {showImageModal && createPortal(
+                <div
+                    className="portfolio-modal-backdrop"
+                    onClick={() => setShowImageModal(false)}
+                    style={{ zIndex: 99999 }}
+                >
+                    <div
+                        style={{
+                            position: 'relative',
+                            maxWidth: '90vw',
+                            maxHeight: '90vh',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={() => setShowImageModal(false)}
+                            style={{
+                                position: 'absolute', top: -40, right: 0,
+                                background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff',
+                                width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 18, zIndex: 10,
+                            }}
+                        >
+                            <X size={20} />
+                        </button>
+                        <button
+                            onClick={() => setModalImgIndex((p) => (p - 1 + images.length) % images.length)}
+                            style={{
+                                position: 'absolute', left: -50, top: '50%', transform: 'translateY(-50%)',
+                                background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff',
+                                width: 40, height: 40, borderRadius: '50%', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
+                        <img
+                            src={images[modalImgIndex]}
+                            alt={`Fullscreen ${modalImgIndex + 1}`}
+                            style={{
+                                maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain',
+                                borderRadius: '12px', boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+                            }}
+                        />
+                        <button
+                            onClick={() => setModalImgIndex((p) => (p + 1) % images.length)}
+                            style={{
+                                position: 'absolute', right: -50, top: '50%', transform: 'translateY(-50%)',
+                                background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff',
+                                width: 40, height: 40, borderRadius: '50%', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
+                        >
+                            <ChevronRight size={24} />
+                        </button>
+                        <div style={{
+                            position: 'absolute', bottom: -35,
+                            color: '#fff', fontSize: 13, opacity: 0.8,
+                        }}>
+                            {modalImgIndex + 1} / {images.length}
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
             <MobileBottomNav theme={theme} />
         </div>
     );
