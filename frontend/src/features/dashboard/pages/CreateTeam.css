@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --primary-bg: #F2F2F2;
     --input-bg: #e6e6e6;
     --text-main: #333;
@@ -50,7 +50,7 @@ body {
 
 .create-team-page .create-team-container {
     position: relative;
-    min-height: calc(100vh - 85px);
+    min-height: calc(100vh - 72px);
     margin-top: 0;
     margin-left: 0;
     padding: 30px 40px 40px 40px;
@@ -608,7 +608,7 @@ body {
 }
 
 /* =======================================
-   ROLE DROPDOWN â€” DARK MODE OVERRIDES
+   ROLE DROPDOWN — DARK MODE OVERRIDES
    Works for: .user-page.dark OR .user-page-dark
 ======================================= */
 
@@ -1807,7 +1807,7 @@ body {
 }
 
 /* =========================================
-   CREATE TEAM â€” DARK MODE
+   CREATE TEAM — DARK MODE
    Works when wrapper has: .user-page.dark
    ========================================= */
 

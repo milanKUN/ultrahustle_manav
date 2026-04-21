@@ -621,7 +621,7 @@ const UserProfile = (props) => {
         onDropdownChange={handleDropdownChange}
       />
 
-      <div className="pt-[85px] flex relative z-10">
+      <div className="pt-[72px] flex relative z-10">
         {/* ✅ SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
@@ -640,7 +640,7 @@ const UserProfile = (props) => {
           <div
             ref={contentRef}
             onScroll={handleScroll}
-            className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]"
+            className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]"
           >
             <main
               className={`inreview-main ${isDropdownOpen || activeItem ? "blurred" : ""} w-full min-w-0`}

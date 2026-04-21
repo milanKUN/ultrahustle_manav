@@ -644,7 +644,7 @@ export default function CreateWebinar({
         />
 
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <div className="create-service-container">
               <div className="csl-stack">
                 <div className="csl-card">

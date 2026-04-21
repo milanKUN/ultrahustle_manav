@@ -20,7 +20,7 @@
 
 .create-service-container {
   position: relative;
-  min-height: calc(100vh - 85px);
+  min-height: calc(100vh - 72px);
   padding: 30px 40px 40px 40px;
   display: flex;
   flex-direction: column;

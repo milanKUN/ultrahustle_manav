@@ -161,7 +161,7 @@ const TeamProfileContent = ({
         />
       ) : null}
 
-      <div className="pt-[85px] flex relative z-10">
+      <div className="pt-[72px] flex relative z-10">
         {SidebarComponent ? (
           <SidebarComponent
             expanded={sidebarProps.expanded}
@@ -176,7 +176,7 @@ const TeamProfileContent = ({
         ) : null}
 
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <main className={`inreview-main ${activeItem ? "blurred" : ""} w-full min-w-0`}>
               {loading ? (
                 <div className="content-card">

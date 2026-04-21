@@ -103,7 +103,7 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                 theme={theme}
             />
 
-            <div className="pt-[85px] flex relative z-10">
+            <div className="pt-[72px] flex relative z-10">
                 <Sidebar
                     expanded={sidebarOpen}
                     setExpanded={setSidebarOpen}
@@ -114,7 +114,7 @@ const CourseDeliverables = ({ theme, setTheme }) => {
                 />
 
                 <div className="relative flex-1 min-w-5 overflow-hidden">
-                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
                         <div className="cd-container">
                             {/* Main Header Card */}
                             <div className="cd-header-card">

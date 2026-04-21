@@ -282,7 +282,7 @@ export default function MyListings({ theme = "light", setTheme }) {
     <div className={`user-page ${theme} min-h-screen relative overflow-hidden mylis-shell`}>
       <UserNavbar toggleSidebar={() => setSidebarOpen((p) => !p)} theme={theme} />
 
-      <div className="pt-[85px] flex relative z-10 w-full h-full">
+      <div className="pt-[72px] flex relative z-10 w-full h-full">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -295,7 +295,7 @@ export default function MyListings({ theme = "light", setTheme }) {
         />
 
         <div className="relative flex-1 min-w-5 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <main className="mylis-main w-full">
               <div className="mylis-header-row">
                 <h1 className="mylis-title">My Listings</h1>

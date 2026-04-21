@@ -8,7 +8,7 @@
 }
 
 .notification-layout-body {
-  padding-top: 85px;
+  padding-top: 72px;
   display: flex;
   position: relative;
   z-index: 10;
@@ -28,7 +28,7 @@
   position: relative;
   z-index: 10;
   overflow-y: auto;
-  height: calc(100vh - 85px);
+  height: calc(100vh - 72px);
   width: 100%;
 }
 

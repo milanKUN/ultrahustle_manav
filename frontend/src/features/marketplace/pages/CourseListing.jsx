@@ -305,9 +305,9 @@ const CourseListing = ({ theme, setTheme }) => {
           isSidebarOpen={sidebarOpen}
           theme={theme}
         />
-        <div className="pt-[85px] flex relative z-10">
+        <div className="pt-[72px] flex relative z-10">
           <div className="relative flex-1 min-w-0 overflow-hidden">
-            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+            <div className="overflow-y-auto h-[calc(100vh-72px)]">
               <div className="cl-page">
                 <div className="content-card">
                   <p className="card-text">Loading course listing...</p>
@@ -329,9 +329,9 @@ const CourseListing = ({ theme, setTheme }) => {
           isSidebarOpen={sidebarOpen}
           theme={theme}
         />
-        <div className="pt-[85px] flex relative z-10">
+        <div className="pt-[72px] flex relative z-10">
           <div className="relative flex-1 min-w-0 overflow-hidden">
-            <div className="overflow-y-auto h-[calc(100vh-85px)]">
+            <div className="overflow-y-auto h-[calc(100vh-72px)]">
               <div className="cl-page">
                 <div className="content-card">
                   <p className="card-text text-red-600">
@@ -355,9 +355,9 @@ const CourseListing = ({ theme, setTheme }) => {
         theme={theme}
       />
 
-      <div className="pt-[85px] flex relative z-10 transition-all duration-300">
+      <div className="pt-[72px] flex relative z-10 transition-all duration-300">
         <div className="relative flex-1 min-w-0 overflow-hidden">
-          <div className="overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="overflow-y-auto h-[calc(100vh-72px)]">
             <div className={`cl-page ${theme}`}>
               <div className="cl-header">
                 <h1 className="cl-title">{listing?.title || "Course"}</h1>

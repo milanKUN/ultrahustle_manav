@@ -783,7 +783,7 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
         theme={theme}
       />
 
-      <div className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isAvatarModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}>
+      <div className={`pt-[72px] flex relative z-10 transition-all duration-300 ${isAvatarModalOpen ? "blur-sm pointer-events-none select-none" : ""}`}>
         {/* ✅ SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
@@ -799,7 +799,7 @@ const CreateTeam = ({ theme, setTheme, mode = "create", initialTeamId = null }) 
         {/* ✅ MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-5 overflow-hidden">
           {/* Scrollable Area */}
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <div className="create-team-container">
               <header className="header-section">
                 <h1>{teamId || mode === "edit" ? "Edit Team" : "Create Your Team"}</h1>

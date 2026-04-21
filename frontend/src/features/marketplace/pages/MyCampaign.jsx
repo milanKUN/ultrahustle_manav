@@ -170,7 +170,7 @@ export default function MyListingPage({ theme, setTheme }) {
                 onDropdownChange={setIsDropdownOpen}
             />
 
-            <div className="pt-[85px] flex relative z-10 w-full">
+            <div className="pt-[72px] flex relative z-10 w-full">
                 <Sidebar
                     expanded={sidebarOpen}
                     setExpanded={setSidebarOpen}
@@ -183,7 +183,7 @@ export default function MyListingPage({ theme, setTheme }) {
                 />
 
                 <div className="relative flex-1 min-w-0 overflow-hidden w-full">
-                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] w-full">
+                    <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)] w-full">
                         <main
                             className={`my-listings-main ${isDropdownOpen ? "blurred" : ""}`}
                         >

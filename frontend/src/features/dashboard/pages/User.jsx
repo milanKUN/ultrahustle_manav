@@ -106,7 +106,7 @@ function User({ theme, setTheme }) {
         theme={theme}
       />
 
-      <div className="pt-[85px] flex relative z-10">
+      <div className="pt-[72px] flex relative z-10">
         {/* ---------- SIDEBAR ---------- */}
         <Sidebar
           expanded={sidebarOpen}
@@ -125,7 +125,7 @@ function User({ theme, setTheme }) {
           <div
             ref={contentRef}
             onScroll={handleScroll}
-            className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]"
+            className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]"
           >
             <div className="p-8 space-y-28 w-full">
               <section ref={refs.account} id="account">

@@ -414,9 +414,9 @@ const PublicUserProfile = (props) => {
         onGoSignup={() => navigate("/signup")}
       />
 
-      <div className="pt-[85px] relative z-10">
+      <div className="pt-[72px] relative z-10">
         <div className="relative flex-1 min-w-0 overflow-hidden">
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
             <main className={`inreview-main ${activeItem ? "blurred" : ""} w-full min-w-0`}>
               {loading ? (
                 <section className="content-card">

@@ -81,7 +81,7 @@ export default function AddNewListing({ theme, setTheme }) {
         onDropdownChange={handleDropdownChange}
       />
 
-      <div className="pt-[85px] flex relative z-10 w-full">
+      <div className="pt-[72px] flex relative z-10 w-full">
         {/* SIDEBAR */}
         <Sidebar
           expanded={sidebarOpen}
@@ -97,7 +97,7 @@ export default function AddNewListing({ theme, setTheme }) {
         {/* MAIN CONTENT WRAPPER */}
         <div className="relative flex-1 min-w-0 overflow-hidden w-full">
           {/* Scrollable Area */}
-          <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)] w-full">
+          <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)] w-full">
             <main
               className={`add-listing-main p-6 lg:p-10 ${
                 isDropdownOpen ? "blurred" : ""

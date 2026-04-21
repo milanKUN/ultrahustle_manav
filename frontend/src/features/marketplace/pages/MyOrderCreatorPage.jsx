@@ -150,7 +150,7 @@ export default function MyOrderCreatorPage({ theme, setTheme }) {
         onDropdownChange={setIsDropdownOpen}
       />
 
-      <div className="pt-[85px] flex relative w-full">
+      <div className="pt-[72px] flex relative w-full">
         <Sidebar
           expanded={sidebarOpen}
           setExpanded={setSidebarOpen}
@@ -163,7 +163,7 @@ export default function MyOrderCreatorPage({ theme, setTheme }) {
         />
 
         <div className="relative flex-1 min-w-0 overflow-hidden w-full">
-          <div className="relative overflow-y-auto h-[calc(100vh-85px)] w-full">
+          <div className="relative overflow-y-auto h-[calc(100vh-72px)] w-full">
             <main className={`my-orders-main ${isDropdownOpen ? "blurred" : ""}`}>
               <section className="my-orders-shell">
                 <header className="my-orders-head">

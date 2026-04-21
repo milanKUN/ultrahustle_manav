@@ -529,7 +529,7 @@ export default function CreateCourse({
           isSidebarOpen={sidebarOpen}
           theme={theme}
         />
-        <div className="pt-[85px] flex relative z-10">
+        <div className="pt-[72px] flex relative z-10">
           <Sidebar
             expanded={sidebarOpen}
             setExpanded={setSidebarOpen}
@@ -558,7 +558,7 @@ export default function CreateCourse({
         />
 
         <div
-          className={`pt-[85px] flex relative z-10 transition-all duration-300 ${
+          className={`pt-[72px] flex relative z-10 transition-all duration-300 ${
             isModalOpen ? "blur-sm pointer-events-none select-none" : ""
           }`}
         >
@@ -574,7 +574,7 @@ export default function CreateCourse({
           />
 
           <div className="relative flex-1 min-w-5 overflow-hidden">
-            <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
+            <div className="relative z-10 overflow-y-auto h-[calc(100vh-72px)]">
               <div className="create-service-container">
                 <div className="csl-stack">
                   <div className="csl-card">
