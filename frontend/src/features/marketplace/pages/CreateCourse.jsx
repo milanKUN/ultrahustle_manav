@@ -68,6 +68,7 @@ export default function CreateCourse({
   const [learningPoints, setLearningPoints] = useState([]);
 
   const [languages, setLanguages] = useState([]);
+  const [aiPowered, setAiPowered] = useState(false);
 
   const [previewVideo, setPreviewVideo] = useState(null);
   const [previewVideoFile, setPreviewVideoFile] = useState(null);
@@ -242,7 +243,9 @@ export default function CreateCourse({
 
   const applyCoverFiles = (files) => {
     setCoverFiles(files);
-    const newUrls = files.map((f) => URL.createObjectURL(f));
+    const newUrls = files.map((f) =>
+      f instanceof File ? URL.createObjectURL(f) : (typeof f === 'string' ? f : '')
+    ).filter(Boolean);
     setCoverImages(newUrls);
     setCoverSlideIdx(0);
     setActivePreviewImg(0);
@@ -322,6 +325,7 @@ export default function CreateCourse({
         setLanguages(
           Array.isArray(item?.details?.languages) ? item.details.languages : []
         );
+        setAiPowered(Boolean(item?.ai_powered));
 
         setFaqs(
           Array.isArray(item.faqs) && item.faqs.length
@@ -419,9 +423,10 @@ export default function CreateCourse({
     return "";
   };
 
-  const buildPayload = () => ({
+  const buildPayload = (status = "published") => ({
   listing_type: LISTING_TYPE,
-  status: "published",
+  status,
+  ai_powered: aiPowered,
   title: form.title,
   category: form.category,
   sub_category: form.subCategory,
@@ -478,35 +483,38 @@ export default function CreateCourse({
   },
 });
 
-  const handleSaveListing = async () => {
-    const validationError = validateBeforeSave();
-    if (validationError) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation error",
-        text: validationError,
-      });
-      return;
+  const handleSaveListing = async (asDraft = false) => {
+    if (!asDraft) {
+      const validationError = validateBeforeSave();
+      if (validationError) {
+        Swal.fire({ icon: "warning", title: "Validation error", text: validationError, background: '#0b0b0b', color: '#fff' });
+        return;
+      }
     }
 
     try {
       setIsSubmitting(true);
+      const status = asDraft ? "draft" : "published";
 
       const res = isEditMode
-        ? await updateListing(username, buildPayload())
-        : await createListing(buildPayload());
+        ? await updateListing(username, buildPayload(status))
+        : await createListing(buildPayload(status));
+
+      const titleText = asDraft
+        ? (isEditMode ? "Draft Updated" : "Draft Saved")
+        : (isEditMode ? "Course Updated" : "Course Created");
+      const bodyText = res?.message || (asDraft ? "Your draft has been saved." : (isEditMode ? "Your course has been updated successfully." : "Your course has been created successfully."));
 
       Swal.fire({
         icon: "success",
-        title: isEditMode ? "Course Updated" : "Course Created",
-        text:
-          res?.message ||
-          (isEditMode
-            ? "Your course has been updated successfully."
-            : "Your course has been created successfully."),
-        confirmButtonText: "OK",
+        title: titleText,
+        text: bodyText,
+        confirmButtonText: asDraft ? "OK" : "Go to Listings",
+        confirmButtonColor: '#CEFF1B',
+        background: '#0b0b0b',
+        color: '#ffffff',
       }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && !asDraft) {
           navigate("/my-listings");
         }
       });
@@ -515,6 +523,8 @@ export default function CreateCourse({
         icon: "error",
         title: isEditMode ? "Update failed" : "Save failed",
         text: e?.message || `Failed to ${isEditMode ? "update" : "save"} course.`,
+        background: '#0b0b0b',
+        color: '#ffffff',
       });
     } finally {
       setIsSubmitting(false);
@@ -587,6 +597,29 @@ export default function CreateCourse({
                           {isEditMode ? "Update course details" : "Fill out each section"}
                         </p>
                       </div>
+                    </div>
+
+                    {/* AI Powered Toggle */}
+                    <div className="csl-group-box" style={{ marginBottom: 8 }}>
+                      <label className="csl-label" style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                        <span>AI Powered</span>
+                        <div
+                          onClick={() => setAiPowered(!aiPowered)}
+                          style={{
+                            width: 44, height: 24, borderRadius: 12,
+                            background: aiPowered ? '#CEFF1B' : '#555',
+                            position: 'relative', cursor: 'pointer',
+                            transition: 'background 0.2s',
+                          }}
+                        >
+                          <div style={{
+                            width: 18, height: 18, borderRadius: '50%',
+                            background: '#fff', position: 'absolute', top: 3,
+                            left: aiPowered ? 22 : 4, transition: 'left 0.2s',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                          }} />
+                        </div>
+                      </label>
                     </div>
 
                     <h2 className="csl-section m-0">Course Details</h2>
@@ -966,6 +999,7 @@ export default function CreateCourse({
                           }}
                           options={languageOptions}
                           placeholder="Select language"
+                          searchable
                         />
 
                         {languages.length > 0 && (
@@ -1025,6 +1059,7 @@ export default function CreateCourse({
                   <div className="csl-group-box">
                     <PreviewVideo
                       previewImage={previewVideo || undefined}
+                      previewType="video"
                       onUpload={() => {
                         const input = document.createElement("input");
                         input.type = "file";
@@ -1097,14 +1132,23 @@ export default function CreateCourse({
                     ))}
                   </div>
 
-                  <div className="faq-actions">
+                  <div className="faq-actions" style={{ display: 'flex', gap: 12 }}>
                     <button
                       type="button"
                       className="faq-save"
-                      onClick={handleSaveListing}
+                      style={{ background: 'transparent', border: '1px solid #CEFF1B', color: '#CEFF1B' }}
+                      onClick={() => handleSaveListing(true)}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Save"}
+                      {isSubmitting ? "Saving..." : "Save as Draft"}
+                    </button>
+                    <button
+                      type="button"
+                      className="faq-save"
+                      onClick={() => handleSaveListing(false)}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Saving..." : isEditMode ? "Update & Publish" : "Save & Publish"}
                     </button>
                   </div>
                   </div>
@@ -1127,7 +1171,7 @@ export default function CreateCourse({
                   initialFiles={coverFiles}
                   onSelect={(files) => {
                     if (files?.length) applyCoverFiles(files);
-                    setUploadStep("success");
+                    setUploadStep(null);
                   }}
                   onBack={() => setUploadStep(null)}
                   blurred={uploadStep === "success"}
@@ -1168,17 +1212,25 @@ function UploadSuccess({ onBack }) {
   );
 }
 
-function CustomSelect({ value, onChange, options, placeholder, disabled = false }) {
+function CustomSelect({ value, onChange, options, placeholder, disabled = false, searchable = false }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const ref = useRef(null);
 
   React.useEffect(() => {
     const fn = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+        setSearch("");
+      }
     };
     document.addEventListener("mousedown", fn);
     return () => document.removeEventListener("mousedown", fn);
   }, []);
+
+  const filtered = searchable && search
+    ? options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
+    : options;
 
   return (
     <div
@@ -1193,19 +1245,38 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
       </div>
 
       {open && (
-        <ul className="onboarding-options-list dark:bg-[#1E1E1E]">
-          {options.map((opt, index) => (
+        <ul className="onboarding-options-list dark:bg-[#1E1E1E]" style={{ maxHeight: 220, overflowY: 'auto' }}>
+          {searchable && (
+            <li style={{ position: 'sticky', top: 0, padding: '6px 10px', background: 'inherit', zIndex: 1 }} onClick={(e) => e.stopPropagation()}>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+                style={{
+                  width: '100%', padding: '6px 10px', borderRadius: 6,
+                  border: '1px solid #444', background: 'transparent',
+                  color: 'inherit', fontSize: 13, outline: 'none',
+                }}
+              />
+            </li>
+          )}
+          {filtered.length > 0 ? filtered.map((opt, index) => (
             <li
               key={`${opt}-${index}`}
               className={value === opt ? "active" : ""}
               onClick={() => {
                 onChange(opt);
                 setOpen(false);
+                setSearch("");
               }}
             >
               {opt}
             </li>
-          ))}
+          )) : (
+            <li style={{ opacity: 0.5, cursor: 'default' }}>No results</li>
+          )}
         </ul>
       )}
     </div>
@@ -1216,6 +1287,14 @@ function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
   const fileRef = useRef(null);
   const [files, setFiles] = useState(initialFiles);
   const activeIndexRef = useRef(null);
+
+  // Get preview URL: handle both File objects and URL strings
+  const getPreviewUrl = (item) => {
+    if (!item) return null;
+    if (item instanceof File) return URL.createObjectURL(item);
+    if (typeof item === "string") return item; // existing URL from edit mode
+    return null;
+  };
 
   const handleFiles = (e) => {
     const newFiles = Array.from(e.target.files);
@@ -1257,13 +1336,13 @@ function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
 
         <div className="am-upload-grid">
           {[...Array(9)].map((_, i) => {
-            const file = files[i];
-            const url = file ? URL.createObjectURL(file) : null;
+            const item = files[i];
+            const url = getPreviewUrl(item);
 
             return (
               <div
                 key={i}
-                className={`am-grid-slot ${file ? "has-file" : ""}`}
+                className={`am-grid-slot ${item ? "has-file" : ""}`}
                 onClick={() => {
                   activeIndexRef.current = i;
                   fileRef.current?.click();
