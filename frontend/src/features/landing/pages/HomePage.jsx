@@ -840,81 +840,108 @@ function ScrollSlideSecond({ slideSecond, index, total, progress, reduceMotion }
     const segment = 1 / total;
     const start = index * segment;
     const end = start + segment;
-    const isLast = index === total - 1;
+    const isFirst = index === 0;
 
-    // Internal timing phases - Start zoom earlier for a "slower" feel
-    const readEnd = start + segment * 0.5; 
-    const zoomEnd = start + segment * 0.98;
+    // Background Image Curtain Wipe (Slide Up)
+    // Starts wiping a bit before the segment starts, fully up by `start`.
+    const wipeStart = Math.max(0, start - segment * 0.3);
+    const wipeEnd = start;
 
-    const layerOpacity = useTransform(
-        progress,
-        [start, start + segment * 0.05, zoomEnd, end],
-        isLast ? [0, 1, 1, 1] : [0, 1, 1, 0]
-    );
+    let wipeYKeys = [wipeStart, wipeEnd];
+    let wipeYVals = ["100%", "0%"];
 
-    const imageScale = useTransform(progress, [start, zoomEnd], [1.15, 1]);
-    const imageY = useTransform(progress, [start, zoomEnd], [20, 0]);
+    // The first image shouldn't wipe in from scroll, it should just be there
+    if (isFirst) {
+        wipeYKeys = [0, 0];
+        wipeYVals = ["0%", "0%"];
+    }
 
-    const copyOpacity = useTransform(
-        progress,
-        [start, start + segment * 0.05, readEnd, zoomEnd],
-        [0, 1, 1, 0]
-    );
+    const slideY = useTransform(progress, wipeYKeys, wipeYVals);
+    
+    // Slow scale on the image while it stays visible
+    const imageScale = useTransform(progress, [start, end], [1.02, 1.15]);
 
-    const copyY = useTransform(
-        progress,
-        [start, readEnd, zoomEnd],
-        [20, 0, -40]
-    );
-
-    const copyScale = useTransform(
-        progress,
-        [start, readEnd, zoomEnd],
-        [0.98, 1, 15] // Reduced final scale and earlier start for slower growth
-    );
+    const chars = Array.from(slideSecond.text);
 
     return (
         <motion.div
             className="absolute inset-0"
-            style={{ opacity: layerOpacity, zIndex: total - index }}
+            style={{ zIndex: index }}
         >
+            {/* Background Wiping Layer */}
             <motion.div
-                className="absolute inset-0"
+                className={`absolute inset-0 ${!isFirst ? 'shadow-[0_-20px_50px_rgba(0,0,0,0.8)]' : ''}`}
                 style={
                     reduceMotion
                         ? undefined
                         : {
-                              scale: imageScale,
-                              y: imageY,
+                              y: slideY,
                           }
                 }
             >
-                <div
+                <motion.div
                     className="absolute inset-0 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${slideSecond.bg})` }}
+                    style={{ 
+                        backgroundImage: `url(${slideSecond.bg})`,
+                        scale: reduceMotion ? 1 : imageScale 
+                    }}
                 />
+                
+                {/* Dark overlay specifically attached to the wiping background */}
+                <div className="scroll-story-overlay absolute inset-0 z-0" />
             </motion.div>
 
-            <div className="scroll-story-overlay absolute inset-0" />
-
-            <motion.div
-                className="relative z-10 flex h-full items-center justify-center px-6 text-center"
-                style={
-                    reduceMotion
-                        ? { opacity: 1 }
-                        : {
-                              opacity: copyOpacity,
-                              y: copyY,
-                              scale: copyScale,
-                          }
-                }
+            {/* Text Layer (Animates Independently) */}
+            <div
+                className="relative z-10 flex h-full w-full items-center justify-center px-4 text-center pointer-events-none"
             >
-                <div className="mx-auto max-w-6xl">
-                    <h2 className="clash scroll-story-title text-[#CEFF1B] font-extrabold tracking-[-0.07em] flex items-center justify-center">
-                        {slideSecond.text}
-                    </h2>
+                <div className="flex overflow-hidden pb-6 pt-4">
+                    {chars.map((char, i) => {
+                        const charDelay = i * 0.04 * segment; 
+                        const charInStart = start + charDelay;
+                        const charInEnd = charInStart + 0.18 * segment;
+                        
+                        const charOutStart = end - 0.28 * segment + charDelay;
+                        const charOutEnd = charOutStart + 0.18 * segment;
+                        
+                        let yOffsetKeys = [charInStart, charInEnd, charOutStart, charOutEnd];
+                        let yOffsetVals = ["120%", "0%", "0%", "-120%"];
+                        
+                        let oOffsetKeys = [charInStart, charInStart + 0.05 * segment, charOutStart, charOutEnd];
+                        let oOffsetVals = [0, 1, 1, 0];
+
+                        if (index === 0) {
+                            yOffsetKeys = [0, 0, charOutStart, charOutEnd];
+                            yOffsetVals = ["0%", "0%", "0%", "-120%"];
+                            oOffsetKeys = [0, 0, charOutStart, charOutEnd];
+                            oOffsetVals = [1, 1, 1, 0];
+                        }
+                        if (index === total - 1) {
+                            yOffsetKeys = [charInStart, charInEnd, 1, 1];
+                            yOffsetVals = ["120%", "0%", "0%", "0%"];
+                            oOffsetKeys = [charInStart, charInStart + 0.05 * segment, 1, 1];
+                            oOffsetVals = [0, 1, 1, 1];
+                        }
+
+                        const y = useTransform(progress, yOffsetKeys, yOffsetVals);
+                        const opacity = useTransform(progress, oOffsetKeys, oOffsetVals);
+
+                        return (
+                            <motion.span
+                                key={i}
+                                style={
+                                    reduceMotion
+                                        ? undefined
+                                        : { y, opacity }
+                                }
+                                className={`inline-block clash text-[#CEFF1B] font-extrabold tracking-[-0.05em] leading-[0.85] text-[15vw] sm:text-[12vw] md:text-[10vw] lg:text-[9vw] xl:text-[8vw] drop-shadow-2xl ${char === ' ' ? 'w-[0.3em]' : ''}`}
+                            >
+                                {char}
+                            </motion.span>
+                        );
+                    })}
                 </div>
-            </motion.div>
+            </div>
         </motion.div>
     );
 }
@@ -1360,8 +1387,6 @@ export default function HomePage() {
 
             <PlatformFeaturesSection containerRef={containerRef} />
             <TestimonialsSection containerRef={containerRef} />
-            <HomepageFAQSection containerRef={containerRef} />
-
             <section
                 ref={sectionRefSecond}
                 className="relative overflow-clip bg-[#040404]"
@@ -1382,7 +1407,7 @@ export default function HomePage() {
                     ))}
                 </div>
             </section>
-
+            <HomepageFAQSection containerRef={containerRef} />
             <Footer containerRef={containerRef} />
             </div>
         </div>
