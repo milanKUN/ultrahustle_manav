@@ -456,7 +456,7 @@ export default function Sidebar({
               })}
             </nav>
 
-            <div className="w-full px-4 pb-4 mt-auto ml-2">
+            {/* <div className="w-full px-4 pb-4 mt-auto ml-2">
               <button
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                 className="
@@ -513,7 +513,7 @@ export default function Sidebar({
                   )}
                 </div>
               </button>
-            </div>
+            </div> */}
           </aside>
         )}
 

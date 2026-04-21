@@ -89,25 +89,6 @@ const Footer = ({ containerRef }) => {
                         </div>
                     ))}
                 </div>
-
-                {/* The Cube Branding Banner */}
-                {/* <div className="uh-footer-banner">
-                    <img src="/UHlogo-new.png" alt="Ultra Hustle" className="uh-footer-banner-img" />
-                </div> */}
-
-                {/* Bottom Section: Branding & Copyright */}
-                {/* <div className="uh-footer-divider" />
-                
-                <div className="uh-footer-bottom">
-                    <div className="uh-footer-bottom-left">
-                        <div className="uh-footer-brand">
-                            <span className="clash uh-footer-logo">ultra hustle.</span>
-                        </div>
-                        <p className="uh-footer-copyright">
-                            © Ultra Hustle International Ltd. 2026
-                        </p>
-                    </div>
-                </div> */}
             </div>
             <div className="uh-footer-banner">
                 <motion.img

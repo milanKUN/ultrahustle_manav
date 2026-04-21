@@ -14,30 +14,30 @@ import "./HomePage.css";
 const slides = [
     {
         text: "create.",
-        bg: "/Create.png",
+        bg: "/Create.webp",
     },
     {
         text: "connect.",
-        bg: "/Connect.png",
+        bg: "/Connect.webp",
     },
     {
         text: "grow.",
-        bg: "/Grow.png",
+        bg: "/Grow.webp",
     },
 ];
 
 const slidesSecond = [
     {
         text: "Work Hard",
-        bg: "/work-hard.png",
+        bg: "/work-hard.webp",
     },
     {
         text: "Work Smart",
-        bg: "/work-smart.png",
+        bg: "/work-smart.webp",
     },
     {
         text: "Work Ultra",
-        bg: "/work-ultra.png",
+        bg: "/work-ultra.webp",
     },
 ];
 
@@ -48,7 +48,7 @@ const buildAroundDomainCards = [
         description:
             "Creators list skills. Clients browse the marketplace and connect directly. Escrow protects every deal.",
         visualTheme: "emerald",
-        image: "/services-card.png",
+        image: "/services-card.jpeg",
     },
     {
         eyebrow: "DIGITAL PRODUCTS",
@@ -56,7 +56,7 @@ const buildAroundDomainCards = [
         description:
             "Templates, presets, packs — passive income for creators, instant downloads for clients.",
         visualTheme: "sunset",
-        image: "/products-card.png",
+        image: "/products-card.jpeg",
     },
     {
         eyebrow: "COURSES & WEBINARS",
@@ -64,7 +64,7 @@ const buildAroundDomainCards = [
         description:
             "Creators teach. Clients learn. Skills that scale beyond any single project.",
         visualTheme: "gold",
-        image: "/course-card.png",
+        image: "/course-card.jpeg",
     },
     {
         eyebrow: "TEAMS",
@@ -72,7 +72,7 @@ const buildAroundDomainCards = [
         description:
             "Creators build squads. Clients get full-stack teams without the agency markup.",
         visualTheme: "violet",
-        image: "/teams-card.png",
+        image: "/teams-card.jpeg",
     },
     {
         eyebrow: "Client Payments",
@@ -275,7 +275,7 @@ const testimonials = [
 
 const howItWorksSteps = {
     creator: {
-        bg: "/Creator.png",
+        bg: "/Creator.jpeg",
         steps: [
             {
                 num: "01",
@@ -304,7 +304,7 @@ const howItWorksSteps = {
         ],
     },
     client: {
-        bg: "/Client.png",
+        bg: "/Client.jpeg",
         steps: [
             {
                 num: "01",
@@ -383,17 +383,22 @@ const homepageFaqs = {
 
 
 function TrustSection({ containerRef }) {
+    const sectionRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start start", "end end"],
+        container: containerRef,
+        layoutEffect: false,
+    });
+
+    const card1Y = useTransform(scrollYProgress, [0.0, 0.25], [800, 0]);
+    const card2Y = useTransform(scrollYProgress, [0.3, 0.55], [800, 0]);
+    const card3Y = useTransform(scrollYProgress, [0.6, 0.85], [800, 0]);
+
     return (
-        <motion.section
+        <section
+            ref={sectionRef}
             className="trust-section"
-            initial={{ opacity: 0, y: 56 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.15, root: containerRef }}
-            transition={{
-                duration: 1.6,
-                delay: 0.3,
-                ease: [0.16, 1, 0.3, 1],
-            }}
         >
             <div className="trust-shell">
                 <div className="trust-content">
@@ -414,12 +419,6 @@ function TrustSection({ containerRef }) {
                                 Escrow-protected transactions
                             </span>
                         </div>
-                        {/* <div className="trust-stat">
-                            <span className="trust-stat-val">₹0</span>
-                            <span className="trust-stat-label">
-                                Founding creator commission
-                            </span>
-                        </div> */}
                         <div className="trust-stat">
                             <span className="trust-stat-val">&lt;2hr</span>
                             <span className="trust-stat-label">
@@ -430,7 +429,10 @@ function TrustSection({ containerRef }) {
                 </div>
 
                 <div className="trust-cards">
-                    <div className="trust-card trust-card-light">
+                    <motion.div 
+                        className="trust-card trust-card-light"
+                        style={{ y: card1Y }}
+                    >
                         <div className="trust-card-icon-box">
                             <Lock size={20} className="text-orange-500" />
                         </div>
@@ -442,9 +444,12 @@ function TrustSection({ containerRef }) {
                                 Funds release. No invoice chasing, no excuses.
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="trust-card trust-card-dark">
+                    <motion.div 
+                        className="trust-card trust-card-dark"
+                        style={{ y: card2Y }}
+                    >
                         <div className="trust-card-icon-box">
                             <ShieldCheck size={20} className="text-blue-500" />
                         </div>
@@ -456,9 +461,12 @@ function TrustSection({ containerRef }) {
                                 KYC-verified creators and real support behind every deal.
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="trust-card trust-card-lime">
+                    <motion.div 
+                        className="trust-card trust-card-lime"
+                        style={{ y: card3Y }}
+                    >
                         <div className="trust-card-icon-box">
                             <FileText size={20} className="text-black" />
                         </div>
@@ -470,10 +478,10 @@ function TrustSection({ containerRef }) {
                                 No scope creep. No &quot;but you said...&quot; moments.
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-        </motion.section>
+        </section>
     );
 }
 
@@ -551,7 +559,7 @@ function PlatformFeaturesSection({ containerRef }) {
                 <div className="hiw-bg-layer">
                     <div
                         className="hiw-bg-img hiw-bg-img--active"
-                        style={{ backgroundImage: "url('/every-feature.png')" }}
+                        style={{ backgroundImage: "url('/every-feature.webp')" }}
                     />
                     <div className="hiw-bg-overlay" />
                 </div>
@@ -708,11 +716,11 @@ function HowItWorksSection({ containerRef }) {
             <div className="hiw-bg-layer">
                 <div
                     className={`hiw-bg-img ${activeTab === "creator" ? "hiw-bg-img--active" : ""}`}
-                    style={{ backgroundImage: "url('/Creator.png')" }}
+                    style={{ backgroundImage: "url('/Creator.jpeg')" }}
                 />
                 <div
                     className={`hiw-bg-img ${activeTab === "client" ? "hiw-bg-img--active" : ""}`}
-                    style={{ backgroundImage: "url('/Client.png')" }}
+                    style={{ backgroundImage: "url('/Client.jpeg')" }}
                 />
                 <div className="hiw-bg-overlay" />
             </div>
@@ -783,19 +791,20 @@ function ScrollSlide({ slide, index, total, progress, reduceMotion }) {
     const fadeInEnd = start + segment * 0.24;
     const fadeOutStart = end - segment * 0.24;
     const fadeEnd = Math.min(1, end + segment * 0.18);
+    const isFirst = index === 0;
     const isLast = index === total - 1;
 
     const layerOpacity = useTransform(
         progress,
         [fadeStart, fadeInEnd, fadeOutStart, fadeEnd],
-        isLast ? [0, 1, 1, 1] : [0, 1, 1, 0]
+        isFirst ? (isLast ? [1, 1, 1, 1] : [1, 1, 1, 0]) : (isLast ? [0, 1, 1, 1] : [0, 1, 1, 0])
     );
-    const imageScale = useTransform(progress, [start, end], [1.5, 1]);
+    const imageScale = useTransform(progress, [start, end], [1.5, 1.2]);
     const imageY = useTransform(progress, [start, end], [64, 30]);
     const copyOpacity = useTransform(
         progress,
         [fadeStart, fadeInEnd, fadeOutStart, fadeEnd],
-        [0, 1, 1, 0],
+        isFirst ? [1, 1, 1, 0] : [0, 1, 1, 0],
     );
     const copyY = useTransform(progress, [start, end], [70, 0]);
     const copyScale = useTransform(progress, [start, end], [0.96, 1]);
@@ -858,7 +867,7 @@ function ScrollSlideSecond({ slideSecond, index, total, progress, reduceMotion }
     const wipeEnd = start;
 
     let wipeYKeys = [wipeStart, wipeEnd];
-    let wipeYVals = ["100%", "0%"];
+    let wipeYVals = ["105%", "0%"];
 
     // The first image shouldn't wipe in from scroll, it should just be there
     if (isFirst) {
@@ -1045,8 +1054,9 @@ export default function HomePage() {
 
     const { scrollYProgress: buildProgress } = useScroll({
         target: buildSectionRef,
-        offset: ["start end", "start start"],
+        offset: ["start end", "end start"],
         container: containerRef,
+        layoutEffect: false,
     });
 
     const buildScale = useTransform(buildProgress, [0, 1], [0.85, 1]);
@@ -1061,6 +1071,7 @@ export default function HomePage() {
         target: sectionRef,
         offset: ["start start", "end end"],
         container: containerRef,
+        layoutEffect: false,
     });
     const smoothProgress = useSpring(scrollYProgress, {
         stiffness: 110,
@@ -1071,11 +1082,12 @@ export default function HomePage() {
         target: sectionRefSecond,
         offset: ["start start", "end end"],
         container: containerRef,
+        layoutEffect: false,
     });
     const smoothProgressSecond = useSpring(scrollYProgressSecond, {
-        stiffness: 40, // Lower stiffness for slower response
-        damping: 30,   // Higher damping to prevent bounce
-        mass: 1,
+        stiffness: 110,
+        damping: 26,
+        mass: 0.2,
     });
     const progressWidth = useTransform(smoothProgress, [0, 1], ["0%", "100%"]);
 
@@ -1123,7 +1135,7 @@ export default function HomePage() {
             <section
                 className="homepage-hero relative flex min-h-screen items-start justify-start px-8 pt-36 sm:px-6 md:px-10 lg:px-20"
                 style={{
-                    backgroundImage: "url('/homepage-hero2.png')",
+                    backgroundImage: "url('/homepage-hero2.webp')",
                     backgroundSize: "130%",
                     backgroundPosition: "100% center",
                     backgroundRepeat: "no-repeat",
@@ -1185,7 +1197,6 @@ export default function HomePage() {
                 style={{ height: SCROLL_HEIGHT }}
             >
                 <div className="sticky top-0 h-screen overflow-hidden">
-                    <div className="absolute inset-0 bg-white" />
 
                     {slides.map((slide, index) => (
                         <ScrollSlide
@@ -1215,7 +1226,7 @@ export default function HomePage() {
                         className="build-domain-header"
                         initial={{ opacity: 0, y: 48 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: false, amount: 0.3, root: containerRef }}
+                        viewport={{ once: true, amount: 0.3, root: containerRef }}
                         transition={{
                             duration: 0.75,
                             ease: [0.22, 1, 0.36, 1],
@@ -1403,7 +1414,6 @@ export default function HomePage() {
                 style={{ height: SCROLL_HEIGHT }}
             >
                 <div className="sticky top-0 h-screen overflow-hidden">
-                    <div className="absolute inset-0 bg-white" />
 
                     {slidesSecond.map((slide, index) => (
                         <ScrollSlideSecond

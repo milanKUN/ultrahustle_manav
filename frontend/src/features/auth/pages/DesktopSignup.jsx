@@ -157,8 +157,9 @@ const DesktopSignup = () => {
   };
 
   return (
-    <div className="desktop-login-container signup-mode">
-      {/* Background Image */}
+    <div className="h-screen w-full overflow-y-auto overflow-x-hidden custom-scroll">
+      <div className="desktop-login-container signup-mode">
+        {/* Background Image */}
       <div className="desktop-login-bg">
         <img src={desktopBg} alt="Background" />
       </div>
@@ -177,12 +178,7 @@ const DesktopSignup = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {submitError ? (
-              <p className="auth-submit-message" role="alert">
-                {submitError}
-              </p>
-            ) : null}
+          <form onSubmit={handleSubmit} className="flex-1 overflow-visible h-auto max-h-none">
 
             {/* Full Name */}
             <div className="form-group">
@@ -202,13 +198,13 @@ const DesktopSignup = () => {
 
             {/* Email */}
             <div className="form-group">
-              <label htmlFor="email">Email Address or phone number</label>
+              <label htmlFor="email">Email Address</label>
               <div className="input-wrapper">
                 <input
                   type="text"
                   id="email"
                   name="email"
-                  placeholder="Email address or phone number"
+                  placeholder="Email address"
                   value={formData.email}
                   onChange={handleInputChange}
                   required
@@ -357,6 +353,12 @@ const DesktopSignup = () => {
               </label>
             </div>
 
+            {submitError ? (
+              <p className="auth-submit-message" role="alert" style={{ color: '#dc2626', textAlign: 'center', marginTop: '12px' }}>
+                {submitError}
+              </p>
+            ) : null}
+
             {/* Submit */}
             <button type="submit" className="desktop-login-btn" disabled={isSubmitting}>
               {isSubmitting ? "Signing up..." : "Sign up"}
@@ -413,6 +415,7 @@ const DesktopSignup = () => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };

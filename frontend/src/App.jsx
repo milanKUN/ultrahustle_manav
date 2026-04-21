@@ -113,9 +113,9 @@ export default function App() {
         <Router>
             <div className="app">
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/test" element={<Test />} />
-                    <Route path="/homepage" element={<HomePage />} />
+                    {/* <Route path="/homepage" element={<HomePage />} /> */}
                     <Route
                         path="/setting"
                         element={

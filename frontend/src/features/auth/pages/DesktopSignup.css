@@ -39,13 +39,14 @@
 .signup-card-glass {
   width: 481px !important;
   /* ✅ Match Login Card */
-  height: 553px !important;
-  /* ✅ Match Login Card Exact Height */
+  height: auto !important;
+  min-height: 553px !important;
+  /* ✅ Allow card to stretch */
   padding: 26px 28px 22px !important;
   /* ✅ Match Login Card Padding */
   margin: 0 !important;
-  overflow: hidden !important;
-  /* ✅ Card itself doesn't scroll */
+  overflow: visible !important;
+  /* ✅ Let container handle scroll */
 
   display: flex;
   flex-direction: column;
@@ -53,35 +54,37 @@
 
 /* ✅ Only the form inside scrolls */
 .signup-card-glass form {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 8px;
-  /* Space for scrollbar */
+  overflow: visible !important;
+  padding-right: 0 !important;
+  /* Remove internal scrollbar */
 }
 
 /* Right-alignment overrides for Signup mode */
 .desktop-login-container.signup-mode {
-  height: 100vh !important;
-  /* ✅ Prevent page scroll */
-  overflow: hidden !important;
-  /* ✅ Only card scrolls */
+  min-height: 100% !important;
+  overflow: visible !important;
+  /* ✅ Page wrapper scrolls */
   justify-content: flex-end !important;
-  padding: 0 70px !important;
+  align-items: flex-start !important;
+  padding: 0 70px 40px !important;
 }
 
 .desktop-login-container.signup-mode .desktop-login-bg img {
   object-position: left center !important;
-  /* ✅ Match Login Exactly */
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  object-fit: cover !important;
 }
 
 .desktop-login-container.signup-mode .desktop-login-content {
-  margin-top: 30px !important;
-  margin-bottom: 30px !important;
-  /* Match login margin if needed, or adjust for vertical center */
+  margin-top: 50px !important;
+  margin-bottom: 50px !important;
   display: flex;
   justify-content: flex-end;
-  align-items: center;
+  /* Remove align-items: center to prevent flex top cutoff on tall items */
 }
 
 /* ===== Compact spacing - Reset to match Login ===== */
@@ -462,15 +465,15 @@
     margin: 0 auto !important;
     padding: 16px 18px !important;
     height: auto !important;
-    max-height: 88vh !important;
-    overflow: hidden !important;
+    max-height: none !important;
+    overflow: visible !important;
     border-radius: 18px !important;
   }
 
   .signup-card-glass form,
   .desktop-login-container.signup-mode .signup-card-glass form {
-    max-height: 45vh !important;
-    overflow-y: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   /* Inputs + Select */
@@ -521,6 +524,7 @@
   .desktop-login-container.signup-mode .signup-card-glass {
     width: 100% !important;
     padding: 14px 14px !important;
-    max-height: 86vh !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
