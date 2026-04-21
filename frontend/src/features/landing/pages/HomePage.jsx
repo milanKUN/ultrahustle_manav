@@ -14,26 +14,26 @@ import "./HomePage.css";
 const slides = [
     {
         text: "create.",
-        bg: "/Create.jpeg",
+        bg: "/Create.png",
     },
     {
         text: "connect.",
-        bg: "/Connect.jpeg",
+        bg: "/Connect.png",
     },
     {
         text: "grow.",
-        bg: "/Grow.jpeg",
+        bg: "/Grow.png",
     },
 ];
 
 const slidesSecond = [
     {
-        text: "Work Smart",
-        bg: "/work-smart.png",
-    },
-    {
         text: "Work Hard",
         bg: "/work-hard.png",
+    },
+    {
+        text: "Work Smart",
+        bg: "/work-smart.png",
     },
     {
         text: "Work Ultra",
