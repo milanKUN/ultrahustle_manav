@@ -511,13 +511,11 @@ const ServiceListing = ({ theme, setTheme }) => {
                                         <div className="tsl-header-actions">
                                             <button className="tsl-icon-btn" title="Share" onClick={() => {
                                                 const url = window.location.href;
-                                                if (navigator.share) {
-                                                    navigator.share({ title: listing?.title || 'Service', url }).catch(() => { });
-                                                } else {
-                                                    navigator.clipboard.writeText(url).then(() => {
-                                                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Link copied to clipboard!', showConfirmButton: false, timer: 1500, background: '#0b0b0b', color: '#fff' });
-                                                    });
-                                                }
+                                                navigator.clipboard.writeText(url).then(() => {
+                                                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Link copied to clipboard!', showConfirmButton: false, timer: 1500, background: '#0b0b0b', color: '#fff' });
+                                                }).catch(() => {
+                                                    alert("Copied to clipboard: " + url);
+                                                });
                                             }}>
                                                 <Share2 size={20} />
                                             </button>
@@ -536,6 +534,10 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                 }).then((result) => {
                                                     if (result.isConfirmed) {
                                                         Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Report submitted. We will review this listing.', showConfirmButton: false, timer: 2500, background: '#0b0b0b', color: '#fff' });
+                                                    }
+                                                }).catch(() => {
+                                                    if (window.confirm("Report this listing?")) {
+                                                        alert("Report submitted.");
                                                     }
                                                 });
                                             }}>
@@ -779,7 +781,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                                         Create Contract
                                                     </button>
                                                     <button className="tsl-btn-outline" onClick={() => {
-                                                        Swal.fire({ toast: true, position: 'top-end', icon: 'info', title: 'Messaging coming soon!', showConfirmButton: false, timer: 2000, background: '#0b0b0b', color: '#fff' });
+                                                        navigate("/messages");
                                                     }}>
                                                         Chat first
                                                     </button>

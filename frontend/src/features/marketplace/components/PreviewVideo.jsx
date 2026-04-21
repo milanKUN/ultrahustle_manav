@@ -26,6 +26,17 @@ const PreviewVideo = ({
         <h3 className="video-preview-title">Preview video</h3>
 
         <div className="video-preview-head-actions">
+          {hasPreview && (
+            <button
+              type="button"
+              className="video-close-btn-static"
+              onClick={onClose}
+              aria-label="Remove video"
+              title="Remove"
+            >
+              × Remove
+            </button>
+          )}
           <button
             type="button"
             className="video-upload-btn"
@@ -33,17 +44,6 @@ const PreviewVideo = ({
           >
             {hasPreview ? "Change Video" : "Upload Video"}
           </button>
-
-          {hasPreview && (
-            <button
-              type="button"
-              className="video-close-btn"
-              onClick={onClose}
-              aria-label="Close preview"
-            >
-              ×
-            </button>
-          )}
         </div>
       </div>
 

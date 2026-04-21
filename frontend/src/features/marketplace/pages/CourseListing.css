@@ -1749,3 +1749,12 @@
 .cl-page.dark .cl-expand-btn {
     color: #000 !important;
 }
+
+.portfolio-modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 40px; }
+.portfolio-modal-content { max-width: 1200px; width: 100%; height: 100%; display: flex; flex-direction: column; }
+.portfolio-modal-topbar { display: flex; justify-content: space-between; align-items: center; padding: 16px; color: white; }
+.portfolio-modal-image { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.portfolio-modal-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.portfolio-modal-close { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 8px; }
+.portfolio-modal-nav { display: flex; align-items: center; gap: 16px; color: white; }
+.nav-arrow { background: none; border: none; color: white; cursor: pointer; padding: 8px; }

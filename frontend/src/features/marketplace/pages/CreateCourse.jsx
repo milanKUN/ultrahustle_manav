@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import "./CreateCourse.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
@@ -55,6 +55,7 @@ export default function CreateCourse({
     productType: "",
     price: "",
     shortDescription: "",
+    about: "",
     prerequisites: "",
   });
 
@@ -89,7 +90,7 @@ export default function CreateCourse({
   const [resources, setResources] = useState([{ file: null, notes: "" }]);
   const [links, setLinks] = useState([""]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isModalOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
 
@@ -105,7 +106,7 @@ export default function CreateCourse({
     };
   }, [isModalOpen]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSidebarOpen(true);
     setShowSettings(false);
   }, []);
@@ -177,16 +178,16 @@ export default function CreateCourse({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadCategories();
     loadLanguages();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadSubCategories(form.category);
   }, [form.category]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadProductTypes(form.category, form.subCategory);
   }, [form.category, form.subCategory]);
 
@@ -277,7 +278,7 @@ export default function CreateCourse({
   const updateLink = (idx, value) => setLinks(links.map((l, i) => (i === idx ? value : l)));
   const removeLink = (idx) => setLinks(links.filter((_, i) => i !== idx));
 
-  React.useEffect(() => {
+  useEffect(() => {
     const loadListing = async () => {
       if (!isEditMode || !listingusername) {
         setInitialLoading(false);
@@ -306,7 +307,8 @@ export default function CreateCourse({
                 ? String(item.details.price)
                 : "",
           shortDescription: item.short_description || "",
-          prerequisites: item?.details?.prerequisites || item.about || "",
+          about: item?.details?.about_course || "",
+          prerequisites: item.about || "",
         });
 
         setTools(Array.isArray(item?.tools) ? item.tools : (Array.isArray(item?.details?.tools) ? item.details.tools : []));
@@ -409,12 +411,10 @@ export default function CreateCourse({
   }, [isEditMode, listingusername]);
 
   const validateBeforeSave = () => {
-    if (!String(form.title || "").trim()) return "Course title is required.";
-    if (!String(form.category || "").trim()) return "Category is required.";
-    if (!String(form.subCategory || "").trim()) return "Sub category is required.";
-    if (!String(form.productType || "").trim()) return "Product type is required.";
-    if (!String(form.price || "").trim()) return "Price is required.";
+    const price = Number(form.price);
+    if (isNaN(price) || price < 1 || price > 9999) return "Price must be between $1 and $9,999.";
     if (!String(form.shortDescription || "").trim()) return "Short description is required.";
+    if (String(form.shortDescription || "").length > 500) return "Short description must be under 500 characters.";
     return "";
   };
 
@@ -426,7 +426,8 @@ export default function CreateCourse({
   category: form.category,
   sub_category: form.subCategory,
   short_description: form.shortDescription,
-  about: form.prerequisites,
+  about: form.about,
+  prerequisites: form.prerequisites,
 
   cover_files: coverFiles,
   existing_cover_urls: coverImages.filter(url => !url.startsWith('blob:')),
@@ -492,7 +493,7 @@ export default function CreateCourse({
       const status = asDraft ? "draft" : "published";
 
       const res = isEditMode
-        ? await updateListing(username, buildPayload(status))
+        ? await updateListing(listingusername, buildPayload(status))
         : await createListing(buildPayload(status));
 
       const titleText = asDraft
@@ -587,6 +588,12 @@ export default function CreateCourse({
                       <div>
                         <h1 className="csl-title">
                           {isEditMode ? "Edit Course Listing" : "Create Course Listing"}
+                          {aiPowered && (
+                            <span className="csl-ai-pill active" style={{ marginLeft: 12, display: 'inline-flex' }}>
+                               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                               AI Powered
+                            </span>
+                          )}
                         </h1>
                         <p className="csl-subtitle">
                           {isEditMode ? "Update course details" : "Fill out each section"}
@@ -696,11 +703,15 @@ export default function CreateCourse({
 
                     <div className="csl-group-box">
                       <div className="csl-field">
-                        <label className="csl-label">Short description</label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="csl-label mb-0">Short description (Max 200 characters)</label>
+                          <span style={{ fontSize: '12px', color: 'var(--csl-muted)' }}>{form.shortDescription.length}/200</span>
+                        </div>
                         <textarea
                           className="csl-textarea"
-                          placeholder="Short description"
+                          placeholder="Briefly describe your course"
                           value={form.shortDescription}
+                          maxLength={200}
                           onChange={(e) => setFormField("shortDescription", e.target.value)}
                         />
                       </div>
@@ -708,23 +719,47 @@ export default function CreateCourse({
 
                     <div className="csl-group-box">
                       <div className="csl-field">
-                        <label className="csl-label">Tools needed</label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="csl-label mb-0">About this course (Max 2000 characters)</label>
+                          <span style={{ fontSize: '12px', color: 'var(--csl-muted)' }}>{form.about.length}/2000</span>
+                        </div>
+                        <textarea
+                          className="csl-textarea h-40"
+                          placeholder="Describe your course in detail..."
+                          value={form.about}
+                          maxLength={2000}
+                          onChange={(e) => setFormField("about", e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="csl-group-box">
+                      <div className="csl-field">
+                        <label className="csl-label">Tools needed (Max 15)</label>
                         <div className="csl-input-group">
                           <input
                             className="csl-input"
-                            placeholder="Tools needed"
+                            placeholder="Type a tool and press Enter"
                             value={toolsInput}
                             onChange={(e) => setToolsInput(e.target.value)}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              (e.preventDefault(),
-                              addSimpleItem(toolsInput, setToolsInput, tools, setTools))
-                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (tools.length < 15) {
+                                  addSimpleItem(toolsInput, setToolsInput, tools, setTools);
+                                }
+                              }
+                            }}
                           />
                           <button
                             type="button"
                             className="csl-add-btn-lime"
-                            onClick={() => addSimpleItem(toolsInput, setToolsInput, tools, setTools)}
+                            onClick={() => {
+                              if (tools.length < 15) {
+                                addSimpleItem(toolsInput, setToolsInput, tools, setTools);
+                              }
+                            }}
+                            disabled={tools.length >= 15}
                           >
                             Add
                           </button>
@@ -761,8 +796,9 @@ export default function CreateCourse({
                         <label className="csl-label">Prerequisites</label>
                         <textarea
                           className="csl-textarea h-28"
-                          placeholder="Prerequisites"
+                          placeholder="Prior knowledge or tools needed (Max 500 characters)"
                           value={form.prerequisites}
+                          maxLength={500}
                           onChange={(e) => setFormField("prerequisites", e.target.value)}
                         />
                       </div>
@@ -770,35 +806,32 @@ export default function CreateCourse({
 
                     <div className="csl-group-box">
                       <div className="csl-field">
-                        <label className="csl-label">Course included</label>
+                        <label className="csl-label">Course included (Max 15)</label>
                         <div className="csl-input-group">
                           <input
                             className="csl-input"
-                            placeholder="Course included"
+                            placeholder="e.g. 12 video lessons (Max 80 chars)"
                             value={includedInput}
+                            maxLength={80}
                             onChange={(e) => setIncludedInput(e.target.value)}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              (e.preventDefault(),
-                              addSimpleItem(
-                                includedInput,
-                                setIncludedInput,
-                                courseIncluded,
-                                setCourseIncluded,
-                              ))
-                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (courseIncluded.length < 15) {
+                                  addSimpleItem(includedInput, setIncludedInput, courseIncluded, setCourseIncluded);
+                                }
+                              }
+                            }}
                           />
                           <button
                             type="button"
                             className="csl-add-btn-lime"
-                            onClick={() =>
-                              addSimpleItem(
-                                includedInput,
-                                setIncludedInput,
-                                courseIncluded,
-                                setCourseIncluded,
-                              )
-                            }
+                            onClick={() => {
+                              if (courseIncluded.length < 15) {
+                                addSimpleItem(includedInput, setIncludedInput, courseIncluded, setCourseIncluded);
+                              }
+                            }}
+                            disabled={courseIncluded.length >= 15}
                           >
                             Add
                           </button>
@@ -834,35 +867,32 @@ export default function CreateCourse({
 
                     <div className="csl-group-box">
                       <div className="csl-field">
-                        <label className="csl-label">What you will learn</label>
+                        <label className="csl-label">What you will learn (Max 15)</label>
                         <div className="csl-input-group">
                           <input
                             className="csl-input"
-                            placeholder="What you will learn"
+                            placeholder="Outcome (Max 100 chars)"
                             value={learningInput}
+                            maxLength={100}
                             onChange={(e) => setLearningInput(e.target.value)}
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              (e.preventDefault(),
-                              addSimpleItem(
-                                learningInput,
-                                setLearningInput,
-                                learningPoints,
-                                setLearningPoints,
-                              ))
-                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (learningPoints.length < 15) {
+                                  addSimpleItem(learningInput, setLearningInput, learningPoints, setLearningPoints);
+                                }
+                              }
+                            }}
                           />
                           <button
                             type="button"
                             className="csl-add-btn-lime"
-                            onClick={() =>
-                              addSimpleItem(
-                                learningInput,
-                                setLearningInput,
-                                learningPoints,
-                                setLearningPoints,
-                              )
-                            }
+                            onClick={() => {
+                              if (learningPoints.length < 15) {
+                                addSimpleItem(learningInput, setLearningInput, learningPoints, setLearningPoints);
+                              }
+                            }}
+                            disabled={learningPoints.length >= 15}
                           >
                             Add
                           </button>
@@ -1062,6 +1092,10 @@ export default function CreateCourse({
                         input.onchange = (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
+                            if (!file.type.startsWith("video/")) {
+                              Swal.fire("Error", "Please select a video file.", "error");
+                              return;
+                            }
                             setPreviewVideoFile(file);
                             const url = URL.createObjectURL(file);
                             setPreviewVideo(url);
@@ -1212,7 +1246,7 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false,
   const [search, setSearch] = useState("");
   const ref = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fn = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
         setOpen(false);
@@ -1223,9 +1257,12 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false,
     return () => document.removeEventListener("mousedown", fn);
   }, []);
 
-  const filtered = searchable && search
-    ? options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
-    : options;
+  const filtered = useMemo(() => {
+    if (!searchable || !search) return options;
+    return options.filter((opt) => 
+      String(opt || "").toLowerCase().includes(search.toLowerCase())
+    );
+  }, [options, search, searchable]);
 
   return (
     <div
@@ -1292,18 +1329,20 @@ function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
   };
 
   const handleFiles = (e) => {
-    const newFiles = Array.from(e.target.files);
+    const newFiles = Array.from(e.target.files || []);
     if (!newFiles.length) return;
 
-    if (activeIndexRef.current !== null) {
+    if (activeIndexRef.current !== null && files[activeIndexRef.current]) {
+      // Replaced a specific slot
       const next = [...files];
       next[activeIndexRef.current] = newFiles[0];
-      setFiles(next);
-      activeIndexRef.current = null;
+      setFiles(next.slice(0, 9));
     } else {
+      // Adding new files
       const combined = [...files, ...newFiles].slice(0, 9);
       setFiles(combined);
     }
+    activeIndexRef.current = null;
     e.target.value = "";
   };
 

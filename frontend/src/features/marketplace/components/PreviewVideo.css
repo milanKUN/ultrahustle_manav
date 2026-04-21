@@ -46,6 +46,23 @@
     padding: 0;
 }
 
+.video-close-btn-static {
+    background: #ff4d4f;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.video-close-btn-static:hover {
+    background: #d9363e;
+    transform: translateY(-1px);
+}
+
 .video-preview-image-wrap {
     position: relative;
     width: 100%;

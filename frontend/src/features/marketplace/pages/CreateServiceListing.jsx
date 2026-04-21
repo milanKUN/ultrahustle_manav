@@ -119,7 +119,7 @@ export default function CreateServiceListing({
       try {
         const catRes = await getListingDropdowns(LISTING_TYPE_SLUG, { type: "categories" });
         if (catRes?.categories) setCategories(catRes.categories);
-        
+
         const teamRes = await getMyTeams();
         const rows = Array.isArray(teamRes?.teams) ? teamRes.teams : (Array.isArray(teamRes) ? teamRes : []);
         setTeamOptions(rows);
@@ -140,9 +140,9 @@ export default function CreateServiceListing({
     }
     const fetchSubs = async () => {
       try {
-        const res = await getListingDropdowns(LISTING_TYPE_SLUG, { 
-          type: "sub_categories", 
-          category: form.category 
+        const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
+          type: "sub_categories",
+          category: form.category
         });
         if (res?.sub_categories) setSubCategories(res.sub_categories);
       } catch (e) {
@@ -159,7 +159,7 @@ export default function CreateServiceListing({
     }
     const fetchProductTypes = async () => {
       try {
-        const res = await getListingDropdowns(LISTING_TYPE_SLUG, { 
+        const res = await getListingDropdowns(LISTING_TYPE_SLUG, {
           type: "product_types",
           category: form.category,
           sub_category: form.subCategory
@@ -174,7 +174,7 @@ export default function CreateServiceListing({
 
   // Load listing for Edit mode
   React.useEffect(() => {
-    if (!isEditMode || !username) {
+    if (!isEditMode || !listingusername) {
       setInitialLoading(false);
       return;
     }
@@ -236,7 +236,7 @@ export default function CreateServiceListing({
           }));
           // Ensure we have 4 slots, filling with empty if needed
           const filled = [...loaded];
-          while(filled.length < 4) {
+          while (filled.length < 4) {
             filled.push({ image: null, title: "", description: "", cost: "" });
           }
           setPortfolioItems(filled);
@@ -410,8 +410,8 @@ export default function CreateServiceListing({
     try {
       if (!isAutoSave) setSavingStatus(status);
       const payload = buildPayload(status);
-      
-      const res = isEditMode 
+
+      const res = isEditMode
         ? await updateListing(listingusername, payload)
         : await createListing(payload);
 
@@ -460,7 +460,7 @@ export default function CreateServiceListing({
       <UserNavbar theme={theme} setTheme={setTheme} />
       <div className="pt-[85px] flex">
         <Sidebar expanded={sidebarOpen} setExpanded={setSidebarOpen} theme={theme} setTheme={setTheme} />
-        
+
         <div className="relative flex-1 min-w-5 overflow-hidden">
           <div className="relative z-10 overflow-y-auto h-[calc(100vh-85px)]">
             <div className="create-service-container">
@@ -483,7 +483,7 @@ export default function CreateServiceListing({
                   </div>
 
                   {/* Section A */}
-                  
+
                   <div className="csl-field mb-6">
                     <div className="flex justify-between items-center mb-2">
                       <label className="csl-label !mb-0">Listing Title <span className="text-red-500">*</span></label>
@@ -600,9 +600,8 @@ export default function CreateServiceListing({
                     {["Solo", "Team"].map((m) => (
                       <button
                         key={m}
-                        className={`flex-1 py-3 rounded-xl border transition-all ${
-                          sellerMode === m ? "bg-[#CEFF1B] border-black text-black font-bold" : "border-gray-200 text-gray-500 hover:text-black hover:border-black"
-                        }`}
+                        className={`flex-1 py-3 rounded-xl border transition-all ${sellerMode === m ? "bg-[#CEFF1B] border-black text-black font-bold" : "border-gray-200 text-gray-500 hover:text-black hover:border-black"
+                          }`}
                         onClick={() => setSellerMode(m)}
                       >
                         {m}
@@ -768,19 +767,19 @@ export default function CreateServiceListing({
                   {addOns.length < 5 && (
                     <div className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input className="csl-input" placeholder="Add-on Name" value={addOn.name} onChange={e => setAddOn({...addOn, name: e.target.value})} />
+                        <input className="csl-input" placeholder="Add-on Name" value={addOn.name} onChange={e => setAddOn({ ...addOn, name: e.target.value })} />
                         <div className="relative">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                          <input type="number" className="csl-input pl-8" placeholder="Price" value={addOn.price} onChange={e => setAddOn({...addOn, price: e.target.value})} />
+                          <input type="number" className="csl-input pl-8" placeholder="Price" value={addOn.price} onChange={e => setAddOn({ ...addOn, price: e.target.value })} />
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center bg-gray-200 p-1 rounded-xl">
-                          <button className="w-8 h-8 text-gray-700" onClick={() => setAddOn({...addOn, days: Math.max(0, (Number(addOn.days)||0)-1)})}>-</button>
+                          <button className="w-8 h-8 text-gray-700" onClick={() => setAddOn({ ...addOn, days: Math.max(0, (Number(addOn.days) || 0) - 1) })}>-</button>
                           <span className="w-20 text-center text-xs text-gray-700">{addOn.days || 0} Extra Days</span>
-                          <button className="w-8 h-8 text-gray-700" onClick={() => setAddOn({...addOn, days: (Number(addOn.days)||0)+1})}>+</button>
+                          <button className="w-8 h-8 text-gray-700" onClick={() => setAddOn({ ...addOn, days: (Number(addOn.days) || 0) + 1 })}>+</button>
                         </div>
-                        <button className="px-6 py-2 bg-[#CEFF1B] text-black rounded-xl font-bold border border-black shadow-[2px_2px_0px_black]" onClick={() => { if(addOn.name && addOn.price) { setAddOns([...addOns, addOn]); setAddOn(EMPTY_ADDON); } }}>+ Add Add-On</button>
+                        <button className="px-6 py-2 bg-[#CEFF1B] text-black rounded-xl font-bold border border-black shadow-[2px_2px_0px_black]" onClick={() => { if (addOn.name && addOn.price) { setAddOns([...addOns, addOn]); setAddOn(EMPTY_ADDON); } }}>+ Add Add-On</button>
                       </div>
                     </div>
                   )}
@@ -788,7 +787,7 @@ export default function CreateServiceListing({
 
                 {/* Section E */}
                 <div className="csl-card">
-                  <div 
+                  <div
                     className={`relative aspect-video rounded-3xl overflow-hidden bg-gray-50 border-2 border-dashed transition-all flex flex-col items-center justify-center cursor-pointer group ${validationErrors.coverImages ? "border-red-500" : "border-gray-200 hover:border-[#CEFF1B]"}`}
                     onClick={() => setUploadStep("grid")}
                   >
@@ -803,7 +802,7 @@ export default function CreateServiceListing({
                     ) : (
                       <>
                         <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 mb-4">
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                         </div>
                         <p className="text-gray-900 font-bold">Click to upload cover photo</p>
                         <p className="text-xs text-gray-500 mt-1">JPG, PNG, WEBP • Max 5MB</p>
@@ -815,11 +814,11 @@ export default function CreateServiceListing({
                 <div className="csl-card">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {portfolioItems.map((item, idx) => (
-                      <div 
-                        key={idx} 
+                      <div
+                        key={idx}
                         className={`bg-gray-50 p-6 rounded-3xl border border-gray-200 relative group transition-all hover:shadow-lg ${idx === 0 ? "md:col-span-2 lg:col-span-2 md:row-span-2" : "md:col-span-1"}`}
                       >
-                        <div 
+                        <div
                           className={`${idx === 0 ? "aspect-[16/9] lg:aspect-[16/10]" : "aspect-video"} bg-gray-200 rounded-2xl mb-4 overflow-hidden relative cursor-pointer shadow-inner`}
                           onClick={() => {
                             const input = document.createElement("input");
@@ -827,7 +826,7 @@ export default function CreateServiceListing({
                             input.accept = "image/*";
                             input.onchange = (e) => {
                               const file = e.target.files[0];
-                              if(file) {
+                              if (file) {
                                 const newItems = [...portfolioItems];
                                 newItems[idx].image = file;
                                 setPortfolioItems(newItems);
@@ -840,33 +839,33 @@ export default function CreateServiceListing({
                             <img src={item.image instanceof File ? URL.createObjectURL(item.image) : item.image} className="w-full h-full object-cover transition-transform group-hover:scale-105" alt="Portfolio" />
                           ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                              <svg width={idx === 0 ? "48" : "24"} height={idx === 0 ? "48" : "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                              <svg width={idx === 0 ? "48" : "24"} height={idx === 0 ? "48" : "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                               <span className={`${idx === 0 ? "text-sm" : "text-xs"} mt-2 font-bold`}>{idx === 0 ? "Upload Main Project Image" : "Upload Project Image"}</span>
                             </div>
                           )}
                           <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                             <span className="px-4 py-2 bg-white text-black text-xs font-bold rounded-full shadow-lg border border-black">Change Image</span>
+                            <span className="px-4 py-2 bg-white text-black text-xs font-bold rounded-full shadow-lg border border-black">Change Image</span>
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <input 
-                            className={`csl-input ${idx === 0 ? "text-lg font-bold" : ""}`} 
-                            placeholder={idx === 0 ? "Main Project Title" : "Project Title"} 
-                            value={item.title} 
-                            onChange={e => { const ni = [...portfolioItems]; ni[idx].title = e.target.value; setPortfolioItems(ni); }} 
+                          <input
+                            className={`csl-input ${idx === 0 ? "text-lg font-bold" : ""}`}
+                            placeholder={idx === 0 ? "Main Project Title" : "Project Title"}
+                            value={item.title}
+                            onChange={e => { const ni = [...portfolioItems]; ni[idx].title = e.target.value; setPortfolioItems(ni); }}
                           />
-                          <textarea 
-                            className={`csl-textarea ${idx === 0 ? "h-32" : "h-24"}`} 
-                            placeholder="Description of this project..." 
-                            value={item.description} 
-                            onChange={e => { const ni = [...portfolioItems]; ni[idx].description = e.target.value; setPortfolioItems(ni); }} 
+                          <textarea
+                            className={`csl-textarea ${idx === 0 ? "h-32" : "h-24"}`}
+                            placeholder="Description of this project..."
+                            value={item.description}
+                            onChange={e => { const ni = [...portfolioItems]; ni[idx].description = e.target.value; setPortfolioItems(ni); }}
                           />
                           <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
                             <input className="csl-input pl-8" placeholder="Cost (e.g. 500-800)" value={item.cost} onChange={e => { const ni = [...portfolioItems]; ni[idx].cost = e.target.value; setPortfolioItems(ni); }} />
                           </div>
                         </div>
-                        
+
                         {portfolioItems.length > 1 && (
                           <button className="absolute -top-3 -right-3 w-8 h-8 bg-red-500 text-white rounded-full hidden group-hover:flex items-center justify-center shadow-lg hover:scale-110 transition-transform" onClick={() => setPortfolioItems(portfolioItems.filter((_, i) => i !== idx))}>×</button>
                         )}
@@ -948,8 +947,8 @@ export default function CreateServiceListing({
             <div className="fixed inset-0 z-[9998] bg-black/40" onClick={() => setUploadStep(null)} />
             <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
               <div className="w-full max-w-4xl pointer-events-auto bg-white rounded-[40px] border border-gray-200 p-8 shadow-2xl">
-                <UploadGrid 
-                  onSelect={applyCoverFiles} 
+                <UploadGrid
+                  onSelect={applyCoverFiles}
                   onBack={() => setUploadStep(null)}
                 />
               </div>
@@ -973,18 +972,18 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
 
   return (
     <div className={`relative w-full ${disabled ? "opacity-40 pointer-events-none" : ""}`} ref={ref}>
-      <div 
+      <div
         className={`w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 flex items-center justify-between cursor-pointer transition-all hover:border-black ${open ? "border-black ring-1 ring-black" : ""}`}
         onClick={() => setOpen(!open)}
       >
         <span className={!value ? "text-gray-400" : "text-gray-900 font-medium"}>{value || placeholder}</span>
-        <svg className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
+        <svg className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
       </div>
       {open && (
         <div className="absolute top-full left-0 w-full mt-2 bg-white border border-gray-200 rounded-2xl overflow-hidden z-[100] shadow-2xl animate-in fade-in slide-in-from-top-2">
           {options.map((opt, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`px-5 py-3 text-sm text-gray-700 hover:bg-[#CEFF1B] hover:text-black cursor-pointer transition-colors ${value === opt ? "bg-gray-50" : ""}`}
               onClick={() => { onChange(opt); setOpen(false); }}
             >
@@ -1016,7 +1015,7 @@ function UploadGrid({ onSelect, onBack }) {
         <h2 className="text-2xl font-bold">Select Cover Images</h2>
         <button onClick={onBack} className="text-gray-400 hover:text-black">✕</button>
       </div>
-      
+
       <div className="grid grid-cols-3 gap-4 mb-8">
         {files.map((f, i) => (
           <div key={i} className="aspect-square rounded-2xl overflow-hidden relative border border-gray-200">
@@ -1026,7 +1025,7 @@ function UploadGrid({ onSelect, onBack }) {
           </div>
         ))}
         {files.length < 9 && (
-          <div 
+          <div
             className="aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-[#CEFF1B] transition-colors bg-gray-50"
             onClick={() => inputRef.current.click()}
           >
@@ -1035,12 +1034,12 @@ function UploadGrid({ onSelect, onBack }) {
           </div>
         )}
       </div>
-      
+
       <input type="file" multiple accept="image/*" className="hidden" ref={inputRef} onChange={handleFile} />
-      
+
       <div className="flex justify-end gap-4">
         <button className="px-6 py-2 text-gray-500 font-bold" onClick={onBack}>Cancel</button>
-        <button 
+        <button
           className="px-10 py-3 bg-[#CEFF1B] text-black rounded-xl font-bold border border-black shadow-[4px_4px_0px_black] disabled:opacity-30"
           disabled={files.length === 0}
           onClick={() => onSelect(files)}

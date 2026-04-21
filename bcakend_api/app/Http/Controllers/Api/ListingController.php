@@ -26,6 +26,7 @@ class ListingController extends Controller
         'sub_category' => 'nullable|string|max:150',
         'short_description' => 'nullable|string',
         'about' => 'nullable|string',
+        'prerequisites' => 'nullable|string',
 
         'ai_powered' => 'nullable|boolean',
         'seller_mode' => 'nullable|in:Solo,Team',
@@ -175,7 +176,7 @@ class ListingController extends Controller
             'sub_category' => $validated['sub_category'] ?? null,
             'price' => $listingPrice,
             'short_description' => $validated['short_description'] ?? null,
-            'about' => $validated['about'] ?? null,
+            'about' => $validated['prerequisites'] ?? null,
             'seller_mode' => $validated['seller_mode'] ?? 'Solo',
             'team_name' => $validated['team_name'] ?? null,
             'tags_json' => !empty($cleanTags) ? json_encode($cleanTags) : null,
@@ -307,10 +308,9 @@ class ListingController extends Controller
                 'included_json' => json_encode($included),
                 'learning_points_json' => !empty($learningPoints) ? json_encode($learningPoints) : null,
                 'languages_json' => !empty($languages) ? json_encode($languages) : null,
-                'preview_video_path' => $previewVideoPath,
-                'preview_video_name' => $previewVideoName,
                 'preview_video_mime' => $previewVideoMime,
                 'preview_video_size' => $previewVideoSize,
+                'about_course' => $validated['about'] ?? null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -620,6 +620,7 @@ public function updateListing(Request $request, string $username): JsonResponse
         'sub_category' => 'nullable|string|max:150',
         'short_description' => 'nullable|string',
         'about' => 'nullable|string',
+        'prerequisites' => 'nullable|string',
 
         'ai_powered' => 'nullable|boolean',
         'seller_mode' => 'nullable|in:Solo,Team',
@@ -792,7 +793,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'sub_category' => $validated['sub_category'] ?? null,
                 'price' => $listingPrice,
                 'short_description' => $validated['short_description'] ?? null,
-                'about' => $validated['about'] ?? null,
+                'about' => $validated['prerequisites'] ?? null,
                 'seller_mode' => $validated['seller_mode'] ?? 'Solo',
                 'team_name' => $validated['team_name'] ?? null,
                 'tags_json' => !empty($cleanTags) ? json_encode($cleanTags) : null,
@@ -954,10 +955,9 @@ public function updateListing(Request $request, string $username): JsonResponse
                         'included_json' => json_encode($included),
                         'learning_points_json' => !empty($learningPoints) ? json_encode($learningPoints) : null,
                         'languages_json' => !empty($languages) ? json_encode($languages) : null,
-                        'preview_video_path' => $previewVideoPath,
-                        'preview_video_name' => $previewVideoName,
                         'preview_video_mime' => $previewVideoMime,
                         'preview_video_size' => $previewVideoSize,
+                        'about_course' => $validated['about'] ?? null,
                         'updated_at' => now(),
                         'created_at' => now(),
                     ]
@@ -969,9 +969,16 @@ public function updateListing(Request $request, string $username): JsonResponse
                     ->where('listing_id', $existing->id)
                     ->get(['media_path']);
 
+                $newMediaPaths = collect(data_get($validated, 'details.lessons', []))
+                    ->pluck('existing_media_path')
+                    ->filter()
+                    ->all();
+
                 foreach ($oldLessons as $oldLesson) {
-                    if ($oldLesson->media_path && Storage::disk('public')->exists($oldLesson->media_path)) {
-                        Storage::disk('public')->delete($oldLesson->media_path);
+                    if ($oldLesson->media_path && !in_array($oldLesson->media_path, $newMediaPaths)) {
+                        if (Storage::disk('public')->exists($oldLesson->media_path)) {
+                            Storage::disk('public')->delete($oldLesson->media_path);
+                        }
                     }
                 }
 
@@ -1461,6 +1468,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 $details['preview_video_url'] = $courseDetails->preview_video_path
                     ? Storage::disk('public')->url($courseDetails->preview_video_path)
                     : null;
+                $details['about_course'] = $courseDetails->about_course ?? null;
             }
 
             $lessons = Schema::hasTable('course_listing_lessons')
