@@ -448,15 +448,15 @@ export default function App() {
                         element={<CourseDeliverables />}
                     /> */}
                     <Route
-                        path="/edit-course/:username"
+                        path="/edit-course/:listingusername"
                         element={<EditCourse />}
                     />
                     <Route
-                        path="/edit-service/:username"
+                        path="/edit-service/:listingusername"
                         element={<EditServiceListing />}
                     />
                     <Route
-                        path="/service/:username"
+                        path="/service/:listingusername"
                         element={
                             <ServiceListing theme={theme} setTheme={setTheme} />
                         }
@@ -466,31 +466,31 @@ export default function App() {
                         element={<WebinarDeliverables />}
                     /> */}
                     <Route
-                        path="/edit-webinar/:username"
+                        path="/edit-webinar/:listingusername"
                         element={<EditWebinar />}
                     />
                     <Route
-                        path="/edit-digital-product/:username"
+                        path="/edit-digital-product/:listingusername"
                         element={<EditDigitalProduct />}
                     />
                     <Route
-                        path="/digital-product/:username"
+                        path="/digital-product/:listingusername"
                         element={<DigitalProductListing />}
                     />
                     <Route
-                        path="/course/:username"
+                        path="/course/:listingusername"
                         element={<CourseListing />}
                     />
                     <Route
-                        path="/edit-course/:username"
+                        path="/edit-course/:listingusername"
                         element={<EditCourse />}
                     />
                     <Route
-                        path="/webinar/:username"
+                        path="/webinar/:listingusername"
                         element={<WebinarListing />}
                     />
                     <Route
-                        path="/edit-webinar/:username"
+                        path="/edit-webinar/:listingusername"
                         element={<EditWebinar />}
                     />
                     <Route

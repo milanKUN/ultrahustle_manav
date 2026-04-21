@@ -91,7 +91,7 @@ const listingTypeToRouteSlug = (type = "") => {
 
 const DigitalProductListing = ({ theme, setTheme }) => {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { listingusername } = useParams();
 
   const [activeImg, setActiveImg] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -126,7 +126,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
         setLoading(true);
         setPageError("");
 
-        const res = await getListingByUsername(username);
+        const res = await getListingByUsername(listingusername);
 
         const listingData = res?.listing || res?.data?.listing || res?.data || null;
 
@@ -171,13 +171,13 @@ const DigitalProductListing = ({ theme, setTheme }) => {
       }
     };
 
-    if (username) {
+    if (listingusername) {
       fetchListing();
     } else {
       setLoading(false);
       setPageError("Missing listing username.");
     }
-  }, [username]);
+  }, [listingusername]);
 
   const scrollGridRef = (ref, direction) => {
     if (ref.current) {

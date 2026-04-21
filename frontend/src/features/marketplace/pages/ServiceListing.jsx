@@ -30,7 +30,7 @@ const TABS = ["Basic", "Standard", "Premium"];
 
 const ServiceListing = ({ theme, setTheme }) => {
     const navigate = useNavigate();
-    const { username } = useParams();
+    const { listingusername } = useParams();
     
     const [listing, setListing] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -45,22 +45,46 @@ const ServiceListing = ({ theme, setTheme }) => {
 
     const recommendedGridRef = useRef(null);
     const moreFromGridRef = useRef(null);
+    const [creatorListings, setCreatorListings] = useState([]);
+    const [recommendedListings, setRecommendedListings] = useState([]);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        if (!username) { setIsLoading(false); return; }
+        document.body.style.overflow = "auto";
+        
+        if (!listingusername) { setIsLoading(false); return; }
         setIsLoading(true);
-        getListingByUsername(username)
+        
+        // Fetch current listing
+        getListingByUsername(listingusername)
             .then((res) => {
                 const data = res?.listing || res?.data || res || null;
                 setListing(data);
                 if (data?.details?.packages?.length) {
                     setActiveTab(data.details.packages[0].package_name || "Basic");
                 }
+                
+                // Fetch more from creator
+                if (data?.creator?.username || data?.creator_username) {
+                    getPublicUserListings(data?.creator?.username || data?.creator_username)
+                        .then(res2 => {
+                            const list = res2?.listings || res2?.data || [];
+                            setCreatorListings(list.filter(l => l.id !== data.id).slice(0, 8));
+                        })
+                        .catch(err => console.error("More from creator error:", err));
+                }
             })
             .catch((e) => setFetchError(e?.message || "Failed to load listing."))
             .finally(() => setIsLoading(false));
-    }, [username]);
+    }, [listingusername]);
+
+    useEffect(() => {
+        if (showImageModal) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, [showImageModal]);
 
     const scrollGridRef = (ref, direction) => {
         if (ref.current) {
@@ -157,10 +181,10 @@ const ServiceListing = ({ theme, setTheme }) => {
         Array.from(selectedAddOns).reduce((acc, idx) => acc + (Number(addOns[idx]?.price) || 0), 0);
 
     return (
-        <div className={`user-page light bg-white min-h-screen font-sans text-gray-900`}>
+        <div className="user-page light bg-white min-h-screen font-sans text-gray-900 overflow-x-hidden">
             <UserNavbar theme="light" setTheme={setTheme} />
             
-            <div className="pt-[100px] max-w-7xl mx-auto px-4 md:px-10 pb-32">
+            <div className="pt-[100px] max-w-7xl mx-auto px-4 md:px-10 pb-40">
                 {/* Header Section */}
                 <div className="flex flex-col gap-6 mb-12">
                     <div className="flex flex-wrap items-center gap-3">
@@ -203,13 +227,13 @@ const ServiceListing = ({ theme, setTheme }) => {
                         </div>
 
                         <div className="flex items-center gap-4 shrink-0">
-                            <button onClick={handleShare} className="w-14 h-14 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:border-black hover:text-black transition-all shadow-sm group">
+                            <button onClick={handleShare} className="w-14 h-14 bg-white border-2 border-black rounded-2xl flex items-center justify-center text-gray-900 hover:bg-[#CEFF1B] transition-all shadow-[4px_4px_0px_black] active:shadow-none active:translate-x-1 active:translate-y-1 group">
                                 <Share2 size={24} className="group-hover:scale-110 transition-transform" />
                             </button>
-                            <button onClick={() => setIsLiked(!isLiked)} className="w-14 h-14 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:border-black hover:text-red-500 transition-all shadow-sm group">
+                            <button onClick={() => setIsLiked(!isLiked)} className="w-14 h-14 bg-white border-2 border-black rounded-2xl flex items-center justify-center text-gray-900 hover:bg-[#CEFF1B] transition-all shadow-[4px_4px_0px_black] active:shadow-none active:translate-x-1 active:translate-y-1 group">
                                 <Heart size={24} fill={isLiked ? "#ef4444" : "none"} color={isLiked ? "#ef4444" : "currentColor"} className="group-hover:scale-110 transition-transform" />
                             </button>
-                            <button onClick={handleReport} className="w-14 h-14 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center text-gray-600 hover:border-black hover:text-black transition-all shadow-sm group">
+                            <button onClick={handleReport} className="w-14 h-14 bg-white border-2 border-black rounded-2xl flex items-center justify-center text-gray-900 hover:bg-[#CEFF1B] transition-all shadow-[4px_4px_0px_black] active:shadow-none active:translate-x-1 active:translate-y-1 group">
                                 <Flag size={24} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
@@ -223,7 +247,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                     <div className="flex flex-col gap-16">
                         {/* Gallery Section */}
                         <div className="flex flex-col gap-6">
-                            <div className="relative aspect-[16/10] bg-gray-50 rounded-[48px] overflow-hidden group border-2 border-gray-100 shadow-xl">
+                            <div className="relative aspect-[16/10] bg-gray-50 rounded-[48px] overflow-hidden group border-4 border-black shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
                                 <img 
                                     src={images[activeImg]} 
                                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
@@ -266,7 +290,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     <button 
                                         key={idx} 
                                         onClick={() => setActiveImg(idx)}
-                                        className={`relative w-28 h-20 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${activeImg === idx ? "border-[#CEFF1B] scale-105 shadow-lg" : "border-gray-100 opacity-60 hover:opacity-100"}`}
+                                        className={`relative w-28 h-20 rounded-2xl overflow-hidden border-4 transition-all shrink-0 ${activeImg === idx ? "border-[#CEFF1B] scale-105 shadow-[6px_6px_0px_black]" : "border-black/5 opacity-60 hover:opacity-100 hover:border-black"}`}
                                     >
                                         <img src={img} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
                                     </button>
@@ -275,7 +299,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                         </div>
 
                         {/* About This Service Section */}
-                        <div className="bg-white p-12 rounded-[56px] border-2 border-gray-100 shadow-sm relative overflow-hidden">
+                        <div className="bg-white p-12 rounded-[56px] border-4 border-black shadow-[12px_12px_0px_rgba(206,255,27,0.2)] relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-3 h-full bg-[#CEFF1B]" />
                             <h3 className="text-3xl font-black text-gray-900 mb-8 tracking-tight">About This Service</h3>
                             <div className="text-gray-600 leading-relaxed text-lg font-medium whitespace-pre-wrap">
@@ -299,7 +323,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                 <div className="flex flex-col gap-10">
                                     {/* Main Featured Project */}
                                     {portfolio[0] && (
-                                        <div className="group bg-white rounded-[56px] overflow-hidden border-2 border-gray-100 hover:border-black transition-all shadow-2xl flex flex-col md:flex-row h-auto md:h-[420px]">
+                                        <div className="group bg-white rounded-[56px] overflow-hidden border-4 border-black hover:shadow-[12px_12px_0px_black] transition-all shadow-xl flex flex-col md:flex-row h-auto md:h-[420px]">
                                             <div className="w-full md:w-3/5 relative overflow-hidden bg-gray-50">
                                                 <img 
                                                     src={portfolio[0].media?.[0]?.url || portfolio[0].cover_media_url} 
@@ -328,7 +352,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     {/* Sub Projects Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                         {portfolio.slice(1, 4).map((p, i) => (
-                                            <div key={i} className="group bg-white rounded-[40px] overflow-hidden border-2 border-gray-100 hover:border-black transition-all shadow-md">
+                                            <div key={i} className="group bg-white rounded-[40px] overflow-hidden border-4 border-black hover:shadow-[8px_8px_0px_black] transition-all shadow-md">
                                                 <div className="aspect-[4/3] relative overflow-hidden bg-gray-50">
                                                     <img src={p.media?.[0]?.url || p.cover_media_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Portfolio Sub" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all flex flex-col justify-end p-8">
@@ -348,7 +372,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                         {/* Compare Packages Table */}
                         <div className="flex flex-col gap-10">
                             <h3 className="text-4xl font-black text-gray-900 tracking-tight">Compare Packages</h3>
-                            <div className="overflow-hidden bg-white rounded-[56px] border-2 border-gray-100 shadow-2xl">
+                            <div className="overflow-hidden bg-white rounded-[56px] border-4 border-black shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-gray-50/80 border-b-2 border-gray-100">
@@ -423,14 +447,20 @@ const ServiceListing = ({ theme, setTheme }) => {
                                             <ShieldCheck size={20} className="text-white" />
                                          </div>
                                      </div>
-                                     <button className="w-full py-3 bg-black text-white text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl">
-                                        Follow User
+                                     <button 
+                                         onClick={() => navigate(`/public-user-profile/${listing?.creator?.username || listing?.creator_username}`)}
+                                         className="w-full py-3 bg-black text-white text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl"
+                                     >
+                                        View Profile
                                      </button>
                                  </div>
                                  
                                  <div className="flex-1">
                                      <div className="flex flex-col gap-2 mb-10">
-                                        <h4 className="text-4xl font-black text-gray-900 tracking-tight">
+                                        <h4 
+                                            onClick={() => navigate(`/public-user-profile/${listing?.creator?.username || listing?.creator_username}`)}
+                                            className="text-4xl font-black text-gray-900 tracking-tight cursor-pointer hover:text-[#CEFF1B] transition-colors"
+                                        >
                                             {listing?.creator?.full_name || listing?.creator?.username}
                                         </h4>
                                         <div className="flex items-center gap-4 text-sm font-bold text-gray-400">
@@ -473,6 +503,48 @@ const ServiceListing = ({ theme, setTheme }) => {
                                  </div>
                              </div>
                         </div>
+
+                        {/* Detailed Team Card (Conditional) */}
+                        {listing?.seller_mode === "Team" && (
+                            <div className="bg-white p-12 rounded-[56px] border-4 border-black shadow-[16px_16px_0px_rgba(0,0,0,0.05)] relative overflow-hidden">
+                                <div className="flex flex-col gap-8">
+                                    <div className="flex justify-between items-center border-b-2 border-gray-100 pb-8">
+                                        <div>
+                                            <h3 className="text-3xl font-black text-gray-900 tracking-tight">Meet The Team</h3>
+                                            <p className="text-gray-400 font-bold text-sm uppercase tracking-widest mt-1">{listing?.team_name || "Premium Agency"}</p>
+                                        </div>
+                                        <div className="bg-[#CEFF1B] text-black px-4 py-2 rounded-2xl border-2 border-black font-black text-[10px] uppercase shadow-[4px_4px_0px_black]">
+                                            Verified Team
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                        <div className="flex flex-col gap-6">
+                                            <p className="text-gray-600 font-bold leading-relaxed italic">
+                                                "We are a collective of specialized experts dedicated to pushing the boundaries of what's possible in digital creation."
+                                            </p>
+                                            <div className="flex -space-x-4">
+                                                {[1,2,3,4].map(m => (
+                                                    <img key={m} src={`https://i.pravatar.cc/150?u=team${m}`} className="w-12 h-12 rounded-full border-4 border-white shadow-lg" alt="Member" />
+                                                ))}
+                                                <div className="w-12 h-12 rounded-full bg-black border-4 border-white flex items-center justify-center text-[#CEFF1B] font-black text-xs shadow-lg">
+                                                    +12
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-gray-50 p-6 rounded-[32px] border-2 border-gray-100">
+                                                <span className="text-[9px] font-black text-gray-400 uppercase block mb-1">Success Rate</span>
+                                                <span className="text-xl font-black text-gray-900">99.8%</span>
+                                            </div>
+                                            <div className="bg-gray-50 p-6 rounded-[32px] border-2 border-gray-100">
+                                                <span className="text-[9px] font-black text-gray-400 uppercase block mb-1">Experience</span>
+                                                <span className="text-xl font-black text-gray-900">8+ Years</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* FAQ Section */}
                         {faqs.length > 0 && (
@@ -573,14 +645,14 @@ const ServiceListing = ({ theme, setTheme }) => {
                     <div className="relative z-10">
                         <div className="flex flex-col gap-10">
                             {/* Main Purchase Card */}
-                            <div className="bg-white rounded-[64px] border-2 border-gray-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] overflow-hidden">
+                            <div className="bg-white rounded-[64px] border-4 border-black shadow-[16px_16px_0px_rgba(206,255,27,0.1)] overflow-hidden">
                                 {/* Tab Header */}
-                                <div className="flex bg-gray-50/80 p-4 border-b-2 border-gray-50">
+                                <div className="flex bg-gray-50/80 p-4 border-b-4 border-black">
                                     {packages.map((p, i) => (
                                         <button 
                                             key={i}
                                             onClick={() => setActiveTab(p.package_name || TABS[i])}
-                                            className={`flex-1 py-5 rounded-[32px] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${activeTab === (p.package_name || TABS[i]) ? "bg-white text-gray-900 shadow-2xl border-2 border-black/5 scale-105 z-10" : "text-gray-400 hover:text-gray-900"}`}
+                                            className={`flex-1 py-5 rounded-[32px] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${activeTab === (p.package_name || TABS[i]) ? "bg-white text-gray-900 shadow-[4px_4px_0px_black] border-2 border-black scale-105 z-10" : "text-gray-400 hover:text-gray-900"}`}
                                         >
                                             {p.package_name || TABS[i]}
                                         </button>
@@ -706,37 +778,95 @@ const ServiceListing = ({ theme, setTheme }) => {
                 </div>
 
                 {/* More from creator section */}
+                {creatorListings.length > 0 && (
+                    <div className="mt-40 border-t-8 border-gray-50 pt-32">
+                        <div className="flex justify-between items-end mb-12">
+                            <div>
+                                <h2 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter">More from {listing?.creator?.full_name || "this Creator"}</h2>
+                                <p className="text-gray-400 font-black text-sm uppercase tracking-widest">Explore other premium services in this category</p>
+                            </div>
+                            <div className="flex gap-4">
+                                <button onClick={() => scrollGridRef(moreFromGridRef, "left")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronLeft size={32} strokeWidth={3} /></button>
+                                <button onClick={() => scrollGridRef(moreFromGridRef, "right")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronRight size={32} strokeWidth={3} /></button>
+                            </div>
+                        </div>
+                        <div className="flex gap-10 overflow-x-auto pb-16 scrollbar-hide px-4 -mx-4" ref={moreFromGridRef}>
+                            {creatorListings.map(item => {
+                                const type = item.type || "service";
+                                const route = type === "digital_product" ? "digital-product" : type;
+                                return (
+                                    <div 
+                                        key={item.id} 
+                                        onClick={() => navigate(`/${route}/${item.username || item.creator?.username}`)}
+                                        className="min-w-[360px] bg-white rounded-[56px] overflow-hidden border-2 border-gray-100 group cursor-pointer hover:border-black transition-all shadow-xl hover:shadow-2xl"
+                                    >
+                                        <div className="aspect-[4/3] bg-gray-50 overflow-hidden relative">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                            <img src={item.cover_media_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.title} />
+                                            <div className="absolute bottom-8 left-8 right-8 flex justify-between items-center transform translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
+                                                <span className="px-5 py-2 bg-[#CEFF1B] text-black rounded-2xl text-[10px] font-black uppercase border-2 border-black shadow-[4px_4px_0px_black]">{type}</span>
+                                                <span className="text-white font-black text-2xl tracking-tighter drop-shadow-2xl">${item.details?.packages?.[0]?.price || item.price || "250"}</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-10">
+                                            <h4 className="text-gray-900 font-black text-xl mb-4 line-clamp-1 group-hover:text-[#CEFF1B] transition-colors">{item.title}</h4>
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1 text-[#CEFF1B]">
+                                                    <Star size={16} fill="#CEFF1B" />
+                                                    <span className="text-gray-900 font-black text-sm">4.9</span>
+                                                </div>
+                                                <span className="text-gray-300">|</span>
+                                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Available Now</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Recommended Services section */}
                 <div className="mt-40 border-t-8 border-gray-50 pt-32">
                     <div className="flex justify-between items-end mb-12">
                         <div>
-                            <h2 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter">More from {listing?.creator?.full_name || "this Creator"}</h2>
-                            <p className="text-gray-400 font-black text-sm uppercase tracking-widest">Explore other premium services in this category</p>
+                            <h2 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter">Recommended For You</h2>
+                            <p className="text-gray-400 font-black text-sm uppercase tracking-widest">Based on your interests and recent searches</p>
                         </div>
                         <div className="flex gap-4">
-                            <button onClick={() => scrollGridRef(moreFromGridRef, "left")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronLeft size={32} strokeWidth={3} /></button>
-                            <button onClick={() => scrollGridRef(moreFromGridRef, "right")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronRight size={32} strokeWidth={3} /></button>
+                            <button onClick={() => scrollGridRef(recommendedGridRef, "left")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronLeft size={32} strokeWidth={3} /></button>
+                            <button onClick={() => scrollGridRef(recommendedGridRef, "right")} className="w-16 h-16 rounded-[24px] border-4 border-gray-100 flex items-center justify-center text-gray-400 hover:border-black hover:text-black transition-all shadow-lg active:scale-90"><ChevronRight size={32} strokeWidth={3} /></button>
                         </div>
                     </div>
-                    <div className="flex gap-10 overflow-x-auto pb-16 scrollbar-hide px-4 -mx-4" ref={moreFromGridRef}>
-                        {[1,2,3,4,5,6].map(i => (
-                            <div key={i} className="min-w-[360px] bg-white rounded-[56px] overflow-hidden border-2 border-gray-100 group cursor-pointer hover:border-black transition-all shadow-xl hover:shadow-2xl">
+                    <div className="flex gap-10 overflow-x-auto pb-16 scrollbar-hide px-4 -mx-4" ref={recommendedGridRef}>
+                        {[
+                            { type: "course", label: "Mastering UI/UX Design 2024", price: "299", img: "1510000000000" },
+                            { type: "digital-product", label: "Pro Motion Graphics Template", price: "49", img: "1520000000000" },
+                            { type: "webinar", label: "Future of AI in Content Creation", price: "Free", img: "1530000000000" },
+                            { type: "service", label: "Premium Brand Identity Design", price: "1,500", img: "1540000000000" }
+                        ].map((item, i) => (
+                            <div 
+                                key={i} 
+                                onClick={() => navigate(`/${item.type}/sample_creator_${i}`)}
+                                className="min-w-[360px] bg-white rounded-[56px] overflow-hidden border-2 border-gray-100 group cursor-pointer hover:border-black transition-all shadow-xl hover:shadow-2xl"
+                            >
                                 <div className="aspect-[4/3] bg-gray-50 overflow-hidden relative">
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    <img src={`https://images.unsplash.com/photo-${1500000000000 + i}?auto=format&fit=crop&w=600&q=80`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Other Listing" />
+                                    <img src={`https://images.unsplash.com/photo-${item.img}?auto=format&fit=crop&w=600&q=80`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={item.label} />
                                     <div className="absolute bottom-8 left-8 right-8 flex justify-between items-center transform translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
-                                        <span className="px-5 py-2 bg-[#CEFF1B] text-black rounded-2xl text-[10px] font-black uppercase border-2 border-black shadow-[4px_4px_0px_black]">Pro Service</span>
-                                        <span className="text-white font-black text-2xl tracking-tighter drop-shadow-2xl">$2,500+</span>
+                                        <span className="px-5 py-2 bg-[#CEFF1B] text-black rounded-2xl text-[10px] font-black uppercase border-2 border-black shadow-[4px_4px_0px_black]">{item.type}</span>
+                                        <span className="text-white font-black text-2xl tracking-tighter drop-shadow-2xl">${item.price}</span>
                                     </div>
                                 </div>
                                 <div className="p-10">
-                                    <h4 className="text-gray-900 font-black text-xl mb-4 line-clamp-1 group-hover:text-[#CEFF1B] transition-colors">Premium Digital Brand Transformation Pack</h4>
+                                    <h4 className="text-gray-900 font-black text-xl mb-4 line-clamp-1 group-hover:text-[#CEFF1B] transition-colors">{item.label}</h4>
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center gap-1 text-[#CEFF1B]">
                                             <Star size={16} fill="#CEFF1B" />
                                             <span className="text-gray-900 font-black text-sm">5.0</span>
                                         </div>
                                         <span className="text-gray-300">|</span>
-                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">24 Orders</span>
+                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Recommended</span>
                                     </div>
                                 </div>
                             </div>

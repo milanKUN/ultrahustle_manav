@@ -77,7 +77,7 @@ const normalizeFaqs = (faqs = []) =>
 
 const CourseListing = ({ theme, setTheme }) => {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { listingusername } = useParams();
 
   const [activeImg, setActiveImg] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -110,7 +110,7 @@ const CourseListing = ({ theme, setTheme }) => {
         setLoading(true);
         setPageError("");
 
-        const res = await getListingByUsername(username);
+        const res = await getListingByUsername(listingusername);
 
         const listingData =
           res?.listing ||
@@ -165,13 +165,13 @@ const CourseListing = ({ theme, setTheme }) => {
       }
     };
 
-    if (username) {
+    if (listingusername) {
       fetchListing();
     } else {
       setLoading(false);
       setPageError("Missing listing username.");
     }
-  }, [username]);
+  }, [listingusername]);
 
   const scrollGridRef = (ref, direction) => {
     if (ref.current) {

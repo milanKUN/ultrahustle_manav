@@ -892,7 +892,7 @@ export default function CreateServiceListing({
                 {/* Footer Buttons */}
                 <div className="flex justify-end gap-4 pb-12 mt-12">
                   <button
-                    className="px-8 py-3 text-gray-500 hover:text-black font-bold transition-colors"
+                    className="px-10 py-4 text-gray-500 hover:text-black font-black uppercase tracking-widest transition-all"
                     onClick={() => {
                       Swal.fire({
                         title: "Discard changes?",
@@ -914,7 +914,7 @@ export default function CreateServiceListing({
                     {savingStatus === "draft" ? "Saving..." : "Save as Draft"}
                   </button>
                   <button
-                    className={`px-10 py-4 rounded-2xl bg-[#CEFF1B] text-black font-extrabold hover:scale-105 transition-all border border-black shadow-[4px_4px_0px_black] ${savingStatus === "published" ? "opacity-50 pointer-events-none" : ""}`}
+                    className="px-10 py-4 bg-[#CEFF1B] text-black rounded-2xl font-black uppercase tracking-widest border-4 border-black shadow-[8px_8px_0px_black] hover:scale-105 active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
                     onClick={() => handleSaveListing("published")}
                   >
                     {savingStatus === "published" ? "Publishing..." : isEditMode ? "Update Listing" : "Save & Publish"}
