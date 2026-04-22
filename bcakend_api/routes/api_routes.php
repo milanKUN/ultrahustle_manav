@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\PublicUserController;
 use App\Http\Controllers\Api\ListingController;
+use App\Http\Controllers\Api\OrderWebinarController;
 
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -166,3 +167,8 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     });
 });
 Route::get('/v1/languages', [ListingController::class, 'getLanguages']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/orders/{order_id}/webinar', [OrderWebinarController::class, 'show']);
+    Route::post('/orders/{order_id}/webinar/agenda/{item_id}/toggle', [OrderWebinarController::class, 'toggleAgenda']);
+});
