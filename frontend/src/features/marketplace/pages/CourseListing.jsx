@@ -12,8 +12,11 @@ import {
   Clock,
   X,
   Play,
-  CheckCircle2 
+  CheckCircle2,
+  Star,
+  Zap
 } from "lucide-react";
+import Swal from "sweetalert2";
 import "./CourseListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import "../../../Darkuser.css";
@@ -81,7 +84,8 @@ const normalizeFaqs = (faqs = []) =>
 
 const CourseListing = ({ theme, setTheme }) => {
   const navigate = useNavigate();
-  const { listingusername } = useParams();
+  const { listingusername, username: routeUsername } = useParams();
+  const username = routeUsername || listingusername;
 
   const [activeImg, setActiveImg] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -431,10 +435,61 @@ const CourseListing = ({ theme, setTheme }) => {
               <div className="cl-header">
                 <h1 className="cl-title">{listing?.title || "Course"}</h1>
                 <div className="cl-header-actions">
-                  <button className="cl-icon-btn">
+                  <button 
+                    className="cl-icon-btn"
+                    onClick={() => {
+                      const shareUrl = window.location.href;
+                      navigator.clipboard.writeText(shareUrl).then(() => {
+                        Swal.fire({
+                          toast: true,
+                          position: 'top-end',
+                          icon: 'success',
+                          title: 'Link copied to clipboard',
+                          showConfirmButton: false,
+                          timer: 3000,
+                          background: '#0b0b0b',
+                          color: '#fff'
+                        });
+                      });
+                    }}
+                  >
                     <Share2 size={20} />
                   </button>
-                  <button className="cl-icon-btn">
+                  <button 
+                    className="cl-icon-btn"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Report Listing',
+                        input: 'select',
+                        inputOptions: {
+                          inappropriate: 'Inappropriate Content',
+                          misleading: 'Misleading Information',
+                          spam: 'Spam',
+                          other: 'Other'
+                        },
+                        inputPlaceholder: 'Select a reason',
+                        showCancelButton: true,
+                        confirmButtonText: 'Submit Report',
+                        confirmButtonColor: '#CEFF1B',
+                        background: '#0b0b0b',
+                        color: '#fff',
+                        customClass: {
+                          confirmButton: 'cl-swal-confirm-btn'
+                        }
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          Swal.fire({
+                            title: 'Reported!',
+                            text: 'Thank you for your feedback.',
+                            icon: 'success',
+                            background: '#0b0b0b',
+                            color: '#fff',
+                            confirmButtonColor: '#CEFF1B'
+                          });
+                        }
+                      });
+                    }}
+                  >
                     <Flag size={20} />
                   </button>
                   <button
@@ -517,37 +572,40 @@ const CourseListing = ({ theme, setTheme }) => {
                     )}
                   </div>
 
-                  <div className="cl-profile-mini-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'var(--cl-bg-secondary)', borderRadius: '12px', marginBottom: '24px' }}>
-                    <div className="cl-pmc-left" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <div className="cl-pmc-avatar-wrap" style={{ position: 'relative', width: '64px', height: '64px' }}>
+                  <div className="cl-profile-mini-card">
+                    <div className="cl-pmc-left">
+                      <div className="cl-pmc-avatar-wrap">
                         {creator?.profile_image_url ? (
-                            <img src={creator.profile_image_url} alt={creator?.name} className="cl-pmc-avatar-img" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                            <img src={creator.profile_image_url} alt={creator?.name} className="cl-pmc-avatar-img" />
                         ) : (
-                            <div className="cl-pmc-avatar-bg" style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '24px' }}>
+                            <div className="cl-pmc-avatar-bg">
                                 <span className="cl-pmc-avatar-initials">{creator?.name?.charAt(0) || "C"}</span>
                             </div>
                         )}
-                        <div className="cl-pmc-status-dot" style={{ position: 'absolute', bottom: '2px', right: '2px', width: '14px', height: '14px', background: '#00FF00', border: '2px solid var(--cl-bg-secondary)', borderRadius: '50%' }}></div>
+                        <div className="cl-pmc-status-dot"></div>
                       </div>
-                      <div className="cl-pmc-info" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <div className="cl-pmc-name-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className="cl-pmc-name" style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                      <div className="cl-pmc-info">
+                        <div className="cl-pmc-name-row">
+                          <span className="cl-pmc-name">
                             {creator?.full_name || creator?.name || username}
                           </span>
                           {creator?.is_verified && <img src="/verified-badge.svg" alt="Verified" className="cl-pmc-verified-icon" style={{ width: 16, height: 16 }} />}
                           {listing?.ai_powered && (
-                            <span style={{ padding: '2px 8px', background: '#e1e1e1', color: '#333', fontSize: '12px', borderRadius: '12px', fontWeight: 'bold' }}>AI Powered</span>
+                            <div className="cl-ai-powered-badge">
+                              <Zap size={14} fill="black" />
+                              AI POWERED
+                            </div>
                           )}
                         </div>
-                        <div className="cl-pmc-role-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                          <span className="cl-pmc-role" style={{ color: '#aaa', fontSize: '14px' }}>
+                        <div className="cl-pmc-role-row">
+                          <span className="cl-pmc-role">
                             {creator?.title || "Creator"}
                           </span>
                           {creator?.rating && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '14px' }}>
-                              <span style={{ color: '#E1F304' }}>★</span>
-                              <span style={{ fontWeight: 600 }}>{creator.rating}</span>
-                              <span style={{ color: '#888' }}>({creator.reviews_count || 0} reviews)</span>
+                            <div className="cl-pmc-rating">
+                              <span className="cl-pmc-star">★</span>
+                              <span className="cl-pmc-rating-val">{creator.rating}</span>
+                              <span className="cl-pmc-rev-count">({creator.reviews_count || 0} reviews)</span>
                             </div>
                           )}
                         </div>
@@ -560,7 +618,6 @@ const CourseListing = ({ theme, setTheme }) => {
                           ? navigate(`/public-user-profile/${creator.username}`)
                           : null
                       }
-                      style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #666', borderRadius: '8px', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                     >
                       View profile
                       <ChevronRight size={18} />
@@ -569,13 +626,13 @@ const CourseListing = ({ theme, setTheme }) => {
 
                   <div className="cl-section">
                     <h2>Description</h2>
-                    <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{listing?.about || listing?.short_description || "No description added yet."}</p>
+                    <p>{listing?.about || listing?.short_description || "No description added yet."}</p>
                   </div>
 
                   {learningPoints.length > 0 && (
                     <div className="cl-section">
                       <h2>What you will learn</h2>
-                      <ul className="cl-bullet-list" style={{ listStyleType: 'disc', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <ul className="cl-bullet-list">
                         {learningPoints.map((point, index) => (
                           <li key={`${point}-${index}`}>{point}</li>
                         ))}
@@ -586,16 +643,16 @@ const CourseListing = ({ theme, setTheme }) => {
                   {listing?.details?.about_course && (
                     <div className="cl-section">
                       <h2>Prerequisites</h2>
-                      <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>{listing.details.about_course}</p>
+                      <p>{listing.details.about_course}</p>
                     </div>
                   )}
 
                   {(Array.isArray(listing?.details?.tools) ? listing.details.tools : []).length > 0 && (
                     <div className="cl-section">
                       <h2>Tools needed</h2>
-                      <div className="cl-tools-list" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <div className="cl-tools-list">
                         {listing.details.tools.map((tool) => (
-                          <span key={tool} style={{ padding: '6px 12px', background: 'var(--cl-bg-secondary)', border: '1px solid #444', borderRadius: '16px', fontSize: '14px' }}>{tool}</span>
+                          <span key={tool}>{tool}</span>
                         ))}
                       </div>
                     </div>
@@ -604,7 +661,7 @@ const CourseListing = ({ theme, setTheme }) => {
                   {languages.length > 0 && (
                     <div className="cl-section">
                       <h2>Languages</h2>
-                      <div className="cl-languages-row" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', color: '#aaa' }}>
+                      <div className="cl-languages-row">
                         {languages.map((language) => <span key={language}>{language}</span>)}
                       </div>
                     </div>
@@ -879,42 +936,77 @@ const CourseListing = ({ theme, setTheme }) => {
 
               <FAQAccordion faqData={faqData} theme={theme} />
 
-              {/* Reviews Section */}
-              <div className="cl-listing-container" style={{ marginTop: "40px" }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                  <h2 className="cl-sectionTitle" style={{ margin: 0 }}>Reviews</h2>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: '#E1F304', fontSize: '20px' }}>★</span>
-                    <span style={{ fontWeight: 'bold', fontSize: '18px' }}>4.9</span>
-                    <span style={{ color: '#888', fontSize: '14px' }}>(420 reviews)</span>
+              <section className="reviews-section">
+                <div className="reviews-header">
+                  <h3 className="reviews-title">Reviews</h3>
+                  <div className="reviews-header-line"></div>
+                </div>
+                <div className="reviews-container">
+                  <div className="reviews-summary">
+                    <div className="rating-overview">
+                      <span className="rating-score">4.9</span>
+                      <div className="rating-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={20} fill={i < 4 ? "#CEFF1B" : "none"} color="#CEFF1B" />
+                        ))}
+                      </div>
+                      <span className="review-count">24 reviews</span>
+                    </div>
+                    <div className="rating-breakdown">
+                      {[5, 4, 3, 2, 1].map((star) => (
+                        <div key={star} className="rating-bar-row">
+                          <span className="rating-label">{star}</span>
+                          <div className="rating-bar">
+                            <div 
+                              className="rating-bar-fill" 
+                              style={{ width: star === 5 ? "85%" : star === 4 ? "10%" : "2%" }}
+                            ></div>
+                          </div>
+                          <span className="rating-count">{star === 5 ? "20" : star === 4 ? "3" : "0"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="reviews-list">
+                    <div className="review-item">
+                      <div className="review-header">
+                        <div className="reviewer-avatar"></div>
+                        <div className="reviewer-info">
+                          <span className="reviewer-name">Alex Johnson</span>
+                          <div className="review-stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} fill="#CEFF1B" color="#CEFF1B" />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="review-date">2 weeks ago</span>
+                      </div>
+                      <p className="review-text">
+                        Excellent course! The information was top-notch and it saved me hours of research. 
+                        Highly recommended for anyone looking for professional insights.
+                      </p>
+                    </div>
+                    <div className="review-item">
+                      <div className="review-header">
+                        <div className="reviewer-avatar"></div>
+                        <div className="reviewer-info">
+                          <span className="reviewer-name">Sarah Miller</span>
+                          <div className="review-stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} fill={i < 4 ? "#CEFF1B" : "none"} color="#CEFF1B" />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="review-date">1 month ago</span>
+                      </div>
+                      <p className="review-text">
+                        Great value for money. Some minor issues with the connection but the 
+                        creator was very helpful in resolving them.
+                      </p>
+                    </div>
                   </div>
                 </div>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {[1, 2].map((review) => (
-                    <div key={review} style={{ display: 'flex', gap: '16px', borderBottom: '1px solid var(--cl-border)', paddingBottom: '24px' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#555', flexShrink: 0, overflow: 'hidden' }}>
-                        <img src={`https://i.pravatar.cc/150?img=${review + 10}`} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ fontWeight: 'bold' }}>User Name {review}</span>
-                          <span style={{ color: '#888', fontSize: '12px' }}>1 month ago</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '2px', marginBottom: '12px' }}>
-                          {[1,2,3,4,5].map(star => <span key={star} style={{ color: '#E1F304', fontSize: '14px' }}>★</span>)}
-                        </div>
-                        <p style={{ color: '#ddd', fontSize: '14px', lineHeight: '1.5', margin: 0 }}>
-                          This course was exactly what I needed. The content is well-structured and the lessons are easy to follow. Highly recommended!
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button style={{ marginTop: '24px', background: 'transparent', border: '1px solid #666', padding: '10px 20px', borderRadius: '8px', color: 'inherit', cursor: 'pointer', fontWeight: '500' }}>
-                  See all reviews
-                </button>
-              </div>
+              </section>
 
               <div className="cl-listing-container">
                 <h2 className="cl-sectionTitle">Recommended</h2>
@@ -1028,54 +1120,53 @@ const CourseListing = ({ theme, setTheme }) => {
 
       {showImageModal &&
         createPortal(
-          <div className="portfolio-modal-backdrop" onClick={() => setShowImageModal(false)}>
-            <div
-              className={`portfolio-modal-content ${theme}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="portfolio-modal-topbar">
-                <div className="portfolio-modal-brand">
-                  <div className="portfolio-brand-circle"></div>
-                  <span>{listing?.title}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="portfolio-modal-nav">
-                    <button
-                      className="nav-arrow left"
-                      onClick={() =>
-                        setModalImgIndex((prev) =>
-                          prev === 0 ? galleryImages.length - 1 : prev - 1,
-                        )
-                      }
-                    >
-                      ◀
-                    </button>
-                    <span className="portfolio-modal-counter">
-                      {modalImgIndex + 1} of {galleryImages.length}
-                    </span>
-                    <button
-                      className="nav-arrow right"
-                      onClick={() =>
-                        setModalImgIndex((prev) =>
-                          prev === galleryImages.length - 1 ? 0 : prev + 1,
-                        )
-                      }
-                    >
-                      ▶
-                    </button>
-                  </div>
-                  <button
-                    className="portfolio-modal-close"
-                    onClick={() => setShowImageModal(false)}
-                  >
-                    <X />
-                  </button>
-                </div>
+          <div className="cl-image-modal-backdrop" onClick={() => setShowImageModal(false)}>
+            <button className="cl-modal-close-btn" onClick={() => setShowImageModal(false)}>
+              <X size={24} />
+            </button>
+
+            <div className="cl-modal-content-wrap" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="cl-modal-nav-btn"
+                onClick={() =>
+                  setModalImgIndex((prev) =>
+                    prev === 0 ? galleryImages.length - 1 : prev - 1,
+                  )
+                }
+              >
+                <ChevronLeft size={32} />
+              </button>
+
+              <div className="cl-modal-img-container">
+                <img
+                  src={galleryImages[modalImgIndex]}
+                  alt="Full view"
+                  className="cl-modal-main-img"
+                />
               </div>
 
-              <div className="portfolio-modal-image">
-                <img src={galleryImages[modalImgIndex]} alt={listing?.title} />
-              </div>
+              <button
+                className="cl-modal-nav-btn"
+                onClick={() =>
+                  setModalImgIndex((prev) =>
+                    prev === galleryImages.length - 1 ? 0 : prev + 1,
+                  )
+                }
+              >
+                <ChevronRight size={32} />
+              </button>
+            </div>
+
+            <div className="cl-modal-thumbs-strip" onClick={(e) => e.stopPropagation()}>
+              {galleryImages.map((img, idx) => (
+                <div
+                  key={idx}
+                  className={`cl-modal-thumb-item ${modalImgIndex === idx ? "active" : ""}`}
+                  onClick={() => setModalImgIndex(idx)}
+                >
+                  <img src={img} alt={`Thumb ${idx}`} />
+                </div>
+              ))}
             </div>
           </div>,
           document.body,

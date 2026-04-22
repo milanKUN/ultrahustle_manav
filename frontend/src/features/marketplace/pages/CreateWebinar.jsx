@@ -27,7 +27,7 @@ export default function CreateWebinar({
   mode = "create",
 }) {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { listingusername } = useParams();
   const isEditMode = mode === "edit";
 
   const [categories, setCategories] = useState([]);
@@ -46,14 +46,9 @@ export default function CreateWebinar({
   const [isMetaLoading, setIsMetaLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [saveError, setSaveError] = useState("");
-  const [saveSuccess, setSaveSuccess] = useState("");
-
   const [coverImages, setCoverImages] = useState([]);
   const [coverFiles, setCoverFiles] = useState([]);
   const [coverSlideIdx, setCoverSlideIdx] = useState(0);
-  const [activePreviewImg, setActivePreviewImg] = useState(0);
-  const [existingPreviewVideoUrl, setExistingPreviewVideoUrl] = useState("");
 
   const [aiPowered, setAiPowered] = useState(false);
 
@@ -139,6 +134,31 @@ export default function CreateWebinar({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  const normalizeStringArray = (value) => {
+    if (!Array.isArray(value)) return [];
+    return value.map((item) => String(item || "").trim()).filter(Boolean);
+  };
+
+  const normalizeFaqs = (value) => {
+    if (!Array.isArray(value) || !value.length) return [{ q: "", a: "" }];
+    return value.map((faq) => ({
+      q: faq.q || faq.question || "",
+      a: faq.a || faq.answer || "",
+    }));
+  };
+
+  const normalizeDeliverables = (value) => {
+    if (!Array.isArray(value) || !value.length) return [{ file: null, notes: "" }];
+    return value.map((d) => ({
+      file: null,
+      notes: d.notes || "",
+      existing_file_name: d.file_name || d.name || "",
+      existing_file_url: d.file_url || d.url || "",
+      name: d.file_name || d.name || "",
+      size: d.file_size || d.size || "",
+    }));
+  };
+
   const loadCategories = async () => {
     try {
       setIsMetaLoading(true);
@@ -146,7 +166,7 @@ export default function CreateWebinar({
         type: "categories",
       });
       setCategories(Array.isArray(res?.categories) ? res.categories : []);
-    } catch (e) {
+    } catch {
       setCategories([]);
     } finally {
       setIsMetaLoading(false);
@@ -165,7 +185,7 @@ export default function CreateWebinar({
         category: categoryName,
       });
       setSubCategories(Array.isArray(res?.sub_categories) ? res.sub_categories : []);
-    } catch (e) {
+    } catch {
       setSubCategories([]);
     }
   };
@@ -183,7 +203,7 @@ export default function CreateWebinar({
         sub_category: subCategoryName,
       });
       setProductTypes(Array.isArray(res?.product_types) ? res.product_types : []);
-    } catch (e) {
+    } catch {
       setProductTypes([]);
     }
   };
@@ -192,12 +212,8 @@ export default function CreateWebinar({
     try {
       const res = await getLanguages();
       const rows = Array.isArray(res?.languages) ? res.languages : [];
-      setLanguageOptions(
-        rows
-          .map((item) => String(item?.value || "").trim())
-          .filter(Boolean)
-      );
-    } catch (e) {
+      setLanguageOptions(rows.map((item) => String(item?.value || "").trim()).filter(Boolean));
+    } catch {
       setLanguageOptions([]);
     }
   };
@@ -217,16 +233,15 @@ export default function CreateWebinar({
 
   React.useEffect(() => {
     const loadListing = async () => {
-      if (!isEditMode || !username) {
+      if (!isEditMode || !listingusername) {
         setInitialLoading(false);
         return;
       }
 
       try {
         setInitialLoading(true);
-        setSaveError("");
 
-        const res = await getListingByUsername(username);
+        const res = await getListingByUsername(listingusername);
         const item = res?.listing || res?.data?.listing || res?.data || null;
 
         if (!item) {
@@ -237,30 +252,32 @@ export default function CreateWebinar({
           title: item.title || "",
           category: item.category || "",
           subCategory: item.sub_category || "",
-          productType: item.product_type || item?.details?.product_type || "",
+          productType: item?.details?.product_type || item?.product_type || "",
           shortDescription: item.short_description || "",
         });
 
         setAiPowered(Boolean(item.ai_powered));
-        setTools(Array.isArray(item?.details?.tools) ? item.details.tools : (Array.isArray(item?.tools) ? item.tools : []));
-        setKeyOutcomes(
-          Array.isArray(item?.details?.key_outcomes) ? item.details.key_outcomes : []
+        setTools(
+          Array.isArray(item?.details?.tools)
+            ? item.details.tools
+            : Array.isArray(item?.tools)
+              ? item.tools
+              : []
         );
+        setKeyOutcomes(normalizeStringArray(item?.details?.key_outcomes));
         setLearningPoints(
           Array.isArray(item?.details?.learning_points)
             ? item.details.learning_points
-            : (Array.isArray(item?.details?.what_you_will_learn)
+            : Array.isArray(item?.details?.what_you_will_learn)
               ? item.details.what_you_will_learn
-              : [])
+              : []
         );
-        setLanguages(
-          Array.isArray(item?.details?.languages) ? item.details.languages : []
-        );
+        setLanguages(normalizeStringArray(item?.details?.languages));
 
         if (Array.isArray(item?.details?.agenda) && item.details.agenda.length) {
           setAgenda(
             item.details.agenda.map((ag, index) => ({
-              id: index + 1,
+              id: ag.id || index + 1,
               time: ag.time || "",
               topic: ag.topic || "",
               description: ag.description || "",
@@ -273,40 +290,24 @@ export default function CreateWebinar({
         setSchedule({
           date: item?.details?.schedule_date || "",
           startTime: item?.details?.schedule_start_time || "",
-          duration: item?.details?.schedule_duration || "",
+          duration:
+            item?.details?.schedule_duration !== undefined &&
+              item?.details?.schedule_duration !== null
+              ? String(item.details.schedule_duration)
+              : "",
           timezone: item?.details?.schedule_timezone || "UTC (Coordinated Universal Time)",
           link: item?.details?.webinar_link || "",
           ticketPrice:
             item?.details?.ticket_price !== undefined && item?.details?.ticket_price !== null
               ? String(item.details.ticket_price)
-              : (item?.price !== undefined && item?.price !== null ? String(item.price) : ""),
+              : item?.price !== undefined && item?.price !== null
+                ? String(item.price)
+                : "",
         });
 
-        setFaqs(
-          Array.isArray(item.faqs) && item.faqs.length
-            ? item.faqs.map((faq) => ({
-                q: faq.q || faq.question || "",
-                a: faq.a || faq.answer || "",
-              }))
-            : [{ q: "", a: "" }]
-        );
-
+        setFaqs(normalizeFaqs(item.faqs));
         setLinks(Array.isArray(item.links) && item.links.length ? item.links : [""]);
-
-        if (Array.isArray(item.deliverables) && item.deliverables.length) {
-          setDeliverables(
-            item.deliverables.map((d) => ({
-              file: null,
-              notes: d.notes || "",
-              existing_file_name: d.file_name || d.name || "",
-              existing_file_url: d.file_url || d.url || "",
-              name: d.file_name || d.name,
-              size: d.file_size || d.size,
-            }))
-          );
-        } else {
-          setDeliverables([]);
-        }
+        setDeliverables(normalizeDeliverables(item.deliverables));
 
         if (Array.isArray(item.gallery) && item.gallery.length > 0) {
           setCoverImages(item.gallery);
@@ -315,16 +316,20 @@ export default function CreateWebinar({
             const gallery = JSON.parse(item.gallery_json);
             if (Array.isArray(gallery)) {
               const urls = gallery.map((path) =>
-                path.startsWith("http") ? path : `/storage/${path}`
+                String(path).startsWith("http") ? path : `/storage/${path}`
               );
               setCoverImages(urls);
             }
-          } catch (e) {
-            console.error("Failed to parse gallery_json", e);
+          } catch {
+            setCoverImages([]);
           }
         } else if (item.cover_media_url || item.cover_media_path) {
           setCoverImages([item.cover_media_url || item.cover_media_path]);
+        } else {
+          setCoverImages([]);
         }
+
+        setCoverSlideIdx(0);
       } catch (e) {
         Swal.fire({
           icon: "error",
@@ -337,7 +342,7 @@ export default function CreateWebinar({
     };
 
     loadListing();
-  }, [isEditMode, username]);
+  }, [isEditMode, listingusername]);
 
   const addSimpleItem = (input, setInput, list, setList) => {
     const value = String(input || "").trim();
@@ -376,10 +381,6 @@ export default function CreateWebinar({
     setAgenda(agenda.filter((_, i) => i !== idx));
   };
 
-  const updateSchedule = (key, value) => {
-    setSchedule((prev) => ({ ...prev, [key]: value }));
-  };
-
   const addFaq = () => setFaqs([...faqs, { q: "", a: "" }]);
 
   const updateFaq = (idx, key, value) => {
@@ -391,7 +392,8 @@ export default function CreateWebinar({
     setFaqs(faqs.filter((_, i) => i !== idx));
   };
 
-  const addDeliverable = () => setDeliverables([...deliverables, { file: null, notes: "" }]);
+  const addDeliverable = () =>
+    setDeliverables([...deliverables, { file: null, notes: "" }]);
 
   const updateDeliverableNotes = (idx, notes) =>
     setDeliverables(deliverables.map((d, i) => (i === idx ? { ...d, notes } : d)));
@@ -403,15 +405,17 @@ export default function CreateWebinar({
     setDeliverables(deliverables.filter((_, i) => i !== idx));
 
   const addLink = () => setLinks([...links, ""]);
-  const updateLink = (idx, value) => setLinks(links.map((l, i) => (i === idx ? value : l)));
+  const updateLink = (idx, value) =>
+    setLinks(links.map((l, i) => (i === idx ? value : l)));
   const removeLink = (idx) => setLinks(links.filter((_, i) => i !== idx));
 
-  const applyCoverFiles = (files) => {
-    setCoverFiles(files);
-    const newUrls = files.map((f) => URL.createObjectURL(f));
-    setCoverImages(newUrls);
+  const applyCoverFiles = (files, append = false) => {
+    const nextFiles = append ? [...coverFiles, ...files].slice(0, 9) : files.slice(0, 9);
+    setCoverFiles(nextFiles);
+
+    const previewUrls = nextFiles.map((file) => URL.createObjectURL(file));
+    setCoverImages(previewUrls);
     setCoverSlideIdx(0);
-    setActivePreviewImg(0);
   };
 
   const validateBeforeSave = () => {
@@ -441,10 +445,7 @@ export default function CreateWebinar({
     if (isTodayDate(schedule.date)) {
       const currentTime = getCurrentTimeString();
       if (schedule.startTime < currentTime) {
-        setSchedule((prev) => ({
-          ...prev,
-          startTime: "",
-        }));
+        setSchedule((prev) => ({ ...prev, startTime: "" }));
       }
     }
   }, [schedule.date]);
@@ -453,10 +454,7 @@ export default function CreateWebinar({
     const today = getTodayDateString();
 
     setSchedule((prev) => {
-      const next = {
-        ...prev,
-        date: value,
-      };
+      const next = { ...prev, date: value };
 
       if (value === today && prev.startTime && prev.startTime < getCurrentTimeString()) {
         next.startTime = "";
@@ -464,8 +462,6 @@ export default function CreateWebinar({
 
       return next;
     });
-
-    setSaveError("");
   };
 
   const handleScheduleTimeChange = (value) => {
@@ -473,19 +469,16 @@ export default function CreateWebinar({
     const currentTime = getCurrentTimeString();
 
     if (schedule.date === today && value < currentTime) {
-      setSaveError("Past time can't be selected for today's webinar.");
-      setSchedule((prev) => ({
-        ...prev,
-        startTime: "",
-      }));
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid time",
+        text: "Past time can't be selected for today's webinar.",
+      });
+      setSchedule((prev) => ({ ...prev, startTime: "" }));
       return;
     }
 
-    setSaveError("");
-    setSchedule((prev) => ({
-      ...prev,
-      startTime: value,
-    }));
+    setSchedule((prev) => ({ ...prev, startTime: value }));
   };
 
   const buildPayload = (status) => ({
@@ -494,7 +487,6 @@ export default function CreateWebinar({
     title: form.title,
     category: form.category,
     sub_category: form.subCategory,
-    product_type: form.productType,
     short_description: form.shortDescription,
     about: form.shortDescription,
     ai_powered: aiPowered,
@@ -502,16 +494,25 @@ export default function CreateWebinar({
     team_name: "",
 
     cover_files: coverFiles,
-    existing_cover_urls: coverImages.filter(url => !url.startsWith('blob:')),
+    existing_cover_urls: coverImages.filter(
+      (url) => typeof url === "string" && !url.startsWith("blob:")
+    ),
 
     faqs: faqs.filter((f) => String(f.q || "").trim() || String(f.a || "").trim()),
     links: links.map((l) => String(l || "").trim()).filter(Boolean),
 
-    deliverables: deliverables.map(d => ({
-      file: d.file,
-      notes: d.notes || "",
-      existing_file_url: d.existing_file_url || ""
-    })),
+    deliverables: deliverables
+      .filter(
+        (d) =>
+          d.file ||
+          String(d.notes || "").trim() ||
+          String(d.existing_file_url || "").trim()
+      )
+      .map((d) => ({
+        file: d.file || null,
+        notes: d.notes || "",
+        existing_file_url: d.existing_file_url || "",
+      })),
 
     details: {
       product_type: form.productType,
@@ -548,21 +549,27 @@ export default function CreateWebinar({
 
     try {
       setIsSubmitting(true);
-      setSaveError("");
-      setSaveSuccess("");
 
+      const payload = buildPayload(status);
       const res = isEditMode
-        ? await updateListing(username, buildPayload(status))
-        : await createListing(buildPayload(status));
+        ? await updateListing(listingusername, payload)
+        : await createListing(payload);
 
       Swal.fire({
         icon: "success",
-        title: isEditMode ? "Webinar Updated" : "Webinar Created",
+        title:
+          status === "draft"
+            ? "Draft Saved"
+            : isEditMode
+              ? "Webinar Updated"
+              : "Webinar Created",
         text:
-          res?.message ||
-          (isEditMode
-            ? "Your webinar has been updated successfully."
-            : "Your webinar has been created successfully."),
+          status === "draft"
+            ? "Your webinar has been saved as a draft."
+            : res?.message ||
+            (isEditMode
+              ? "Your webinar has been updated successfully."
+              : "Your webinar has been created successfully."),
         confirmButtonText: "OK",
       }).then((result) => {
         if (result.isConfirmed) {
@@ -616,9 +623,8 @@ export default function CreateWebinar({
       />
 
       <div
-        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${
-          isModalOpen ? "blur-sm pointer-events-none select-none" : ""
-        }`}
+        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""
+          }`}
       >
         <Sidebar
           expanded={sidebarOpen}
@@ -736,7 +742,7 @@ export default function CreateWebinar({
                           className="csl-input"
                           placeholder="Ticket price"
                           type="number"
-                          value={schedule.ticketPrice || ""}
+                          value={schedule.ticketPrice}
                           onChange={(e) =>
                             setSchedule((prev) => ({ ...prev, ticketPrice: e.target.value }))
                           }
@@ -766,12 +772,10 @@ export default function CreateWebinar({
                         value={toolsInput}
                         onChange={(e) => setToolsInput(e.target.value)}
                         onKeyDown={(e) =>
-                          onEnterAdd(e, () =>
-                            addSimpleItem(toolsInput, setToolsInput, tools, setTools)
-                          )
+                          onEnterAdd(e, () => addSimpleItem(toolsInput, setToolsInput, tools, setTools))
                         }
                       />
-                      <p className="csl-hint mt-2">You can add up to 10 tools & technologies</p>
+                      <p className="csl-hint mt-2">You can add tools one by one</p>
 
                       {tools.length > 0 && (
                         <div className="csl-chips-container mt-4">
@@ -783,14 +787,6 @@ export default function CreateWebinar({
                               </button>
                             </div>
                           ))}
-                          <button
-                            type="button"
-                            className="csl-clear-all"
-                            onClick={() => setTools([])}
-                            title="Clear all"
-                          >
-                            ✕
-                          </button>
                         </div>
                       )}
                     </div>
@@ -806,30 +802,10 @@ export default function CreateWebinar({
                         onChange={(e) => setKeyOutcomeInput(e.target.value)}
                         onKeyDown={(e) =>
                           onEnterAdd(e, () =>
-                            addSimpleItem(
-                              keyOutcomeInput,
-                              setKeyOutcomeInput,
-                              keyOutcomes,
-                              setKeyOutcomes
-                            )
+                            addSimpleItem(keyOutcomeInput, setKeyOutcomeInput, keyOutcomes, setKeyOutcomes)
                           )
                         }
                       />
-                      <button
-                        type="button"
-                        className="csl-add-btn-lime-below"
-                        onClick={() =>
-                          addSimpleItem(
-                            keyOutcomeInput,
-                            setKeyOutcomeInput,
-                            keyOutcomes,
-                            setKeyOutcomes
-                          )
-                        }
-                      >
-                        + Add
-                      </button>
-
                       {keyOutcomes.length > 0 && (
                         <div className="csl-chips-container mt-4">
                           {keyOutcomes.map((item, i) => (
@@ -843,14 +819,6 @@ export default function CreateWebinar({
                               </button>
                             </div>
                           ))}
-                          <button
-                            type="button"
-                            className="csl-clear-all"
-                            onClick={() => setKeyOutcomes([])}
-                            title="Clear all"
-                          >
-                            ✕
-                          </button>
                         </div>
                       )}
                     </div>
@@ -866,51 +834,25 @@ export default function CreateWebinar({
                         onChange={(e) => setLearningInput(e.target.value)}
                         onKeyDown={(e) =>
                           onEnterAdd(e, () =>
-                            addSimpleItem(
-                              learningInput,
-                              setLearningInput,
-                              learningPoints,
-                              setLearningPoints
-                            )
+                            addSimpleItem(learningInput, setLearningInput, learningPoints, setLearningPoints)
                           )
                         }
                       />
-                      <button
-                        type="button"
-                        className="csl-add-btn-lime-below"
-                        onClick={() =>
-                          addSimpleItem(
-                            learningInput,
-                            setLearningInput,
-                            learningPoints,
-                            setLearningPoints
-                          )
-                        }
-                      >
-                        + Add
-                      </button>
-
                       {learningPoints.length > 0 && (
                         <div className="csl-chips-container mt-4">
-                          {learningPoints.map((p, i) => (
+                          {learningPoints.map((item, i) => (
                             <div className="csl-tag-chip" key={i}>
-                              {p}
+                              {item}
                               <button
                                 type="button"
-                                onClick={() => removeSimpleItem(i, learningPoints, setLearningPoints)}
+                                onClick={() =>
+                                  removeSimpleItem(i, learningPoints, setLearningPoints)
+                                }
                               >
                                 ×
                               </button>
                             </div>
                           ))}
-                          <button
-                            type="button"
-                            className="csl-clear-all"
-                            onClick={() => setLearningPoints([])}
-                            title="Clear all"
-                          >
-                            ✕
-                          </button>
                         </div>
                       )}
                     </div>
@@ -922,9 +864,9 @@ export default function CreateWebinar({
                       <CustomSelect
                         value=""
                         onChange={(val) => {
-                          if (!val) return;
-                          if (languages.some((x) => x.toLowerCase() === val.toLowerCase())) return;
-                          setLanguages([...languages, val]);
+                          if (!languages.some((x) => x.toLowerCase() === String(val).toLowerCase())) {
+                            setLanguages((prev) => [...prev, val]);
+                          }
                         }}
                         options={languageOptions}
                         placeholder="Select language"
@@ -935,27 +877,47 @@ export default function CreateWebinar({
                           {languages.map((l, i) => (
                             <div className="csl-tag-chip" key={i}>
                               {l}
-                              <button
-                                type="button"
-                                onClick={() => removeSimpleItem(i, languages, setLanguages)}
-                              >
+                              <button type="button" onClick={() => removeSimpleItem(i, languages, setLanguages)}>
                                 ×
                               </button>
                             </div>
                           ))}
-                          <button
-                            type="button"
-                            className="csl-clear-all"
-                            onClick={() => setLanguages([])}
-                            title="Clear all"
-                          >
-                            ✕
-                          </button>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
+
+                <CoverSection
+                  mode="listing"
+                  listingType={LISTING_TYPE}
+                  cover={coverImages[coverSlideIdx] || null}
+                  coverFileName={coverFiles?.[0]?.name || ""}
+                  onUploadClick={() => setUploadStep("grid")}
+                  onRemoveCover={() => {
+                    setCoverImages([]);
+                    setCoverFiles([]);
+                    setCoverSlideIdx(0);
+                  }}
+                />
+
+                {coverImages.length > 1 ? (
+                  <div className="csl-card">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {coverImages.map((img, idx) => (
+                        <div key={idx} className="relative">
+                          <img
+                            src={img}
+                            alt={`cover-${idx}`}
+                            className={`w-full h-24 object-cover rounded-xl border cursor-pointer ${idx === coverSlideIdx ? "border-black" : "border-gray-200"
+                              }`}
+                            onClick={() => setCoverSlideIdx(idx)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="csl-card">
                   <h2 className="csl-section">Agenda</h2>
@@ -1008,11 +970,7 @@ export default function CreateWebinar({
                       </div>
                     ))}
 
-                    <button
-                      type="button"
-                      className="csl-add-btn-lime-below"
-                      onClick={addAgendaItem}
-                    >
+                    <button type="button" className="csl-add-btn-lime-below" onClick={addAgendaItem}>
                       + Add
                     </button>
                   </div>
@@ -1027,7 +985,7 @@ export default function CreateWebinar({
                         <input
                           className="csl-input"
                           type="date"
-                          value={schedule.date || ""}
+                          value={schedule.date}
                           min={getTodayDateString()}
                           onChange={(e) => handleScheduleDateChange(e.target.value)}
                         />
@@ -1038,15 +996,10 @@ export default function CreateWebinar({
                         <input
                           className="csl-input"
                           type="time"
-                          value={schedule.startTime || ""}
+                          value={schedule.startTime}
                           min={schedule.date === getTodayDateString() ? getCurrentTimeString() : ""}
                           onChange={(e) => handleScheduleTimeChange(e.target.value)}
                         />
-                        {saveError && (
-                          <p style={{ color: "red", marginTop: "8px", fontSize: "14px" }}>
-                            {saveError}
-                          </p>
-                        )}
                       </div>
                     </div>
 
@@ -1058,25 +1011,21 @@ export default function CreateWebinar({
                           className="csl-input"
                           placeholder="Duration"
                           value={schedule.duration}
-                          onChange={(e) => updateSchedule("duration", e.target.value)}
+                          onChange={(e) =>
+                            setSchedule((prev) => ({ ...prev, duration: e.target.value }))
+                          }
                         />
                       </div>
 
                       <div className="csl-field">
                         <label className="csl-label">Timezone</label>
-                        <CustomSelect
+                        <input
+                          className="csl-input"
+                          placeholder="Timezone"
                           value={schedule.timezone}
-                          onChange={(val) => updateSchedule("timezone", val)}
-                          options={[
-                            "UTC (Coordinated Universal Time)",
-                            "Asia/Kolkata (IST)",
-                            "US/Eastern (EST)",
-                            "US/Pacific (PST)",
-                            "Europe/London (GMT)",
-                            "Dubai (GST)",
-                            "Singapore (SGT)"
-                          ]}
-                          placeholder="Select timezone"
+                          onChange={(e) =>
+                            setSchedule((prev) => ({ ...prev, timezone: e.target.value }))
+                          }
                         />
                       </div>
                     </div>
@@ -1087,22 +1036,19 @@ export default function CreateWebinar({
                         className="csl-input"
                         placeholder="Enter webinar URL"
                         value={schedule.link}
-                        onChange={(e) => updateSchedule("link", e.target.value)}
+                        onChange={(e) =>
+                          setSchedule((prev) => ({ ...prev, link: e.target.value }))
+                        }
                       />
                     </div>
                   </div>
                 </div>
 
-                {saveSuccess ? <p className="text-green-600 text-sm">{saveSuccess}</p> : null}
-
                 <DeliverablesSection
-                  deliverables={deliverables.map(d => ({
-                    file: d.file,
-                    notes: d.notes,
-                    name: d.file?.name || d.existing_file_name || d.name,
-                    size: d.file?.size || d.size
-                  }))}
-                  onAddDeliverable={(file) => setDeliverables([...deliverables, { file, notes: "" }])}
+                  mode="listing"
+                  listingType={LISTING_TYPE}
+                  deliverables={deliverables}
+                  onAddDeliverable={addDeliverable}
                   onRemoveDeliverable={removeDeliverable}
                   onUpdateDeliverableNotes={updateDeliverableNotes}
                   onUpdateDeliverableFile={updateDeliverableFile}
@@ -1141,13 +1087,12 @@ export default function CreateWebinar({
 
             {(uploadStep === "grid" || uploadStep === "success") && (
               <UploadGrid
-                initialFiles={coverFiles}
+                blurred={uploadStep === "success"}
+                onBack={() => setUploadStep(null)}
                 onSelect={(files) => {
-                  if (files?.length) applyCoverFiles(files);
+                  if (files?.length) applyCoverFiles(files, false);
                   setUploadStep("success");
                 }}
-                onBack={() => setUploadStep(null)}
-                blurred={uploadStep === "success"}
               />
             )}
 
@@ -1173,9 +1118,8 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
 
   return (
     <div
-      className={`onboarding-custom-select ${open ? "active" : ""} ${
-        disabled ? "opacity-50 pointer-events-none" : ""
-      }`}
+      className={`onboarding-custom-select ${open ? "active" : ""} ${disabled ? "opacity-50 pointer-events-none" : ""
+        }`}
       ref={ref}
     >
       <div className="onboarding-selected-option" onClick={() => !disabled && setOpen(!open)}>
@@ -1185,109 +1129,141 @@ function CustomSelect({ value, onChange, options, placeholder, disabled = false 
 
       {open && (
         <ul className="onboarding-options-list dark:bg-[#1E1E1E]">
-          {options.map((opt, index) => (
-            <li
-              key={`${opt}-${index}`}
-              className={value === opt ? "active" : ""}
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
-            >
-              {opt}
-            </li>
-          ))}
+          {options.map((opt, index) => {
+            const label = opt?.name || opt;
+            return (
+              <li
+                key={`${label}-${index}`}
+                className={value === label ? "active" : ""}
+                onClick={() => {
+                  onChange(label);
+                  setOpen(false);
+                }}
+              >
+                {label}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
   );
 }
 
-function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
+function UploadGrid({ onSelect, onBack, blurred }) {
   const fileRef = useRef(null);
-  const [files, setFiles] = useState(initialFiles);
-  const activeIndexRef = useRef(null);
+  const [files, setFiles] = useState([]);
 
   const handleFiles = (e) => {
-    const newFiles = Array.from(e.target.files);
-    if (!newFiles.length) return;
-
-    if (activeIndexRef.current !== null) {
-      const next = [...files];
-      next[activeIndexRef.current] = newFiles[0];
-      setFiles(next);
-      activeIndexRef.current = null;
-    } else {
-      const combined = [...files, ...newFiles].slice(0, 9);
-      setFiles(combined);
-    }
+    const selected = Array.from(e.target.files || []);
+    if (!selected.length) return;
+    setFiles((prev) => [...prev, ...selected].slice(0, 9));
     e.target.value = "";
   };
 
-  const removeFile = (idx, e) => {
-    e.stopPropagation();
-    setFiles(files.filter((_, i) => i !== idx));
+  const removeFile = (idx) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
   return (
-    <div className={`am-modal-overlay ${blurred ? "blurred" : ""}`}>
-      <div className="am-modal-content">
-        <div className="am-modal-header">
-          <button className="am-back-btn" onClick={onBack}>
-            ← Back
-          </button>
-          <h2 className="am-modal-title">Upload Cover Photo</h2>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
+      <div
+        className={`upload-card rounded-2xl p-4 w-[95%] max-w-[820px] h-auto max-h-[90vh] flex flex-col bg-white dark:bg-[#1A1A1A] shadow-[0_0_20px_#CEFF1B] transition-all duration-200 ${blurred ? "blur-sm scale-[0.98] pointer-events-none select-none opacity-95" : ""
+          }`}
+      >
+        <div className="upload-header flex items-center gap-3 mb-3 shrink-0">
           <button
-            className="am-done-btn"
-            onClick={() => onSelect(files)}
-            disabled={!files.length}
+            type="button"
+            onClick={onBack}
+            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 shrink-0"
+            title="Back"
           >
-            Done
+            ←
+          </button>
+
+          <h4 className="text-sm font-medium text-black dark:text-white">
+            Select and upload your file
+          </h4>
+
+          <button
+            type="button"
+            onClick={onBack}
+            className="ml-auto w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#CEFF1B]"
+            title="Close"
+          >
+            ✕
           </button>
         </div>
 
-        <div className="am-upload-grid">
-          {[...Array(9)].map((_, i) => {
+        <div className="grid grid-cols-3 gap-4 flex-1 overflow-y-auto pr-2 custom-scroll">
+          {Array.from({ length: 9 }).map((_, i) => {
             const file = files[i];
-            const url = file ? URL.createObjectURL(file) : null;
-
             return (
               <div
                 key={i}
-                className={`am-grid-slot ${file ? "has-file" : ""}`}
-                onClick={() => {
-                  activeIndexRef.current = i;
-                  fileRef.current?.click();
-                }}
+                onClick={() => fileRef.current?.click()}
+                className="upload-slot relative h-[110px] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800"
               >
-                {url ? (
+                {file ? (
                   <>
-                    <img src={url} alt="" className="am-slot-img" />
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                     <button
-                      className="am-remove-slot"
-                      onClick={(e) => removeFile(i, e)}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(i);
+                      }}
+                      className="absolute top-1 right-1 bg-black text-white rounded-full w-6 h-6"
                     >
                       ×
                     </button>
                   </>
                 ) : (
-                  <div className="am-slot-add">+</div>
+                  <div className="relative pointer-events-none">
+                    <div className="absolute bottom-4 right-6 w-6 h-6 rounded-full bg-[#CEFF1B] flex items-center justify-center text-black font-bold">
+                      +
+                    </div>
+                  </div>
                 )}
               </div>
             );
           })}
         </div>
+
+        <div className="flex justify-end items-center mt-3 shrink-0">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onBack}
+              className="upload-btn-cancel px-4 py-2 rounded-lg text-sm border border-black dark:border-white/20 dark:text-white"
+            >
+              Cancel
+            </button>
+
+            {files.filter(Boolean).length > 0 && (
+              <button
+                type="button"
+                onClick={() => onSelect(files.filter(Boolean))}
+                className="upload-btn-confirm px-5 py-2 rounded-lg text-sm font-medium bg-[#CEFF1B] border border-black"
+              >
+                Upload
+              </button>
+            )}
+          </div>
+        </div>
+
         <input
-          type="file"
           ref={fileRef}
-          className="hidden"
+          type="file"
+          accept="image/*,video/*"
           multiple
-          accept="image/*"
           onChange={handleFiles}
+          className="hidden"
         />
-        <p className="am-modal-hint">
-          Upload up to 9 images. The first image will be your main cover.
-        </p>
       </div>
     </div>
   );

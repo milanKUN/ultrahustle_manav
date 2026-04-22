@@ -41,7 +41,6 @@ const extractErrorMessage = (error) => {
   return "Request failed";
 };
 
-//my listings
 export const getMyListings = async () => {
   try {
     const res = await api.get("/api/v1/my-listings");
@@ -60,564 +59,24 @@ export const getListingByUsername = async (username) => {
   }
 };
 
-export const createListing = async (payload) => {
+export const getListingDropdowns = async (listingTypeSlug, params = {}) => {
   try {
-    const formData = new FormData();
-
-    formData.append("listing_type", payload.listing_type || "");
-    formData.append("status", payload.status || "published");
-    formData.append("title", payload.title || "");
-    formData.append("category", payload.category || "");
-    formData.append("sub_category", payload.sub_category || "");
-    formData.append("short_description", payload.short_description || "");
-    formData.append("about", payload.about || "");
-    formData.append("ai_powered", payload.ai_powered ? "1" : "0");
-
-    if (payload.seller_mode) {
-      formData.append("seller_mode", payload.seller_mode);
-    }
-
-    if (payload.team_name) {
-      formData.append("team_name", payload.team_name);
-    }
-
-    if (payload.cover_files && Array.isArray(payload.cover_files)) {
-      payload.cover_files.forEach((file, index) => {
-        if (file) formData.append(`cover_files[${index}]`, file);
-      });
-    } else if (payload.cover_file) {
-      formData.append("cover_file", payload.cover_file);
-    }
-
-    if (payload.existing_cover_urls && Array.isArray(payload.existing_cover_urls)) {
-      payload.existing_cover_urls.forEach((url, index) => {
-        formData.append(`existing_cover_urls[${index}]`, url);
-      });
-    }
-
-    (payload.tags || []).forEach((tag, index) => {
-      formData.append(`tags[${index}]`, tag);
-    });
-
-    (payload.faqs || []).forEach((faq, index) => {
-      formData.append(`faqs[${index}][q]`, faq.q || "");
-      formData.append(`faqs[${index}][a]`, faq.a || "");
-    });
-
-    (payload.links || []).forEach((link, index) => {
-      formData.append(`links[${index}]`, link);
-    });
-
-    (payload.deliverables || []).forEach((item, index) => {
-      if (item.file) {
-        formData.append(`deliverables[${index}][file]`, item.file);
-      }
-      formData.append(`deliverables[${index}][notes]`, item.notes || "");
-    });
-
-    const details = payload.details || {};
-
-    if (
-      details.price !== undefined &&
-      details.price !== null &&
-      details.price !== ""
-    ) {
-      formData.append("details[price]", details.price);
-    }
-
-    (details.included || []).forEach((item, index) => {
-      formData.append(`details[included][${index}]`, item);
-    });
-
-    if (details.delivery_format) {
-      formData.append("details[delivery_format]", details.delivery_format);
-    }
-
-    (payload.portfolio_projects || []).forEach((project, index) => {
-      formData.append(`portfolio_projects[${index}][title]`, project.title || "");
-      formData.append(
-        `portfolio_projects[${index}][description]`,
-        project.description || ""
-      );
-      formData.append(`portfolio_projects[${index}][cost]`, project.cost || "");
-      formData.append(
-        `portfolio_projects[${index}][sort_order]`,
-        project.sort_order ?? index
-      );
-
-      (project.files || []).forEach((file, fileIndex) => {
-        if (file instanceof File) {
-          formData.append(
-            `portfolio_projects[${index}][files][${fileIndex}]`,
-            file
-          );
-        }
-      });
-
-      (project.existing_media || project.media || []).forEach((m, mIdx) => {
-        const path = typeof m === 'string' ? m : (m.path || m.url);
-        if (path && typeof path === 'string' && !path.startsWith('blob:')) {
-          formData.append(`portfolio_projects[${index}][existing_media][${mIdx}]`, path);
-        }
-      });
-    });
-
-    if (details.product_type) {
-      formData.append("details[product_type]", details.product_type);
-    }
-
-    if (details.course_level) {
-      formData.append("details[course_level]", details.course_level);
-    }
-
-    if (details.webinar_level) {
-      formData.append("details[webinar_level]", details.webinar_level);
-    }
-
-    if (
-      details.ticket_price !== undefined &&
-      details.ticket_price !== null &&
-      details.ticket_price !== ""
-    ) {
-      formData.append("details[ticket_price]", details.ticket_price);
-    }
-
-    if (details.schedule_date) {
-      formData.append("details[schedule_date]", details.schedule_date);
-    }
-
-    if (details.schedule_start_time) {
-      formData.append("details[schedule_start_time]", details.schedule_start_time);
-    }
-
-    if (details.schedule_duration) {
-      formData.append("details[schedule_duration]", details.schedule_duration);
-    }
-
-    if (details.schedule_timezone) {
-      formData.append("details[schedule_timezone]", details.schedule_timezone);
-    }
-
-    if (details.webinar_link) {
-      formData.append("details[webinar_link]", details.webinar_link);
-    }
-
-    (details.tools || []).forEach((tool, index) => {
-      formData.append(`details[tools][${index}]`, tool);
-    });
-
-    (details.learning_points || []).forEach((point, index) => {
-      formData.append(`details[learning_points][${index}]`, point);
-    });
-
-    (details.languages || []).forEach((language, index) => {
-      formData.append(`details[languages][${index}]`, language);
-    });
-
-    (details.key_outcomes || []).forEach((key_outcome, index) => {
-      formData.append(`details[key_outcomes][${index}]`, key_outcome);
-    });
-
-    if (details.preview_video_file) {
-      formData.append("details[preview_video_file]", details.preview_video_file);
-    }
-
-    (details.agenda || []).forEach((item, index) => {
-      formData.append(`details[agenda][${index}][time]`, item.time || "");
-      formData.append(`details[agenda][${index}][topic]`, item.topic || "");
-      formData.append(
-        `details[agenda][${index}][description]`,
-        item.description || ""
-      );
-    });
-
-    (details.lessons || []).forEach((lesson, index) => {
-      formData.append(`details[lessons][${index}][title]`, lesson.title || "");
-      formData.append(
-        `details[lessons][${index}][description]`,
-        lesson.description || ""
-      );
-      formData.append(
-        `details[lessons][${index}][media_type]`,
-        lesson.media_type || ""
-      );
-      formData.append(
-        `details[lessons][${index}][existing_media_url]`,
-        lesson.existing_media_url || ""
-      );
-      formData.append(
-        `details[lessons][${index}][existing_media_path]`,
-        lesson.existing_media_path || ""
-      );
-
-      if (lesson.media_file) {
-        formData.append(
-          `details[lessons][${index}][media_file]`,
-          lesson.media_file
-        );
-      }
-    });
-
-    // service
-    // service
-    (details.packages || []).forEach((pkg, index) => {
-      formData.append(
-        `details[packages][${index}][package_name]`,
-        pkg.package_name || pkg.packageName || ""
-      );
-      formData.append(
-        `details[packages][${index}][price]`,
-        pkg.price ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][delivery_days]`,
-        pkg.delivery_days ?? pkg.deliveryDays ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][revisions]`,
-        pkg.revisions ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][scope]`,
-        pkg.scope || ""
-      );
-
-      (pkg.included || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][included][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.how_it_works || pkg.howItWorks || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][how_it_works][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.not_included || pkg.notIncluded || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][not_included][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.tools_used || pkg.toolsUsed || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][tools_used][${itemIndex}]`,
-          item
-        );
-      });
-
-      formData.append(
-        `details[packages][${index}][delivery_format]`,
-        pkg.delivery_format || pkg.deliveryFormat || ""
-      );
-    });
-
-    (details.add_ons || details.addOns || []).forEach((item, index) => {
-      formData.append(`details[add_ons][${index}][name]`, item.name || "");
-      formData.append(`details[add_ons][${index}][price]`, item.price ?? "");
-      formData.append(`details[add_ons][${index}][days]`, item.days ?? "");
-    });
-
-    const res = await api.post("/api/v1/listings", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
+    const res = await api.get(`/api/v1/listing-dropdowns/${listingTypeSlug}`, { params });
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));
   }
 };
 
-export const updateListing = async (username, payload) => {
+export const getLanguages = async () => {
   try {
-    const formData = new FormData();
-
-    formData.append("_method", "PUT");
-    formData.append("listing_type", payload.listing_type || "");
-    formData.append("status", payload.status || "published");
-    formData.append("title", payload.title || "");
-    formData.append("category", payload.category || "");
-    formData.append("sub_category", payload.sub_category || "");
-    formData.append("short_description", payload.short_description || "");
-    formData.append("about", payload.about || "");
-    formData.append("ai_powered", payload.ai_powered ? "1" : "0");
-
-    if (payload.seller_mode) {
-      formData.append("seller_mode", payload.seller_mode);
-    }
-
-    if (payload.team_name) {
-      formData.append("team_name", payload.team_name);
-    }
-
-    if (payload.cover_files && Array.isArray(payload.cover_files)) {
-      payload.cover_files.forEach((file, index) => {
-        if (file) formData.append(`cover_files[${index}]`, file);
-      });
-    } else if (payload.cover_file) {
-      formData.append("cover_file", payload.cover_file);
-    }
-
-    if (payload.existing_cover_urls && Array.isArray(payload.existing_cover_urls)) {
-      payload.existing_cover_urls.forEach((url, index) => {
-        formData.append(`existing_cover_urls[${index}]`, url);
-      });
-    }
-
-    (payload.tags || []).forEach((tag, index) => {
-      formData.append(`tags[${index}]`, tag);
-    });
-
-    (payload.faqs || []).forEach((faq, index) => {
-      formData.append(`faqs[${index}][q]`, faq.q || "");
-      formData.append(`faqs[${index}][a]`, faq.a || "");
-    });
-
-    (payload.links || []).forEach((link, index) => {
-      formData.append(`links[${index}]`, link);
-    });
-
-    (payload.deliverables || []).forEach((item, index) => {
-      if (item.file) {
-        formData.append(`deliverables[${index}][file]`, item.file);
-      }
-      formData.append(`deliverables[${index}][notes]`, item.notes || "");
-    });
-
-    const details = payload.details || {};
-
-    // digital product
-    if (details.product_type) {
-      formData.append("details[product_type]", details.product_type);
-    }
-
-    if (
-      details.price !== undefined &&
-      details.price !== null &&
-      details.price !== ""
-    ) {
-      formData.append("details[price]", details.price);
-    }
-
-    (details.included || []).forEach((item, index) => {
-      formData.append(`details[included][${index}]`, item);
-    });
-
-    if (details.delivery_format) {
-      formData.append("details[delivery_format]", details.delivery_format);
-    }
-
-    // shared detail arrays
-    (details.tools || []).forEach((tool, index) => {
-      formData.append(`details[tools][${index}]`, tool);
-    });
-
-    (details.learning_points || []).forEach((point, index) => {
-      formData.append(`details[learning_points][${index}]`, point);
-    });
-
-    (details.languages || []).forEach((language, index) => {
-      formData.append(`details[languages][${index}]`, language);
-    });
-
-    // course
-    if (details.course_level) {
-      formData.append("details[course_level]", details.course_level);
-    }
-
-    if (details.preview_video_file) {
-      formData.append("details[preview_video_file]", details.preview_video_file);
-    }
-
-    (details.lessons || []).forEach((lesson, index) => {
-      formData.append(`details[lessons][${index}][title]`, lesson.title || "");
-      formData.append(
-        `details[lessons][${index}][description]`,
-        lesson.description || ""
-      );
-      formData.append(
-        `details[lessons][${index}][media_type]`,
-        lesson.media_type || ""
-      );
-      formData.append(
-        `details[lessons][${index}][existing_media_url]`,
-        lesson.existing_media_url || ""
-      );
-      formData.append(
-        `details[lessons][${index}][existing_media_path]`,
-        lesson.existing_media_path || ""
-      );
-
-      if (lesson.media_file) {
-        formData.append(
-          `details[lessons][${index}][media_file]`,
-          lesson.media_file
-        );
-      }
-    });
-
-    // webinar
-    (details.key_outcomes || []).forEach((key_outcome, index) => {
-      formData.append(`details[key_outcomes][${index}]`, key_outcome);
-    });
-
-    if (
-      details.ticket_price !== undefined &&
-      details.ticket_price !== null &&
-      details.ticket_price !== ""
-    ) {
-      formData.append("details[ticket_price]", details.ticket_price);
-    }
-
-    if (details.schedule_date) {
-      formData.append("details[schedule_date]", details.schedule_date);
-    }
-
-    if (details.schedule_start_time) {
-      formData.append("details[schedule_start_time]", details.schedule_start_time);
-    }
-
-    if (details.schedule_duration) {
-      formData.append("details[schedule_duration]", details.schedule_duration);
-    }
-
-    if (details.schedule_timezone) {
-      formData.append("details[schedule_timezone]", details.schedule_timezone);
-    }
-
-    if (details.webinar_link) {
-      formData.append("details[webinar_link]", details.webinar_link);
-    }
-
-    (details.agenda || []).forEach((item, index) => {
-      formData.append(`details[agenda][${index}][time]`, item.time || "");
-      formData.append(`details[agenda][${index}][topic]`, item.topic || "");
-      formData.append(
-        `details[agenda][${index}][description]`,
-        item.description || ""
-      );
-    });
-
-    // service
-    (details.packages || []).forEach((pkg, index) => {
-      formData.append(
-        `details[packages][${index}][package_name]`,
-        pkg.package_name || pkg.packageName || ""
-      );
-      formData.append(
-        `details[packages][${index}][price]`,
-        pkg.price ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][delivery_days]`,
-        pkg.delivery_days ?? pkg.deliveryDays ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][revisions]`,
-        pkg.revisions ?? ""
-      );
-      formData.append(
-        `details[packages][${index}][scope]`,
-        pkg.scope || ""
-      );
-
-      (pkg.included || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][included][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.how_it_works || pkg.howItWorks || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][how_it_works][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.not_included || pkg.notIncluded || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][not_included][${itemIndex}]`,
-          item
-        );
-      });
-
-      (pkg.tools_used || pkg.toolsUsed || []).forEach((item, itemIndex) => {
-        formData.append(
-          `details[packages][${index}][tools_used][${itemIndex}]`,
-          item
-        );
-      });
-
-      formData.append(
-        `details[packages][${index}][delivery_format]`,
-        pkg.delivery_format || pkg.deliveryFormat || ""
-      );
-    });
-
-    (details.add_ons || details.addOns || []).forEach((item, index) => {
-      formData.append(`details[add_ons][${index}][name]`, item.name || "");
-      formData.append(`details[add_ons][${index}][price]`, item.price ?? "");
-      formData.append(`details[add_ons][${index}][days]`, item.days ?? "");
-    });
-
-    (payload.portfolio_projects || []).forEach((project, index) => {
-      formData.append(`portfolio_projects[${index}][title]`, project.title || "");
-      formData.append(
-        `portfolio_projects[${index}][description]`,
-        project.description || ""
-      );
-      formData.append(`portfolio_projects[${index}][cost]`, project.cost || "");
-      formData.append(
-        `portfolio_projects[${index}][sort_order]`,
-        project.sort_order ?? index
-      );
-
-      if (project.serverId) {
-        formData.append(
-          `portfolio_projects[${index}][serverId]`,
-          project.serverId
-        );
-      }
-
-      (project.files || []).forEach((file, fileIndex) => {
-        if (file instanceof File) {
-          formData.append(
-            `portfolio_projects[${index}][files][${fileIndex}]`,
-            file
-          );
-        }
-      });
-
-      (project.existing_media || project.media || []).forEach((m, mIdx) => {
-        const path = typeof m === 'string' ? m : (m.path || m.url);
-        if (path && typeof path === 'string' && !path.startsWith('blob:')) {
-          formData.append(`portfolio_projects[${index}][existing_media][${mIdx}]`, path);
-        }
-      });
-    });
-
-    const res = await api.post(
-      `/api/v1/listings/${encodeURIComponent(username)}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
+    const res = await api.get("/api/v1/languages");
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));
   }
 };
+
 
 export const getPublicDigitalProductListing = async ({ username, listingId }) => {
   try {
@@ -647,23 +106,225 @@ export const getMyTeams = async () => {
   }
 };
 
-//fetch all languages
-export const getLanguages = async () => {
+
+
+const appendCommonListingFields = (formData, payload) => {
+  formData.append("listing_type", payload.listing_type || "");
+  formData.append("status", payload.status || "published");
+  formData.append("title", payload.title || "");
+  formData.append("category", payload.category || "");
+  formData.append("sub_category", payload.sub_category || "");
+  formData.append("short_description", payload.short_description || "");
+  formData.append("about", payload.about || "");
+  formData.append("ai_powered", payload.ai_powered ? "1" : "0");
+
+  if (payload.seller_mode) formData.append("seller_mode", payload.seller_mode);
+  if (payload.team_name) formData.append("team_name", payload.team_name);
+
+  if (payload.cover_files && Array.isArray(payload.cover_files)) {
+    payload.cover_files.forEach((file, index) => {
+      if (file instanceof File) formData.append(`cover_files[${index}]`, file);
+    });
+  } else if (payload.cover_file instanceof File) {
+    formData.append("cover_file", payload.cover_file);
+  }
+
+  if (payload.existing_cover_urls && Array.isArray(payload.existing_cover_urls)) {
+    payload.existing_cover_urls.forEach((url, index) => {
+      if (url) formData.append(`existing_cover_urls[${index}]`, url);
+    });
+  }
+
+  (payload.tags || []).forEach((tag, index) => {
+    formData.append(`tags[${index}]`, tag);
+  });
+
+  (payload.faqs || []).forEach((faq, index) => {
+    formData.append(`faqs[${index}][q]`, faq.q || "");
+    formData.append(`faqs[${index}][a]`, faq.a || "");
+  });
+
+  (payload.links || []).forEach((link, index) => {
+    formData.append(`links[${index}]`, link);
+  });
+
+  (payload.deliverables || []).forEach((item, index) => {
+    if (item.file instanceof File) {
+      formData.append(`deliverables[${index}][file]`, item.file);
+    }
+    formData.append(`deliverables[${index}][notes]`, item.notes || "");
+    if (item.existing_file_url) {
+      formData.append(`deliverables[${index}][existing_file_url]`, item.existing_file_url);
+    }
+  });
+
+  (payload.portfolio_projects || []).forEach((project, index) => {
+    formData.append(`portfolio_projects[${index}][title]`, project.title || "");
+    formData.append(`portfolio_projects[${index}][description]`, project.description || "");
+    formData.append(`portfolio_projects[${index}][cost]`, project.cost || "");
+    formData.append(`portfolio_projects[${index}][sort_order]`, project.sort_order ?? index);
+
+    (project.files || []).forEach((file, fileIndex) => {
+      if (file instanceof File) {
+        formData.append(`portfolio_projects[${index}][files][${fileIndex}]`, file);
+      }
+    });
+
+    (project.existing_media || project.media || []).forEach((m, mIdx) => {
+      const path = typeof m === "string" ? m : m.path || m.url;
+      if (path && typeof path === "string" && !path.startsWith("blob:")) {
+        formData.append(`portfolio_projects[${index}][existing_media][${mIdx}]`, path);
+      }
+    });
+  });
+};
+
+const appendDetails = (formData, details = {}) => {
+  if (details.product_type) {
+    formData.append("details[product_type]", details.product_type);
+  }
+
+  if (details.price !== undefined && details.price !== null && details.price !== "") {
+    formData.append("details[price]", details.price);
+  }
+
+  (details.included || []).forEach((item, index) => {
+    formData.append(`details[included][${index}]`, item);
+  });
+
+  if (details.delivery_format) {
+    formData.append("details[delivery_format]", details.delivery_format);
+  }
+
+  (details.tools || []).forEach((tool, index) => {
+    formData.append(`details[tools][${index}]`, tool);
+  });
+
+  (details.learning_points || []).forEach((point, index) => {
+    formData.append(`details[learning_points][${index}]`, point);
+  });
+
+  (details.languages || []).forEach((language, index) => {
+    formData.append(`details[languages][${index}]`, language);
+  });
+
+  (details.key_outcomes || []).forEach((item, index) => {
+    formData.append(`details[key_outcomes][${index}]`, item);
+  });
+
+  if (details.course_level) {
+    formData.append("details[course_level]", details.course_level);
+  }
+
+  if (details.ticket_price !== undefined && details.ticket_price !== null && details.ticket_price !== "") {
+    formData.append("details[ticket_price]", details.ticket_price);
+  }
+
+  if (details.schedule_date) {
+    formData.append("details[schedule_date]", details.schedule_date);
+  }
+
+  if (details.schedule_start_time) {
+    formData.append("details[schedule_start_time]", details.schedule_start_time);
+  }
+
+  if (details.schedule_duration !== undefined && details.schedule_duration !== null && details.schedule_duration !== "") {
+    formData.append("details[schedule_duration]", details.schedule_duration);
+  }
+
+  if (details.schedule_timezone) {
+    formData.append("details[schedule_timezone]", details.schedule_timezone);
+  }
+
+  if (details.webinar_link) {
+    formData.append("details[webinar_link]", details.webinar_link);
+  }
+
+  (details.agenda || []).forEach((item, index) => {
+    formData.append(`details[agenda][${index}][time]`, item.time || "");
+    formData.append(`details[agenda][${index}][topic]`, item.topic || "");
+    formData.append(`details[agenda][${index}][description]`, item.description || "");
+  });
+
+  if (details.preview_video_file instanceof File) {
+    formData.append("details[preview_video_file]", details.preview_video_file);
+  }
+
+  (details.lessons || []).forEach((lesson, index) => {
+    formData.append(`details[lessons][${index}][title]`, lesson.title || "");
+    formData.append(`details[lessons][${index}][description]`, lesson.description || "");
+    formData.append(`details[lessons][${index}][media_type]`, lesson.media_type || "");
+    formData.append(`details[lessons][${index}][existing_media_url]`, lesson.existing_media_url || "");
+    formData.append(`details[lessons][${index}][existing_media_path]`, lesson.existing_media_path || "");
+
+    if (lesson.media_file instanceof File) {
+      formData.append(`details[lessons][${index}][media_file]`, lesson.media_file);
+    }
+  });
+
+  (details.packages || []).forEach((pkg, index) => {
+    formData.append(`details[packages][${index}][package_name]`, pkg.package_name || pkg.packageName || "");
+    formData.append(`details[packages][${index}][price]`, pkg.price ?? "");
+    formData.append(`details[packages][${index}][delivery_days]`, pkg.delivery_days ?? pkg.deliveryDays ?? "");
+    formData.append(`details[packages][${index}][revisions]`, pkg.revisions ?? "");
+    formData.append(`details[packages][${index}][scope]`, pkg.scope || "");
+
+    (pkg.included || []).forEach((item, itemIndex) => {
+      formData.append(`details[packages][${index}][included][${itemIndex}]`, item);
+    });
+
+    (pkg.how_it_works || pkg.howItWorks || []).forEach((item, itemIndex) => {
+      formData.append(`details[packages][${index}][how_it_works][${itemIndex}]`, item);
+    });
+
+    (pkg.not_included || pkg.notIncluded || []).forEach((item, itemIndex) => {
+      formData.append(`details[packages][${index}][not_included][${itemIndex}]`, item);
+    });
+
+    (pkg.tools_used || pkg.toolsUsed || []).forEach((item, itemIndex) => {
+      formData.append(`details[packages][${index}][tools_used][${itemIndex}]`, item);
+    });
+
+    formData.append(
+      `details[packages][${index}][delivery_format]`,
+      pkg.delivery_format || pkg.deliveryFormat || ""
+    );
+  });
+
+  (details.add_ons || details.addOns || []).forEach((item, index) => {
+    formData.append(`details[add_ons][${index}][name]`, item.name || "");
+    formData.append(`details[add_ons][${index}][price]`, item.price ?? "");
+    formData.append(`details[add_ons][${index}][days]`, item.days ?? "");
+  });
+};
+
+export const createListing = async (payload) => {
   try {
-    const res = await api.get("/api/v1/languages");
+    const formData = new FormData();
+    appendCommonListingFields(formData, payload);
+    appendDetails(formData, payload.details || {});
+
+    const res = await api.post("/api/v1/listings", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));
   }
 };
 
-
-export const getListingDropdowns = async (listingTypeSlug, params = {}) => {
+export const updateListing = async (username, payload) => {
   try {
-    const res = await api.get(
-      `/api/v1/listing-dropdowns/${encodeURIComponent(listingTypeSlug)}`,
-      { params }
-    );
+    const formData = new FormData();
+    formData.append("_method", "PUT");
+    appendCommonListingFields(formData, payload);
+    appendDetails(formData, payload.details || {});
+
+    const res = await api.post(`/api/v1/listings/${encodeURIComponent(username)}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));

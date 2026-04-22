@@ -1072,7 +1072,9 @@ public function updateListing(Request $request, string $username): JsonResponse
             }
 
             if (Schema::hasTable('webinar_listing_agendas')) {
-                DB::table('webinar_listing_agendas')->where('listing_id', $existing->id)->delete();
+                DB::table('webinar_listing_agendas')
+                    ->where('listing_id', $existing->id)
+                    ->delete();
 
                 foreach ((data_get($validated, 'details.agenda') ?? []) as $index => $agendaItem) {
                     $time = trim((string) ($agendaItem['time'] ?? ''));
