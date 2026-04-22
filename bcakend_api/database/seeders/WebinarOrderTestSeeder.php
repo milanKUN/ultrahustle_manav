@@ -301,7 +301,7 @@ class WebinarOrderTestSeeder extends Seeder
 
                 DB::table('order_webinar_agenda_progress')->insert([
                     [
-                        'id' => 701,
+                        'id' => 789,
                         'order_id' => $orderId,
                         'agenda_item_id' => 401,
                         'user_id' => $clientId,
@@ -311,7 +311,7 @@ class WebinarOrderTestSeeder extends Seeder
                         'updated_at' => $now,
                     ],
                     [
-                        'id' => 702,
+                        'id' => 741,
                         'order_id' => $orderId,
                         'agenda_item_id' => 402,
                         'user_id' => $clientId,
@@ -335,7 +335,7 @@ class WebinarOrderTestSeeder extends Seeder
 
                 DB::table('order_resources')->insert([
                     [
-                        'id' => 801,
+                        'id' => 501,
                         'order_id' => $orderId,
                         'title' => 'Webinar Slides PDF',
                         'resource_type' => 'download',
@@ -351,7 +351,7 @@ class WebinarOrderTestSeeder extends Seeder
                         'updated_at' => $now,
                     ],
                     [
-                        'id' => 802,
+                        'id' => 204,
                         'order_id' => $orderId,
                         'title' => 'Design Checklist',
                         'resource_type' => 'download',
@@ -367,7 +367,7 @@ class WebinarOrderTestSeeder extends Seeder
                         'updated_at' => $now,
                     ],
                     [
-                        'id' => 803,
+                        'id' => 502,
                         'order_id' => $orderId,
                         'title' => 'Reference Figma File',
                         'resource_type' => 'link',
@@ -397,7 +397,7 @@ class WebinarOrderTestSeeder extends Seeder
                     ->delete();
 
                 DB::table('order_reviews')->insert([
-                    'id' => 901,
+                    'id' => 564,
                     'order_id' => $orderId,
                     'user_id' => $clientId,
                     'rating' => 5,
