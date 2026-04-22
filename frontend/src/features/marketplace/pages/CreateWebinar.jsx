@@ -84,7 +84,7 @@ export default function CreateWebinar({
     date: "",
     startTime: "",
     duration: "",
-    timezone: "Asia/Kolkata",
+    timezone: "UTC (Coordinated Universal Time)",
     link: "",
     ticketPrice: "",
   });
@@ -274,7 +274,7 @@ export default function CreateWebinar({
           date: item?.details?.schedule_date || "",
           startTime: item?.details?.schedule_start_time || "",
           duration: item?.details?.schedule_duration || "",
-          timezone: item?.details?.schedule_timezone || "Asia/Kolkata",
+          timezone: item?.details?.schedule_timezone || "UTC (Coordinated Universal Time)",
           link: item?.details?.webinar_link || "",
           ticketPrice:
             item?.details?.ticket_price !== undefined && item?.details?.ticket_price !== null
@@ -1064,11 +1064,19 @@ export default function CreateWebinar({
 
                       <div className="csl-field">
                         <label className="csl-label">Timezone</label>
-                        <input
-                          className="csl-input"
-                          placeholder="Timezone"
+                        <CustomSelect
                           value={schedule.timezone}
-                          onChange={(e) => updateSchedule("timezone", e.target.value)}
+                          onChange={(val) => updateSchedule("timezone", val)}
+                          options={[
+                            "UTC (Coordinated Universal Time)",
+                            "Asia/Kolkata (IST)",
+                            "US/Eastern (EST)",
+                            "US/Pacific (PST)",
+                            "Europe/London (GMT)",
+                            "Dubai (GST)",
+                            "Singapore (SGT)"
+                          ]}
+                          placeholder="Select timezone"
                         />
                       </div>
                     </div>

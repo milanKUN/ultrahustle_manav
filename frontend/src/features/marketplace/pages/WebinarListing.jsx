@@ -15,7 +15,11 @@ import {
   Globe,
   Ticket,
   CalendarPlus,
+  Star,
+  Zap,
+  Award,
 } from "lucide-react";
+import Swal from "sweetalert2";
 import "./WebinarListing.css";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import "../../../Darkuser.css";
@@ -368,10 +372,59 @@ const WebinarListing = ({ theme, setTheme }) => {
               <div className="cl-header">
                 <h1 className="cl-title">{listing?.title || "Webinar"}</h1>
                 <div className="cl-header-actions">
-                  <button className="cl-icon-btn">
+                  <button 
+                    className="cl-icon-btn"
+                    title="Share"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      Swal.fire({
+                        toast: true,
+                        position: "top-end",
+                        icon: "success",
+                        title: "Link copied to clipboard!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: "#CEFF1B",
+                        color: "#000",
+                      });
+                    }}
+                  >
                     <Share2 size={20} />
                   </button>
-                  <button className="cl-icon-btn">
+                  <button 
+                    className="cl-icon-btn"
+                    title="Report"
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Report Webinar",
+                        text: "Reason for reporting:",
+                        input: "select",
+                        inputOptions: {
+                          inappropriate: "Inappropriate Content",
+                          misleading: "Misleading Information",
+                          spam: "Spam",
+                          other: "Other",
+                        },
+                        background: "#0b0b0b",
+                        color: "#fff",
+                        confirmButtonColor: "#CEFF1B",
+                        confirmButtonText: "<span style='color:#000'>Submit Report</span>",
+                        showCancelButton: true,
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          Swal.fire({
+                            title: "Reported!",
+                            text: "Our team will review this webinar.",
+                            icon: "success",
+                            background: "#0b0b0b",
+                            color: "#fff",
+                            confirmButtonColor: "#CEFF1B",
+                            confirmButtonText: "<span style='color:#000'>OK</span>",
+                          });
+                        }
+                      });
+                    }}
+                  >
                     <Flag size={20} />
                   </button>
                   <button className="cl-icon-btn" onClick={() => setIsLiked(!isLiked)}>
@@ -578,12 +631,84 @@ const WebinarListing = ({ theme, setTheme }) => {
                   </div>
 
                   <div className="ticket-actions-group">
-                    <button className="btn-get-ticket">
+                    <button 
+                      className="btn-get-ticket"
+                      onClick={() => {
+                        Swal.fire({
+                          title: "Registration Successful!",
+                          text: "You have been registered for this webinar. Check your email for details.",
+                          icon: "success",
+                          background: "#0b0b0b",
+                          color: "#fff",
+                          confirmButtonColor: "#CEFF1B",
+                          confirmButtonText: "<span style='color:#000'>Great!</span>",
+                        });
+                      }}
+                    >
                       <Ticket size={20} />
                       Get ticket
                     </button>
 
-                    <button className="btn-add-calendar">
+                    <button 
+                      className="btn-add-calendar"
+                      onClick={() => {
+                        const title = listing?.title || "Webinar";
+                        const description = listing?.short_description || "";
+                        const dateStr = webinarDetails?.schedule_date || ""; // YYYY-MM-DD
+                        const timeStr = webinarDetails?.schedule_start_time || ""; // HH:mm
+                        
+                        if (!dateStr || !timeStr) {
+                          Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Schedule date or time is missing!',
+                            background: "#0b0b0b",
+                            color: "#fff",
+                            confirmButtonColor: "#CEFF1B",
+                          });
+                          return;
+                        }
+
+                        const startDateTime = new Date(`${dateStr}T${timeStr}:00`);
+                        const endDateTime = new Date(startDateTime.getTime() + (webinarDetails?.schedule_duration || 60) * 60000);
+
+                        const formatICSDate = (date) => {
+                          return date.toISOString().replace(/-|:|\.\d+/g, "");
+                        };
+
+                        const icsContent = [
+                          "BEGIN:VCALENDAR",
+                          "VERSION:2.0",
+                          "BEGIN:VEVENT",
+                          `DTSTART:${formatICSDate(startDateTime)}`,
+                          `DTEND:${formatICSDate(endDateTime)}`,
+                          `SUMMARY:${title}`,
+                          `DESCRIPTION:${description}`,
+                          "STATUS:CONFIRMED",
+                          "END:VEVENT",
+                          "END:VCALENDAR"
+                        ].join("\n");
+
+                        const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+                        const link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(blob);
+                        link.setAttribute("download", `${title.replace(/\s+/g, "_")}.ics`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        Swal.fire({
+                          toast: true,
+                          position: "top-end",
+                          icon: "success",
+                          title: "Event added to your calendar!",
+                          showConfirmButton: false,
+                          timer: 2000,
+                          background: "#CEFF1B",
+                          color: "#000",
+                        });
+                      }}
+                    >
                       <CalendarPlus size={20} />
                       Add to calendar
                     </button>
@@ -800,6 +925,78 @@ const WebinarListing = ({ theme, setTheme }) => {
 
               <FAQAccordion faqData={faqData} theme={theme} />
 
+              <section className="reviews-section">
+                <div className="reviews-header">
+                  <h3 className="reviews-title">Reviews</h3>
+                  <div className="reviews-header-line"></div>
+                </div>
+                <div className="reviews-container">
+                  <div className="reviews-summary">
+                    <div className="rating-overview">
+                      <span className="rating-score">4.9</span>
+                      <div className="rating-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={20} fill={i < 4 ? "#CEFF1B" : "none"} color="#CEFF1B" />
+                        ))}
+                      </div>
+                      <span className="review-count">24 reviews</span>
+                    </div>
+                    <div className="rating-breakdown">
+                      {[5, 4, 3, 2, 1].map((star) => (
+                        <div key={star} className="rating-bar-row">
+                          <span className="rating-label">{star}</span>
+                          <div className="rating-bar">
+                            <div 
+                              className="rating-bar-fill" 
+                              style={{ width: star === 5 ? "85%" : star === 4 ? "10%" : "2%" }}
+                            ></div>
+                          </div>
+                          <span className="rating-count">{star === 5 ? "20" : star === 4 ? "3" : "0"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="reviews-list">
+                    <div className="review-item">
+                      <div className="review-header">
+                        <div className="reviewer-avatar"></div>
+                        <div className="reviewer-info">
+                          <span className="reviewer-name">Alex Johnson</span>
+                          <div className="review-stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} fill="#CEFF1B" color="#CEFF1B" />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="review-date">2 weeks ago</span>
+                      </div>
+                      <p className="review-text">
+                        Excellent webinar! The information was top-notch and it saved me hours of research. 
+                        Highly recommended for anyone looking for professional insights.
+                      </p>
+                    </div>
+                    <div className="review-item">
+                      <div className="review-header">
+                        <div className="reviewer-avatar"></div>
+                        <div className="reviewer-info">
+                          <span className="reviewer-name">Sarah Miller</span>
+                          <div className="review-stars">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} fill={i < 4 ? "#CEFF1B" : "none"} color="#CEFF1B" />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="review-date">1 month ago</span>
+                      </div>
+                      <p className="review-text">
+                        Great value for money. Some minor issues with the connection but the 
+                        creator was very helpful in resolving them.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               <div className="cl-listing-container">
                 <h2 className="cl-sectionTitle">Recommended</h2>
                 <div className="cl-mp-grid" ref={recommendedGridRef}>
@@ -910,54 +1107,53 @@ const WebinarListing = ({ theme, setTheme }) => {
 
       {showImageModal &&
         createPortal(
-          <div className="portfolio-modal-backdrop" onClick={() => setShowImageModal(false)}>
-            <div
-              className={`portfolio-modal-content ${theme}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="portfolio-modal-topbar">
-                <div className="portfolio-modal-brand">
-                  <div className="portfolio-brand-circle"></div>
-                  <span>{listing?.title}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="portfolio-modal-nav">
-                    <button
-                      className="nav-arrow left"
-                      onClick={() =>
-                        setModalImgIndex((prev) =>
-                          prev === 0 ? galleryImages.length - 1 : prev - 1,
-                        )
-                      }
-                    >
-                      ◀
-                    </button>
-                    <span className="portfolio-modal-counter">
-                      {modalImgIndex + 1} of {galleryImages.length}
-                    </span>
-                    <button
-                      className="nav-arrow right"
-                      onClick={() =>
-                        setModalImgIndex((prev) =>
-                          prev === galleryImages.length - 1 ? 0 : prev + 1,
-                        )
-                      }
-                    >
-                      ▶
-                    </button>
-                  </div>
-                  <button
-                    className="portfolio-modal-close"
-                    onClick={() => setShowImageModal(false)}
-                  >
-                    <X />
-                  </button>
-                </div>
+          <div className="cl-image-modal-backdrop" onClick={() => setShowImageModal(false)}>
+            <button className="cl-modal-close-btn" onClick={() => setShowImageModal(false)}>
+              <X size={24} />
+            </button>
+
+            <div className="cl-modal-content-wrap" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="cl-modal-nav-btn"
+                onClick={() =>
+                  setModalImgIndex((prev) =>
+                    prev === 0 ? galleryImages.length - 1 : prev - 1,
+                  )
+                }
+              >
+                <ChevronLeft size={32} />
+              </button>
+
+              <div className="cl-modal-img-container">
+                <img 
+                  src={galleryImages[modalImgIndex]} 
+                  alt={listing?.title} 
+                  className="cl-modal-main-img"
+                />
               </div>
 
-              <div className="portfolio-modal-image">
-                <img src={galleryImages[modalImgIndex]} alt={listing?.title} />
-              </div>
+              <button
+                className="cl-modal-nav-btn"
+                onClick={() =>
+                  setModalImgIndex((prev) =>
+                    prev === galleryImages.length - 1 ? 0 : prev + 1,
+                  )
+                }
+              >
+                <ChevronRight size={32} />
+              </button>
+            </div>
+
+            <div className="cl-modal-thumbs-strip" onClick={(e) => e.stopPropagation()}>
+              {galleryImages.map((img, idx) => (
+                <div
+                  key={idx}
+                  className={`cl-modal-thumb-item ${modalImgIndex === idx ? "active" : ""}`}
+                  onClick={() => setModalImgIndex(idx)}
+                >
+                  <img src={img} alt={`Thumb ${idx + 1}`} />
+                </div>
+              ))}
             </div>
           </div>,
           document.body,

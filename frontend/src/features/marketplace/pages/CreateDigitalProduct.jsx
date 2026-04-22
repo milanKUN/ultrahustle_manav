@@ -22,6 +22,8 @@ export default function CreateDigitalProduct({
 }) {
   const LISTING_TYPE_SLUG = "digital-product";
   const TABS = ["Basic", "Standard", "Premium"];
+  const STANDARD_FORMATS = ["PDF", "JPG", "JPEG", "PSD", "ZIP", "MP4", "MOV", "PNG", "SVG", "FIG", "NOTION", "DOCX", "XLSX"];
+
 
   const navigate = useNavigate();
   const { listingusername } = useParams();
@@ -453,9 +455,9 @@ export default function CreateDigitalProduct({
       setFaqs(
         Array.isArray(listing.faqs) && listing.faqs.length
           ? listing.faqs.map((item) => ({
-              q: item.q || item.question || "",
-              a: item.a || item.answer || "",
-            }))
+            q: item.q || item.question || "",
+            a: item.a || item.answer || "",
+          }))
           : [{ q: "", a: "" }],
       );
 
@@ -499,9 +501,9 @@ export default function CreateDigitalProduct({
         : [];
 
       const deliveryFormat = listing?.details?.delivery_format
-        ? (Array.isArray(listing.details.delivery_format) 
-            ? listing.details.delivery_format 
-            : String(listing.details.delivery_format).split(",").map((s) => s.trim()).filter(Boolean))
+        ? (Array.isArray(listing.details.delivery_format)
+          ? listing.details.delivery_format
+          : String(listing.details.delivery_format).split(",").map((s) => s.trim()).filter(Boolean))
         : [];
 
       setPkg((prev) => ({
@@ -610,24 +612,22 @@ export default function CreateDigitalProduct({
 
       Swal.fire({
         icon: "success",
-        title: isEditMode ? "Updated!" : "Saved!",
-        text:
-          res?.message ||
-          (isEditMode
-            ? "Listing updated successfully"
-            : "Listing saved successfully"),
+        title: status === "draft" ? "Draft Saved!" : (isEditMode ? "Updated!" : "Published!"),
+        text: status === "draft"
+          ? "Your listing has been saved to your drafts."
+          : (res?.message || (isEditMode ? "Listing updated successfully" : "Your product is now live!")),
         background: "#0b0b0b",
         color: "#ffffff",
         iconColor: "#CEFF1B",
         confirmButtonColor: "#CEFF1B",
-        confirmButtonText: "<span style='color:#000;font-weight:700'>Go to My Listings</span>",
+        confirmButtonText: `<span style="color:#000;font-weight:700">${status === "draft" ? "OK" : "Go to My Listings"}</span>`,
         customClass: {
           popup: "swal-brand-popup",
           title: "swal-brand-title",
           confirmButton: "swal-brand-confirm",
         },
       }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && status !== "draft") {
           navigate("/my-listings");
         }
       });
@@ -658,9 +658,8 @@ export default function CreateDigitalProduct({
       />
 
       <div
-        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${
-          isModalOpen ? "blur-sm pointer-events-none select-none" : ""
-        }`}
+        className={`pt-[85px] flex relative z-10 transition-all duration-300 ${isModalOpen ? "blur-sm pointer-events-none select-none" : ""
+          }`}
       >
         <Sidebar
           expanded={sidebarOpen}
@@ -935,52 +934,93 @@ export default function CreateDigitalProduct({
 
                     <div className="sp-field mt-4">
                       <label className="sp-label">What's included</label>
-                      <div className="sp-toolsRow">
-                        <input
-                          className="sp-input"
-                          value={includedInput}
-                          onChange={(e) => setIncludedInput(e.target.value)}
-                          onKeyDown={(e) => onEnterAdd(e, addIncluded)}
-                          placeholder="eg., Source file, Commercial License"
-                        />
-                        <button
-                          type="button"
-                          className="sp-addBtnRight"
-                          onClick={addIncluded}
-                        >
-                          + Add
-                        </button>
-                      </div>
-
                       {!!current.included?.length && (
-                        <ul className="included-bullet-list">
-                          {current.included.map((x, idx) => (
-                            <li key={`${x}-${idx}`} className="included-bullet-item">
-                              <span className="included-bullet-dot">•</span>
-                              <span className="included-bullet-text">{x}</span>
-                              <button
-                                type="button"
-                                className="included-bullet-del"
-                                onClick={() => removeFromList("included", idx)}
-                                aria-label="Remove"
-                              >
-                                ×
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
+                        <div className="included-bullet-wrap">
+                          <ul className="included-bullet-list">
+                            {current.included.map((x, idx) => (
+                              <li key={`${x}-${idx}`} className="included-bullet-item">
+                                <span className="included-bullet-dot">•</span>
+                                <span className="included-bullet-text">{x}</span>
+                                <button
+                                  type="button"
+                                  className="included-bullet-del"
+                                  onClick={() => removeFromList("included", idx)}
+                                  aria-label="Remove"
+                                >
+                                  ×
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+
+                          <div className="sp-toolsRow mt-3">
+                            <input
+                              className="sp-input"
+                              value={includedInput}
+                              onChange={(e) => setIncludedInput(e.target.value)}
+                              onKeyDown={(e) => onEnterAdd(e, addIncluded)}
+                              placeholder="eg., Source file, Commercial License"
+                            />
+                            <button
+                              type="button"
+                              className="sp-addBtnRight"
+                              onClick={addIncluded}
+                            >
+                              + Add
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {!current.included?.length && (
+                        <div className="sp-toolsRow">
+                          <input
+                            className="sp-input"
+                            value={includedInput}
+                            onChange={(e) => setIncludedInput(e.target.value)}
+                            onKeyDown={(e) => onEnterAdd(e, addIncluded)}
+                            placeholder="eg., Source file, Commercial License"
+                          />
+                          <button
+                            type="button"
+                            className="sp-addBtnRight"
+                            onClick={addIncluded}
+                          >
+                            + Add
+                          </button>
+                        </div>
                       )}
                     </div>
 
                     <div className="sp-field mt-4">
                       <label className="sp-label">Delivery format</label>
                       <div className="sp-toolsRow">
+                        <div className="csl-selectWrap flex-1">
+                          <CustomSelect
+                            value={""}
+                            onChange={(val) => {
+                              if (!val) return;
+                              const current_df = pkg[activeTab].deliveryFormat || [];
+                              if (!current_df.includes(val)) {
+                                setPkg(p => ({
+                                  ...p,
+                                  [activeTab]: {
+                                    ...p[activeTab],
+                                    deliveryFormat: [...current_df, val]
+                                  }
+                                }));
+                              }
+                            }}
+                            options={STANDARD_FORMATS}
+                            placeholder="Select format..."
+                          />
+                        </div>
                         <input
-                          className="sp-input"
+                          className="sp-input ml-2"
                           value={deliveryFormatInput}
                           onChange={(e) => setDeliveryFormatInput(e.target.value)}
                           onKeyDown={(e) => onEnterAdd(e, addDeliveryFormat)}
-                          placeholder="eg., PDF, Figma, ZIP Download"
+                          placeholder="or type custom format..."
                         />
                         <button
                           type="button"
@@ -1028,17 +1068,17 @@ export default function CreateDigitalProduct({
                   <h3 className="am-title" style={{ marginTop: 0 }}>
                     Cover Pages
                   </h3>
-                  <p className="csl-label" style={{marginBottom:'8px',opacity:.7}}>Upload up to 9 images — first image is the primary cover.</p>
+                  <p className="csl-label" style={{ marginBottom: '8px', opacity: .7 }}>Upload up to 9 images — first image is the primary cover.</p>
                   <div className="am-uploadBox">
                     {coverImages.length > 0 ? (
                       <>
                         {/* Slider Preview */}
-                        <div className="am-cover-slider" style={{position:'relative',width:'100%'}}>
+                        <div className="am-cover-slider" style={{ position: 'relative', width: '100%' }}>
                           <img
                             src={coverImages[coverSlideIdx]}
                             alt={`cover ${coverSlideIdx + 1}`}
                             className="am-preview"
-                            style={{display:'block'}}
+                            style={{ display: 'block' }}
                           />
                           {coverImages.length > 1 && (
                             <>
@@ -1086,8 +1126,8 @@ export default function CreateDigitalProduct({
                           title="Change cover images"
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                           Change
                         </button>
@@ -1296,9 +1336,8 @@ function CustomSelect({
 
   return (
     <div
-      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${
-        disabled ? "opacity-50 pointer-events-none" : ""
-      }`}
+      className={`onboarding-custom-select size-phone ${open ? "active" : ""} ${disabled ? "opacity-50 pointer-events-none" : ""
+        }`}
       ref={ref}
     >
       <div
@@ -1336,27 +1375,63 @@ function CustomSelect({
 function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
   const fileRef = useRef(null);
   const [files, setFiles] = useState(initialFiles);
+  const [previews, setPreviews] = useState([]);
   const activeIndexRef = useRef(null);
+
+  // Initialize previews from initialFiles
+  React.useEffect(() => {
+    const urls = initialFiles.map(f => {
+      if (f instanceof File) return URL.createObjectURL(f);
+      if (typeof f === 'string') return f;
+      return null;
+    });
+    setPreviews(urls);
+
+    return () => {
+      urls.forEach(u => {
+        if (typeof u === 'string' && u.startsWith('blob:')) URL.revokeObjectURL(u);
+      });
+    };
+  }, [initialFiles]);
 
   const handleFiles = (e) => {
     const newFiles = Array.from(e.target.files);
     if (!newFiles.length) return;
 
     if (activeIndexRef.current !== null) {
-      const next = [...files];
-      next[activeIndexRef.current] = newFiles[0];
-      setFiles(next);
+      const idx = activeIndexRef.current;
+      const nextFiles = [...files];
+      const nextPreviews = [...previews];
+
+      // Cleanup old blob if needed
+      if (typeof nextPreviews[idx] === 'string' && nextPreviews[idx].startsWith('blob:')) {
+        URL.revokeObjectURL(nextPreviews[idx]);
+      }
+
+      nextFiles[idx] = newFiles[0];
+      nextPreviews[idx] = URL.createObjectURL(newFiles[0]);
+
+      setFiles(nextFiles);
+      setPreviews(nextPreviews);
       activeIndexRef.current = null;
     } else {
-      const combined = [...files, ...newFiles].slice(0, 9);
-      setFiles(combined);
+      const remainingSlots = 9 - files.length;
+      const filesToAdd = newFiles.slice(0, remainingSlots);
+      const newUrls = filesToAdd.map(f => URL.createObjectURL(f));
+
+      setFiles(prev => [...prev, ...filesToAdd]);
+      setPreviews(prev => [...prev, ...newUrls]);
     }
     e.target.value = "";
   };
 
   const removeFile = (idx, e) => {
     e.stopPropagation();
-    setFiles(files.filter((_, i) => i !== idx));
+    if (typeof previews[idx] === 'string' && previews[idx].startsWith('blob:')) {
+      URL.revokeObjectURL(previews[idx]);
+    }
+    setFiles(p => p.filter((_, i) => i !== idx));
+    setPreviews(p => p.filter((_, i) => i !== idx));
   };
 
   return (
@@ -1378,13 +1453,12 @@ function UploadGrid({ onSelect, onBack, blurred, initialFiles = [] }) {
 
         <div className="am-upload-grid">
           {[...Array(9)].map((_, i) => {
-            const file = files[i];
-            const url = file ? URL.createObjectURL(file) : null;
+            const url = previews[i];
 
             return (
               <div
                 key={i}
-                className={`am-grid-slot ${file ? "has-file" : ""}`}
+                className={`am-grid-slot ${url ? "has-file" : ""}`}
                 onClick={() => {
                   activeIndexRef.current = i;
                   fileRef.current?.click();

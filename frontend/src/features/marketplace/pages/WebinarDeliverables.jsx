@@ -180,7 +180,7 @@ const WebinarDeliverables = ({ theme, setTheme }) => {
                                     </div>
                                     <div className="wd-schedule-info">
                                         <span className="wd-label">Time zone</span>
-                                        <span className="wd-value">Asia/Kolkata (IST)</span>
+                                        <span className="wd-value">UTC (Coordinated Universal Time)</span>
                                     </div>
                                 </div>
                             </div>

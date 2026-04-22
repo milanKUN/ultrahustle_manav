@@ -29,20 +29,17 @@ const DeliverablesSection = ({
     setIsDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
     if (droppedFiles.length > 0) {
-      // We pass the first file for simplicity if the handler expects one, 
-      // or all files if it can handle them. 
-      // Most of our handlers take a single file and we have an "Add more" button.
-      onUpdateDeliverableFile(deliverables.length, droppedFiles[0]);
+      droppedFiles.forEach(file => {
+        onAddDeliverable(file);
+      });
     }
   };
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
     if (selectedFiles.length > 0) {
-      selectedFiles.forEach((file, idx) => {
-          // If we have empty slots, fill them. Otherwise add new.
-          // For simplicity, let's just add them one by one.
-          onAddDeliverable(file);
+      selectedFiles.forEach((file) => {
+        onAddDeliverable(file);
       });
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
