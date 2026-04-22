@@ -591,25 +591,19 @@ const CourseListing = ({ theme, setTheme }) => {
                           <span className="cl-pmc-name">
                             {creator?.full_name || creator?.name || username}
                           </span>
-                          {creator?.is_verified && <img src="/verified-badge.svg" alt="Verified" className="cl-pmc-verified-icon" style={{ width: 16, height: 16 }} />}
-                          {listing?.ai_powered && (
-                            <div className="cl-ai-powered-badge">
-                              <Zap size={14} fill="black" />
-                              AI POWERED
-                            </div>
-                          )}
+                          <div className="cl-pmc-online-badge">
+                            <div className="cl-pmc-online-dot"></div>
+                            <span>Online</span>
+                          </div>
+                        </div>
+                        <div className="cl-pmc-meta">
+                          <Clock size={14} />
+                          <span>Avg response: {creator?.avg_response || "1 hour"}</span>
                         </div>
                         <div className="cl-pmc-role-row">
                           <span className="cl-pmc-role">
                             {creator?.title || "Creator"}
                           </span>
-                          {creator?.rating && (
-                            <div className="cl-pmc-rating">
-                              <span className="cl-pmc-star">★</span>
-                              <span className="cl-pmc-rating-val">{creator.rating}</span>
-                              <span className="cl-pmc-rev-count">({creator.reviews_count || 0} reviews)</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
