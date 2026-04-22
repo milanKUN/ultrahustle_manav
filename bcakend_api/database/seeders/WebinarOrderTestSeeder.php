@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class WebinarOrderTestSeeder extends Seeder
@@ -19,44 +18,25 @@ class WebinarOrderTestSeeder extends Seeder
 
             /*
             |--------------------------------------------------------------------------
-            | 1) USERS
+            | 1) USE EXISTING USERS ONLY
+            |--------------------------------------------------------------------------
+            | IMPORTANT:
+            | Set these to real existing user IDs from your database.
+            | Do NOT use non-existing IDs.
             |--------------------------------------------------------------------------
             */
-            $clientId = 101;
-            $creatorId = 102;
+            $clientId = 1;   // change this to your logged-in client user id
+            $creatorId = 2;  // change this to an existing creator user id
 
-            if (Schema::hasTable('users')) {
-                $this->upsertUser([
-                    'id' => $clientId,
-                    'username' => 'clientdemo',
-                    'uh_user_id' => 'uh-8177-2455654',
-                    'full_name' => 'Client Demo',
-                    'name' => 'Client Demo',
-                    'email' => 'clientdemo@example.com',
-                    'password' => Hash::make('password123'),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+            $clientExists = DB::table('users')->where('id', $clientId)->exists();
+            $creatorExists = DB::table('users')->where('id', $creatorId)->exists();
 
-                $this->upsertUser([
-                    'id' => $creatorId,
-                    'username' => 'creatorwebinar',
-                    'uh_user_id' => 'uh-8177-24557888',
-                    'full_name' => 'Webinar Creator',
-                    'name' => 'Webinar Creator',
-                    'email' => 'creatorwebinar@example.com',
-                    'password' => Hash::make('password123'),
-                    'bio' => 'Experienced webinar creator focused on product design systems and workflow improvement.',
-                    'about' => 'Experienced webinar creator focused on product design systems and workflow improvement.',
-                    'location' => 'India',
-                    'rating' => 4.9,
-                    'review_count' => 48,
-                    'karma' => 1200,
-                    'projects_completed' => 87,
-                    'avg_response' => '1 hour',
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+            if (!$clientExists) {
+                throw new \Exception("Client user with id {$clientId} does not exist.");
+            }
+
+            if (!$creatorExists) {
+                throw new \Exception("Creator user with id {$creatorId} does not exist.");
             }
 
             /*
@@ -93,9 +73,9 @@ class WebinarOrderTestSeeder extends Seeder
             |--------------------------------------------------------------------------
             | 3) WEBINAR DETAILS
             |--------------------------------------------------------------------------
-            | Change the date below to test:
-            | - future date => upcoming/live state
-            | - past date   => delivered session tracking state
+            | Change date for testing:
+            | - future date => upcoming webinar state
+            | - past date   => delivered session state
             |--------------------------------------------------------------------------
             */
             $webinarDate = Carbon::now()->addDays(5)->format('Y-m-d');
@@ -209,10 +189,9 @@ class WebinarOrderTestSeeder extends Seeder
                     ->delete();
 
                 $faqColumns = Schema::getColumnListing('listing_faqs');
-
                 $rows = [];
 
-                if (in_array('question', $faqColumns) && in_array('answer', $faqColumns)) {
+                if (in_array('question', $faqColumns, true) && in_array('answer', $faqColumns, true)) {
                     $rows = [
                         [
                             'id' => 501,
@@ -231,7 +210,7 @@ class WebinarOrderTestSeeder extends Seeder
                             'updated_at' => $now,
                         ],
                     ];
-                } elseif (in_array('q', $faqColumns) && in_array('a', $faqColumns)) {
+                } elseif (in_array('q', $faqColumns, true) && in_array('a', $faqColumns, true)) {
                     $rows = [
                         [
                             'id' => 501,
@@ -281,28 +260,28 @@ class WebinarOrderTestSeeder extends Seeder
                     'updated_at' => $now,
                 ];
 
-                if (in_array('quantity', $orderColumns)) {
+                if (in_array('quantity', $orderColumns, true)) {
                     $orderData['quantity'] = 1;
                 }
-                if (in_array('subtotal', $orderColumns)) {
+                if (in_array('subtotal', $orderColumns, true)) {
                     $orderData['subtotal'] = 49.00;
                 }
-                if (in_array('service_fee', $orderColumns)) {
+                if (in_array('service_fee', $orderColumns, true)) {
                     $orderData['service_fee'] = 2.00;
                 }
-                if (in_array('total_amount', $orderColumns)) {
+                if (in_array('total_amount', $orderColumns, true)) {
                     $orderData['total_amount'] = 51.00;
                 }
-                if (in_array('currency', $orderColumns)) {
+                if (in_array('currency', $orderColumns, true)) {
                     $orderData['currency'] = 'USD';
                 }
-                if (in_array('payment_status', $orderColumns)) {
+                if (in_array('payment_status', $orderColumns, true)) {
                     $orderData['payment_status'] = 'paid';
                 }
-                if (in_array('order_type', $orderColumns)) {
+                if (in_array('order_type', $orderColumns, true)) {
                     $orderData['order_type'] = 'webinar';
                 }
-                if (in_array('completed_at', $orderColumns)) {
+                if (in_array('completed_at', $orderColumns, true)) {
                     $orderData['completed_at'] = $now;
                 }
 
@@ -431,8 +410,8 @@ class WebinarOrderTestSeeder extends Seeder
             DB::commit();
 
             $this->command?->info('WebinarOrderTestSeeder completed successfully.');
-            $this->command?->info('Client user email: clientdemo@example.com');
-            $this->command?->info('Creator user email: creatorwebinar@example.com');
+            $this->command?->info("Client user id: {$clientId}");
+            $this->command?->info("Creator user id: {$creatorId}");
             $this->command?->info('Order ID: 601');
             $this->command?->info('Listing username: advanced-product-design-webinar');
         } catch (\Throwable $e) {
@@ -451,34 +430,6 @@ class WebinarOrderTestSeeder extends Seeder
             DB::table($table)->where('id', $data['id'])->update($updateData);
         } else {
             DB::table($table)->insert($data);
-        }
-    }
-
-    private function upsertUser(array $data): void
-    {
-        if (!Schema::hasTable('users')) return;
-
-        $columns = Schema::getColumnListing('users');
-        $filtered = [];
-
-        foreach ($data as $key => $value) {
-            if (in_array($key, $columns, true)) {
-                $filtered[$key] = $value;
-            }
-        }
-
-        if (!isset($filtered['id'])) {
-            return;
-        }
-
-        $exists = DB::table('users')->where('id', $filtered['id'])->exists();
-
-        if ($exists) {
-            $updateData = $filtered;
-            unset($updateData['id']);
-            DB::table('users')->where('id', $filtered['id'])->update($updateData);
-        } else {
-            DB::table('users')->insert($filtered);
         }
     }
 }
