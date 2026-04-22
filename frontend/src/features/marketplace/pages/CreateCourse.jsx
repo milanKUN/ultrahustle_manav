@@ -433,7 +433,8 @@ export default function CreateCourse({
 
   const validateBeforeSave = () => {
     const price = Number(form.price);
-    if (isNaN(price) || price < 1 || price > 9999) return "Price must be between $1 and $9,999.";
+    if (isNaN(price)) return "Please enter a valid price in numbers.";
+    // if (isNaN(price) || price < 1 || price > 9999) return "Price must be between $1 and $9,999.";
     if (!String(form.shortDescription || "").trim()) return "Short description is required.";
     if (String(form.shortDescription || "").length > 500) return "Short description must be under 500 characters.";
     return "";
