@@ -246,9 +246,9 @@ const WebinarListing = ({ theme, setTheme }) => {
     creatorUsername: item?.creator_username || "",
     image: toMediaUrl(
       item?.cover_media_url ||
-        item?.cover_media_path ||
-        item?.cover ||
-        "",
+      item?.cover_media_path ||
+      item?.cover ||
+      "",
     ),
     title: item?.title || "Untitled Listing",
     type:
@@ -372,7 +372,7 @@ const WebinarListing = ({ theme, setTheme }) => {
               <div className="cl-header">
                 <h1 className="cl-title">{listing?.title || "Webinar"}</h1>
                 <div className="cl-header-actions">
-                  <button 
+                  <button
                     className="cl-icon-btn"
                     title="Share"
                     onClick={() => {
@@ -391,7 +391,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                   >
                     <Share2 size={20} />
                   </button>
-                  <button 
+                  <button
                     className="cl-icon-btn"
                     title="Report"
                     onClick={() => {
@@ -507,7 +507,17 @@ const WebinarListing = ({ theme, setTheme }) => {
                   <div className="cl-profile-mini-card">
                     <div className="cl-pmc-left">
                       <div className="cl-pmc-avatar-wrap">
-                        <div className="cl-pmc-avatar-bg"></div>
+                        <div className="cl-pmc-avatar-bg">
+                          {creator?.avatar_url ? (
+                            <img
+                              src={creator?.avatar_url}
+                              alt={creator?.full_name || "Profile"}
+                              className="cl-pmc-avatar-bg"
+                            />
+                          ) : (
+                            <div className="cl-pmc-avatar-bg"></div>
+                          )}
+                        </div>
                         <div className="cl-pmc-status-dot"></div>
                       </div>
                       <div className="cl-pmc-info">
@@ -561,7 +571,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                       <p>No learning points added yet.</p>
                     )}
                   </div>
-                  
+
                   <div className="cl-section">
                     <h2>Key Outcomes</h2>
                     <div className="cl-tools-list">
@@ -631,7 +641,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                   </div>
 
                   <div className="ticket-actions-group">
-                    <button 
+                    <button
                       className="btn-get-ticket"
                       onClick={() => {
                         Swal.fire({
@@ -649,14 +659,14 @@ const WebinarListing = ({ theme, setTheme }) => {
                       Get ticket
                     </button>
 
-                    <button 
+                    <button
                       className="btn-add-calendar"
                       onClick={() => {
                         const title = listing?.title || "Webinar";
                         const description = listing?.short_description || "";
                         const dateStr = webinarDetails?.schedule_date || ""; // YYYY-MM-DD
                         const timeStr = webinarDetails?.schedule_start_time || ""; // HH:mm
-                        
+
                         if (!dateStr || !timeStr) {
                           Swal.fire({
                             icon: 'error',
@@ -696,7 +706,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-                        
+
                         Swal.fire({
                           toast: true,
                           position: "top-end",
@@ -946,8 +956,8 @@ const WebinarListing = ({ theme, setTheme }) => {
                         <div key={star} className="rating-bar-row">
                           <span className="rating-label">{star}</span>
                           <div className="rating-bar">
-                            <div 
-                              className="rating-bar-fill" 
+                            <div
+                              className="rating-bar-fill"
                               style={{ width: star === 5 ? "85%" : star === 4 ? "10%" : "2%" }}
                             ></div>
                           </div>
@@ -971,7 +981,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                         <span className="review-date">2 weeks ago</span>
                       </div>
                       <p className="review-text">
-                        Excellent webinar! The information was top-notch and it saved me hours of research. 
+                        Excellent webinar! The information was top-notch and it saved me hours of research.
                         Highly recommended for anyone looking for professional insights.
                       </p>
                     </div>
@@ -989,7 +999,7 @@ const WebinarListing = ({ theme, setTheme }) => {
                         <span className="review-date">1 month ago</span>
                       </div>
                       <p className="review-text">
-                        Great value for money. Some minor issues with the connection but the 
+                        Great value for money. Some minor issues with the connection but the
                         creator was very helpful in resolving them.
                       </p>
                     </div>
@@ -1125,9 +1135,9 @@ const WebinarListing = ({ theme, setTheme }) => {
               </button>
 
               <div className="cl-modal-img-container">
-                <img 
-                  src={galleryImages[modalImgIndex]} 
-                  alt={listing?.title} 
+                <img
+                  src={galleryImages[modalImgIndex]}
+                  alt={listing?.title}
                   className="cl-modal-main-img"
                 />
               </div>
