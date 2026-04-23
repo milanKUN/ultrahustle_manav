@@ -77,6 +77,42 @@ const ServiceListing = ({ theme, setTheme }) => {
         ? listing?.team?.bio || listing?.team?.about || ""
         : listing?.creator?.bio || listing?.creator?.about || "";
 
+    const displayLocation = isTeamListing
+        ? listing?.team?.location || ""
+        : listing?.creator?.location || "";
+
+    const displayRating = isTeamListing
+        ? listing?.team?.rating || 0
+        : listing?.creator?.rating || 0;
+
+    const displayReviewCount = isTeamListing
+        ? listing?.team?.review_count || 0
+        : listing?.creator?.review_count || 0;
+
+    const displayLanguages = isTeamListing
+        ? listing?.team?.languages || []
+        : listing?.creator?.languages || [];
+
+    const displaySkills = isTeamListing
+        ? listing?.team?.skills || []
+        : listing?.creator?.skills || listing?.tags || [];
+
+    const displayMemberSince = isTeamListing
+        ? listing?.team?.created_at || ""
+        : listing?.creator?.created_at || listing?.creator?.member_since || "";
+
+    const displayKarma = isTeamListing
+        ? listing?.team?.karma || "—"
+        : listing?.creator?.karma || "—";
+
+    const displayProjectsCompleted = isTeamListing
+        ? listing?.team?.projects_completed || "—"
+        : listing?.creator?.projects_completed || "—";
+
+    const displayResponseSpeed = isTeamListing
+        ? listing?.team?.avg_response || listing?.team?.response_speed || "—"
+        : listing?.creator?.avg_response || listing?.creator?.response_speed || "—";
+
     const profileRoute = isTeamListing
         ? listing?.team?.username || listing?.team_name
         : listing?.creator?.username || listing?.creator_username || listingusername;
@@ -1226,20 +1262,16 @@ const ServiceListing = ({ theme, setTheme }) => {
                                     <DetailedTeamCard
                                         teamName={displayOwnerName}
                                         avatarUrl={displayAvatar}
-                                        location={listing?.creator?.location || ""}
-                                        rating={listing?.creator?.rating || 0}
-                                        reviewCount={listing?.creator?.review_count || 0}
+                                        location={displayLocation}
+                                        rating={displayRating}
+                                        reviewCount={displayReviewCount}
                                         description={displayBio}
-                                        languages={listing?.creator?.languages || []}
-                                        skills={listing?.creator?.skills || listing?.tags || []}
-                                        memberSince={listing?.creator?.created_at || listing?.creator?.member_since || ""}
-                                        karma={listing?.creator?.karma || "—"}
-                                        projectsCompleted={listing?.creator?.projects_completed || "—"}
-                                        responseSpeed={
-                                            listing?.creator?.avg_response ||
-                                            listing?.creator?.response_speed ||
-                                            "—"
-                                        }
+                                        languages={displayLanguages}
+                                        skills={displaySkills}
+                                        memberSince={displayMemberSince}
+                                        karma={displayKarma}
+                                        projectsCompleted={displayProjectsCompleted}
+                                        responseSpeed={displayResponseSpeed}
                                         buttonText={isTeamListing ? "View Team" : "View Profile"}
                                         onViewProfile={() => navigate(`${profileBasePath}/${profileRoute}`)}
                                     />
