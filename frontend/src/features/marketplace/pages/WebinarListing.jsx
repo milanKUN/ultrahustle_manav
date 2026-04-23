@@ -1025,7 +1025,17 @@ const WebinarListing = ({ theme, setTheme }) => {
                       <div className="cl-mp-cardBody">
                         <div className="cl-mp-topLine">
                           <div className="cl-mp-user">
-                            <div className="cl-mp-avatar"></div>
+                            <div className="cl-mp-avatar">
+                              {p?.creator_avatar_url ? (
+                                <img
+                                  src={p?.creator_avatar_url}
+                                  alt={p?.creator_name || "Profile"}
+                                  className="cl-pmc-avatar-bg"
+                                />
+                              ) : (
+                                <div className="cl-pmc-avatar-bg"></div>
+                              )}
+                            </div>
                             <span className="cl-mp-userName">
                               {p.creatorUsername || p.listingUsername}
                             </span>
