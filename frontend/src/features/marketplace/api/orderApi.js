@@ -84,3 +84,12 @@ export const getOrderService = async (orderId) => {
         throw new Error(extractErrorMessage(err));
     }
 };
+
+export const toggleOrderCourseLesson = async (orderId, lessonId) => {
+    try {
+        const res = await api.post(`/api/orders/${orderId}/course/lessons/${lessonId}/toggle`);
+        return unwrap(res);
+    } catch (err) {
+        throw new Error(extractErrorMessage(err));
+    }
+};
