@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PublicUserController;
 use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\Api\OrderWebinarController;
 use App\Http\Controllers\Api\OrderCourseController;
+use App\Http\Controllers\Api\OrderDigitalProductController;
 
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -177,4 +178,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/{orderId}/course', [OrderCourseController::class, 'show']);
     Route::post('/orders/{orderId}/course/lessons/{lessonId}/toggle', [OrderCourseController::class, 'toggleLesson']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/orders/{orderId}/digital-product', [OrderDigitalProductController::class, 'show']);
 });
