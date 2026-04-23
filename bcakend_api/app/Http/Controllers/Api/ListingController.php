@@ -1719,7 +1719,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'users.username as creator_username',
                 'users.full_name as creator_name',
                 'user_personal_info.avatar_path',
-                'user_personal_info.avatar_url',
+                'user_personal_info.avatar_filename',
             ])
             ->map(fn ($row) => [
                 'id' => $row->id,
@@ -1734,7 +1734,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'creator_name' => $row->creator_name,
                 'creator_avatar_url' => !empty($row->avatar_path)
                     ? Storage::disk('public')->url($row->avatar_path)
-                    : (!empty($row->avatar_url) ? $row->avatar_url : null),
+                    : (!empty($row->avatar_filename) ? $row->avatar_filename : null),
             ])
             ->values()
             ->all();
@@ -1759,7 +1759,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'users.username as creator_username',
                 'users.full_name as creator_name',
                 'user_personal_info.avatar_path',
-                'user_personal_info.avatar_url',
+                'user_personal_info.avatar_filename',
             ])
             ->map(fn ($row) => [
                 'id' => $row->id,
@@ -1774,7 +1774,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 'creator_name' => $row->creator_name,
                 'creator_avatar_url' => !empty($row->avatar_path)
                     ? Storage::disk('public')->url($row->avatar_path)
-                    : (!empty($row->avatar_url) ? $row->avatar_url : null),
+                    : (!empty($row->avatar_filename) ? $row->avatar_filename : null),
             ])
             ->values()
             ->all();
