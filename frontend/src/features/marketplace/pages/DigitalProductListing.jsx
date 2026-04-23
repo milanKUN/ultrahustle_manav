@@ -14,6 +14,7 @@ import {
   X,
   Star,
   Award,
+  Zap
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "./DigitalProductListing.css";
@@ -264,9 +265,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
     creatorUsername: item?.creator_username || "",
     image: toMediaUrl(
       item?.cover_media_url ||
-        item?.cover_media_path ||
-        item?.cover ||
-        "",
+      item?.cover_media_path ||
+      item?.cover ||
+      "",
     ),
     title: item?.title || "Untitled Listing",
     type:
@@ -382,7 +383,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                   )}
                 </div>
                 <div className="tsl-header-actions">
-                  <button 
+                  <button
                     className="tsl-icon-btn"
                     title="Share"
                     onClick={() => {
@@ -401,7 +402,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                   >
                     <Share2 size={20} />
                   </button>
-                  <button 
+                  <button
                     className="tsl-icon-btn"
                     title="Report"
                     onClick={() => {
@@ -586,7 +587,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                     <h2>Description</h2>
                     <p>{listing?.short_description || listing?.about || "No description added yet."}</p>
 
-                    
+
 
                     <div className="tsl-tech-section">
                       <h4 className="tsl-detail-title">Tools & Technologies</h4>
@@ -651,7 +652,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                       )}
                     </div>
 
-                    
+
 
                     <div className="tsl-pricing-actions">
                       <button className="tsl-btn-primary">Buy now</button>
@@ -1039,8 +1040,8 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                         <div key={star} className="rating-bar-row">
                           <span className="rating-label">{star}</span>
                           <div className="rating-bar">
-                            <div 
-                              className="rating-bar-fill" 
+                            <div
+                              className="rating-bar-fill"
                               style={{ width: star === 5 ? "85%" : star === 4 ? "10%" : "2%" }}
                             ></div>
                           </div>
@@ -1064,7 +1065,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                         <span className="review-date">2 weeks ago</span>
                       </div>
                       <p className="review-text">
-                        Excellent product! The quality is top-notch and it saved me hours of work. 
+                        Excellent product! The quality is top-notch and it saved me hours of work.
                         Highly recommended for anyone looking for professional assets.
                       </p>
                     </div>
@@ -1082,7 +1083,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
                         <span className="review-date">1 month ago</span>
                       </div>
                       <p className="review-text">
-                        Great value for money. Some minor issues with the documentation but the 
+                        Great value for money. Some minor issues with the documentation but the
                         creator was very helpful in resolving them.
                       </p>
                     </div>
@@ -1246,9 +1247,9 @@ const DigitalProductListing = ({ theme, setTheme }) => {
               </button>
 
               <div className="tsl-modal-img-container">
-                <img 
-                  src={galleryImages[modalImgIndex]} 
-                  alt={listing?.title} 
+                <img
+                  src={galleryImages[modalImgIndex]}
+                  alt={listing?.title}
                   className="tsl-modal-main-img"
                 />
               </div>
