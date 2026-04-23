@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class ListingController extends Controller
 {
@@ -217,11 +218,13 @@ class ListingController extends Controller
             ]);
         }
 
+        Log::info('Deliverables store hit', ['deliverables' => $request->input('deliverables')]);
         foreach (($request->input('deliverables', []) ?? []) as $index => $deliverableInput) {
             $file = $request->file("deliverables.$index.file");
             $notes = trim((string) ($deliverableInput['notes'] ?? ''));
+            $existingFileUrl = trim((string) ($deliverableInput['existing_file_url'] ?? ''));
 
-            if (!$file && $notes === '') continue;
+            if (!$file && $notes === '' && $existingFileUrl === '') continue;
 
             $filePath = null;
             $fileName = null;
@@ -233,7 +236,20 @@ class ListingController extends Controller
                 $fileName = $file->getClientOriginalName();
                 $fileMime = $file->getMimeType();
                 $fileSize = $file->getSize();
+            } elseif ($existingFileUrl !== '') {
+                $path = str_replace(url('storage') . '/', '', $existingFileUrl);
+                $path = str_replace(Storage::disk('public')->url(''), '', $path);
+                $path = str_replace('/storage/', '', $path);
+
+                if ($path !== '' && Storage::disk('public')->exists($path)) {
+                    $filePath = $path;
+                    $fileName = trim((string) ($deliverableInput['existing_file_name'] ?? basename($path)));
+                    $fileSize = isset($deliverableInput['file_size']) ? (int) $deliverableInput['file_size'] : Storage::disk('public')->size($path);
+                    $fileMime = Storage::disk('public')->mimeType($path);
+                }
             }
+
+            if (!$filePath && $notes === '') continue;
 
             DB::table('listing_deliverables')->insert([
                 'listing_id' => $listingId,
@@ -882,6 +898,7 @@ public function updateListing(Request $request, string $username): JsonResponse
                 ->where('listing_id', $existing->id)
                 ->delete();
 
+            Log::info('Deliverables update hit', ['deliverables' => $request->input('deliverables')]);
             foreach (($request->input('deliverables', []) ?? []) as $index => $deliverableInput) {
                 $file = $request->file("deliverables.$index.file");
                 $notes = trim((string) ($deliverableInput['notes'] ?? ''));
@@ -904,9 +921,9 @@ public function updateListing(Request $request, string $username): JsonResponse
 
                     if ($path !== '' && Storage::disk('public')->exists($path)) {
                         $filePath = $path;
-                        $fileName = basename($path);
+                        $fileName = trim((string) ($deliverableInput['existing_file_name'] ?? basename($path)));
+                        $fileSize = isset($deliverableInput['file_size']) ? (int) $deliverableInput['file_size'] : Storage::disk('public')->size($path);
                         $fileMime = Storage::disk('public')->mimeType($path);
-                        $fileSize = Storage::disk('public')->size($path);
                     }
                 }
 

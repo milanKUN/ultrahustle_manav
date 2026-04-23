@@ -154,8 +154,8 @@ export default function CreateWebinar({
       notes: d.notes || "",
       existing_file_name: d.file_name || d.name || "",
       existing_file_url: d.file_url || d.url || "",
-      name: d.file_name || d.name || "",
-      size: d.file_size || d.size || "",
+      file_name: d.file_name || d.name || "",
+      file_size: d.file_size || d.size || 0,
     }));
   };
 
@@ -546,6 +546,8 @@ export default function CreateWebinar({
         file: d.file || null,
         notes: d.notes || "",
         existing_file_url: (d.existing_file_url || "").replace(/.*\/storage\//, ""),
+        existing_file_name: d.existing_file_name || d.file_name || "",
+        file_size: d.file_size || 0,
       })),
 
     details: {

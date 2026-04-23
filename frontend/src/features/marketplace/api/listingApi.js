@@ -160,6 +160,18 @@ const appendCommonListingFields = (formData, payload) => {
         `deliverables[${index}][existing_file_url]`,
         item.existing_file_url
       );
+      if (item.existing_file_name) {
+        formData.append(
+          `deliverables[${index}][existing_file_name]`,
+          item.existing_file_name
+        );
+      }
+      if (item.file_size) {
+        formData.append(
+          `deliverables[${index}][file_size]`,
+          item.file_size
+        );
+      }
     }
   });
 
