@@ -40,7 +40,9 @@ class OrderCourseController extends Controller
             ->first();
 
         $courseDetails = Schema::hasTable('course_listing_details')
-            ? DB::table('course_listing_details')->where('listing_id', $listing->id)->first()
+            ? DB::table('course_listing_details')
+                ->where('listing_id', $listing->id)
+                ->first()
             : null;
 
         $lessonRows = Schema::hasTable('course_listing_lessons')
@@ -62,6 +64,7 @@ class OrderCourseController extends Controller
         $faqRows = Schema::hasTable('listing_faqs')
             ? DB::table('listing_faqs')
                 ->where('listing_id', $listing->id)
+                ->orderBy('sort_order')
                 ->orderBy('id')
                 ->get()
             : collect();
@@ -81,19 +84,11 @@ class OrderCourseController extends Controller
                 ->first()
             : null;
 
-        $tools = [];
-        $languages = [];
-        $learningPoints = [];
-        $included = [];
-        $prerequisites = [];
-
-        if ($courseDetails) {
-            $tools = json_decode($courseDetails->tools_json ?? '[]', true) ?: [];
-            $languages = json_decode($courseDetails->languages_json ?? '[]', true) ?: [];
-            $learningPoints = json_decode($courseDetails->learning_points_json ?? '[]', true) ?: [];
-            $included = json_decode($courseDetails->included_json ?? '[]', true) ?: [];
-            $prerequisites = json_decode($courseDetails->prerequisites_json ?? '[]', true) ?: [];
-        }
+        $tools = $this->decodeJsonArray($listing->tools_json ?? null);
+        $languages = $this->decodeJsonArray($courseDetails->languages_json ?? null);
+        $learningPoints = $this->decodeJsonArray($courseDetails->learning_points_json ?? null);
+        $included = $this->decodeJsonArray($courseDetails->included_json ?? null);
+        $prerequisites = $this->decodeJsonArray($courseDetails->prerequisites_json ?? null);
 
         $lessons = $lessonRows->map(function ($row, $index) use ($progressMap) {
             $mediaUrl = null;
@@ -111,6 +106,9 @@ class OrderCourseController extends Controller
                 'description' => $row->description,
                 'media_type' => $row->media_type ?? 'video',
                 'media_url' => $mediaUrl,
+                'media_name' => $row->media_name ?? null,
+                'media_mime' => $row->media_mime ?? null,
+                'media_size' => $row->media_size ?? null,
                 'watched' => (bool)($progressMap[$row->id] ?? false),
             ];
         })->values()->all();
@@ -120,7 +118,7 @@ class OrderCourseController extends Controller
 
             if ($row->resource_type === 'link') {
                 $url = $row->external_url;
-            } elseif ($row->file_path) {
+            } elseif (!empty($row->file_path)) {
                 $url = Storage::disk('public')->url($row->file_path);
             }
 
@@ -129,9 +127,11 @@ class OrderCourseController extends Controller
                 'title' => $row->title,
                 'type' => $row->resource_type,
                 'url' => $url,
-                'size_label' => $row->file_size ? $this->formatBytes((int)$row->file_size) : '—',
+                'file_name' => $row->file_name,
+                'mime_type' => $row->mime_type,
+                'size_label' => $row->file_size ? $this->formatBytes((int) $row->file_size) : '—',
                 'updated_at_display' => $row->updated_at ? date('M d, Y', strtotime($row->updated_at)) : '—',
-                'tags' => json_decode($row->tags_json ?? '[]', true) ?: [],
+                'tags' => $this->decodeJsonArray($row->tags_json ?? null),
                 'note' => $row->note,
             ];
         })->values()->all();
@@ -162,24 +162,31 @@ class OrderCourseController extends Controller
             'avg_response' => $creator->avg_response ?? null,
         ];
 
-        $faqPayload = $faqRows->map(fn ($row) => [
-            'id' => $row->id,
-            'question' => $row->question ?? $row->q ?? '',
-            'answer' => $row->answer ?? $row->a ?? '',
-        ])->values()->all();
+        $faqPayload = $faqRows->map(function ($row) {
+            return [
+                'id' => $row->id,
+                'question' => $row->question ?? $row->q ?? '',
+                'answer' => $row->answer ?? $row->a ?? '',
+            ];
+        })->values()->all();
 
         $listingPayload = [
             'id' => $listing->id,
             'title' => $listing->title,
+            'username' => $listing->username ?? null,
+            'category' => $listing->category ?? null,
+            'sub_category' => $listing->sub_category ?? null,
             'short_description' => $listing->short_description,
             'about' => $listing->about,
-            'preview_video_url' => $previewVideoUrl,
+            'tags' => $this->decodeJsonArray($listing->tags_json ?? null),
             'tools' => $tools,
+            'preview_video_url' => $previewVideoUrl,
             'learning_points' => $learningPoints,
             'included' => $included,
             'prerequisites' => $prerequisites,
             'languages' => $languages,
             'course_level' => $courseDetails->course_level ?? null,
+            'product_type' => $courseDetails->product_type ?? null,
             'price' => $courseDetails->price ?? ($order->amount ?? $order->total_amount ?? 0),
         ];
 
@@ -252,6 +259,12 @@ class OrderCourseController extends Controller
             ], 404);
         }
 
+        if ((int) $lesson->listing_id !== (int) $order->listing_id) {
+            return response()->json([
+                'message' => 'Lesson does not belong to this order listing.'
+            ], 422);
+        }
+
         $existing = DB::table('order_course_lesson_progress')
             ->where('order_id', $order->id)
             ->where('lesson_id', $lessonId)
@@ -283,12 +296,32 @@ class OrderCourseController extends Controller
         ]);
     }
 
+    private function decodeJsonArray($value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_filter($value, fn ($item) => $item !== null && $item !== ''));
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                return array_values(array_filter($decoded, fn ($item) => $item !== null && $item !== ''));
+            }
+        }
+
+        return [];
+    }
+
     private function formatBytes(int $bytes): string
     {
-        if ($bytes <= 0) return '0 B';
+        if ($bytes <= 0) {
+            return '0 B';
+        }
+
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $power = (int) floor(log($bytes, 1024));
         $power = min($power, count($units) - 1);
+
         return round($bytes / (1024 ** $power), 2) . ' ' . $units[$power];
     }
 }
