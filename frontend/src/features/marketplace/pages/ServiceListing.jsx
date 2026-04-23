@@ -77,7 +77,11 @@ const ServiceListing = ({ theme, setTheme }) => {
         ? listing?.team?.bio || listing?.team?.about || ""
         : listing?.creator?.bio || listing?.creator?.about || "";
 
-    const profileRoute = listing?.creator?.username || listing?.creator_username || listingusername;
+    const profileRoute = isTeamListing
+        ? listing?.team?.username || listing?.team_name
+        : listing?.creator?.username || listing?.creator_username || listingusername;
+
+    const profileBasePath = isTeamListing ? "/public-team-profile" : "/public-user-profile";
 
     useEffect(() => {
         if (!listingusername) {
@@ -730,7 +734,7 @@ const ServiceListing = ({ theme, setTheme }) => {
 
                                                 <button
                                                     className="tsl-pmc-view-btn"
-                                                    onClick={() => navigate(`/public-user-profile/${profileRoute}`)}
+                                                    onClick={() => navigate(`${profileBasePath}/${profileRoute}`)}
                                                 >
                                                     View profile
                                                     <ChevronRight size={18} />
@@ -1237,7 +1241,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                                             "—"
                                         }
                                         buttonText={isTeamListing ? "View Team" : "View Profile"}
-                                        onViewProfile={() => navigate(`/public-user-profile/${profileRoute}`)}
+                                        onViewProfile={() => navigate(`${profileBasePath}/${profileRoute}`)}
                                     />
 
                                     <section className="faq-section">
