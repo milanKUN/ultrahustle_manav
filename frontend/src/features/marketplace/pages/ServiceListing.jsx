@@ -53,7 +53,7 @@ const ServiceListing = ({ theme, setTheme }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
 
-    const isAuthenticated = !!(localStorage.getItem("token") || localStorage.getItem("auth_token"));
+    const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
     useEffect(() => {
         if (!isAuthenticated) {

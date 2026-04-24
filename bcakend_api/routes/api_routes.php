@@ -156,6 +156,7 @@ Route::get('/v1/public/users/{username}/listings', [ListingController::class, 'g
 Route::get('/v1/public/marketplace/listings', [ListingController::class, 'getAllMarketplaceListings']);
 Route::get('/v1/public/marketplace/categories', [ListingController::class, 'getMarketplaceCategories']);
 Route::get('/v1/public/marketplace/languages', [ListingController::class, 'getLanguages']);
+Route::get('/v1/listings/{username}', [ListingController::class, 'showListingPublic']);
 Route::get('/v1/public/listings/{username}', [ListingController::class, 'showListingPublic']);
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/listings', [ListingController::class, 'store']);

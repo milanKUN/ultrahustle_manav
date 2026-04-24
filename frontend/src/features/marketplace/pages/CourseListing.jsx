@@ -30,7 +30,7 @@ import { getListingByUsername } from "../api/listingApi";
 import axios from "axios";
 
 // Fallback to get token from localStorage if authApi isn't exported correctly
-const getAuthToken = () => localStorage.getItem("token") || localStorage.getItem("auth_token");
+const getAuthToken = () => localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token");
 
 const toMediaUrl = (path = "") => {
   if (!path) return "";
@@ -107,7 +107,7 @@ const CourseListing = ({ theme, setTheme }) => {
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
 
-  const isAuthenticated = !!(localStorage.getItem("token") || localStorage.getItem("auth_token"));
+  const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
   useEffect(() => {
     if (!isAuthenticated) {

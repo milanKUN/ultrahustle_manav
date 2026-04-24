@@ -138,7 +138,7 @@ const AllListingPages = ({ theme, setTheme }) => {
     const [allListings, setAllListings] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const isAuthenticated = !!(localStorage.getItem("token") || localStorage.getItem("auth_token"));
+    const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
     useEffect(() => {
         if (!isAuthenticated) {

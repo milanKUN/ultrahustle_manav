@@ -52,7 +52,7 @@ export const getMyListings = async () => {
 
 export const getListingByUsername = async (username) => {
   try {
-    const res = await api.get(`/api/v1/public/listings/${encodeURIComponent(username)}`);
+    const res = await api.get(`/api/v1/listings/${encodeURIComponent(username)}`);
     return unwrap(res);
   } catch (err) {
     throw new Error(extractErrorMessage(err));

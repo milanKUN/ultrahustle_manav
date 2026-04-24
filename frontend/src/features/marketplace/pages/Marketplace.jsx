@@ -45,7 +45,7 @@ export default function Marketplace({ theme, setTheme }) {
     const [dbListingTypes, setDbListingTypes] = useState([]);
     const [dbLanguages, setDbLanguages] = useState([]);
 
-    const isAuthenticated = !!(localStorage.getItem("token") || localStorage.getItem("auth_token"));
+    const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
     useEffect(() => {
         if (!isAuthenticated) {

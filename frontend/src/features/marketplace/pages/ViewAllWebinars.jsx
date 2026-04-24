@@ -128,7 +128,7 @@ const ViewAllWebinars = ({ theme, setTheme }) => {
         fetchWebinars();
     }, []);
 
-    const isAuthenticated = !!(localStorage.getItem("token") || localStorage.getItem("auth_token"));
+    const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
     useEffect(() => {
         if (!isAuthenticated) {
