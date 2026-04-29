@@ -20,16 +20,16 @@ api.interceptors.request.use((config) => {
 });
 
 export const getConversations = async () => {
-    const response = await api.get("/api/conversations");
+    const response = await api.get("/api/v1/conversations");
     return response.data;
 };
 
 export const getMessages = async (conversationId) => {
-    const response = await api.get(`/api/conversations/${conversationId}/messages`);
+    const response = await api.get(`/api/v1/conversations/${conversationId}/messages`);
     return response.data;
 };
 
 export const sendMessage = async (data) => {
-    const response = await api.post("/api/messages", data);
+    const response = await api.post("/api/v1/messages", data);
     return response.data;
 };

@@ -32,7 +32,7 @@ export default function MessageBox({ theme, setTheme }) {
     const [activeConversation, setActiveConversation] = useState(null);
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [creatorInfo, setCreatorInfo] = useState(null);
+    const [otherUserInfo, setOtherUserInfo] = useState(null);
     const [draft, setDraft] = useState("");
     const [isConversationListMinimized, setIsConversationListMinimized] =
         useState(false);
@@ -145,28 +145,28 @@ export default function MessageBox({ theme, setTheme }) {
         return () => clearInterval(interval);
     }, [selectedChatId]);
 
-    // Fetch Creator Info for Sidebar
+    // Fetch Other User Info for Sidebar
     useEffect(() => {
-        setCreatorInfo(null);
+        setOtherUserInfo(null);
         if (!activeConversation) return;
         console.log("Active Conversation updated:", activeConversation);
 
-        const fetchCreator = async () => {
+        const fetchOtherUser = async () => {
             const username = activeConversation.handle?.replace('@', '') || "";
             if (!username) return;
 
-            console.log("Fetching creator for username:", username);
+            console.log("Fetching profile for username:", username);
             try {
-                const data = await getCreatorProfile(username);
-                console.log("Creator profile data:", data);
+                const data = await getCreatorProfile(username); // This API works for any user by username
+                console.log("Other user profile data:", data);
                 if (data.user) {
-                    setCreatorInfo(data.user);
+                    setOtherUserInfo(data.user);
                 }
             } catch (err) {
-                console.error("Failed to fetch creator info", err);
+                console.error("Failed to fetch other user info", err);
             }
         };
-        fetchCreator();
+        fetchOtherUser();
     }, [activeConversation]);
 
     const handleSendMessage = async () => {
@@ -208,28 +208,28 @@ export default function MessageBox({ theme, setTheme }) {
         if (type === "creator") {
             provider = {
                 username: currentUser?.username || "",
-                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : "",
+                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : currentUser?.full_name || "",
                 email: currentUser?.email || "",
                 company: currentUser?.company_name || ""
             };
             client = {
-                username: activeConversation?.handle?.replace("@", "") || "",
-                full_name: activeConversation?.name || "",
-                email: "",
-                company: ""
+                username: otherUserInfo?.username || activeConversation?.handle?.replace("@", "") || "",
+                full_name: otherUserInfo?.full_name || activeConversation?.name || "",
+                email: otherUserInfo?.email || "",
+                company: otherUserInfo?.company_name || ""
             };
         } else {
             client = {
                 username: currentUser?.username || "",
-                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : "",
+                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : currentUser?.full_name || "",
                 email: currentUser?.email || "",
                 company: currentUser?.company_name || ""
             };
             provider = {
-                username: activeConversation?.handle?.replace("@", "") || "",
-                full_name: activeConversation?.name || "",
-                email: "",
-                company: ""
+                username: otherUserInfo?.username || activeConversation?.handle?.replace("@", "") || "",
+                full_name: otherUserInfo?.full_name || activeConversation?.name || "",
+                email: otherUserInfo?.email || "",
+                company: otherUserInfo?.company_name || ""
             };
         }
 
@@ -473,6 +473,12 @@ export default function MessageBox({ theme, setTheme }) {
                                         onChange={(event) =>
                                             setDraft(event.target.value)
                                         }
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSendMessage();
+                                            }
+                                        }}
                                         aria-label="Type a message"
                                     />
 
@@ -502,21 +508,21 @@ export default function MessageBox({ theme, setTheme }) {
                         </section>
 
                         <aside className="messagebox-column messagebox-profile pr-1">
-                            {creatorInfo ? (
+                            {otherUserInfo ? (
                                 <DetailedTeamCard 
-                                    teamName={creatorInfo.full_name || creatorInfo.username}
-                                    location={creatorInfo.country}
+                                    teamName={otherUserInfo.full_name || otherUserInfo.username}
+                                    location={otherUserInfo.country}
                                     rating={4.5} // Placeholder
                                     reviewCount={28} // Placeholder
-                                    description={creatorInfo.bio || creatorInfo.about}
-                                    languages={creatorInfo.languages || []}
+                                    description={otherUserInfo.bio || otherUserInfo.about}
+                                    languages={otherUserInfo.languages || []}
                                     karma={120} // Placeholder
                                     projectsCompleted={15} // Placeholder
                                     responseSpeed="1 hour"
-                                    memberSince={creatorInfo.created_at}
-                                    skills={creatorInfo.skills || []}
-                                    avatarUrl={creatorInfo.avatar_url}
-                                    onViewProfile={() => navigate(`/creators/${creatorInfo.username}`)}
+                                    memberSince={otherUserInfo.created_at}
+                                    skills={otherUserInfo.skills || []}
+                                    avatarUrl={otherUserInfo.avatar_url}
+                                    onViewProfile={() => navigate(`/creators/${otherUserInfo.username}`)}
                                 />
                             ) : (
                                 <DetailedTeamCard />
