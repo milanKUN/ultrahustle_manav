@@ -5,6 +5,8 @@ import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "../../../Darkuser.css";
 import "./ResolutionCenter.css";
+import { requestResolution } from "../api/contractApi";
+import { useNavigate } from "react-router-dom";
 
 const REQUEST_OPTIONS = [
   {
@@ -47,21 +49,24 @@ const CANCELLATION_REASONS = [
 
 export default function ResolutionCenter({ theme, setTheme }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const requestMode = location.state?.requestMode;
+  const contractId = location.state?.contractId;
+  const userType = location.state?.userType;
   const availableOptions = useMemo(() => {
-    if (requestMode === "cancellationOnly") {
+    if (requestMode === "cancellationOnly" || userType === 'client') {
       return REQUEST_OPTIONS.filter((item) => item.id === "cancellation");
     }
 
     return REQUEST_OPTIONS;
-  }, [requestMode]);
+  }, [requestMode, userType]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeSetting, setActiveSetting] = useState("basic");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedRequest, setSelectedRequest] = useState(
-    requestMode === "cancellationOnly" ? "cancellation" : "extension",
+    (requestMode === "cancellationOnly" || userType === 'client') ? "cancellation" : "extension",
   );
   const [extensionDays, setExtensionDays] = useState("");
   const [extensionReason, setExtensionReason] = useState("");
@@ -107,12 +112,35 @@ export default function ResolutionCenter({ theme, setTheme }) {
 
   const resetFlow = () => {
     setStep(1);
-    setSelectedRequest(requestMode === "cancellationOnly" ? "cancellation" : "extension");
+    setSelectedRequest((requestMode === "cancellationOnly" || userType === 'client') ? "cancellation" : "extension");
     setExtensionDays("");
     setExtensionReason("");
     setCancellationReason("");
     setSelectedCancellationReason(CANCELLATION_REASONS[0]);
     setShowConfirmModal(false);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!contractId) {
+      alert("Contract ID missing");
+      return;
+    }
+
+    try {
+      const payload = {
+        type: selectedRequest,
+        reason: selectedRequest === 'extension' ? extensionReason : (cancellationReason || selectedCancellationReason),
+        days: selectedRequest === 'extension' ? extensionDays : null
+      };
+
+      const res = await requestResolution(contractId, payload);
+      if (res.success) {
+        alert("Request submitted successfully");
+        navigate(`/milestones/${contractId}`);
+      }
+    } catch (err) {
+      alert(err.message || "Failed to submit request");
+    }
   };
 
   useEffect(() => {
@@ -340,7 +368,7 @@ export default function ResolutionCenter({ theme, setTheme }) {
               </button>
               <button
                 type="button"
-                onClick={resetFlow}
+                onClick={handleSubmitRequest}
                 className="resolution-center-btn resolution-center-btn-primary"
               >
                 Confirm

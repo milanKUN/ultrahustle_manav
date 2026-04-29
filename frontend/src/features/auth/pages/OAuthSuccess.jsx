@@ -44,6 +44,21 @@ const OAuthSuccess = () => {
     (async () => {
       try {
         setAuthToken(token);
+
+        // Set default sidebar state based on role
+        const role =
+          params.searchParams.get("role") ||
+          params.hashParams.get("role") ||
+          "";
+
+        if (role === "client") {
+          localStorage.setItem("userType", "client");
+          localStorage.setItem("sidebarOpen", "true");
+        } else if (role === "freelancer" || role === "creator") {
+          localStorage.setItem("userType", "creator");
+          localStorage.setItem("sidebarOpen", "true");
+        }
+
         const status = await getOnboardingStatus();
         const completed = extractOnboardingCompleted(status);
         if (completed) setOnboardingCompleted(undefined, true);

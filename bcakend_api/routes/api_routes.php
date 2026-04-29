@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ListingController;
 use App\Http\Controllers\Api\OrderWebinarController;
 use App\Http\Controllers\Api\OrderCourseController;
 use App\Http\Controllers\Api\OrderDigitalProductController;
+use App\Http\Controllers\Api\ContractController;
 
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -171,6 +172,21 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::delete('/projects/{project}', [PortfolioController::class, 'destroyListingProject']);
         Route::delete('/media/{media}', [PortfolioController::class, 'destroyListingMedia']);
     });
+
+    Route::post('/contracts', [ContractController::class, 'store']);
+    Route::get('/contracts', [ContractController::class, 'index']);
+    Route::get('/contracts/{contract_id}', [ContractController::class, 'show']);
+    Route::patch('/contracts/{contract_id}/status', [ContractController::class, 'updateStatus']);
+    Route::post('/contracts/{contract_id}/resolution', [ContractController::class, 'requestResolution']);
+    Route::post('/contracts/milestones/{milestone_id}/submit', [ContractController::class, 'submitMilestone']);
+    Route::post('/contracts/milestones/{milestone_id}/approve', [ContractController::class, 'approveMilestone']);
+    Route::post('/contracts/milestones/{milestone_id}/revision', [ContractController::class, 'requestRevision']);
+    Route::post('/contracts/milestones/{milestone_id}/accept-revision', [ContractController::class, 'acceptRevision']);
+    Route::post('/contracts/milestones/{milestone_id}/cancel-revision', [ContractController::class, 'cancelRevision']);
+
+    Route::get('/conversations', [\App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::get('/conversations/{id}/messages', [\App\Http\Controllers\Api\MessageController::class, 'show']);
+    Route::post('/messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
 });
 Route::get('/v1/languages', [ListingController::class, 'getLanguages']);
 

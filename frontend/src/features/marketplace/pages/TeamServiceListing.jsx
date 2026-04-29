@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
     Share2,
@@ -26,13 +27,32 @@ import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 const TeamServiceListing = ({ theme, setTheme }) => {
     const [activeTab, setActiveTab] = useState("Basic");
     const [activeImg, setActiveImg] = useState(0);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [activeSetting, setActiveSetting] = useState("basic");
     const [showMoreListings, setShowMoreListings] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
     const [modalImgIndex, setModalImgIndex] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
+
+    const navigate = useNavigate();
+    const { listingusername } = useParams();
+
+    const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
+
+    const handleChatFirst = () => {
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
+        navigate("/messages", {
+            state: {
+                source: "team_service_listing",
+                listingUsername: listingusername,
+                prefillMessage: "Hi, I'm interested in your team service.",
+            },
+        });
+    };
 
     // Portfolio & Listing State (same as UserProfile.jsx)
     const [activeItem, setActiveItem] = useState(null);
@@ -793,7 +813,7 @@ const TeamServiceListing = ({ theme, setTheme }) => {
                                             <button className="tsl-btn-primary">
                                                 Create Contract
                                             </button>
-                                            <button className="tsl-btn-outline">
+                                            <button className="tsl-btn-outline" onClick={handleChatFirst}>
                                                 Chat first
                                             </button>
                                         </div>

@@ -38,8 +38,18 @@ const DesktopLogin = () => {
 
     try {
       setIsSubmitting(true);
-      await login({ email: formData.email, password: formData.password });
+      const resData = await login({ email: formData.email, password: formData.password });
       setCurrentUserEmail(formData.email);
+
+      // Set default sidebar state based on role
+      const userRole = resData?.data?.role;
+      if (userRole === "client") {
+        localStorage.setItem("userType", "client");
+        localStorage.setItem("sidebarOpen", "true");
+      } else if (userRole === "freelancer" || userRole === "creator") {
+        localStorage.setItem("userType", "creator");
+        localStorage.setItem("sidebarOpen", "true");
+      }
 
       const status = await getOnboardingStatus();
       const completed = extractOnboardingCompleted(status);

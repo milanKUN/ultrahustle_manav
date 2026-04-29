@@ -1,154 +1,38 @@
 import React, { useMemo, useState, useEffect } from "react";
 import {
-  ArrowLeft,
-  BadgeCheck,
-  ChevronLeft,
-  ChevronRight,
-  Paperclip,
-  Search,
-  SendHorizontal,
-  Smile,
-  Star,
-  SquarePen,
+    ArrowLeft,
+    BadgeCheck,
+    ChevronLeft,
+    ChevronRight,
+    Paperclip,
+    Search,
+    SendHorizontal,
+    Smile,
+    Star,
+    SquarePen,
 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import UserNavbar from "../../../components/layout/UserNavbar";
-import Sidebar from "../../../components/layout/Sidebar"; 
+import Sidebar from "../../../components/layout/Sidebar";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 import DetailedTeamCard from "../components/DetailedTeamCard";
 import "../../../Darkuser.css";
 import "./MessageBox.css";
+import { getMyPersonalInfo } from "../../dashboard/api/personalInfoApi";
+import { getConversations, getMessages, sendMessage } from "../api/messageApi";
+import { getListingByUsername, getCreatorProfile } from "../api/listingApi";
 
-const CONVERSATIONS = [
-  {
-    id: 1,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Sure",
-    time: "5 hours",
-    online: true,
-  },
-  {
-    id: 2,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Sure",
-    time: "5 hours",
-    online: true,
-  },
-  {
-    id: 3,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Can you review this today?",
-    time: "7 hours",
-    online: false,
-  },
-  {
-    id: 4,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Sharing the latest files now",
-    time: "1 day",
-    online: true,
-  },
-  {
-    id: 5,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Let me know once done",
-    time: "1 day",
-    online: false,
-  },
-  {
-    id: 6,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "We can start from this screen very soon now",
-    time: "2 days",
-    online: true,
-  },
-  {
-    id: 7,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Thanks for the quick update",
-    time: "3 days",
-    online: false,
-  },
-  {
-    id: 8,
-    name: "Mehedi",
-    handle: "@Abigail_12",
-    preview: "Please send the final version",
-    time: "4 days",
-    online: true,
-  },
-];
-
-const MESSAGES = [
-  {
-    id: 1,
-    sender: "Mehedi",
-    text: "Frontend Hey, could you please do this?",
-    time: "Jan 22, 5:20 PM",
-    tone: "dark",
-  },
-  {
-    id: 2,
-    sender: "Me",
-    text: "Sure",
-    time: "Jan 23, 3:23 PM",
-    tone: "light",
-  },
-  {
-    id: 3,
-    sender: "Mehedi",
-    text: "Please keep the first two columns exactly aligned with the mock.",
-    time: "Jan 23, 3:31 PM",
-    tone: "dark",
-  },
-  {
-    id: 4,
-    sender: "Me",
-    text: "Working on it. I will update the spacing and scrollbar next.",
-    time: "Jan 23, 3:36 PM",
-    tone: "light",
-  },
-  {
-    id: 5,
-    sender: "Mehedi",
-    text: "Perfect, and keep the create contract button at the top right.",
-    time: "Jan 23, 3:38 PM",
-    tone: "dark",
-  },
-  {
-    id: 6,
-    sender: "Me",
-    text: "Sure, I am also adding more rows so the panel scrolls like the reference.",
-    time: "Jan 23, 3:42 PM",
-    tone: "light",
-  },
-  {
-    id: 7,
-    sender: "Mehedi",
-    text: "That sounds good.",
-    time: "Jan 23, 3:44 PM",
-    tone: "dark",
-  },
-  {
-    id: 8,
-    sender: "Me",
-    text: "Almost done, checking the final proportions now.",
-    time: "Jan 23, 3:50 PM",
-    tone: "light",
-  },
-];
 
 export default function MessageBox({ theme, setTheme }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [activeSetting, setActiveSetting] = useState("basic");
-    const [selectedChatId, setSelectedChatId] = useState(1);
+    const [conversations, setConversations] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [activeConversation, setActiveConversation] = useState(null);
+    const [selectedChatId, setSelectedChatId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [creatorInfo, setCreatorInfo] = useState(null);
     const [draft, setDraft] = useState("");
     const [isConversationListMinimized, setIsConversationListMinimized] =
         useState(false);
@@ -156,45 +40,202 @@ export default function MessageBox({ theme, setTheme }) {
         () => typeof window !== "undefined" && window.innerWidth <= 900,
     );
     const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Handle window resize for mobile view
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 900;
+            setIsMobileView(mobile);
+            if (!mobile) setIsMobileChatOpen(false);
+            if (mobile) setIsConversationListMinimized(false);
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const showConversationList = !isMobileView || !isMobileChatOpen;
+    const showChatPanel = !isMobileView || isMobileChatOpen;
 
     useEffect(() => {
         setSidebarOpen(false);
         setShowSettings(false);
     }, []);
 
+    // Fetch My Info
     useEffect(() => {
-        if (typeof window === "undefined") {
-            return undefined;
-        }
-
-        const handleResize = () => {
-            const mobile = window.innerWidth <= 900;
-            setIsMobileView(mobile);
-
-            if (!mobile) {
-                setIsMobileChatOpen(false);
-            }
-
-            if (mobile) {
-                setIsConversationListMinimized(false);
+        const fetchMe = async () => {
+            try {
+                const res = await getMyPersonalInfo();
+                setCurrentUser(res.data);
+            } catch (err) {
+                console.error("Failed to fetch current user info", err);
             }
         };
-
-        handleResize();
-        window.addEventListener("resize", handleResize);
-
-        return () => window.removeEventListener("resize", handleResize);
+        fetchMe();
     }, []);
 
-    const activeConversation = useMemo(
-        () =>
-            CONVERSATIONS.find((item) => item.id === selectedChatId) ??
-            CONVERSATIONS[0],
-        [selectedChatId],
-    );
+    // Fetch Conversations
+    useEffect(() => {
+        const fetchConversations = async () => {
+            setIsLoading(true);
+            try {
+                const res = await getConversations();
+                setConversations(res.data);
 
-    const showConversationList = !isMobileView || !isMobileChatOpen;
-    const showChatPanel = !isMobileView || isMobileChatOpen;
+                // Handle redirection from listing page
+                if (location.state?.creatorUsername) {
+                    const existing = res.data.find(c => c.handle === '@' + location.state.creatorUsername);
+                    if (existing) {
+                        setSelectedChatId(existing.id);
+                        setActiveConversation(existing);
+                    } else {
+                        // Start a temporary conversation object for UI
+                        const tempConv = {
+                            id: 'temp',
+                            name: location.state.creatorName || location.state.creatorUsername,
+                            handle: '@' + location.state.creatorUsername,
+                            avatar_url: null,
+                            preview: 'New Message',
+                            time: 'Now',
+                            online: true,
+                            other_user_id: location.state.creatorId, // We might need creatorId in state
+                            listing_id: location.state.listingId
+                        };
+                        setConversations(prev => [tempConv, ...prev]);
+                        setSelectedChatId('temp');
+                        setActiveConversation(tempConv);
+                    }
+                } else if (res.data.length > 0) {
+                    setSelectedChatId(res.data[0].id);
+                    setActiveConversation(res.data[0]);
+                }
+            } catch (err) {
+                console.error("Failed to fetch conversations", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchConversations();
+    }, [location.state]);
+
+    // Fetch Messages when chatId changes
+    useEffect(() => {
+        if (!selectedChatId || selectedChatId === 'temp') {
+            setMessages([]);
+            return;
+        }
+
+        const fetchMessagesData = async () => {
+            try {
+                const res = await getMessages(selectedChatId);
+                setMessages(res.data);
+            } catch (err) {
+                console.error("Failed to fetch messages", err);
+            }
+        };
+        fetchMessagesData();
+        
+        // Polling (optional, but requested simple dynamic)
+        const interval = setInterval(fetchMessagesData, 5000);
+        return () => clearInterval(interval);
+    }, [selectedChatId]);
+
+    // Fetch Creator Info for Sidebar
+    useEffect(() => {
+        setCreatorInfo(null);
+        if (!activeConversation) return;
+        console.log("Active Conversation updated:", activeConversation);
+
+        const fetchCreator = async () => {
+            const username = activeConversation.handle?.replace('@', '') || "";
+            if (!username) return;
+
+            console.log("Fetching creator for username:", username);
+            try {
+                const data = await getCreatorProfile(username);
+                console.log("Creator profile data:", data);
+                if (data.user) {
+                    setCreatorInfo(data.user);
+                }
+            } catch (err) {
+                console.error("Failed to fetch creator info", err);
+            }
+        };
+        fetchCreator();
+    }, [activeConversation]);
+
+    const handleSendMessage = async () => {
+        if (!draft.trim()) return;
+
+        try {
+            const payload = {
+                content: draft,
+                conversation_id: selectedChatId === 'temp' ? null : selectedChatId,
+                receiver_id: activeConversation?.other_user_id || location.state?.creatorId,
+                listing_id: activeConversation?.listing_id || location.state?.listingId
+            };
+
+            const res = await sendMessage(payload);
+            if (res.success) {
+                setDraft("");
+                if (selectedChatId === 'temp') {
+                    // Refresh conversations to get the real ID
+                    const convRes = await getConversations();
+                    setConversations(convRes.data);
+                    const newConv = convRes.data.find(c => c.handle === activeConversation.handle);
+                    if (newConv) {
+                        setSelectedChatId(newConv.id);
+                        setActiveConversation(newConv);
+                    }
+                } else {
+                    setMessages(prev => [...prev, res.data]);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to send message", err);
+        }
+    };
+
+    const handleCreateContract = () => {
+        const type = localStorage.getItem("userType") || "client";
+
+        let provider, client;
+        if (type === "creator") {
+            provider = {
+                username: currentUser?.username || "",
+                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : "",
+                email: currentUser?.email || "",
+                company: currentUser?.company_name || ""
+            };
+            client = {
+                username: activeConversation?.handle?.replace("@", "") || "",
+                full_name: activeConversation?.name || "",
+                email: "",
+                company: ""
+            };
+        } else {
+            client = {
+                username: currentUser?.username || "",
+                full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : "",
+                email: currentUser?.email || "",
+                company: currentUser?.company_name || ""
+            };
+            provider = {
+                username: activeConversation?.handle?.replace("@", "") || "",
+                full_name: activeConversation?.name || "",
+                email: "",
+                company: ""
+            };
+        }
+
+        const state = { provider, client };
+        navigate("/contracts-listing", { state });
+    };
 
     return (
         <div className={`messagebox-page user-page ${theme} min-h-screen`}>
@@ -219,20 +260,17 @@ export default function MessageBox({ theme, setTheme }) {
 
                 <div className="messagebox-shell">
                     <main
-                        className={`messagebox-layout ${
-                            isConversationListMinimized
-                                ? "messagebox-layout-list-minimized"
-                                : ""
-                        }`}
+                        className={`messagebox-layout ${isConversationListMinimized
+                            ? "messagebox-layout-list-minimized"
+                            : ""
+                            }`}
                     >
                         <aside
-                            className={`messagebox-column messagebox-list ${
-                                isConversationListMinimized
-                                    ? "messagebox-list-minimized"
-                                    : ""
-                            } ${
-                                showConversationList ? "" : "messagebox-hidden-mobile"
-                            }`}
+                            className={`messagebox-column messagebox-list ${isConversationListMinimized
+                                ? "messagebox-list-minimized"
+                                : ""
+                                } ${showConversationList ? "" : "messagebox-hidden-mobile"
+                                }`}
                         >
                             <div className="messagebox-list-inner">
                                 <div className="messagebox-list-toolbar">
@@ -278,30 +316,32 @@ export default function MessageBox({ theme, setTheme }) {
                                 )}
 
                                 <div className="messagebox-thread-list">
-                                    {CONVERSATIONS.map((conversation) => (
+                                    {conversations.map((conversation) => (
                                         <button
                                             type="button"
                                             key={conversation.id}
-                                            className={`messagebox-thread ${
-                                                conversation.id ===
+                                            className={`messagebox-thread ${conversation.id ===
                                                 selectedChatId
-                                                    ? "active"
-                                                    : ""
-                                            } ${
-                                                isConversationListMinimized
+                                                ? "active"
+                                                : ""
+                                                } ${isConversationListMinimized
                                                     ? "messagebox-thread-minimized"
                                                     : ""
-                                            }`}
+                                                }`}
                                             onClick={() => {
                                                 setSelectedChatId(
                                                     conversation.id,
                                                 );
+                                                setActiveConversation(conversation);
                                                 if (isMobileView) {
                                                     setIsMobileChatOpen(true);
                                                 }
                                             }}
                                         >
                                             <div className="messagebox-avatar placeholder">
+                                                {conversation.avatar_url ? (
+                                                    <img src={conversation.avatar_url} alt="" className="rounded-full w-full h-full object-cover" />
+                                                ) : null}
                                                 {conversation.online && (
                                                     <span className="messagebox-dot" />
                                                 )}
@@ -333,9 +373,8 @@ export default function MessageBox({ theme, setTheme }) {
                         </aside>
 
                         <section
-                            className={`messagebox-column messagebox-chat ${
-                                showChatPanel ? "" : "messagebox-hidden-mobile"
-                            }`}
+                            className={`messagebox-column messagebox-chat ${showChatPanel ? "" : "messagebox-hidden-mobile"
+                                }`}
                         >
                             <header className="messagebox-chat-header">
                                 <div className="messagebox-chat-user">
@@ -353,17 +392,20 @@ export default function MessageBox({ theme, setTheme }) {
                                     )}
 
                                     <div className="messagebox-avatar large placeholder">
+                                        {activeConversation?.avatar_url ? (
+                                            <img src={activeConversation.avatar_url} alt="" className="rounded-full w-full h-full object-cover" />
+                                        ) : null}
                                         <span className="messagebox-dot" />
                                     </div>
 
                                     <div>
                                         <div className="messagebox-chat-name">
                                             <span>
-                                                {activeConversation.name}
+                                                {activeConversation?.name || "Chat"}
                                             </span>
                                             <BadgeCheck size={15} />
                                         </div>
-                                        <p>{activeConversation.handle}</p>
+                                        <p>{activeConversation?.handle}</p>
                                         <small>Online</small>
                                     </div>
                                 </div>
@@ -371,6 +413,7 @@ export default function MessageBox({ theme, setTheme }) {
                                 <button
                                     type="button"
                                     className="messagebox-contract-btn"
+                                    onClick={handleCreateContract}
                                 >
                                     <SquarePen size={14} />
                                     <span>Create Contract</span>
@@ -386,7 +429,7 @@ export default function MessageBox({ theme, setTheme }) {
                                     </div>
 
                                     <div className="messagebox-messages">
-                                        {MESSAGES.map((message) => (
+                                        {messages.map((message) => (
                                             <article
                                                 key={message.id}
                                                 className="messagebox-message"
@@ -449,6 +492,7 @@ export default function MessageBox({ theme, setTheme }) {
                                         <button
                                             type="button"
                                             aria-label="Send message"
+                                            onClick={handleSendMessage}
                                         >
                                             <SendHorizontal size={16} />
                                         </button>
@@ -458,7 +502,25 @@ export default function MessageBox({ theme, setTheme }) {
                         </section>
 
                         <aside className="messagebox-column messagebox-profile pr-1">
-                            <DetailedTeamCard />
+                            {creatorInfo ? (
+                                <DetailedTeamCard 
+                                    teamName={creatorInfo.full_name || creatorInfo.username}
+                                    location={creatorInfo.country}
+                                    rating={4.5} // Placeholder
+                                    reviewCount={28} // Placeholder
+                                    description={creatorInfo.bio || creatorInfo.about}
+                                    languages={creatorInfo.languages || []}
+                                    karma={120} // Placeholder
+                                    projectsCompleted={15} // Placeholder
+                                    responseSpeed="1 hour"
+                                    memberSince={creatorInfo.created_at}
+                                    skills={creatorInfo.skills || []}
+                                    avatarUrl={creatorInfo.avatar_url}
+                                    onViewProfile={() => navigate(`/creators/${creatorInfo.username}`)}
+                                />
+                            ) : (
+                                <DetailedTeamCard />
+                            )}
                         </aside>
                     </main>
                 </div>

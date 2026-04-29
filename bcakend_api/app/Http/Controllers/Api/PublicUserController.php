@@ -24,6 +24,8 @@ class PublicUserController extends Controller
                 'username' => $user->username,
                 'full_name' => $user->full_name,
                 'display_name' => $user->full_name,
+                'email' => $user->email,
+                'contact_email' => $info?->contact_email,
                 'created_at' => $user->created_at,
 
                 'title' => $info?->title,

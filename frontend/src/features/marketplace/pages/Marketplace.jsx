@@ -430,20 +430,6 @@ export default function Marketplace({ theme, setTheme }) {
                     <Navbar />
                 )}
 
-                <div className="mp-content-wrapper flex flex-1 relative z-10">
-                    {isAuthenticated && (
-                        <Sidebar
-                            expanded={sidebarOpen}
-                            setExpanded={setSidebarOpen}
-                            showSettings={showSettings}
-                            setShowSettings={setShowSettings}
-                            activeSetting={activeSetting}
-                            onSectionChange={setActiveSetting}
-                            theme={theme}
-                            setTheme={setTheme}
-                        />
-                    )}
-
                     {/* MAIN CONTENT */}
                     <div className="relative flex-1 min-w-5 overflow-hidden">
                         <div className="mp-scroll-area relative z-10 overflow-y-auto h-full">
@@ -562,7 +548,7 @@ export default function Marketplace({ theme, setTheme }) {
                             </div>
                         </div>
                     </div>
-                </div>
+
                 {/* CHIP FILTER MEGA DROPDOWN — product types from DB */}
                 {openChip && chipProductTypes.length > 0 && (
                     <div

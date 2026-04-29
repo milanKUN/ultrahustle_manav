@@ -26,11 +26,12 @@ import "../../../Darkuser.css";
 import "../../dashboard/pages/TeamProfileLight.css";
 import MobileBottomNav from "../../../components/layout/MobileBottomNav";
 import DetailedTeamCard from "../components/DetailedTeamCard";
+import { getMyPersonalInfo } from "../../dashboard/api/personalInfoApi";
 
 const ServiceListing = ({ theme, setTheme }) => {
     const [activeTab, setActiveTab] = useState("Basic");
     const [activeImg, setActiveImg] = useState(0);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [activeSetting, setActiveSetting] = useState("basic");
     const [showMoreListings, setShowMoreListings] = useState(false);
@@ -53,11 +54,17 @@ const ServiceListing = ({ theme, setTheme }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
 
+    const [currentUser, setCurrentUser] = useState(null);
+
     const isAuthenticated = !!(localStorage.getItem("uh_auth_token") || localStorage.getItem("token") || localStorage.getItem("auth_token"));
 
     useEffect(() => {
         if (!isAuthenticated) {
             setSidebarOpen(false);
+        } else {
+            getMyPersonalInfo()
+                .then(res => setCurrentUser(res.data))
+                .catch(console.error);
         }
     }, [isAuthenticated]);
 
@@ -285,6 +292,10 @@ const ServiceListing = ({ theme, setTheme }) => {
     };
 
     const handleChatFirst = () => {
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
         navigate("/messages", {
             state: {
                 source: "service_listing",
@@ -294,6 +305,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                 listingType: listing?.listing_type || "service",
                 sellerMode: listing?.seller_mode || "Solo",
                 teamName: listing?.team_name || "",
+                creatorId: listing?.creator?.id || listing?.user_id || null,
                 creatorUsername: listing?.creator?.username || listing?.creator_username || "",
                 creatorName:
                     listing?.creator?.full_name || listing?.creator?.username || "",
@@ -593,18 +605,7 @@ const ServiceListing = ({ theme, setTheme }) => {
                     )}
 
                     <div className="pt-[85px] flex relative z-10 transition-all duration-300">
-                        {isAuthenticated && (
-                            <Sidebar
-                                expanded={sidebarOpen}
-                                setExpanded={setSidebarOpen}
-                                showSettings={showSettings}
-                                setShowSettings={setShowSettings}
-                                activeSetting={activeSetting}
-                                onSectionChange={setActiveSetting}
-                                theme={theme}
-                                setTheme={setTheme}
-                            />
-                        )}
+
                         <div className="relative flex-1 min-w-0 overflow-hidden">
                             <div className="overflow-y-auto h-[calc(100vh-85px)]">
                                 <div className={`tsl-page ${theme}`}>
@@ -892,11 +893,24 @@ const ServiceListing = ({ theme, setTheme }) => {
 
                                                 <div className="tsl-pricing-actions">
                                                     <button
-                                                        onClick={() =>
-                                                            navigate("/contracts-listing", {
-                                                                state: { listingId: listing?.id },
-                                                            })
-                                                        }
+                                                        onClick={() => {
+                                                            const state = {
+                                                                listingId: listing?.id,
+                                                                provider: {
+                                                                    username: listing?.creator?.username || listing?.creator_username || "",
+                                                                    full_name: listing?.creator?.full_name || listing?.creator?.username || "",
+                                                                    email: listing?.creator?.email || "",
+                                                                    company: ""
+                                                                },
+                                                                client: {
+                                                                    username: currentUser?.username || "",
+                                                                    full_name: currentUser ? `${currentUser.first_name || ""} ${currentUser.last_name || ""}`.trim() : "",
+                                                                    email: currentUser?.email || "",
+                                                                    company: currentUser?.company_name || ""
+                                                                }
+                                                            };
+                                                            navigate("/contracts-listing", { state });
+                                                        }}
                                                         className="tsl-btn-primary"
                                                     >
                                                         Create Contract

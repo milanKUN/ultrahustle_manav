@@ -32,6 +32,7 @@ const CREATOR_ITEMS = [
         children: [
             { label: "My Listings", icon: CiSaveDown1, path: "/my-listings" },
             { label: "Add New Listings", icon: FilePlus, path: "/add-listing" },
+            { label: "Contracts", icon: NotebookTabs, path: "/creator/contracts" },
         ],
     },
     { label: "My Orders", icon: ShoppingBag, path: "/creator-orders" },
@@ -99,7 +100,14 @@ const CREATOR_ITEMS = [
 
 const CLIENT_ITEMS = [
     { label: "Dashboard", icon: LayoutGrid, path: "/client-dashboard" },
-    { label: "Marketplace", icon: Store, path: "/marketplace" },
+    {
+        label: "Marketplace",
+        icon: Store,
+        children: [
+            { label: "Browse", icon: Store, path: "/marketplace" },
+            { label: "Contracts", icon: NotebookTabs, path: "/creator/contracts" },
+        ],
+    },
     { label: "My Orders", icon: ShoppingBag, path: "/client-orders" },
     { label: "My Cart", icon: ShoppingCart, path: "/cart" },
     {
@@ -139,10 +147,23 @@ export default function Sidebar({
   const navigate = useNavigate();
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(null);
-  const [userType, setUserType] = useState("creator");
+  const [userType, setUserType] = useState(() => localStorage.getItem("userType") || "creator");
   const [activeMain, setActiveMain] = useState("Dashboard");
   const [isMobile, setIsMobile] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState("Marketplace");
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setUserType(localStorage.getItem("userType") || "creator");
+    };
+    window.addEventListener("storage", handleStorage);
+    // Also listen for custom events if the app uses them
+    window.addEventListener("userTypeChange", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("userTypeChange", handleStorage);
+    };
+  }, []);
 
   const path = location.pathname;
   const sidebarItems = userType === "creator" ? CREATOR_ITEMS : CLIENT_ITEMS;
@@ -196,6 +217,21 @@ export default function Sidebar({
     if (forceClient) {
       setUserType("client");
       setShowSettings?.(false);
+    } else {
+      // Auto-sync userType based on dashboard routes to ensure sidebar stays consistent
+      if (path === "/client-dashboard") {
+        setUserType("client");
+        if (localStorage.getItem("userType") !== "client") {
+          localStorage.setItem("userType", "client");
+          window.dispatchEvent(new CustomEvent("userTypeChange", { detail: "client" }));
+        }
+      } else if (path === "/dashboard") {
+        setUserType("creator");
+        if (localStorage.getItem("userType") !== "creator") {
+          localStorage.setItem("userType", "creator");
+          window.dispatchEvent(new CustomEvent("userTypeChange", { detail: "creator" }));
+        }
+      }
     }
   }, [forceClient, path, setExpanded, setShowSettings]);
 
@@ -212,13 +248,6 @@ export default function Sidebar({
       setShowSettings?.(false);
     }
   }, [isMobile, setExpanded, setShowSettings]);
-
-  useEffect(() => {
-    if (userType === "client") {
-      setActiveMain("Dashboard");
-      setOpenMenu(null);
-    }
-  }, [userType]);
 
   const handleMainItemClick = (item) => {
     if (item.path && !item.children) {
@@ -341,7 +370,16 @@ export default function Sidebar({
                   return (
                     <button
                       key={type}
-                      onClick={() => setUserType(type)}
+                      onClick={() => {
+                        setUserType(type);
+                        localStorage.setItem("userType", type);
+                        window.dispatchEvent(new CustomEvent("userTypeChange", { detail: type }));
+                        if (type === 'client') {
+                          navigate('/client-dashboard');
+                        } else {
+                          navigate('/dashboard');
+                        }
+                      }}
                       className="flex-1 py-2 rounded-xl text-sm font-semibold transition"
                       style={{
                         backgroundColor: isActive ? "#ffffff" : "transparent",

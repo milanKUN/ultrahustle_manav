@@ -83,9 +83,8 @@ import BoostCampaign from "./features/marketplace/pages/BoostCampaign";
 import CampaignAnalytics from "./features/marketplace/pages/CampaignAnalytics";
 import FriendRequestPage from "./features/dashboard/pages/FriendRequestPage";
 import AdminDashboard from "./features/dashboard/pages/uh-admin-complete";
+import CreatorContractsDashboard from "./features/marketplace/pages/CreatorContractsDashboard";
 import Components from "./features/dashboard/pages/Components";
-
-
 
 export default function App() {
     const THEME_KEY = "user-theme";
@@ -115,7 +114,22 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/test" element={<Test />} />
-                    {/* <Route path="/homepage" element={<HomePage />} /> */}
+                    <Route
+                        path="/creator/contracts"
+                        element={
+                            <ProtectedRoute>
+                                <CreatorContractsDashboard theme={theme} setTheme={setTheme} />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/milestones/:contractId"
+                        element={
+                            <ProtectedRoute>
+                                <SoloMilestonesPage theme={theme} setTheme={setTheme} />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/setting"
                         element={

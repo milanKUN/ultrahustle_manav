@@ -196,6 +196,17 @@ const DesktopEmailVerification = () => {
                                     setCurrentUserEmail(email);
                                     try {
                                         const status = await getOnboardingStatus();
+
+                                        // Set default sidebar state based on role from onboarding status if available
+                                        const userRole = status?.data?.onboarding_type;
+                                        if (userRole === "client") {
+                                            localStorage.setItem("userType", "client");
+                                            localStorage.setItem("sidebarOpen", "true");
+                                        } else if (userRole === "creator" || userRole === "freelancer") {
+                                            localStorage.setItem("userType", "creator");
+                                            localStorage.setItem("sidebarOpen", "true");
+                                        }
+
                                         const completed = extractOnboardingCompleted(status);
                                         if (completed) setOnboardingCompleted(email, true);
                                         navigate(completed ? "/dashboard" : "/onboarding", { replace: true });

@@ -1,14 +1,19 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { Trash2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "./SoloContractListing.css";
 import '../../../Darkuser.css';
+import { saveContract } from "../api/contractApi";
+import { getPublicUserProfile } from "../../dashboard/api/personalInfoApi";
 
 export default function SoloContractListing({ theme = "light", setTheme, embedded = false, readOnly = false }) {
 
 
-  const contractId = useMemo(() => "AUTO-123456", []);
+  const contractId = useMemo(() => "AUTO-" + Math.floor(100000 + Math.random() * 900000), []);
+  const location = useLocation();
+  const navigate = useNavigate();
 
 
   const [form, setForm] = useState({
@@ -75,6 +80,56 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
   useEffect(() => {
     localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
   }, [sidebarOpen]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      if (location.state) {
+        const { provider, client } = location.state;
+        
+        // Initial set from state
+        setForm((p) => ({
+          ...p,
+          creatorUsername: provider?.username || p.creatorUsername,
+          clientUsername: client?.username || p.clientUsername,
+        }));
+
+        // Fetch full info from DB
+        if (provider?.username) {
+          try {
+            const res = await getPublicUserProfile(provider.username);
+            const user = res.user;
+            if (user) {
+              setForm(p => ({
+                ...p,
+                creatorFullName: user.full_name || "",
+                finalCreatorName: user.full_name || "",
+                creatorEmail: user.contact_email || user.email || "",
+                creatorCompany: user.city || "", // Placeholder for company if not found
+              }));
+            }
+          } catch (e) { console.error("Provider fetch error", e); }
+        }
+
+        if (client?.username) {
+          try {
+            const res = await getPublicUserProfile(client.username);
+            const user = res.user;
+            if (user) {
+              setForm(p => ({
+                ...p,
+                clientFullName: user.full_name || "",
+                finalClientName: user.full_name || "",
+                clientEmail: user.contact_email || user.email || "",
+                clientCompany: user.city || "",
+              }));
+            }
+          } catch (e) { console.error("Client fetch error", e); }
+        }
+      }
+    };
+
+    fetchProfiles();
+  }, [location.state]);
 
   const handleSectionChange = (id) => {
     setActiveSetting(id);
@@ -159,13 +214,90 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
 
   // Activity log dummy (same UI)
   const activity = useMemo(
-    () => [
-      { ts: "2025-11-20 10:00", actor: "Client @acme_corp", action: "Contract Created", details: "Initial draft submitted" },
-      { ts: "2025-11-21 14:30", actor: "Creator @alex_design", action: "Terms Negotiated", details: "Updated milestones and delivery timeline" },
-      { ts: "2025-11-22 09:15", actor: "Client @acme_corp", action: "Contract Approved", details: "Ready for escrow funding" }
-    ],
-    []
+    () => {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const ts = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      
+      const userType = localStorage.getItem("userType") || "client";
+      let actor = "User";
+      
+      if (userType === "creator") {
+        actor = form.creatorFullName ? `Creator @${form.creatorFullName.replace(/\s+/g, '').toLowerCase()}` : "Creator";
+      } else {
+        actor = form.clientFullName ? `Client @${form.clientFullName.replace(/\s+/g, '').toLowerCase()}` : "Client";
+      }
+      
+      return [
+        { ts, actor, action: "Draft Started", details: "Contract creation initiated" }
+      ];
+    },
+    [form.creatorFullName, form.clientFullName]
   );
+
+  const handleSave = async (isReview = false) => {
+    const toSQLDate = (str) => {
+      if (!str) return null;
+      const parts = str.split("-");
+      if (parts.length === 3 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return str;
+    };
+
+    const payload = {
+      contract_id: contractId,
+      title: form.title,
+      type: form.soloTeam ? "Team" : "Solo",
+      client_username: form.clientUsername,
+      client_full_name: form.clientFullName,
+      client_email: form.clientEmail,
+      client_company: form.clientCompany,
+      provider_username: form.creatorUsername,
+      provider_full_name: form.creatorFullName,
+      provider_email: form.creatorEmail,
+      provider_company: form.creatorCompany,
+      project_summary: form.projectSummary,
+      out_of_scope: form.outOfScope,
+      initial_delivery_deadline: toSQLDate(form.initialDeliveryDeadline),
+      client_review_window: form.clientReviewWindow,
+      revision_rounds: parseInt(form.includedRevisionRounds) || 0,
+      revision_turnaround_time: form.revisionTurnaroundDays,
+      late_delivery_consequence: form.lateDeliveryConsequence,
+      delivery_sla: form.deliverySLA,
+      communication_sla: form.communicationSLA,
+      revision_sla: form.revisionSLA,
+      quality_standards: form.qualityStandards,
+      client_responsibilities: form.clientResponsibilities,
+      provider_responsibilities: form.creatorResponsibilities,
+      payment_type: form.paymentType,
+      project_cost: parseFloat(form.projectCost) || 0,
+      status: isReview ? "Review" : "Open",
+      final_client_name: form.finalClientName,
+      final_creator_name: form.finalCreatorName,
+      deliverables: deliverables.map(d => ({
+        title: d.title,
+        format: d.format,
+        quantity: d.qty,
+        acceptance_criteria: d.acceptance
+      })),
+      milestones: milestones.map(m => ({
+        title: m.name,
+        amount: parseFloat(m.amount) || 0,
+        deadline: toSQLDate(m.deadline)
+      }))
+    };
+
+    try {
+      const res = await saveContract(payload);
+      if (res.success) {
+        alert(isReview ? "Contract sent for review!" : "Contract saved successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to save contract");
+    }
+  };
 
   // --- Dropdown state keys to manage open/close ---
   const [openSelect, setOpenSelect] = useState(null); // Keeps track of which dropdown is open
@@ -1104,6 +1236,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                           <button
                                               type="button"
                                               className="cnc-primaryBtn"
+                                              onClick={handleSave}
                                           >
                                               Ready to fund escrow
                                           </button>
@@ -1111,6 +1244,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                               <button
                                                   type="button"
                                                   className="cnc-ghostBtn"
+                                                  onClick={() => handleSave(true)}
                                               >
                                                   Send for review
                                               </button>
@@ -1159,6 +1293,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                           <button
                                               type="button"
                                               className="cnc-primaryBtn"
+                                              onClick={handleSave}
                                           >
                                               Accept contract
                                           </button>

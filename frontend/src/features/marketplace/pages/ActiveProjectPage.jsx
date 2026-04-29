@@ -7,70 +7,22 @@ import {
   Search,
   UserRound,
   Users,
+  AlertCircle
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import UserNavbar from "../../../components/layout/UserNavbar";
 import Sidebar from "../../../components/layout/Sidebar";
 import "../../../Darkuser.css";
 import "./ActiveProjectPage.css";
+import { getContracts } from "../api/contractApi";
 
 const PROJECT_MODE_TABS = ["Solo", "Teams"];
 const PROJECT_STATUS_TABS = ["Active", "Completed", "Disputed"];
 const SORT_OPTIONS = ["Recent activity", "Due soon", "Newest"];
 
-const PROJECTS = [
-  {
-    id: 1,
-    title: "Brand Identity + Landing Page",
-    mode: "Solo",
-    status: "Active",
-    client: "Ava (Client)",
-    contractId: "contract id",
-    done: 1,
-    total: 4,
-    nextStep: "Logo directions",
-    dueDate: "Feb 20, 2026",
-    dueFull: "Mar 15, 2026",
-    timeLeft: "12 days left",
-    messages: 34,
-    files: 12,
-  },
-  {
-    id: 2,
-    title: "Monthly Content Ops (Retainer)",
-    mode: "Teams",
-    status: "Active",
-    client: "Ava (Client)",
-    contractId: "contract id",
-    done: 1,
-    total: 4,
-    nextStep: "Logo directions",
-    dueDate: "Feb 20, 2026",
-    dueFull: "Mar 15, 2026",
-    timeLeft: "12 days left",
-    messages: 34,
-    files: 12,
-    hasExtension: true,
-  },
-  {
-    id: 3,
-    title: "Creator Studio Revamp",
-    mode: "Teams",
-    status: "Disputed",
-    client: "Maya (Client)",
-    contractId: "contract id",
-    done: 2,
-    total: 5,
-    nextStep: "Revision review",
-    dueDate: "Mar 08, 2026",
-    dueFull: "Mar 18, 2026",
-    timeLeft: "Needs review",
-    messages: 48,
-    files: 18,
-  },
-];
-
 export default function ActiveProjectPage({ theme, setTheme }) {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeSetting, setActiveSetting] = useState("basic");
@@ -82,10 +34,37 @@ export default function ActiveProjectPage({ theme, setTheme }) {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef(null);
 
+  const [contracts, setContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userType, setUserType] = useState(() => localStorage.getItem("userType") || "creator");
+
   useEffect(() => {
-    setSidebarOpen(false);
-    setShowSettings(false);
+    const handleStorage = () => {
+      setUserType(localStorage.getItem("userType") || "creator");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  useEffect(() => {
+    fetchActiveProjects();
+  }, [activeStatus, userType]);
+
+  const fetchActiveProjects = async () => {
+    setLoading(true);
+    try {
+      // Map frontend tab status to backend status
+      let backendStatus = activeStatus;
+      const res = await getContracts(backendStatus, userType);
+      if (res.success) {
+        setContracts(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch active projects", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -99,13 +78,12 @@ export default function ActiveProjectPage({ theme, setTheme }) {
   }, []);
 
   const filteredProjects = useMemo(() => {
-    return PROJECTS.filter((project) => {
-      const matchesMode = project.mode === activeMode;
-      const matchesStatus = project.status === activeStatus;
+    return contracts.filter((project) => {
+      const matchesMode = project.type === activeMode;
       const matchesSearch = project.title.toLowerCase().includes(search.trim().toLowerCase());
-      return matchesMode && matchesStatus && matchesSearch;
+      return matchesMode && matchesSearch;
     });
-  }, [activeMode, activeStatus, search]);
+  }, [contracts, activeMode, search]);
 
   return (
     <div className={`active-projects-page user-page ${theme || "light"} min-h-screen relative overflow-hidden`}>
@@ -221,9 +199,13 @@ export default function ActiveProjectPage({ theme, setTheme }) {
                   </div>
 
                   <div className="active-projects-grid">
-                    {filteredProjects.map((project) => {
-                      const progress = `${project.done}/${project.total}`;
-                      const progressPct = (project.done / project.total) * 100;
+                    {loading ? (
+                      <div className="p-10 text-center opacity-50">Loading projects...</div>
+                    ) : filteredProjects.map((project) => {
+                      const totalMilestones = project.milestones?.length || 0;
+                      const completedMilestones = project.milestones?.filter(m => m.status === 'Paid').length || 0;
+                      const progress = `${completedMilestones}/${totalMilestones}`;
+                      const progressPct = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
                       return (
                         <React.Fragment key={project.id}>
@@ -232,17 +214,17 @@ export default function ActiveProjectPage({ theme, setTheme }) {
                               <div className="active-projects-cardTitleGroup">
                               <div className="active-projects-cardTitleRow">
                                 <h3>{project.title}</h3>
-                                <span className="active-projects-miniStatus">{project.status}</span>
-                                {project.hasExtension && (
-                                  <span className="active-projects-extensionTag">Extension</span>
-                                )}
+                                <span className={`active-projects-miniStatus ${project.status.includes('Requested') || project.status === 'Disputed' ? 'text-red-500 font-bold' : ''}`}>
+                                  {project.status.includes('Requested') ? <AlertCircle size={12} className="inline mr-1" /> : null}
+                                  {project.status}
+                                </span>
                               </div>
                                 <div className="active-projects-cardMeta">
-                                  <span>{project.mode}</span>
+                                  <span>{project.type}</span>
                                   <span>•</span>
-                                  <span>{project.client}</span>
+                                  <span>{userType === 'creator' ? project.client_full_name : project.provider_full_name}</span>
                                   <span>•</span>
-                                  <span>{project.contractId}</span>
+                                  <span>{project.contract_id}</span>
                                 </div>
                               </div>
                             </div>
@@ -259,9 +241,9 @@ export default function ActiveProjectPage({ theme, setTheme }) {
 
                               <div className="active-projects-nextRow">
                                 <span>
-                                  Next: <strong>{project.nextStep}</strong>
+                                  Next: <strong>{project.milestones?.find(m => m.status !== 'Paid')?.title || 'N/A'}</strong>
                                 </span>
-                                <span>• due {project.dueDate}</span>
+                                <span>• due {project.initial_delivery_deadline || 'N/A'}</span>
                               </div>
                             </div>
                           </article>
@@ -271,11 +253,11 @@ export default function ActiveProjectPage({ theme, setTheme }) {
                             <div className="active-projects-sideInfo">
                               <div>
                                 <CalendarDays size={14} />
-                                <span>{project.dueFull}</span>
+                                <span>{project.initial_delivery_deadline || 'N/A'}</span>
                               </div>
                               <div>
                                 <Clock3 size={14} />
-                                <span>{project.timeLeft}</span>
+                                <span>Active</span>
                               </div>
                             </div>
                           </article>
@@ -285,15 +267,19 @@ export default function ActiveProjectPage({ theme, setTheme }) {
                             <div className="active-projects-collabPills">
                               <span>
                                 <MessageSquareText size={13} />
-                                <b>{project.messages}</b>
+                                <b>0</b>
                               </span>
                               <span>
                                 <CalendarDays size={13} />
-                                <b>{project.files}</b>
+                                <b>0</b>
                               </span>
                             </div>
 
-                            <button type="button" className="active-projects-roomBtn">
+                            <button 
+                              type="button" 
+                              className="active-projects-roomBtn"
+                              onClick={() => navigate(`/milestones/${project.contract_id}`)}
+                            >
                               Open Workroom
                               <span>→</span>
                             </button>
@@ -303,7 +289,7 @@ export default function ActiveProjectPage({ theme, setTheme }) {
                     })}
                   </div>
 
-                  {filteredProjects.length === 0 && (
+                  {!loading && filteredProjects.length === 0 && (
                     <div className="active-projects-empty">
                       No active projects match your current filters.
                     </div>

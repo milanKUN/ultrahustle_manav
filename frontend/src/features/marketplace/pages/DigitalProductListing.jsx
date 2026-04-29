@@ -100,7 +100,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
   const { listingusername } = useParams();
 
   const [activeImg, setActiveImg] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showMoreListings, setShowMoreListings] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImgIndex, setModalImgIndex] = useState(0);
@@ -391,18 +391,7 @@ const DigitalProductListing = ({ theme, setTheme }) => {
       )}
 
       <div className="pt-[72px] flex relative z-10 transition-all duration-300">
-        {isAuthenticated && (
-          <Sidebar
-            expanded={sidebarOpen}
-            setExpanded={setSidebarOpen}
-            showSettings={false}
-            setShowSettings={() => {}}
-            activeSetting="dashboard"
-            onSectionChange={() => {}}
-            theme={theme}
-            setTheme={setTheme}
-          />
-        )}
+
         <div className="relative flex-1 min-w-0 overflow-hidden">
           <div className="overflow-y-auto h-[calc(100vh-72px)]">
             <div className={`tsl-page ${theme}`}>

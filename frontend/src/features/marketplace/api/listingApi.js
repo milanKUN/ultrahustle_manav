@@ -59,6 +59,15 @@ export const getListingByUsername = async (username) => {
   }
 };
 
+export const getCreatorProfile = async (username) => {
+  try {
+    const res = await api.get(`/api/v1/users/username/${encodeURIComponent(username)}`);
+    return unwrap(res);
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
 export const getListingDropdowns = async (listingTypeSlug, params = {}) => {
   try {
     const res = await api.get(`/api/v1/listing-dropdowns/${listingTypeSlug}`, { params });

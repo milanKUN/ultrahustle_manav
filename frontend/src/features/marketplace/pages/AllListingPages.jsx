@@ -196,18 +196,7 @@ const AllListingPages = ({ theme, setTheme }) => {
             )}
 
             <div className="pt-[72px] flex relative w-full">
-                {isAuthenticated && (
-                    <Sidebar
-                        expanded={sidebarOpen}
-                        setExpanded={setSidebarOpen}
-                        showSettings={showSettings}
-                        setShowSettings={setShowSettings}
-                        activeSetting={activeSetting}
-                        onSectionChange={setActiveSetting}
-                        theme={theme}
-                        setTheme={setTheme}
-                    />
-                )}
+
 
                 <div className="relative flex-1 min-w-0 overflow-hidden w-full">
                     <div className="relative overflow-y-auto h-[calc(100vh-72px)] w-full">
