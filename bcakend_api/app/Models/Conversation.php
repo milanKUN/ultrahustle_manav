@@ -11,10 +11,13 @@ class Conversation extends Model
         'participant_one_id',
         'participant_two_id',
         'last_message_at',
+        'typing_user_id',
+        'typing_until',
     ];
 
     protected $casts = [
         'last_message_at' => 'datetime',
+        'typing_until' => 'datetime',
     ];
 
     public function messages()

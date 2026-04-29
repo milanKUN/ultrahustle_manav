@@ -19,7 +19,7 @@ import DetailedTeamCard from "../components/DetailedTeamCard";
 import "../../../Darkuser.css";
 import "./MessageBox.css";
 import { getMyPersonalInfo } from "../../dashboard/api/personalInfoApi";
-import { getConversations, getMessages, sendMessage } from "../api/messageApi";
+import { getConversations, getMessages, sendMessage, setTypingStatus } from "../api/messageApi";
 import { getListingByUsername, getCreatorProfile } from "../api/listingApi";
 
 
@@ -85,14 +85,15 @@ export default function MessageBox({ theme, setTheme }) {
             setIsLoading(true);
             try {
                 const res = await getConversations();
-                setConversations(res.data);
 
                 // Handle redirection from listing page
+                let currentConversations = res.data;
+                let foundActive = null;
+
                 if (location.state?.creatorUsername) {
                     const existing = res.data.find(c => c.handle === '@' + location.state.creatorUsername);
                     if (existing) {
-                        setSelectedChatId(existing.id);
-                        setActiveConversation(existing);
+                        foundActive = existing;
                     } else {
                         // Start a temporary conversation object for UI
                         const tempConv = {
@@ -103,16 +104,34 @@ export default function MessageBox({ theme, setTheme }) {
                             preview: 'New Message',
                             time: 'Now',
                             online: true,
-                            other_user_id: location.state.creatorId, // We might need creatorId in state
+                            other_user_id: location.state.creatorId,
                             listing_id: location.state.listingId
                         };
-                        setConversations(prev => [tempConv, ...prev]);
-                        setSelectedChatId('temp');
-                        setActiveConversation(tempConv);
+                        currentConversations = [tempConv, ...res.data];
+                        foundActive = tempConv;
                     }
-                } else if (res.data.length > 0) {
-                    setSelectedChatId(res.data[0].id);
-                    setActiveConversation(res.data[0]);
+                }
+
+                setConversations(prev => {
+                    const hasTemp = prev.some(c => c.id === 'temp');
+                    if (hasTemp && selectedChatId === 'temp') {
+                        const tempObj = prev.find(c => c.id === 'temp');
+                        const filtered = res.data.filter(c => c.other_user_id !== tempObj.other_user_id);
+                        return [tempObj, ...filtered];
+                    }
+                    return currentConversations;
+                });
+
+                // Initialize selection
+                if (!selectedChatId && currentConversations.length > 0) {
+                    setSelectedChatId(currentConversations[0].id);
+                    setActiveConversation(currentConversations[0]);
+                } else if (foundActive) {
+                    setSelectedChatId(foundActive.id);
+                    setActiveConversation(foundActive);
+                } else if (selectedChatId && selectedChatId !== 'temp') {
+                    const updatedActive = res.data.find(c => c.id === Number(selectedChatId));
+                    if (updatedActive) setActiveConversation(updatedActive);
                 }
             } catch (err) {
                 console.error("Failed to fetch conversations", err);
@@ -121,6 +140,8 @@ export default function MessageBox({ theme, setTheme }) {
             }
         };
         fetchConversations();
+        const convInterval = setInterval(fetchConversations, 5000);
+        return () => clearInterval(convInterval);
     }, [location.state]);
 
     // Fetch Messages when chatId changes
@@ -168,6 +189,31 @@ export default function MessageBox({ theme, setTheme }) {
         };
         fetchOtherUser();
     }, [activeConversation]);
+
+    // Handle Typing Status
+    useEffect(() => {
+        if (!draft.trim() || !selectedChatId || selectedChatId === 'temp') return;
+
+        const startTyping = async () => {
+            try {
+                await setTypingStatus(selectedChatId, true);
+            } catch (err) {
+                console.error("Failed to set typing status", err);
+            }
+        };
+
+        startTyping();
+
+        const timeout = setTimeout(async () => {
+            try {
+                await setTypingStatus(selectedChatId, false);
+            } catch (err) {
+                console.error("Failed to clear typing status", err);
+            }
+        }, 3000);
+
+        return () => clearTimeout(timeout);
+    }, [draft, selectedChatId]);
 
     const handleSendMessage = async () => {
         if (!draft.trim()) return;
@@ -357,7 +403,7 @@ export default function MessageBox({ theme, setTheme }) {
                                                     </div>
                                                     <div className="messagebox-thread-meta">
                                                         <span className="messagebox-thread-time">
-                                                            {conversation.time}
+                                                            {conversation.timestamp ? new Date(conversation.timestamp * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : conversation.time}
                                                         </span>
                                                         <Star size={13} />
                                                     </div>
@@ -406,7 +452,14 @@ export default function MessageBox({ theme, setTheme }) {
                                             <BadgeCheck size={15} />
                                         </div>
                                         <p>{activeConversation?.handle}</p>
-                                        <small>Online</small>
+                                        <small>
+                                            {activeConversation?.is_typing 
+                                                ? "Typing..." 
+                                                : (activeConversation?.time 
+                                                    ? `Last message sent ${activeConversation.time}` 
+                                                    : "Online")
+                                            }
+                                        </small>
                                     </div>
                                 </div>
 
@@ -443,10 +496,16 @@ export default function MessageBox({ theme, setTheme }) {
                                                             {message.sender}
                                                         </h3>
                                                         <time>
-                                                            {message.time}
+                                                            {isNaN(message.time) ? message.time : new Date(message.time * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                                         </time>
                                                     </div>
                                                     <p>{message.text}</p>
+                                                    {message.is_me && message.is_read && (
+                                                        <div className="messagebox-message-seen">
+                                                            <span>Seen {message.read_at ? `at ${new Date(message.read_at * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ""}</span>
+                                                            <CheckCircle2 size={10} className="ml-1 text-[#ceff1b]" />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </article>
                                         ))}
@@ -455,15 +514,13 @@ export default function MessageBox({ theme, setTheme }) {
                             </div>
 
                             <footer className="messagebox-composer-wrap">
-                                <button
-                                    type="button"
-                                    className="messagebox-sticker-btn"
-                                    aria-label="Open quick tools"
-                                >
-                                    <span />
-                                    <span />
-                                    <span />
-                                </button>
+                                {activeConversation?.is_typing && (
+                                    <div className="messagebox-sticker-btn typing-indicator-active">
+                                        <span />
+                                        <span />
+                                        <span />
+                                    </div>
+                                )}
 
                                 <div className="messagebox-composer">
                                     <input

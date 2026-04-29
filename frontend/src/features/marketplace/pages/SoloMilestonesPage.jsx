@@ -279,9 +279,13 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
         netAmount: `$${contract?.project_cost || 0}`,
       },
 
-      split: [
-        { member: contract?.provider_full_name || "Creator", pct: "100%", amount: `$${contract?.project_cost || 0}` },
-      ],
+      split: contract?.type === 'Team' 
+        ? [
+            { member: contract?.provider_full_name || "Team Lead", pct: "100%", amount: `$${contract?.project_cost || 0}` },
+          ]
+        : [
+            { member: contract?.provider_full_name || "Creator", pct: "100%", amount: `$${contract?.project_cost || 0}` },
+          ],
     }),
     [contract],
   );
@@ -945,7 +949,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                               <button
                                 className="ms-actionBtn lime"
                                 type="button"
-                                onClick={() => handleStatusUpdate('Active', 'Start Project', 'Creator finalized and started the project.')}
+                                onClick={() => handleStatusUpdate('Active', 'Start Project', `${contract?.type === 'Team' ? 'Team' : 'Creator'} finalized and started the project.`)}
                               >
                                 Finalize & Start Project
                               </button>
@@ -1113,7 +1117,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                           </div>
                           <div className="ms-panelSub">
                             {contract?.status === 'Accepted' 
-                              ? (userType === 'creator' ? 'Client has funded escrow. You can now finalize and start the project.' : 'You have accepted the terms. Waiting for creator to start the project.')
+                              ? (userType === 'creator' ? 'Client has funded escrow. You can now finalize and start the project.' : `You have accepted the terms. Waiting for ${contract?.type === 'Team' ? 'team' : 'creator'} to start the project.`)
                               : (contract.review_turn === userType ? "It's your turn to review the latest changes." : "Waiting for the other party to review.")
                             }
                           </div>
@@ -1158,7 +1162,7 @@ export default function MilestoneBoard({ theme = "light", setTheme }) {
                    <div className="msd-head">
                     <h2 className="msd-title">{details.title}</h2>
                     <div className="msd-sub">
-                      Ordered from <b>{details.orderedFrom}</b> &nbsp;·&nbsp;
+                      Ordered from <b>{details.orderedFrom}</b> ({contract?.type || 'Solo'}) &nbsp;·&nbsp;
                       Delivery date: {details.deliveryDate}
                     </div>
                     <div className="msd-muted">Order ID: {details.orderNumber}</div>

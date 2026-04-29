@@ -37,6 +37,9 @@ class MessageController extends Controller
                     : null,
                 'preview' => $lastMessage ? $lastMessage->content : '',
                 'time' => $conv->last_message_at ? $conv->last_message_at->diffForHumans() : '',
+                'timestamp' => $conv->last_message_at ? $conv->last_message_at->timestamp : null,
+                'last_message_at' => $conv->last_message_at,
+                'is_typing' => $conv->typing_until && $conv->typing_until->isFuture() && $conv->typing_user_id !== $user->id,
                 'online' => false, // Placeholder for now
                 'other_user_id' => $otherUser->id,
                 'listing_id' => $conv->listing_id,
@@ -63,15 +66,26 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Mark other user's messages as read
+        Message::where('conversation_id', $id)
+            ->where('sender_id', '!=', $user->id)
+            ->whereNull('read_at')
+            ->update([
+                'is_read' => true,
+                'read_at' => now()
+            ]);
+
         $formattedMessages = $messages->map(function($msg) use ($user) {
             return [
                 'id' => $msg->id,
                 'sender' => $msg->sender->full_name ?? $msg->sender->username,
                 'sender_id' => $msg->sender_id,
                 'text' => $msg->content,
-                'time' => $msg->created_at->format('M d, g:i A'),
+                'time' => $msg->created_at->timestamp,
                 'is_me' => $msg->sender_id === $user->id,
                 'tone' => $msg->sender_id === $user->id ? 'light' : 'dark',
+                'is_read' => $msg->is_read || $msg->read_at !== null,
+                'read_at' => $msg->read_at ? $msg->read_at->timestamp : null,
             ];
         });
 
@@ -131,10 +145,36 @@ class MessageController extends Controller
                 'sender' => $user->full_name ?? $user->username,
                 'sender_id' => $user->id,
                 'text' => $message->content,
-                'time' => $message->created_at->format('M d, g:i A'),
+                'time' => $message->created_at->timestamp,
                 'is_me' => true,
                 'tone' => 'light',
             ]
         ]);
+    }
+
+    public function setTyping(Request $request, $id)
+    {
+        $user = $request->user();
+        $isTyping = $request->input('is_typing', false);
+
+        $conversation = Conversation::where('id', $id)
+            ->where(function($q) use ($user) {
+                $q->where('participant_one_id', $user->id)
+                  ->orWhere('participant_two_id', $user->id);
+            })->firstOrFail();
+
+        if ($isTyping) {
+            $conversation->update([
+                'typing_user_id' => $user->id,
+                'typing_until' => now()->addSeconds(5)
+            ]);
+        } else {
+            $conversation->update([
+                'typing_user_id' => null,
+                'typing_until' => null
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

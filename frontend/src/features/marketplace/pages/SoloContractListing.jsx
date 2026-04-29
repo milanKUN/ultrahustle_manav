@@ -42,22 +42,6 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
     clientReviewWindow: "",
     includedRevisionRounds: "",
     revisionTurnaroundDays: "",
-    lateDeliveryConsequence: "",
-
-    // SLA
-    deliverySLA: "",
-    communicationSLA: "",
-    revisionSLA: "",
-    qualityStandards: "",
-    clientResponsibilities: "",
-    creatorResponsibilities: "",
-
-    // Payment & escrow
-    paymentType: "",
-    projectCost: "",
-    escrowRules: "",
-
-    // Final confirmation
     finalClientName: "",
     finalCreatorName: "",
     clientAgree: false,
@@ -68,6 +52,8 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
       { id: "3", name: "Member C", role: "QA", percentage: "50%" },
     ],
   });
+
+  const userType = localStorage.getItem("userType") || "client";
 
   // ✅ Sidebar & Settings state (matching standard layout)
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -263,16 +249,9 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
       client_review_window: form.clientReviewWindow,
       revision_rounds: parseInt(form.includedRevisionRounds) || 0,
       revision_turnaround_time: form.revisionTurnaroundDays,
-      late_delivery_consequence: form.lateDeliveryConsequence,
-      delivery_sla: form.deliverySLA,
-      communication_sla: form.communicationSLA,
-      revision_sla: form.revisionSLA,
-      quality_standards: form.qualityStandards,
-      client_responsibilities: form.clientResponsibilities,
-      provider_responsibilities: form.creatorResponsibilities,
       payment_type: form.paymentType,
       project_cost: parseFloat(form.projectCost) || 0,
-      status: isReview ? "Review" : "Open",
+      status: isReview ? "Review" : "Draft",
       final_client_name: form.finalClientName,
       final_creator_name: form.finalCreatorName,
       deliverables: deliverables.map(d => ({
@@ -797,6 +776,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                           onOpen={() =>
                                               setCalendarConfig({
                                                   value: form.initialDeliveryDeadline,
+                                                  minDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
                                                   onSelect: (val) =>
                                                       setFormField(
                                                           "initialDeliveryDeadline",
@@ -863,41 +843,6 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                           }
                                       />
 
-                                      {/* Late delivery consequence */}
-                                      <SoloSelect
-                                          id="lateDeliveryConsequence"
-                                          label="Late delivery consequence"
-                                          value={form.lateDeliveryConsequence}
-                                          options={[
-                                              {
-                                                  value: "discount_5",
-                                                  label: "5% discount",
-                                              },
-                                              {
-                                                  value: "discount_10",
-                                                  label: "10% discount",
-                                              },
-                                              {
-                                                  value: "refund_partial",
-                                                  label: "Partial refund",
-                                              },
-                                              {
-                                                  value: "refund_full",
-                                                  label: "Full refund",
-                                              },
-                                              {
-                                                  value: "extend_deadline",
-                                                  label: "Extend deadline",
-                                              },
-                                          ]}
-                                          placeholder="Select"
-                                          onChange={(val) =>
-                                              handleSelectValue(
-                                                  "lateDeliveryConsequence",
-                                                  val,
-                                              )
-                                          }
-                                      />
                                   </div>
                               </div>
 
@@ -1007,10 +952,6 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                                   value: "milestone",
                                                   label: "Milestone based",
                                               },
-                                              {
-                                                  value: "hourly",
-                                                  label: "Hourly",
-                                              },
                                           ]}
                                           onChange={(val) =>
                                               handleSelectValue(
@@ -1043,92 +984,96 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                       </div>
                                   </div>
 
-                                  <div className="cnc-milestones">
-                                      <div className="cnc-del-title">
-                                          Milestones
-                                      </div>
+                                  {form.paymentType === 'milestone' && (
+                                    <div className="cnc-milestones">
+                                        <div className="cnc-del-title">
+                                            Milestones
+                                        </div>
 
-                                      {milestones.length > 0 && (
-                                          <div className="cnc-mil-header">
-                                              <label className="cnc-label">
-                                                  Milestone Name
-                                              </label>
-                                              <label className="cnc-label">
-                                                  Amount
-                                              </label>
-                                              <label className="cnc-label">
-                                                  Deadline
-                                              </label>
-                                              <div /> {/* remove btn space */}
-                                          </div>
-                                      )}
+                                        {milestones.length > 0 && (
+                                            <div className="cnc-mil-header">
+                                                <label className="cnc-label">
+                                                    Milestone Name
+                                                </label>
+                                                <label className="cnc-label">
+                                                    Amount
+                                                </label>
+                                                <label className="cnc-label">
+                                                    Deadline
+                                                </label>
+                                                <div /> {/* remove btn space */}
+                                            </div>
+                                        )}
 
-                                      {milestones.map((m, index) => (
-                                          <div
-                                              className="cnc-mil-row-wrapper"
-                                              key={m.id}
-                                          >
-                                              <div className="cnc-mil-grid">
-                                                  <input
-                                                      className="cnc-input"
-                                                      placeholder={`Milestone ${index + 1}`}
-                                                      value={m.name}
-                                                      onChange={(e) =>
-                                                          updateMilestone(
-                                                              index,
-                                                              "name",
-                                                              e.target.value,
-                                                          )
-                                                      }
-                                                  />
-                                                  <input
-                                                      className="cnc-input"
-                                                      placeholder="$1000"
-                                                      value={m.amount}
-                                                      onChange={(e) =>
-                                                          updateMilestone(
-                                                              index,
-                                                              "amount",
-                                                              e.target.value,
-                                                          )
-                                                      }
-                                                  />
-                                                  <DateInput
-                                                      label=""
-                                                      value={m.deadline}
-                                                      onOpen={() =>
-                                                          setCalendarConfig({
-                                                              value: m.deadline,
-                                                              onSelect: (val) =>
-                                                                  updateMilestone(
-                                                                      index,
-                                                                      "deadline",
-                                                                      val,
-                                                                  ),
-                                                          })
-                                                      }
-                                                  />
-                                                  <button
-                                                      type="button"
-                                                      className="cnc-mil-row-remove"
-                                                      onClick={() =>
-                                                          removeMilestone(m.id)
-                                                      }
-                                                      title="Remove milestone"
-                                                  >
-                                                      ✕
-                                                  </button>
-                                              </div>
-                                          </div>
-                                      ))}
-                                      <button
-                                          type="button"
-                                          className="cnc-addBtn mt-2"
-                                          onClick={addMilestone}
-                                      >
-                                          + Add Milestone
-                                      </button>
-                                  </div>
+                                        {milestones.map((m, index) => (
+                                            <div
+                                                className="cnc-mil-row-wrapper"
+                                                key={m.id}
+                                            >
+                                                <div className="cnc-mil-grid">
+                                                    <input
+                                                        className="cnc-input"
+                                                        placeholder={`Milestone ${index + 1}`}
+                                                        value={m.name}
+                                                        onChange={(e) =>
+                                                            updateMilestone(
+                                                                index,
+                                                                "name",
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    />
+                                                    <input
+                                                        className="cnc-input"
+                                                        placeholder="$1000"
+                                                        value={m.amount}
+                                                        onChange={(e) =>
+                                                            updateMilestone(
+                                                                index,
+                                                                "amount",
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    />
+                                                    <DateInput
+                                                        label=""
+                                                        value={m.deadline}
+                                                        onOpen={() =>
+                                                            setCalendarConfig({
+                                                                value: m.deadline,
+                                                                maxDate: form.initialDeliveryDeadline,
+                                                                minDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
+                                                                onSelect: (val) =>
+                                                                    updateMilestone(
+                                                                        index,
+                                                                        "deadline",
+                                                                        val,
+                                                                    ),
+                                                            })
+                                                        }
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="cnc-mil-row-remove"
+                                                        onClick={() =>
+                                                            removeMilestone(m.id)
+                                                        }
+                                                        title="Remove milestone"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            className="cnc-addBtn mt-2"
+                                            onClick={addMilestone}
+                                        >
+                                            + Add Milestone
+                                        </button>
+                                    </div>
+                                  )}
                               </div>
 
                               {/* Team Payout Configuration (Conditional) */}
@@ -1213,6 +1158,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                                   className="cnc-input"
                                                   placeholder="Full Name"
                                                   value={form.finalClientName}
+                                                  disabled={userType === 'creator'}
                                                   onChange={onChange(
                                                       "finalClientName",
                                                   )}
@@ -1235,16 +1181,18 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                           </label>
                                           <button
                                               type="button"
-                                              className="cnc-primaryBtn"
-                                              onClick={handleSave}
+                                              className={`cnc-primaryBtn ${userType === 'creator' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                              onClick={() => userType === 'client' && handleSave()}
+                                              disabled={userType === 'creator'}
                                           >
                                               Ready to fund escrow
                                           </button>
                                           <div className="cnc-confirmActions">
                                               <button
                                                   type="button"
-                                                  className="cnc-ghostBtn"
-                                                  onClick={() => handleSave(true)}
+                                                  className={`cnc-ghostBtn ${userType === 'creator' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                  onClick={() => userType === 'client' && handleSave(true)}
+                                                  disabled={userType === 'creator'}
                                               >
                                                   Send for review
                                               </button>
@@ -1270,6 +1218,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                                   className="cnc-input"
                                                   placeholder="Team Name"
                                                   value={form.finalCreatorName}
+                                                  disabled={userType === 'client'}
                                                   onChange={onChange(
                                                       "finalCreatorName",
                                                   )}
@@ -1291,12 +1240,13 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
                                               </span>
                                           </label>
                                           <button
-                                              type="button"
-                                              className="cnc-primaryBtn"
-                                              onClick={handleSave}
-                                          >
-                                              Accept contract
-                                          </button>
+                                               type="button"
+                                               className={`cnc-primaryBtn ${userType === 'client' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                               onClick={() => userType === 'creator' && handleSave()}
+                                               disabled={userType === 'client'}
+                                           >
+                                               Accept contract
+                                           </button>
                                           <div className="cnc-confirmActions">
                                               <button
                                                   type="button"
@@ -1354,6 +1304,8 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
           {calendarConfig && (
               <Calendar
                   initialDate={calendarConfig.value}
+                  minDate={calendarConfig.minDate}
+                  maxDate={calendarConfig.maxDate}
                   onClose={() => setCalendarConfig(null)}
                   onSelect={(date) => {
                       calendarConfig.onSelect(date);
@@ -1367,7 +1319,7 @@ export default function SoloContractListing({ theme = "light", setTheme, embedde
 
 /* ================= CALENDAR COMPONENT ================= */
 
-function Calendar({ onClose, onSelect, initialDate }) {
+function Calendar({ onClose, onSelect, initialDate, minDate, maxDate }) {
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
@@ -1512,17 +1464,34 @@ function Calendar({ onClose, onSelect, initialDate }) {
               const formatted = formatDate(day);
               const isSelected = selectedDate === formatted;
 
+              // Parse dates for comparison
+              const parse = (dStr) => {
+                if (!dStr) return null;
+                const p = dStr.split("-");
+                return new Date(p[2], p[1]-1, p[0]);
+              };
+
+              const current = new Date(year, month, day);
+              const min = parse(minDate);
+              const max = parse(maxDate);
+
+              const isDisabled = (min && current < min.setHours(0,0,0,0)) || 
+                                 (max && current > max.setHours(23,59,59,999));
+
               return (
                 <div
                   key={day}
                   onClick={() => {
+                    if (isDisabled) return;
                     setSelectedDate(formatted);
                     onSelect(formatted);
                   }}
                   className={`mx-auto w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 font-bold
                     ${isSelected
                       ? "bg-[#CEFF1B] text-black shadow-[0_0_10px_rgba(206,255,27,0.4)]"
-                      : "text-black dark:text-gray-300 hover:bg-[#CEFF1B] hover:text-black"
+                      : isDisabled
+                        ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+                        : "text-black dark:text-gray-300 hover:bg-[#CEFF1B] hover:text-black"
                     }`}
                 >
                   {day}

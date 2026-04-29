@@ -520,6 +520,46 @@
   color: #585858;
 }
 
+.messagebox-message-seen {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 10px;
+  color: #7a9d61;
+  margin-top: 4px;
+  font-weight: 600;
+  gap: 4px;
+}
+
+.messagebox-page.dark .messagebox-message-seen {
+  color: #ceff1b;
+}
+
+.messagebox-sticker-btn.typing-indicator-active {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 6px 12px;
+  margin-bottom: 4px;
+}
+
+.messagebox-sticker-btn.typing-indicator-active span {
+  width: 6px;
+  height: 6px;
+  margin: 0 2px;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing-pulse 1.4s infinite ease-in-out both;
+}
+
+.messagebox-sticker-btn.typing-indicator-active span:nth-child(1) { animation-delay: -0.32s; }
+.messagebox-sticker-btn.typing-indicator-active span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing-pulse {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1.0); }
+}
+
 .messagebox-composer-wrap {
   margin-top: auto;
   padding: 10px 18px 10px;

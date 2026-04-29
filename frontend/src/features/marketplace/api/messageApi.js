@@ -33,3 +33,8 @@ export const sendMessage = async (data) => {
     const response = await api.post("/api/v1/messages", data);
     return response.data;
 };
+
+export const setTypingStatus = async (conversationId, isTyping) => {
+    const response = await api.post(`/api/v1/conversations/${conversationId}/typing`, { is_typing: isTyping });
+    return response.data;
+};

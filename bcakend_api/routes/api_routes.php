@@ -186,6 +186,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
     Route::get('/conversations', [\App\Http\Controllers\Api\MessageController::class, 'index']);
     Route::get('/conversations/{id}/messages', [\App\Http\Controllers\Api\MessageController::class, 'show']);
+    Route::post('/conversations/{id}/typing', [\App\Http\Controllers\Api\MessageController::class, 'setTyping']);
     Route::post('/messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
 });
 Route::get('/v1/languages', [ListingController::class, 'getLanguages']);

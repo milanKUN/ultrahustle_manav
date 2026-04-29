@@ -41,6 +41,8 @@ class ContractController extends Controller
         if ($status && $status !== 'Total') {
             if ($status === 'In Review') {
                 $query->where('status', 'Review');
+            } elseif ($status === 'Drafts') {
+                $query->where('status', 'Draft');
             } else {
                 $query->where('status', $status);
             }
